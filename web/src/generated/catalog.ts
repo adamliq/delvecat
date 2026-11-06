@@ -127,6 +127,15 @@ export interface CatalogBundle {
     };
     [k: string]: unknown;
   };
+  references?: OpenReference[];
+  /**
+   * Bundles combined by `delvecat-ingest merge`.
+   */
+  mergedFrom?: {
+    instances: string[];
+    generatedAt: string;
+    source?: string;
+  }[];
 }
 export interface Instance {
   id: string;
@@ -285,6 +294,10 @@ export interface ConnectorReport {
   counts?: {
     [k: string]: number;
   };
+  /**
+   * Instance the report is about (set when bundles are merged).
+   */
+  instance?: string;
 }
 export interface ChangeSummary {
   previousGeneratedAt: string;
@@ -325,4 +338,19 @@ export interface Classification {
   sensitive?: boolean;
   propagate?: boolean;
   source?: string;
+}
+/**
+ * A reference another instance may satisfy; re-resolved by `delvecat-ingest merge`.
+ */
+export interface OpenReference {
+  known: string;
+  edgeType: EdgeType;
+  target: {
+    type: EntityType;
+    name: string;
+    app?: string;
+    pattern?: boolean;
+  };
+  knownIsFrom?: boolean;
+  origin?: "config" | "spl" | "connector" | "annotation";
 }

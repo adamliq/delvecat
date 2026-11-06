@@ -27,19 +27,13 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Build demo bundle (redacted for public hosting)
-        working-directory: ingestion
+      - name: Build demo catalog (merged, redacted for public hosting)
         env:
           DELVECAT_REDACT_SALT: delvecat-demo  # not a secret: keeps demo pseudonyms stable
         run: |
-          uv sync --locked
-          uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --shard \
-            --deployment-apps-dir ../deploy/deployment-apps \
-            --soar-fixtures tests/fixtures/soar-sample --ueba-fixtures tests/fixtures/ueba-sample \
-            --instance-name "Acme (demo)" --strict --annotations ../annotations \
-            --annotation-repo "${{ github.server_url }}/${{ github.repository }}" \
-            --annotation-branch "${{ github.ref_name }}" --redact-profile public \
-            --out ../web/public/catalog
+          (cd ingestion && uv sync --locked)
+          make demo ANNOTATION_REPO="${{ github.server_url }}/${{ github.repository }}" \
+            ANNOTATION_BRANCH="${{ github.ref_name }}" REDACT="--redact-profile public"
       - name: Build site
         working-directory: web
         run: npm ci && npm run build

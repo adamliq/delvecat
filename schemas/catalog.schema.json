@@ -106,6 +106,38 @@
           }
         }
       }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OpenReference"
+      }
+    },
+    "mergedFrom": {
+      "description": "Bundles combined by `delvecat-ingest merge`.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instances",
+          "generatedAt"
+        ],
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "generatedAt": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -552,6 +584,10 @@
           "additionalProperties": {
             "type": "integer"
           }
+        },
+        "instance": {
+          "description": "Instance the report is about (set when bundles are merged).",
+          "type": "string"
         }
       }
     },
@@ -786,6 +822,58 @@
         },
         "source": {
           "type": "string"
+        }
+      }
+    },
+    "OpenReference": {
+      "description": "A reference another instance may satisfy; re-resolved by `delvecat-ingest merge`.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "known",
+        "edgeType",
+        "target"
+      ],
+      "properties": {
+        "known": {
+          "type": "string"
+        },
+        "edgeType": {
+          "$ref": "#/$defs/EdgeType"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "name"
+          ],
+          "properties": {
+            "type": {
+              "$ref": "#/$defs/EntityType"
+            },
+            "name": {
+              "type": "string"
+            },
+            "app": {
+              "type": "string"
+            },
+            "pattern": {
+              "type": "boolean"
+            }
+          }
+        },
+        "knownIsFrom": {
+          "type": "boolean"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "config",
+            "spl",
+            "connector",
+            "annotation"
+          ]
         }
       }
     }

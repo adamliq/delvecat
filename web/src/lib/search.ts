@@ -6,6 +6,7 @@ import { effectiveDescription } from "./annotate";
 export const FACETS = {
   type: (e: Entity) => [e.type],
   product: (e: Entity) => [e.product],
+  instance: (e: Entity) => [e.instance],
   app: (e: Entity) => (e.app ? [e.app] : []),
   owner: (e: Entity) => e.annotations?.owners ?? [],
   tag: (e: Entity) => e.annotations?.tags ?? [],

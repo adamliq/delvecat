@@ -195,7 +195,7 @@ are confirmed against a live instance before their connector ships.
 | **5. Security suite** ✅ | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
 | **6. Usage & health** ✅ | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
 | **7. Governance** ✅ | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
-| Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
+| Later | Field-level lineage, Edge/Ingest Processor pipelines, NL search | |
 
 ### Phase 1 notes (done)
 
@@ -399,6 +399,24 @@ are confirmed against a live instance before their connector ships.
 - Web: Governance page ("who can see …", access matrix, exposure, consumers,
   taxonomy), governance panel on entity pages, Sensitivity facet, redaction
   notice in the footer.
+
+### Multi-instance catalogs (done)
+
+- `delvecat-ingest merge a b c ... --out catalog/` combines bundles built from
+  different instances (search heads, indexers, Deployment Server, DB Connect
+  heavy forwarders, SOAR, UBA). `build` can now produce a SOAR- or UBA-only
+  bundle.
+- Every bundle keeps the references it could not resolve plus all wildcard
+  patterns (`references`, global object types only); merge re-resolves them
+  across instances, re-links machines to hosts, clears broken-reference
+  diagnostics another instance fixes, revives objects that gained consumers,
+  folds a search head's observation-only index stubs into the configured
+  index on the indexers (when exactly one instance configures it), and
+  recomputes governance. Annotations, `--previous` versioning and redaction
+  run on the merged result; redacted bundles cannot be merged.
+- Instance ids must be unique across inputs; annotation ids include the
+  instance, so annotate objects under the instance that owns them.
+- The demo is now four instances merged (`make demo`), used by CI and Pages.
 
 ## 8. Repository layout
 

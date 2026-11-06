@@ -20,8 +20,9 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest -q
-      - name: Build demo bundle
-        run: uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --deployment-apps-dir ../deploy/deployment-apps --soar-fixtures tests/fixtures/soar-sample --ueba-fixtures tests/fixtures/ueba-sample --shard --strict --instance-name "Acme (demo)" --annotations ../annotations --out ../web/public/catalog
+      - name: Build demo catalog (four instances, merged)
+        working-directory: .
+        run: make demo
       - run: uv run delvecat-ingest validate ../web/public/catalog
       - name: Public redaction of the demo validates
         env:

@@ -15,7 +15,7 @@ from .attribute import attribute_products
 from .health import apply_usage, evaluate_health, mark_unused
 from .lineage import derive, record_unresolved
 from .link import link_hosts
-from .model import ExtractResult
+from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
 from .resolve import Resolver
 
 # Bookkeeping and human annotations never count as a change to the Splunk object.
@@ -39,6 +39,54 @@ def find_schema(start: Path | None = None, name: str = "catalog.schema.json") ->
             if candidate.is_file():
                 return candidate
     raise FileNotFoundError(f"could not find {relative}")
+
+
+# --- references kept for cross-instance merging ----------------------------------------
+
+
+def ref_to_json(ref: Ref) -> dict[str, Any]:
+    t = ref.target
+    target: dict[str, Any] = {"type": t.type, "name": t.name}
+    if t.app:
+        target["app"] = t.app
+    if t.pattern:
+        target["pattern"] = True
+    return {
+        "known": ref.known,
+        "edgeType": ref.edge_type,
+        "target": target,
+        "knownIsFrom": ref.known_is_from,
+        "origin": ref.origin,
+    }
+
+
+def ref_from_json(d: dict[str, Any]) -> Ref:
+    t = d["target"]
+    return Ref(
+        d["known"],
+        Target(t["type"], t["name"], t.get("app"), t.get("pattern", False)),
+        d["edgeType"],
+        d.get("knownIsFrom", True),
+        d.get("origin", "config"),
+    )
+
+
+def cross_instance_refs(refs: list[Ref], unresolved: list[Ref]) -> list[dict[str, Any]]:
+    """References another instance may satisfy: unresolved ones, and every wildcard pattern
+    (a role's ``web*`` should also match indexes on other indexers). Only global object
+    types, where names mean the same thing across instances."""
+    keep = {id(r) for r in unresolved}
+    out, seen = [], set()
+    for r in refs:
+        if r.target.type not in GLOBAL_TYPES or r.target.visible_only:
+            continue
+        if id(r) in keep or r.target.pattern:
+            j = ref_to_json(r)
+            key = json.dumps(j, sort_keys=True)
+            if key not in seen:
+                seen.add(key)
+                out.append(j)
+    return out
 
 
 # --- merging --------------------------------------------------------------------------
@@ -96,7 +144,7 @@ def apply_versions(
         else:
             e["firstSeenAt"] = old.get("firstSeenAt", generated_at)
             e["version"] = old.get("version", 1)
-            if old.get("contentHash") != h:
+            if (old.get("contentHash") or content_hash(old)) != h:
                 e["version"] += 1
                 modified.append(e["id"])
         e["contentHash"] = h
@@ -129,8 +177,10 @@ def assemble(
     attribute_products(entities)
     spl_refs = derive(entities)
     result.edges.extend(link_hosts(entities))
-    resolved, unresolved = Resolver(entities).resolve([*result.refs, *spl_refs])
+    all_refs = [*result.refs, *spl_refs]
+    resolved, unresolved = Resolver(entities).resolve(all_refs)
     broken = record_unresolved({e["id"]: e for e in entities}, unresolved)
+    open_refs = cross_instance_refs(all_refs, unresolved)
 
     # Drop dangling edges (e.g. to an app that was not extracted) and duplicates.
     ids = {e["id"] for e in entities}
@@ -217,6 +267,7 @@ def assemble(
         "entities": entities,
         "edges": sorted(edges, key=lambda e: (e["from"], e["type"], e["to"])),
         "ingestionReport": reports,
+        **({"references": open_refs} if open_refs else {}),
     }
     if changes is not None:
         bundle["changes"] = changes

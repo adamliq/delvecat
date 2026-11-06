@@ -24,7 +24,8 @@ from .connectors import (
 )
 from .connectors.splunk import Options
 from .governance import apply_governance
-from .model import merge_facts
+from .merge import MergeError, merge_bundles
+from .model import ExtractResult, merge_facts
 from .redaction import load_profile, redact_bundle
 from .transport import FixtureTransport, HttpTransport, RecordingTransport, Transport
 
@@ -46,14 +47,23 @@ PRODUCTS = {"deploymentServer", "dbConnect", "stream", "enterpriseSecurity"}
 
 
 def _build(args: argparse.Namespace) -> int:
+    # A bundle can come from a Splunk instance, or only from SOAR / UBA servers.
+    splunk_source = bool(args.fixtures or args.url)
+    if not splunk_source and not any(
+        getattr(args, k) for k in ("soar_url", "soar_fixtures", "ueba_url", "ueba_fixtures")
+    ):
+        print("error: give --url or --fixtures (or a SOAR / UBA source)", file=sys.stderr)
+        return 2
     transport: Transport
     if args.fixtures:
         transport = FixtureTransport(Path(args.fixtures))
-    else:
+    elif args.url:
         if not (token := _token(args.token_env)):
             return 2
         transport = HttpTransport(args.url, token, verify=_verify(args))
-    if args.record:
+    else:
+        transport = FixtureTransport(Path("/nonexistent-delvecat"))  # never queried
+    if args.record and splunk_source:
         transport = RecordingTransport(transport, Path(args.record))
 
     options = Options(
@@ -70,10 +80,16 @@ def _build(args: argparse.Namespace) -> int:
     if only and (unknown := only - set(splunk.EXTRACTORS)):
         print(f"error: unknown extractor(s): {', '.join(sorted(unknown))}", file=sys.stderr)
         return 2
-    result = splunk.extract(transport, args.instance, options, only)
+    result = (
+        splunk.extract(transport, args.instance, options, only)
+        if splunk_source
+        else ExtractResult()
+    )
     # --only narrows the run to the named platform extractors unless products are asked for.
     chosen = args.products or ("none" if only else "all")
     products = PRODUCTS if chosen == "all" else set(filter(None, chosen.split(",")))
+    if not splunk_source:
+        products = set()
     if unknown := products - PRODUCTS - {"none"}:
         print(f"error: unknown product(s): {', '.join(sorted(unknown))}", file=sys.stderr)
         return 2
@@ -156,7 +172,7 @@ def _build(args: argparse.Namespace) -> int:
     if isinstance(instance.get("properties"), dict):
         instance["properties"] = {k: v for k, v in instance["properties"].items() if v is not None}
 
-    instances = [instance, *extra_instances]
+    instances = [instance, *extra_instances] if splunk_source else extra_instances
 
     previous = None
     if args.previous:
@@ -258,6 +274,37 @@ def _redact(args: argparse.Namespace) -> int:
     return 0
 
 
+def _merge(args: argparse.Namespace) -> int:
+    try:
+        inputs = [(path, load_bundle(Path(path))) for path in args.bundles]
+        previous = (
+            load_bundle(Path(args.previous))
+            if args.previous and Path(args.previous).exists()
+            else None
+        )
+        generated_at = datetime.fromisoformat(args.generated_at) if args.generated_at else None
+        bundle = merge_bundles(inputs, generated_at, previous)
+    except (MergeError, FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    if args.annotations and (code := _annotate_into(bundle, args)) is not None:
+        return code
+    if (code := _redact_into(bundle, args)) is not None:
+        return code
+    problems = validate(bundle)
+    if problems:
+        print("merged bundle failed validation:", *problems[:50], sep="\n  ", file=sys.stderr)
+        return 1
+    files = write_bundle(bundle, Path(args.out), shard=args.shard, pretty=args.pretty)
+    report = next(r for r in bundle["ingestionReport"] if r["connector"] == "merge")
+    print(f"  merge {report['counts']}")
+    print(
+        f"wrote {files[0]}: {len(bundle['entities'])} entities, {len(bundle['edges'])} edges "
+        f"from {len(bundle['instances'])} instances"
+    )
+    return 0
+
+
 def _annotate(args: argparse.Namespace) -> int:
     if not args.annotations:
         print("error: annotate requires --annotations DIR", file=sys.stderr)
@@ -313,7 +360,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     b = sub.add_parser("build", help="extract metadata and write a catalog bundle")
-    src = b.add_mutually_exclusive_group(required=True)
+    src = b.add_mutually_exclusive_group()
     src.add_argument("--fixtures", help="directory of recorded REST responses")
     src.add_argument("--url", help="Splunk management URL, e.g. https://splunk:8089")
     b.add_argument("--instance", required=True, help="short instance id used in FQNs")
@@ -447,6 +494,22 @@ def main(argv: list[str] | None = None) -> int:
         help="exit 3 if an entry matches nothing or a term is undefined",
     )
     a.set_defaults(func=_annotate)
+
+    mg = sub.add_parser("merge", help="combine bundles from several instances into one catalog")
+    mg.add_argument("bundles", nargs="+", help="bundle files, manifests or directories")
+    annotation_args(mg)
+    redaction_args(mg)
+    mg.add_argument("--previous", help="previous merged bundle, for versions and changes")
+    mg.add_argument("--generated-at")
+    mg.add_argument(
+        "--strict",
+        action="store_true",
+        help="exit 3 if annotations match nothing (with --annotations)",
+    )
+    mg.add_argument("--out", required=True)
+    mg.add_argument("--shard", action="store_true")
+    mg.add_argument("--pretty", action="store_true")
+    mg.set_defaults(func=_merge)
 
     rd = sub.add_parser("redact", help="redact an existing bundle for publishing")
     rd.add_argument("bundle", help="bundle file, manifest or directory")

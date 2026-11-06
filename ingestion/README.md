@@ -69,6 +69,28 @@ and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
 
+## Several instances
+
+Build each instance with its own `--instance`, then merge:
+
+```bash
+uv run delvecat-ingest build --url https://sh:8089   --instance prod-sh  --out sh.json
+uv run delvecat-ingest build --url https://idx1:8089 --instance prod-idx --only serverInfo,indexes --out idx.json
+uv run delvecat-ingest build --url https://ds:8089   --instance prod-ds  --only serverInfo \
+    --products deploymentServer --deployment-apps-dir /opt/splunk/etc/deployment-apps --out ds.json
+uv run delvecat-ingest build --instance soar --soar-url https://soar.example.com --out soar.json
+uv run delvecat-ingest merge sh.json idx.json ds.json soar.json --annotations ../annotations \
+    --previous catalog/ --shard --out catalog/
+```
+
+The merge links what crosses instances: search-head searches to indexer
+indexes, role patterns to every matching index, Deployment Server inputs to
+the indexes they feed, deployment clients and forwarders to the hosts in the
+data, ES detections to SOAR labels, UBA data sources to Splunk indexes. Names
+of global objects (indexes, sourcetypes, hosts, SOAR labels) are matched
+across instances; an index name configured on several indexer clusters links
+to all of them. Merge unredacted bundles and redact the result.
+
 ## Publishing safely
 
 Bundles can be redacted before they go anywhere public:

@@ -35,7 +35,7 @@ Requires [uv](https://docs.astral.sh/uv/) and Node 22+.
 
 ```bash
 make install
-make dev      # builds the demo bundle (recorded from a real Splunk 9.4) and starts Vite
+make dev      # builds the demo catalog (four instances, merged) and starts Vite
 make test     # lint + tests for both packages
 ```
 
@@ -48,6 +48,8 @@ cd ingestion && uv run delvecat-ingest build --url https://splunk.example.com:80
 ```
 
 Splunk Cloud: add `--acs-stack <stack>` (ACS token in `DELVECAT_ACS_TOKEN`).
+Several instances (search heads, indexers, Deployment Server, SOAR, ...): build
+each with its own `--instance` and combine them with `delvecat-ingest merge`.
 See [ingestion/README.md](ingestion/README.md) for all options.
 
 ### Local Splunk for development

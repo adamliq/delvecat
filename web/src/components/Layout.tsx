@@ -66,6 +66,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <>
             Bundle generated {new Date(state.catalog.bundle.generatedAt).toLocaleString()} · source{" "}
             <code>{state.origin}</code> · read-only snapshot
+            {state.catalog.bundle.mergedFrom && <> · merged from {state.catalog.bundle.mergedFrom.length} bundles</>}
             {state.catalog.bundle.redaction && (
               <> · <strong>redacted ({String(state.catalog.bundle.redaction.profile)} profile)</strong>: user and host names are pseudonyms</>
             )}

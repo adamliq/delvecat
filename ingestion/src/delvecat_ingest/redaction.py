@@ -221,5 +221,8 @@ def redact_bundle(
         bundle["entities"] = _mask_ips(bundle["entities"])
         bundle["instances"] = _mask_ips(bundle["instances"])
 
+    # Kept only so `merge` can link instances; they hold raw names, and a redacted bundle
+    # cannot be merged anyway.
+    bundle.pop("references", None)
     bundle["redaction"] = {"profile": profile.name, "stablePseudonyms": stable, "counts": counts}
     return counts

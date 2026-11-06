@@ -12,6 +12,7 @@ const FACET_PREVIEW = 8;
 const FACET_TITLES: Record<Facet, string> = {
   type: "Type",
   product: "Product",
+  instance: "Instance",
   app: "App",
   owner: "Owner",
   tag: "Tag",
@@ -26,7 +27,10 @@ const FACET_TITLES: Record<Facet, string> = {
   usage: "Usage",
 };
 
+let instanceNames: Record<string, string> = {};
+
 function valueLabel(facet: Facet, value: string): string {
+  if (facet === "instance") return instanceNames[value] ?? value;
   if (facet === "type") return pluralTypeLabel(value as EntityType);
   if (facet === "product") return PRODUCT_LABELS[value as Product] ?? value;
   return value;
@@ -64,7 +68,8 @@ function FacetBox({ facet, counts, selected, onToggle }: {
 }
 
 export function SearchPage() {
-  const { search } = useCatalog();
+  const { search, catalog } = useCatalog();
+  instanceNames = Object.fromEntries(catalog.bundle.instances.map((i) => [i.id, i.name]));
   const [params, setParams] = useSearchParams();
   const [limit, setLimit] = useState(PAGE);
   const q = params.get("q") ?? "";
