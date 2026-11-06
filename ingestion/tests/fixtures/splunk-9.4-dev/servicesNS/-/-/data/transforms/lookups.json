@@ -61,7 +61,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners"
    },
    "name": "asset_owners",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:03+00:00"
   },
   {
    "acl": {
@@ -372,7 +372,7 @@
     "remove": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup"
    },
    "name": "threat_hosts_lookup",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:03+00:00"
   }
  ],
  "generator": {
@@ -384,5 +384,5 @@
   "offset": 0,
   "total": 6
  },
- "updated": "2026-11-06T05:43:47+00:00"
+ "updated": "2026-11-06T07:34:37+00:00"
 }

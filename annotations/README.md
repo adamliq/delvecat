@@ -38,6 +38,17 @@ glossary:
     synonyms: [shop]
 ```
 
+Classifications can be defined once in a taxonomy (see `classifications.yaml`):
+
+```yaml
+classifications:
+  - name: PII            # also covers PII.Email, PII.IPAddress, ...
+    sensitive: true      # counts for "who can see sensitive data"
+    propagate: true      # carried to data derived from it through lineage
+```
+
+Undefined classifications count as sensitive and propagate.
+
 Rules:
 
 - Selector (`match`) entries are applied first, in file order, then `id`

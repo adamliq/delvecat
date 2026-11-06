@@ -23,6 +23,12 @@ jobs:
       - name: Build demo bundle
         run: uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --deployment-apps-dir ../deploy/deployment-apps --soar-fixtures tests/fixtures/soar-sample --ueba-fixtures tests/fixtures/ueba-sample --shard --strict --instance-name "Acme (demo)" --annotations ../annotations --out ../web/public/catalog
       - run: uv run delvecat-ingest validate ../web/public/catalog
+      - name: Public redaction of the demo validates
+        env:
+          DELVECAT_REDACT_SALT: ci
+        run: |
+          uv run delvecat-ingest redact ../web/public/catalog --redact-profile public --out /tmp/public.json
+          uv run delvecat-ingest validate /tmp/public.json
       - name: Annotations are valid and all match an object
         run: uv run delvecat-ingest lint-annotations ../annotations --bundle ../web/public/catalog
       - uses: actions/upload-artifact@v4

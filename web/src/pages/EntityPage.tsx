@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
+import { GovernancePanel } from "../components/GovernancePanel";
 import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
@@ -160,6 +161,8 @@ export function EntityPage() {
           </dl>
 
           {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
+
+          <GovernancePanel catalog={catalog} entity={entity} />
 
           <UsagePanel entity={entity} />
 

@@ -75,9 +75,9 @@
   },
   {
    "app": "TA-acme-firewall",
-   "last": "1793942591.132304",
+   "last": "1793950407.671740",
    "provenance": "N/A",
-   "runs": "12",
+   "runs": "13",
    "search": "'| makeresults count=2 | streamstats count | eval ip=\"10.0.0.\".count, owner=if(count=1,\"netops\",\"web\") | table ip owner | outputlookup asset_owners.csv'",
    "users": "1"
   },
@@ -99,18 +99,18 @@
   },
   {
    "app": "SplunkDeploymentServerConfig",
-   "last": "1793937284.200799",
+   "last": "1793944091.144956",
    "provenance": "N/A",
-   "runs": "8",
-   "search": "'| tstats prestats=t latest(data.lastPhoneHomeTime) values(data.lastPhoneHomeTime) latest(data.updaterRunning) where index=_dsphonehome earliest=1793936762 latest=now `filter_by_client_id(\"\")` by data.clientId ``` Obtain phonehome values to calculate average PH time.``` \n```Obtain data from dsclient index to enrich phonehome data with client information.``` \n| tstats prestats=t append=t latest(data.build) latest(data.connectionId) latest(data.dns) \n           latest(data.guid) latest(data.hostname) latest(data.instanceId) \n           latest(data.instanceName) latest(data.ip) latest(data.mgmt) latest(data.name) latest(data.package) \n           latest(data.packageType) latest(data.splunkVersion) latest(data.utsname) where index=_dsclient earliest=1 latest=now `filter_by_client_id(\"\")` by \n           data.clientId \n```Instead of doing join operation on dsclient index, previous tstats queries obtain data from relevant indexes and merge them with stats command.``` \n| stats latest(data.lastPhoneHomeTime) as lastPhoneHomeTime values(data.lastPhoneHomeTime) as allphs latest(data.updaterRunning) as updaterRunning latest(data.build) as data.build latest(data.connectionId) as data.connectionId latest(data.dns) as data.dns \n           latest(data.guid) as data.guid latest(data.hostname) as data.hostname latest(data.instanceId) as data.instanceId \n           latest(data.instanceName) as data.instanceName latest(data.ip) as data.ip latest(data.mgmt) as data.mgmt latest(data.name) as data.name latest(data.package) as data.package \n           latest(data.packageType) as data.packageType latest(data.splunkVersion) as data.splunkVersion latest(data.utsname) as data.utsname by data.clientId \n```Discard entries from dsclient that do not have a matching entry from dsphonehome index. This emulates join operation.``` \n```A reverse is not necessary - every client that stored phonehome data will have a corresponding entry in dsclient index.``` \n| where lastPhoneHomeTime!=\"\" \n| search `filter_by_phonehome(0)` \n```Obtain time after the initial processing of the phonehomes is finished.``` \n```Extract last 4 phonehomes and calculate averagePhoneHomeInterval``` \n| eval last4phs=mvindex(allphs,-4,-1) \n``` First phoneHome is the oldest one``` \n| eval oldestph=mvindex(last4phs,0) \n| eval newestph=mvindex(last4phs,-1) \n| eval deltacount=max(1,mvcount(last4phs)-1) \n| eval averagePhoneHomeInterval=floor((newestph-oldestph)/deltacount) \n```Use time() instead of now(), since now() runs at the beginning of search which makes it possible for lastPhoneHomeTime > now``` \n```Use floor() to discard millisecond resolution``` \n| eval actual_ratio=(floor(time())-lastPhoneHomeTime)/averagePhoneHomeInterval \n| search `filter_by_ratio(\"\", 0)` \n| fields - allphs oldestph newestph deltacount last4phs \n```Enrich client data with its latest applications data``` \n| join data.clientId type=left max=0 [ \n    ```Obtain latest application status.``` \n    | tstats latest(data.appName) as appName latest(data.serverClassName) as serverClassName \n      latest(data.action) as action latest(data.result) as result latest(data.failedReason) as failedReason \n      latest(data.checksum) as checksum latest(data.timestamp) as timestamp latest(data.clientId) \n      as data.clientId where index=_dsappevent earliest=1793936762 latest=now \n      `filter_by_client_id(\"\")` `filter_by_app(\"\")` `filter_by_action(\"\")` `filter_by_checksum(0)` \n      `filter_by_error(\"\")` by data.key \n    | stats list(appName) as appName list(serverClassName) as serverClassName \n      list(action) as action list(result) as result list(failedReason) as failedReason \n      list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId \n    | eval appName=mvjoin(appName, \"#\") \n    | eval serverClassName=mvjoin(serverClassName, \"#\") \n    | eval action=mvjoin(action, \"#\") \n    | eval result=mvjoin(result, \"#\") \n    | eval failedReason=mvjoin(failedReason, \"#\") \n    | eval checksum=mvjoin(checksum, \"#\") \n    | eval timestamp=mvjoin(timestamp, \"#\") \n    ] \n| eval appName=split(appName, \"#\") \n| eval serverClassName=split(serverClassName, \"#\") \n| eval action=split(action, \"#\") \n| eval result=split(result, \"#\") \n| eval failedReason=split(failedReason, \"#\") \n| eval checksum=split(checksum, \"#\") \n| eval timestamp=split(timestamp, \"#\") \n| search `filter_by_app_count(\"\")` \n| rename data.* as *'",
+   "runs": "10",
+   "search": "'| tstats prestats=t latest(data.lastPhoneHomeTime) values(data.lastPhoneHomeTime) latest(data.updaterRunning) where index=_dsphonehome earliest=1793942576 latest=now `filter_by_client_id(\"\")` by data.clientId ``` Obtain phonehome values to calculate average PH time.``` \n```Obtain data from dsclient index to enrich phonehome data with client information.``` \n| tstats prestats=t append=t latest(data.build) latest(data.connectionId) latest(data.dns) \n           latest(data.guid) latest(data.hostname) latest(data.instanceId) \n           latest(data.instanceName) latest(data.ip) latest(data.mgmt) latest(data.name) latest(data.package) \n           latest(data.packageType) latest(data.splunkVersion) latest(data.utsname) where index=_dsclient earliest=1 latest=now `filter_by_client_id(\"\")` by \n           data.clientId \n```Instead of doing join operation on dsclient index, previous tstats queries obtain data from relevant indexes and merge them with stats command.``` \n| stats latest(data.lastPhoneHomeTime) as lastPhoneHomeTime values(data.lastPhoneHomeTime) as allphs latest(data.updaterRunning) as updaterRunning latest(data.build) as data.build latest(data.connectionId) as data.connectionId latest(data.dns) as data.dns \n           latest(data.guid) as data.guid latest(data.hostname) as data.hostname latest(data.instanceId) as data.instanceId \n           latest(data.instanceName) as data.instanceName latest(data.ip) as data.ip latest(data.mgmt) as data.mgmt latest(data.name) as data.name latest(data.package) as data.package \n           latest(data.packageType) as data.packageType latest(data.splunkVersion) as data.splunkVersion latest(data.utsname) as data.utsname by data.clientId \n```Discard entries from dsclient that do not have a matching entry from dsphonehome index. This emulates join operation.``` \n```A reverse is not necessary - every client that stored phonehome data will have a corresponding entry in dsclient index.``` \n| where lastPhoneHomeTime!=\"\" \n| search `filter_by_phonehome(0)` \n```Obtain time after the initial processing of the phonehomes is finished.``` \n```Extract last 4 phonehomes and calculate averagePhoneHomeInterval``` \n| eval last4phs=mvindex(allphs,-4,-1) \n``` First phoneHome is the oldest one``` \n| eval oldestph=mvindex(last4phs,0) \n| eval newestph=mvindex(last4phs,-1) \n| eval deltacount=max(1,mvcount(last4phs)-1) \n| eval averagePhoneHomeInterval=floor((newestph-oldestph)/deltacount) \n```Use time() instead of now(), since now() runs at the beginning of search which makes it possible for lastPhoneHomeTime > now``` \n```Use floor() to discard millisecond resolution``` \n| eval actual_ratio=(floor(time())-lastPhoneHomeTime)/averagePhoneHomeInterval \n| search `filter_by_ratio(\"\", 0)` \n| fields - allphs oldestph newestph deltacount last4phs \n```Enrich client data with its latest applications data``` \n| join data.clientId type=left max=0 [ \n    ```Obtain latest application status.``` \n    | tstats latest(data.appName) as appName latest(data.serverClassName) as serverClassName \n      latest(data.action) as action latest(data.result) as result latest(data.failedReason) as failedReason \n      latest(data.checksum) as checksum latest(data.timestamp) as timestamp latest(data.clientId) \n      as data.clientId where index=_dsappevent earliest=1793942576 latest=now \n      `filter_by_client_id(\"\")` `filter_by_app(\"\")` `filter_by_action(\"\")` `filter_by_checksum(0)` \n      `filter_by_error(\"\")` by data.key \n    | stats list(appName) as appName list(serverClassName) as serverClassName \n      list(action) as action list(result) as result list(failedReason) as failedReason \n      list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId \n    | eval appName=mvjoin(appName, \"#\") \n    | eval serverClassName=mvjoin(serverClassName, \"#\") \n    | eval action=mvjoin(action, \"#\") \n    | eval result=mvjoin(result, \"#\") \n    | eval failedReason=mvjoin(failedReason, \"#\") \n    | eval checksum=mvjoin(checksum, \"#\") \n    | eval timestamp=mvjoin(timestamp, \"#\") \n    ] \n| eval appName=split(appName, \"#\") \n| eval serverClassName=split(serverClassName, \"#\") \n| eval action=split(action, \"#\") \n| eval result=split(result, \"#\") \n| eval failedReason=split(failedReason, \"#\") \n| eval checksum=split(checksum, \"#\") \n| eval timestamp=split(timestamp, \"#\") \n| search `filter_by_app_count(\"\")` \n| rename data.* as *'",
    "users": "1"
   },
   {
    "app": "SplunkDeploymentServerConfig",
-   "last": "1793943821.132628",
+   "last": "1793937284.200799",
    "provenance": "N/A",
    "runs": "8",
-   "search": "'| tstats prestats=t latest(data.lastPhoneHomeTime) values(data.lastPhoneHomeTime) latest(data.updaterRunning) where index=_dsphonehome earliest=1793942576 latest=now `filter_by_client_id(\"\")` by data.clientId ``` Obtain phonehome values to calculate average PH time.``` \n```Obtain data from dsclient index to enrich phonehome data with client information.``` \n| tstats prestats=t append=t latest(data.build) latest(data.connectionId) latest(data.dns) \n           latest(data.guid) latest(data.hostname) latest(data.instanceId) \n           latest(data.instanceName) latest(data.ip) latest(data.mgmt) latest(data.name) latest(data.package) \n           latest(data.packageType) latest(data.splunkVersion) latest(data.utsname) where index=_dsclient earliest=1 latest=now `filter_by_client_id(\"\")` by \n           data.clientId \n```Instead of doing join operation on dsclient index, previous tstats queries obtain data from relevant indexes and merge them with stats command.``` \n| stats latest(data.lastPhoneHomeTime) as lastPhoneHomeTime values(data.lastPhoneHomeTime) as allphs latest(data.updaterRunning) as updaterRunning latest(data.build) as data.build latest(data.connectionId) as data.connectionId latest(data.dns) as data.dns \n           latest(data.guid) as data.guid latest(data.hostname) as data.hostname latest(data.instanceId) as data.instanceId \n           latest(data.instanceName) as data.instanceName latest(data.ip) as data.ip latest(data.mgmt) as data.mgmt latest(data.name) as data.name latest(data.package) as data.package \n           latest(data.packageType) as data.packageType latest(data.splunkVersion) as data.splunkVersion latest(data.utsname) as data.utsname by data.clientId \n```Discard entries from dsclient that do not have a matching entry from dsphonehome index. This emulates join operation.``` \n```A reverse is not necessary - every client that stored phonehome data will have a corresponding entry in dsclient index.``` \n| where lastPhoneHomeTime!=\"\" \n| search `filter_by_phonehome(0)` \n```Obtain time after the initial processing of the phonehomes is finished.``` \n```Extract last 4 phonehomes and calculate averagePhoneHomeInterval``` \n| eval last4phs=mvindex(allphs,-4,-1) \n``` First phoneHome is the oldest one``` \n| eval oldestph=mvindex(last4phs,0) \n| eval newestph=mvindex(last4phs,-1) \n| eval deltacount=max(1,mvcount(last4phs)-1) \n| eval averagePhoneHomeInterval=floor((newestph-oldestph)/deltacount) \n```Use time() instead of now(), since now() runs at the beginning of search which makes it possible for lastPhoneHomeTime > now``` \n```Use floor() to discard millisecond resolution``` \n| eval actual_ratio=(floor(time())-lastPhoneHomeTime)/averagePhoneHomeInterval \n| search `filter_by_ratio(\"\", 0)` \n| fields - allphs oldestph newestph deltacount last4phs \n```Enrich client data with its latest applications data``` \n| join data.clientId type=left max=0 [ \n    ```Obtain latest application status.``` \n    | tstats latest(data.appName) as appName latest(data.serverClassName) as serverClassName \n      latest(data.action) as action latest(data.result) as result latest(data.failedReason) as failedReason \n      latest(data.checksum) as checksum latest(data.timestamp) as timestamp latest(data.clientId) \n      as data.clientId where index=_dsappevent earliest=1793942576 latest=now \n      `filter_by_client_id(\"\")` `filter_by_app(\"\")` `filter_by_action(\"\")` `filter_by_checksum(0)` \n      `filter_by_error(\"\")` by data.key \n    | stats list(appName) as appName list(serverClassName) as serverClassName \n      list(action) as action list(result) as result list(failedReason) as failedReason \n      list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId \n    | eval appName=mvjoin(appName, \"#\") \n    | eval serverClassName=mvjoin(serverClassName, \"#\") \n    | eval action=mvjoin(action, \"#\") \n    | eval result=mvjoin(result, \"#\") \n    | eval failedReason=mvjoin(failedReason, \"#\") \n    | eval checksum=mvjoin(checksum, \"#\") \n    | eval timestamp=mvjoin(timestamp, \"#\") \n    ] \n| eval appName=split(appName, \"#\") \n| eval serverClassName=split(serverClassName, \"#\") \n| eval action=split(action, \"#\") \n| eval result=split(result, \"#\") \n| eval failedReason=split(failedReason, \"#\") \n| eval checksum=split(checksum, \"#\") \n| eval timestamp=split(timestamp, \"#\") \n| search `filter_by_app_count(\"\")` \n| rename data.* as *'",
+   "search": "'| tstats prestats=t latest(data.lastPhoneHomeTime) values(data.lastPhoneHomeTime) latest(data.updaterRunning) where index=_dsphonehome earliest=1793936762 latest=now `filter_by_client_id(\"\")` by data.clientId ``` Obtain phonehome values to calculate average PH time.``` \n```Obtain data from dsclient index to enrich phonehome data with client information.``` \n| tstats prestats=t append=t latest(data.build) latest(data.connectionId) latest(data.dns) \n           latest(data.guid) latest(data.hostname) latest(data.instanceId) \n           latest(data.instanceName) latest(data.ip) latest(data.mgmt) latest(data.name) latest(data.package) \n           latest(data.packageType) latest(data.splunkVersion) latest(data.utsname) where index=_dsclient earliest=1 latest=now `filter_by_client_id(\"\")` by \n           data.clientId \n```Instead of doing join operation on dsclient index, previous tstats queries obtain data from relevant indexes and merge them with stats command.``` \n| stats latest(data.lastPhoneHomeTime) as lastPhoneHomeTime values(data.lastPhoneHomeTime) as allphs latest(data.updaterRunning) as updaterRunning latest(data.build) as data.build latest(data.connectionId) as data.connectionId latest(data.dns) as data.dns \n           latest(data.guid) as data.guid latest(data.hostname) as data.hostname latest(data.instanceId) as data.instanceId \n           latest(data.instanceName) as data.instanceName latest(data.ip) as data.ip latest(data.mgmt) as data.mgmt latest(data.name) as data.name latest(data.package) as data.package \n           latest(data.packageType) as data.packageType latest(data.splunkVersion) as data.splunkVersion latest(data.utsname) as data.utsname by data.clientId \n```Discard entries from dsclient that do not have a matching entry from dsphonehome index. This emulates join operation.``` \n```A reverse is not necessary - every client that stored phonehome data will have a corresponding entry in dsclient index.``` \n| where lastPhoneHomeTime!=\"\" \n| search `filter_by_phonehome(0)` \n```Obtain time after the initial processing of the phonehomes is finished.``` \n```Extract last 4 phonehomes and calculate averagePhoneHomeInterval``` \n| eval last4phs=mvindex(allphs,-4,-1) \n``` First phoneHome is the oldest one``` \n| eval oldestph=mvindex(last4phs,0) \n| eval newestph=mvindex(last4phs,-1) \n| eval deltacount=max(1,mvcount(last4phs)-1) \n| eval averagePhoneHomeInterval=floor((newestph-oldestph)/deltacount) \n```Use time() instead of now(), since now() runs at the beginning of search which makes it possible for lastPhoneHomeTime > now``` \n```Use floor() to discard millisecond resolution``` \n| eval actual_ratio=(floor(time())-lastPhoneHomeTime)/averagePhoneHomeInterval \n| search `filter_by_ratio(\"\", 0)` \n| fields - allphs oldestph newestph deltacount last4phs \n```Enrich client data with its latest applications data``` \n| join data.clientId type=left max=0 [ \n    ```Obtain latest application status.``` \n    | tstats latest(data.appName) as appName latest(data.serverClassName) as serverClassName \n      latest(data.action) as action latest(data.result) as result latest(data.failedReason) as failedReason \n      latest(data.checksum) as checksum latest(data.timestamp) as timestamp latest(data.clientId) \n      as data.clientId where index=_dsappevent earliest=1793936762 latest=now \n      `filter_by_client_id(\"\")` `filter_by_app(\"\")` `filter_by_action(\"\")` `filter_by_checksum(0)` \n      `filter_by_error(\"\")` by data.key \n    | stats list(appName) as appName list(serverClassName) as serverClassName \n      list(action) as action list(result) as result list(failedReason) as failedReason \n      list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId \n    | eval appName=mvjoin(appName, \"#\") \n    | eval serverClassName=mvjoin(serverClassName, \"#\") \n    | eval action=mvjoin(action, \"#\") \n    | eval result=mvjoin(result, \"#\") \n    | eval failedReason=mvjoin(failedReason, \"#\") \n    | eval checksum=mvjoin(checksum, \"#\") \n    | eval timestamp=mvjoin(timestamp, \"#\") \n    ] \n| eval appName=split(appName, \"#\") \n| eval serverClassName=split(serverClassName, \"#\") \n| eval action=split(action, \"#\") \n| eval result=split(result, \"#\") \n| eval failedReason=split(failedReason, \"#\") \n| eval checksum=split(checksum, \"#\") \n| eval timestamp=split(timestamp, \"#\") \n| search `filter_by_app_count(\"\")` \n| rename data.* as *'",
    "users": "1"
   },
   {
@@ -122,27 +122,27 @@
    "users": "1"
   },
   {
-   "app": "search",
-   "last": "1793942861.163299",
-   "provenance": "N/A",
-   "runs": "4",
-   "search": "'search (index=* OR index=_*) sourcetype=\"splunkd\" | head 1000 | fieldsummary maxvals=0 | fields field count distinct_count numeric_count'",
-   "users": "1"
-  },
-  {
    "app": "splunk_monitoring_console",
-   "last": "1793942591.128867",
+   "last": "1793950407.666742",
    "provenance": "N/A",
-   "runs": "4",
+   "runs": "5",
    "search": "' | rest /services/search/distributed/groups splunk_server=local | fields + title, member | where isnotnull(mvfind(member,\"localhost:localhost\")) | eval peerURI=\"localhost\" | rename title as search_groups | fields + peerURI, search_groups | mvcombine delim=\" \" search_groups'",
    "users": "1"
   },
   {
    "app": "splunk_monitoring_console",
-   "last": "1793942591.133098",
+   "last": "1793950407.673014",
+   "provenance": "N/A",
+   "runs": "5",
+   "search": "' | rest /services/server/info splunk_server=local | eval peerURI=\"localhost\" | eval server_roles=\"indexer,search_head,license_master,kv_store\" | makemv delim=\",\" server_roles | mvexpand server_roles | eval computed_search_groups=(\"dmc_group_\" . server_roles) | stats first(peerURI) AS peerURI first(host) AS host first(host_fqdn) AS machine values(computed_search_groups) AS computed_search_groups by serverName | join type=outer peerURI [ | rest /services/search/distributed/groups splunk_server=local | fields + title, member | where isnotnull(mvfind(member,\"localhost:localhost\")) | eval peerURI=\"localhost\" | rename title as search_groups | fields + peerURI, search_groups | mvcombine delim=\" \" search_groups] | makemv delim=\" \" search_groups | eval search_groups=if(isnotnull(search_groups),search_groups,computed_search_groups) | fields - computed_search_groups | mvexpand search_groups | rename search_groups as search_group'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793942861.163299",
    "provenance": "N/A",
    "runs": "4",
-   "search": "' | rest /services/server/info splunk_server=local | eval peerURI=\"localhost\" | eval server_roles=\"indexer,search_head,license_master,kv_store\" | makemv delim=\",\" server_roles | mvexpand server_roles | eval computed_search_groups=(\"dmc_group_\" . server_roles) | stats first(peerURI) AS peerURI first(host) AS host first(host_fqdn) AS machine values(computed_search_groups) AS computed_search_groups by serverName | join type=outer peerURI [ | rest /services/search/distributed/groups splunk_server=local | fields + title, member | where isnotnull(mvfind(member,\"localhost:localhost\")) | eval peerURI=\"localhost\" | rename title as search_groups | fields + peerURI, search_groups | mvcombine delim=\" \" search_groups] | makemv delim=\" \" search_groups | eval search_groups=if(isnotnull(search_groups),search_groups,computed_search_groups) | fields - computed_search_groups | mvexpand search_groups | rename search_groups as search_group'",
+   "search": "'search (index=* OR index=_*) sourcetype=\"splunkd\" | head 1000 | fieldsummary maxvals=0 | fields field count distinct_count numeric_count'",
    "users": "1"
   },
   {
@@ -195,6 +195,54 @@
   },
   {
    "app": "search",
+   "last": "1793950407.665281",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"db_orders\" sourcetype=\"mysql:orders\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950407.661546",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"firewall\" sourcetype=\"acme:fw\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950407.670364",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"stream\" sourcetype=\"stream:dns\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950407.683282",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"stream\" sourcetype=\"stream:http\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950407.680386",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"web\" sourcetype=\"access_combined\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950407.677721",
+   "provenance": "N/A",
+   "runs": "3",
+   "search": "'| tstats count where index=\"wineventlog\" sourcetype=\"WinEventLog:Security\"'",
+   "users": "1"
+  },
+  {
+   "app": "search",
    "last": "1793930399.861523",
    "provenance": "N/A",
    "runs": "2",
@@ -202,51 +250,19 @@
    "users": "1"
   },
   {
-   "app": "search",
-   "last": "1793942591.125341",
-   "provenance": "N/A",
+   "app": "system",
+   "last": "1793944361.116712",
+   "provenance": "summary_director",
    "runs": "2",
-   "search": "'| tstats count where index=\"db_orders\" sourcetype=\"mysql:orders\"'",
+   "search": "'summarize maintain=\"%22SUMMARY_ID%22%2C%22EARLIEST_TIME%22%2C%22REMOTE_SEARCH%22%2C%22NORM_SUMMARY_ID%22%2C%22NORM_REMOTE_SEARCH%22%0A\" summaryprefix=\"93D348A9-E8C3-401C-9360-FD5FFB5B0B89\"'",
    "users": "1"
   },
   {
-   "app": "search",
-   "last": "1793942591.131065",
-   "provenance": "N/A",
+   "app": "system",
+   "last": "1793944361.117900",
+   "provenance": "summary_director",
    "runs": "2",
-   "search": "'| tstats count where index=\"firewall\" sourcetype=\"acme:fw\"'",
-   "users": "1"
-  },
-  {
-   "app": "search",
-   "last": "1793942591.121703",
-   "provenance": "N/A",
-   "runs": "2",
-   "search": "'| tstats count where index=\"stream\" sourcetype=\"stream:dns\"'",
-   "users": "1"
-  },
-  {
-   "app": "search",
-   "last": "1793942591.135511",
-   "provenance": "N/A",
-   "runs": "2",
-   "search": "'| tstats count where index=\"stream\" sourcetype=\"stream:http\"'",
-   "users": "1"
-  },
-  {
-   "app": "search",
-   "last": "1793942591.118870",
-   "provenance": "N/A",
-   "runs": "2",
-   "search": "'| tstats count where index=\"web\" sourcetype=\"access_combined\"'",
-   "users": "1"
-  },
-  {
-   "app": "search",
-   "last": "1793942591.127995",
-   "provenance": "N/A",
-   "runs": "2",
-   "search": "'| tstats count where index=\"wineventlog\" sourcetype=\"WinEventLog:Security\"'",
+   "search": "'summarize tstats=t maintain=\"\" summaryprefix=\"93D348A9-E8C3-401C-9360-FD5FFB5B0B89\"'",
    "users": "1"
   },
   {
@@ -491,6 +507,22 @@
   },
   {
    "app": "SplunkDeploymentServerConfig",
+   "last": "1793943851.132294",
+   "provenance": "N/A",
+   "runs": "1",
+   "search": "' | tstats summariesonly=false allow_old_summaries=false latest(\"data.appName\") as appName, latest(\"data.serverClassName\") as serverClassName, latest(\"data.action\") as action, latest(\"data.result\") as result, latest(\"data.failedReason\") as failedReason, latest(\"data.checksum\") as checksum, latest(\"data.timestamp\") as timestamp, latest(\"data.clientId\") as \"data.clientId\" WHERE (index=_dsappevent _time>=1793942576.000 _time<1793943831.000) BY \"data.key\" | stats list(appName) as appName list(serverClassName) as serverClassName        list(action) as action list(result) as result list(failedReason) as failedReason        list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId | eval appName=mvjoin(appName,\"#\") | eval serverClassName=mvjoin(serverClassName,\"#\") | eval action=mvjoin(action,\"#\") | eval result=mvjoin(result,\"#\") | eval failedReason=mvjoin(failedReason,\"#\") | eval checksum=mvjoin(checksum,\"#\") | eval timestamp=mvjoin(timestamp,\"#\")'",
+   "users": "1"
+  },
+  {
+   "app": "SplunkDeploymentServerConfig",
+   "last": "1793944091.138809",
+   "provenance": "N/A",
+   "runs": "1",
+   "search": "' | tstats summariesonly=false allow_old_summaries=false latest(\"data.appName\") as appName, latest(\"data.serverClassName\") as serverClassName, latest(\"data.action\") as action, latest(\"data.result\") as result, latest(\"data.failedReason\") as failedReason, latest(\"data.checksum\") as checksum, latest(\"data.timestamp\") as timestamp, latest(\"data.clientId\") as \"data.clientId\" WHERE (index=_dsappevent _time>=1793942576.000 _time<1793944065.000) BY \"data.key\" | stats list(appName) as appName list(serverClassName) as serverClassName        list(action) as action list(result) as result list(failedReason) as failedReason        list(checksum) as checksum list(timestamp) as timestamp count(appName) as countApps by data.clientId | eval appName=mvjoin(appName,\"#\") | eval serverClassName=mvjoin(serverClassName,\"#\") | eval action=mvjoin(action,\"#\") | eval result=mvjoin(result,\"#\") | eval failedReason=mvjoin(failedReason,\"#\") | eval checksum=mvjoin(checksum,\"#\") | eval timestamp=mvjoin(timestamp,\"#\")'",
+   "users": "1"
+  },
+  {
+   "app": "SplunkDeploymentServerConfig",
    "last": "1793936774.196198",
    "provenance": "N/A",
    "runs": "1",
@@ -559,6 +591,14 @@
    "provenance": "N/A",
    "runs": "1",
    "search": "'search earliest_time=-7d splunk_server=local index=_audit sid trigger_time action=alert_* (expiration>1793942541 OR NOT expiration=*) | rex \",\\s*ss_name=\\\"(?<ss_name>(?:[^\\\"]+|\\\"(?!,\\s*sid=))*)\\\",\\s*sid=\\\"\"| rex \",\\s*sid=\\\"(?<sid>.*)\\\",\\s+\\w+_\\w+=\" | stats sum(deleted) AS deleted,    list(alert_actions) AS alert_actions, list(severity) AS severity,   list(expiration) AS expiration    list(ss_name) AS ss_name,   list(ss_app) AS ss_app,           list(ss_user) AS ss_user   list(digest_mode) AS digest_mode, list(triggered_alerts) AS triggered_alerts  BY sid, trigger_time | search NOT deleted=* OR deleted=0 | fields - deleted '",
+   "users": "1"
+  },
+  {
+   "app": "search",
+   "last": "1793950377.628370",
+   "provenance": "N/A",
+   "runs": "1",
+   "search": "'search earliest_time=-7d splunk_server=local index=_audit sid trigger_time action=alert_* (expiration>1793950367 OR NOT expiration=*) | rex \",\\s*ss_name=\\\"(?<ss_name>(?:[^\\\"]+|\\\"(?!,\\s*sid=))*)\\\",\\s*sid=\\\"\"| rex \",\\s*sid=\\\"(?<sid>.*)\\\",\\s+\\w+_\\w+=\" | stats sum(deleted) AS deleted,    list(alert_actions) AS alert_actions, list(severity) AS severity,   list(expiration) AS expiration    list(ss_name) AS ss_name,   list(ss_app) AS ss_app,           list(ss_user) AS ss_user   list(digest_mode) AS digest_mode, list(triggered_alerts) AS triggered_alerts  BY sid, trigger_time | search NOT deleted=* OR deleted=0 | fields - deleted '",
    "users": "1"
   },
   {
@@ -823,22 +863,6 @@
    "provenance": "N/A",
    "runs": "1",
    "search": "'| search index=_internal earliest=-1d source=*splunkd_ui_access.log (\"server/health/splunkd/details\" OR \"server/health/deployment/details\") | stats count as click_count'",
-   "users": "1"
-  },
-  {
-   "app": "system",
-   "last": "1793931659.847068",
-   "provenance": "summary_director",
-   "runs": "1",
-   "search": "'summarize maintain=\"%22SUMMARY_ID%22%2C%22EARLIEST_TIME%22%2C%22REMOTE_SEARCH%22%2C%22NORM_SUMMARY_ID%22%2C%22NORM_REMOTE_SEARCH%22%0A\" summaryprefix=\"93D348A9-E8C3-401C-9360-FD5FFB5B0B89\"'",
-   "users": "1"
-  },
-  {
-   "app": "system",
-   "last": "1793931659.847880",
-   "provenance": "summary_director",
-   "runs": "1",
-   "search": "'summarize tstats=t maintain=\"\" summaryprefix=\"93D348A9-E8C3-401C-9360-FD5FFB5B0B89\"'",
    "users": "1"
   }
  ],

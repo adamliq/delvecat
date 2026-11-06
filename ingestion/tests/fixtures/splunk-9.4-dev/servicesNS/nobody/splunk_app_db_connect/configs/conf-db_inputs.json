@@ -47,7 +47,7 @@
     "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch"
    },
    "name": "customers_batch",
-   "updated": "2026-11-06T05:22:57+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -98,7 +98,7 @@
     "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising"
    },
    "name": "orders_rising",
-   "updated": "2026-11-06T05:22:57+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   }
  ],
  "generator": {
@@ -110,5 +110,5 @@
   "offset": 0,
   "total": 2
  },
- "updated": "2026-11-06T05:43:51+00:00"
+ "updated": "2026-11-06T07:34:41+00:00"
 }

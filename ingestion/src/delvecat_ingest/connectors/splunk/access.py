@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from ...model import ExtractResult
 from ...splunk_rest import as_bool, iter_entries
-from .common import Ctx, add_global, content, ref, split_list
+from .common import Ctx, add_global, content, permissions, ref, split_list
 
 
 def extract_apps(ctx: Ctx, out: ExtractResult) -> int:
@@ -17,6 +17,7 @@ def extract_apps(ctx: Ctx, out: ExtractResult) -> int:
             "app",
             e["name"],
             displayName=c.get("label"),
+            permissions=permissions(e),
             disabled=as_bool(c.get("disabled", False)),
             description=c.get("description"),
             updatedAt=e.get("updated"),

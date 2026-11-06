@@ -69,7 +69,7 @@
     "imported_srchDiskQuota": 100,
     "imported_srchFilter": "",
     "imported_srchIndexesAllowed": [
-     "*"
+     "main;os"
     ],
     "imported_srchIndexesDefault": [
      "main"
@@ -176,7 +176,7 @@
     "imported_srchDiskQuota": 100,
     "imported_srchFilter": "",
     "imported_srchIndexesAllowed": [
-     "*"
+     "main;os"
     ],
     "imported_srchIndexesDefault": [
      "main"
@@ -193,7 +193,7 @@
     "kvstore_update.implicit_deny_list": [],
     "rtSrchJobsQuota": 6,
     "srchDiskQuota": 100,
-    "srchFilter": "",
+    "srchFilter": "NOT uri_path=/admin*",
     "srchIndexesAllowed": [
      "summary_*",
      "web*"
@@ -415,7 +415,8 @@
     "imported_srchDiskQuota": 500,
     "imported_srchFilter": "",
     "imported_srchIndexesAllowed": [
-     "*"
+     "*",
+     "main;os"
     ],
     "imported_srchIndexesDefault": [
      "main"
@@ -612,7 +613,7 @@
     "imported_srchDiskQuota": 100,
     "imported_srchFilter": "",
     "imported_srchIndexesAllowed": [
-     "*"
+     "main;os"
     ],
     "imported_srchIndexesDefault": [
      "main"
@@ -851,7 +852,8 @@
     "imported_srchFilter": "*",
     "imported_srchIndexesAllowed": [
      "*",
-     "_*"
+     "_*",
+     "main;os"
     ],
     "imported_srchIndexesDefault": [
      "main",
@@ -1047,7 +1049,7 @@
     "srchDiskQuota": 100,
     "srchFilter": "",
     "srchIndexesAllowed": [
-     "*"
+     "main;os"
     ],
     "srchIndexesDefault": [
      "main"
@@ -1077,5 +1079,5 @@
   "offset": 0,
   "total": 8
  },
- "updated": "2026-11-06T05:43:46+00:00"
+ "updated": "2026-11-06T07:34:34+00:00"
 }

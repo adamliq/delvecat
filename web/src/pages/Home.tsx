@@ -54,6 +54,7 @@ export function Home() {
   const firing = detections.filter((d) => d.state === "ready").length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
   const healthReport = bundle.ingestionReport?.find((r) => r.connector === "health");
+  const gov = bundle.ingestionReport?.find((r) => r.connector === "governance")?.counts;
   const unhealthy = bundle.entities.filter((e) => e.health);
   const unusedCustom = bundle.entities.filter((e) => e.usage?.unused && !e.usage.builtin).length;
   const noIndex = bundle.entities.filter((e) => e.lineage?.implicitIndex).length;
@@ -118,6 +119,17 @@ export function Home() {
             {detections.length} detections, <strong>{firing}</strong> can fire
             {detections.length - firing > 0 && <>, <strong>{detections.length - firing}</strong> cannot (disabled, broken or without data)</>}.{" "}
             <Link to="/coverage">See ATT&CK and CIM coverage</Link>
+          </p>
+        </section>
+      )}
+
+      {gov && gov.sensitiveStores > 0 && (
+        <section>
+          <h2>Governance</h2>
+          <p>
+            {gov.sensitiveStores} data stores hold sensitive data
+            {gov.exposedToEveryone > 0 && <>, <strong>{gov.exposedToEveryone}</strong> readable by every role</>}.{" "}
+            <Link to="/governance">Who can see sensitive data?</Link>
           </p>
         </section>
       )}

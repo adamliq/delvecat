@@ -4,6 +4,7 @@ import { useCatalogState } from "./lib/CatalogContext";
 import { CoveragePage } from "./pages/CoveragePage";
 import { EntityPage } from "./pages/EntityPage";
 import { GlossaryPage } from "./pages/GlossaryPage";
+import { GovernancePage } from "./pages/GovernancePage";
 import { HealthPage } from "./pages/HealthPage";
 import { Home } from "./pages/Home";
 import { SearchPage } from "./pages/SearchPage";
@@ -31,6 +32,7 @@ function Body() {
       <Route path="/glossary" element={<GlossaryPage />} />
       <Route path="/coverage" element={<CoveragePage />} />
       <Route path="/health" element={<HealthPage />} />
+      <Route path="/governance" element={<GovernancePage />} />
       <Route path="/glossary/:term" element={<GlossaryPage />} />
       <Route path="*" element={<Home />} />
     </Routes>

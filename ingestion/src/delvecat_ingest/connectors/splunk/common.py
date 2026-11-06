@@ -45,6 +45,13 @@ def acl(entry: dict[str, Any]) -> tuple[str | None, str | None, str | None]:
     return a.get("app"), a.get("owner"), a.get("sharing")
 
 
+def permissions(entry: dict[str, Any]) -> dict[str, list[str]] | None:
+    """Roles that may read / write the object (``*`` means every role)."""
+    perms = (entry.get("acl") or {}).get("perms") or {}
+    out = {k: sorted(set(split_list(perms.get(k)))) for k in ("read", "write") if perms.get(k)}
+    return out or None
+
+
 def content(entry: dict[str, Any]) -> dict[str, Any]:
     return entry.get("content") or {}
 
@@ -111,6 +118,7 @@ def add_ko(
         updatedAt=entry.get("updated"),
         properties=properties,
         observed=observed,
+        permissions=permissions(entry),
     )
     out.entities.append(ent)
     if e := app_edge(ctx, app, eid):

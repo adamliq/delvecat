@@ -615,8 +615,7 @@
       "*"
      ],
      "write": [
-      "admin",
-      "power"
+      "*"
      ]
     },
     "removable": false,
@@ -773,8 +772,7 @@
       "*"
      ],
      "write": [
-      "admin",
-      "power"
+      "*"
      ]
     },
     "removable": false,
@@ -1797,8 +1795,7 @@
       "*"
      ],
      "write": [
-      "admin",
-      "power"
+      "*"
      ]
     },
     "removable": false,
@@ -1991,5 +1988,5 @@
   "offset": 0,
   "total": 39
  },
- "updated": "2026-11-06T05:43:46+00:00"
+ "updated": "2026-11-06T07:34:34+00:00"
 }

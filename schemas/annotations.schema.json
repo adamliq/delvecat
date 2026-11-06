@@ -17,6 +17,12 @@
       "items": {
         "$ref": "#/$defs/Term"
       }
+    },
+    "classifications": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ClassificationDef"
+      }
     }
   },
   "$defs": {
@@ -131,6 +137,31 @@
         },
         "related": {
           "$ref": "#/$defs/StringList"
+        }
+      }
+    },
+    "ClassificationDef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "description": "A classification in the taxonomy. 'PII' also covers 'PII.Email' unless that is defined itself.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "sensitive": {
+          "type": "boolean",
+          "description": "Counts for 'who can see sensitive data' (default true)."
+        },
+        "propagate": {
+          "type": "boolean",
+          "description": "Carry to data derived from it (default true)."
         }
       }
     }

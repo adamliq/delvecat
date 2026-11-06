@@ -2,58 +2,64 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "C",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "CN",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "O",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "abt",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "after",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "43",
+   "count": "49",
    "distinct_count": "1",
    "field": "autoBatch",
-   "numeric_count": "43"
+   "numeric_count": "49"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "autoLBFrequency",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
    "count": "6",
-   "distinct_count": "1",
+   "distinct_count": "2",
    "field": "channel",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "cm_ct",
-   "numeric_count": "0"
+   "numeric_count": "1"
+  },
+  {
+   "count": "8",
+   "distinct_count": "4",
+   "field": "connid",
+   "numeric_count": "8"
   },
   {
    "count": "1",
@@ -62,20 +68,20 @@
    "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "ct",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "curves",
    "numeric_count": "0"
   },
   {
    "count": "1000",
-   "distinct_count": "1",
+   "distinct_count": "2",
    "field": "date_hour",
    "numeric_count": "1000"
   },
@@ -99,7 +105,7 @@
   },
   {
    "count": "1000",
-   "distinct_count": "60",
+   "distinct_count": "57",
    "field": "date_second",
    "numeric_count": "1000"
   },
@@ -122,55 +128,67 @@
    "numeric_count": "1000"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "delay",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
    "field": "dft",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "disabled",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "disk_objects",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "dispatch",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "distributedIndexes",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "duration",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "enableTeleportSupervisor",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
    "field": "enable_tls_proxy",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "2",
    "field": "enabled",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "6",
+   "count": "5",
    "distinct_count": "1",
    "field": "err",
    "numeric_count": "0"
@@ -182,40 +200,40 @@
    "numeric_count": "0"
   },
   {
-   "count": "777",
-   "distinct_count": "13",
+   "count": "556",
+   "distinct_count": "23",
    "field": "file",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "fishbucket",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "fwdtype",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "fznb",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "guid",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "handshakeRetry",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
    "count": "1000",
@@ -224,40 +242,40 @@
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "ht",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "http_proxy",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "https_proxy",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "icps",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "51",
+   "count": "53",
    "distinct_count": "5",
    "field": "idx",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "im",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
    "count": "1000",
@@ -266,8 +284,8 @@
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "indexes",
    "numeric_count": "0"
   },
@@ -278,39 +296,27 @@
    "numeric_count": "2"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "invalidateSessionTokensOnLogout",
+   "count": "5",
+   "distinct_count": "2",
+   "field": "ip",
    "numeric_count": "1"
   },
   {
-   "count": "4",
+   "count": "1",
    "distinct_count": "1",
-   "field": "ip",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
    "field": "is",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "isHttpOutConfigured",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "issuer",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
-   "field": "label",
    "numeric_count": "0"
   },
   {
@@ -320,34 +326,22 @@
    "numeric_count": "1000"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "log_throttling_disabled",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "log_throttling_threshold_ms",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
-   "field": "master",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
-   "field": "masterGuid",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "maxQueueSize",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
    "count": "1",
@@ -362,160 +356,172 @@
    "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "mccf",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "mob",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "mode",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "mor",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "mosr",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "node",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "notValidAfter",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "notValidBefore",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "4",
+   "distinct_count": "1",
+   "field": "numberOfFailures",
+   "numeric_count": "4"
+  },
+  {
+   "count": "8",
+   "distinct_count": "8",
    "field": "offset",
-   "numeric_count": "0"
+   "numeric_count": "8"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "13",
+   "distinct_count": "12",
    "field": "parameters",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "partitions",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "pass4symmkey",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "pb",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "pe",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "period",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "phonehome",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "4",
+   "distinct_count": "1",
+   "field": "port",
+   "numeric_count": "4"
+  },
+  {
+   "count": "2",
+   "distinct_count": "1",
    "field": "pptr",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "pptrl",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "43",
+   "count": "49",
    "distinct_count": "1",
    "field": "pset",
-   "numeric_count": "43"
+   "numeric_count": "49"
   },
   {
    "count": "1000",
-   "distinct_count": "21",
+   "distinct_count": "141",
    "field": "punct",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rct",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "replication_check_deletes",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "replication_enabled",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "replication_max_check_time_secs",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "replication_max_wait_time_secs",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "replication_min_check_time_secs",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
    "count": "2",
@@ -524,93 +530,87 @@
    "numeric_count": "2"
   },
   {
-   "count": "43",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "retries",
+   "numeric_count": "1"
+  },
+  {
+   "count": "49",
    "distinct_count": "1",
    "field": "reuse",
-   "numeric_count": "43"
+   "numeric_count": "49"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rf",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rmrt",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rmst",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "4",
+   "distinct_count": "4",
    "field": "role",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rrt",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rst",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "rt",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "sbs",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "serial",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "sf",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "sfrt",
-   "numeric_count": "0"
+   "numeric_count": "1"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "sha256_fingerprint",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
-   "field": "slave",
-   "numeric_count": "0"
-  },
-  {
-   "count": "0",
-   "distinct_count": "0",
-   "field": "slaveId",
    "numeric_count": "0"
   },
   {
@@ -638,43 +638,43 @@
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "1",
    "field": "st",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "13",
+   "distinct_count": "13",
    "field": "stanza",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "subject",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "subjectAltName",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "suite",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "summaries",
    "numeric_count": "0"
   },
   {
-   "count": "61",
+   "count": "40",
    "distinct_count": "1",
    "field": "targetUri",
    "numeric_count": "0"
@@ -692,26 +692,26 @@
    "numeric_count": "1000"
   },
   {
-   "count": "69",
+   "count": "81",
    "distinct_count": "1",
    "field": "uri",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "2",
+   "distinct_count": "2",
    "field": "value",
-   "numeric_count": "0"
+   "numeric_count": "2"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "versions",
    "numeric_count": "0"
   },
   {
-   "count": "0",
-   "distinct_count": "0",
+   "count": "1",
+   "distinct_count": "1",
    "field": "volumes",
    "numeric_count": "0"
   }

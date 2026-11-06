@@ -31,16 +31,16 @@
   },
   {
    "app": "acme_secops",
-   "avgRuntime": "0.1036",
+   "avgRuntime": "0.09900000000000002",
    "continued": "0",
    "failed": "0",
    "first": "1793930400.252",
-   "last": "1793943000.690",
+   "last": "1793943900.646",
    "maxRuntime": "0.136",
    "savedsearch_name": "Firewall - Denied Outbound to Rare Ports",
    "skipped": "0",
-   "success": "5",
-   "total": "5",
+   "success": "6",
+   "total": "6",
    "user": "admin"
   },
   {
@@ -73,16 +73,16 @@
   },
   {
    "app": "splunk_monitoring_console",
-   "avgRuntime": "0.08875000000000001",
+   "avgRuntime": "0.0892",
    "continued": "0",
    "failed": "0",
    "first": "1793929860.376",
-   "last": "1793942561.774",
+   "last": "1793950387.598",
    "maxRuntime": "0.112",
    "savedsearch_name": "DMC Asset - Build Standalone Asset Table",
    "skipped": "0",
-   "success": "4",
-   "total": "4",
+   "success": "5",
+   "total": "5",
    "user": "nobody"
   }
  ],

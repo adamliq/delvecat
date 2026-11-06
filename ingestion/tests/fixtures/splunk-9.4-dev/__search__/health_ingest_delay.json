@@ -3,14 +3,14 @@
  "results": [
   {
    "index": "_audit",
-   "indexed": "1793943829",
-   "newest": "1793943829",
+   "indexed": "1793950479",
+   "newest": "1793950479",
    "sourcetype": "audittrail"
   },
   {
    "index": "_configtracker",
-   "indexed": "1793942582",
-   "newest": "1793942582",
+   "indexed": "1793950393",
+   "newest": "1793950390",
    "sourcetype": "splunk_configuration_change"
   },
   {
@@ -21,14 +21,14 @@
   },
   {
    "index": "_dsclient",
-   "indexed": "1793942542",
-   "newest": "1793942542",
+   "indexed": "1793950362",
+   "newest": "1793950357",
    "sourcetype": "dsclient"
   },
   {
    "index": "_dsphonehome",
-   "indexed": "1793943808",
-   "newest": "1793943808",
+   "indexed": "1793950479",
+   "newest": "1793950479",
    "sourcetype": "dsphonehome"
   },
   {
@@ -39,14 +39,14 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793943795",
-   "newest": "1793943795",
+   "indexed": "1793950423",
+   "newest": "1793950423",
    "sourcetype": "mongod"
   },
   {
    "index": "_internal",
-   "indexed": "1793943021",
-   "newest": "1793943021",
+   "indexed": "1793950390",
+   "newest": "1793950387",
    "sourcetype": "scheduler"
   },
   {
@@ -63,8 +63,8 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793942539",
-   "newest": "1793942536",
+   "indexed": "1793950365",
+   "newest": "1793950365",
    "sourcetype": "splunk_python"
   },
   {
@@ -75,8 +75,8 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793942534",
-   "newest": "1793942533",
+   "indexed": "1793950361",
+   "newest": "1793950361",
    "sourcetype": "splunk_shc_upgrade_completion_script"
   },
   {
@@ -87,38 +87,38 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793942536",
-   "newest": "1793942536",
+   "indexed": "1793950364",
+   "newest": "1793950364",
    "sourcetype": "splunk_web_access"
   },
   {
    "index": "_internal",
-   "indexed": "1793942537",
-   "newest": "1793942536",
+   "indexed": "1793950365",
+   "newest": "1793950365",
    "sourcetype": "splunk_web_service"
   },
   {
    "index": "_internal",
-   "indexed": "1793943824",
-   "newest": "1793943824",
+   "indexed": "1793950479",
+   "newest": "1793950479",
    "sourcetype": "splunkd"
   },
   {
    "index": "_internal",
-   "indexed": "1793943829",
-   "newest": "1793943829",
+   "indexed": "1793950477",
+   "newest": "1793950477",
    "sourcetype": "splunkd_access"
   },
   {
    "index": "_internal",
-   "indexed": "1793942542",
-   "newest": "1793942530",
+   "indexed": "1793950361",
+   "newest": "1793950346",
    "sourcetype": "splunkd_conf"
   },
   {
    "index": "_internal",
-   "indexed": "1793942542",
-   "newest": "1793942523",
+   "indexed": "1793950362",
+   "newest": "1793950336",
    "sourcetype": "splunkd_stderr"
   },
   {
@@ -129,20 +129,20 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793942536",
-   "newest": "1793942536",
+   "indexed": "1793950365",
+   "newest": "1793950365",
    "sourcetype": "splunkd_ui_access"
   },
   {
    "index": "_internal",
-   "indexed": "1793942534",
-   "newest": "1793942533",
+   "indexed": "1793950362",
+   "newest": "1793950361",
    "sourcetype": "sup-pkg-agent-manager-stdout-too_small"
   },
   {
    "index": "_internal",
-   "indexed": "1793943823",
-   "newest": "1793943823",
+   "indexed": "1793950451",
+   "newest": "1793950451",
    "sourcetype": "sup-pkg-identity-stdout-2"
   },
   {
@@ -153,8 +153,8 @@
   },
   {
    "index": "_internal",
-   "indexed": "1793942536",
-   "newest": "1793942534",
+   "indexed": "1793950364",
+   "newest": "1793950362",
    "sourcetype": "supervisor-2"
   },
   {
@@ -165,32 +165,32 @@
   },
   {
    "index": "_introspection",
-   "indexed": "1793943775",
-   "newest": "1793943775",
+   "indexed": "1793950444",
+   "newest": "1793950444",
    "sourcetype": "http_event_collector_metrics"
   },
   {
    "index": "_introspection",
-   "indexed": "1793943827",
-   "newest": "1793943827",
+   "indexed": "1793950480",
+   "newest": "1793950477",
    "sourcetype": "kvstore"
   },
   {
    "index": "_introspection",
-   "indexed": "1793943829",
-   "newest": "1793943829",
+   "indexed": "1793950479",
+   "newest": "1793950479",
    "sourcetype": "search_telemetry"
   },
   {
    "index": "_introspection",
-   "indexed": "1793943734",
-   "newest": "1793943731",
+   "indexed": "1793950359",
+   "newest": "1793950357",
    "sourcetype": "splunk_disk_objects"
   },
   {
    "index": "_introspection",
-   "indexed": "1793943824",
-   "newest": "1793943821",
+   "indexed": "1793950480",
+   "newest": "1793950477",
    "sourcetype": "splunk_resource_usage"
   },
   {
@@ -219,14 +219,14 @@
   },
   {
    "index": "main",
-   "indexed": "1793942533",
-   "newest": "1793942522",
+   "indexed": "1793950361",
+   "newest": "1793950334",
    "sourcetype": "acme:app"
   },
   {
    "index": "os",
-   "indexed": "1793943827",
-   "newest": "1793943827",
+   "indexed": "1793950478",
+   "newest": "1793950478",
    "sourcetype": "acme:uf:splunkd"
   },
   {

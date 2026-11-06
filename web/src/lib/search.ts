@@ -15,6 +15,11 @@ export const FACETS = {
   status: (e: Entity) => [e.disabled ? "disabled" : "enabled"],
   documented: (e: Entity) => [effectiveDescription(e) ? "yes" : "no"],
   health: (e: Entity) => (e.health ? [e.health.status] : []),
+  sensitivity: (e: Entity) => {
+    const cs = ((e.governance as { classifications?: { sensitive: boolean; derived: boolean }[] } | undefined)?.classifications ?? []).filter((c) => c.sensitive);
+    if (!cs.length) return [];
+    return [cs.some((c) => !c.derived) ? "sensitive" : "sensitive (derived)"];
+  },
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   issue: (e: Entity) => [
     ...(e.lineage?.unresolved?.length ? ["broken reference"] : []),

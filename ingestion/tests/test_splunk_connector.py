@@ -90,12 +90,20 @@ def test_no_secrets_or_emails(bundle):
 
 
 def test_role_index_access_is_effective_and_expands_wildcards(bundle):
-    # acme_soc: firewall;wineventlog directly, plus "*" inherited from the user role
+    # acme_soc: firewall;wineventlog directly, plus main;os inherited from the user role
     granted = {t for _, _, t in edges(bundle, frm="dev:role:acme_soc", type_="grantsAccess")}
-    assert {"dev:index:firewall", "dev:index:wineventlog", "dev:index:web"} <= granted
-    assert not any(t.startswith("dev:index:_") for t in granted)  # "*" excludes internal
+    assert granted == {
+        "dev:index:firewall",
+        "dev:index:wineventlog",
+        "dev:index:main",
+        "dev:index:os",
+    }
+    analyst = {
+        t for _, _, t in edges(bundle, frm="dev:role:acme_web_analyst", type_="grantsAccess")
+    }
+    assert {"dev:index:web", "dev:index:summary_web"} <= analyst  # web* and summary_*
     admin = {t for _, _, t in edges(bundle, frm="dev:role:admin", type_="grantsAccess")}
-    assert "dev:index:_internal" in admin
+    assert "dev:index:_internal" in admin  # admin's "*" plus "_*"
     assert ("dev:role:acme_soc", "inherits", "dev:role:user") in edges(
         bundle, frm="dev:role:acme_soc"
     )

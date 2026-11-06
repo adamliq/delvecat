@@ -36,6 +36,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <NavLink to="/glossary">Glossary</NavLink>
           <NavLink to="/coverage">Coverage</NavLink>
           <NavLink to="/health">Health</NavLink>
+          <NavLink to="/governance">Governance</NavLink>
         </nav>
         <form className="search-box" onSubmit={submit} role="search">
           <input
@@ -65,6 +66,9 @@ export function Layout({ children }: { children: ReactNode }) {
           <>
             Bundle generated {new Date(state.catalog.bundle.generatedAt).toLocaleString()} · source{" "}
             <code>{state.origin}</code> · read-only snapshot
+            {state.catalog.bundle.redaction && (
+              <> · <strong>redacted ({String(state.catalog.bundle.redaction.profile)} profile)</strong>: user and host names are pseudonyms</>
+            )}
           </>
         )}
       </footer>

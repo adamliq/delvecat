@@ -259,7 +259,7 @@
     "suppress": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/saved/searches/Access%20-%20Excessive%20Failed%20Logins%20-%20Rule/suppress"
    },
    "name": "Access - Excessive Failed Logins - Rule",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -1763,7 +1763,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
+    "next_scheduled_time": "2026-11-06 08:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Authentication.Authentication where Authentication.action=failure by Authentication.src | where count > 10",
     "realtime_schedule": true,
@@ -1800,7 +1800,7 @@
     "suppress": "/servicesNS/nobody/DA-ESS-ContentUpdate/saved/searches/ESCU%20-%20Brute%20Force%20Access%20Behavior%20Detected/suppress"
    },
    "name": "ESCU - Brute Force Access Behavior Detected",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -2033,7 +2033,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
+    "next_scheduled_time": "2026-11-06 08:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Network_Traffic.All_Traffic by All_Traffic.src All_Traffic.dest_port | where count < 3",
     "realtime_schedule": true,
@@ -2070,7 +2070,7 @@
     "suppress": "/servicesNS/nobody/DA-ESS-ContentUpdate/saved/searches/ESCU%20-%20Rare%20Outbound%20Port%20Traffic/suppress"
    },
    "name": "ESCU - Rare Outbound Port Traffic",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -2306,7 +2306,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
+    "next_scheduled_time": "2026-11-06 08:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Endpoint.Processes where Processes.process_name=\"powershell.exe\" by Processes.dest",
     "realtime_schedule": true,
@@ -2343,7 +2343,7 @@
     "suppress": "/servicesNS/nobody/DA-ESS-ContentUpdate/saved/searches/ESCU%20-%20Suspicious%20PowerShell%20Execution/suppress"
    },
    "name": "ESCU - Suspicious PowerShell Execution",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -2566,7 +2566,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 05:45:00 UTC",
+    "next_scheduled_time": "2026-11-06 07:45:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": "search index=firewall sourcetype=acme:fw action=blocked NOT dest_port IN (80,443,53) | `rare_port_threshold(5)`",
     "realtime_schedule": true,
@@ -4603,7 +4603,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 06:05:00 UTC",
+    "next_scheduled_time": "2026-11-06 08:05:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": "search index=web sourcetype=access_combined | `web_status_buckets` | stats count by status_bucket, host",
     "realtime_schedule": false,
@@ -5914,5 +5914,5 @@
   "offset": 0,
   "total": 23
  },
- "updated": "2026-11-06T05:43:46+00:00"
+ "updated": "2026-11-06T07:34:36+00:00"
 }

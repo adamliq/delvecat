@@ -22,6 +22,7 @@ const FACET_TITLES: Record<Facet, string> = {
   documented: "Has description",
   issue: "Search issues",
   health: "Health",
+  sensitivity: "Sensitivity",
   usage: "Usage",
 };
 

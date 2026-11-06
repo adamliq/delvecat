@@ -1,0 +1,15 @@
+# Classification taxonomy. "PII" also covers "PII.Email", "PII.IPAddress", ...
+# sensitive: counts for "who can see sensitive data"; propagate: carried to data derived from it.
+classifications:
+  - name: PII
+    description: Personal data that identifies or can be linked to a person.
+    sensitive: true
+    propagate: true
+  - name: Confidential
+    description: Business-confidential data (orders, customers, contracts).
+    sensitive: true
+    propagate: true
+  - name: Public
+    description: Approved for public release.
+    sensitive: false
+    propagate: false

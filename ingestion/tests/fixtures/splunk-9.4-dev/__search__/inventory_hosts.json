@@ -2,6 +2,22 @@
  "earliest": "-7d",
  "results": [
   {
+   "count": "37561",
+   "host": "splunk",
+   "indexes": [
+    "_audit",
+    "_configtracker",
+    "_dsappevent",
+    "_dsclient",
+    "_dsphonehome",
+    "_internal",
+    "_introspection",
+    "_telemetry",
+    "main"
+   ],
+   "lastSeen": "1793950474"
+  },
+  {
    "count": "33822",
    "host": "9306d2af8296",
    "indexes": [
@@ -15,30 +31,14 @@
    "lastSeen": "1793933610"
   },
   {
-   "count": "29722",
-   "host": "splunk",
-   "indexes": [
-    "_audit",
-    "_configtracker",
-    "_dsappevent",
-    "_dsclient",
-    "_dsphonehome",
-    "_internal",
-    "_introspection",
-    "_telemetry",
-    "main"
-   ],
-   "lastSeen": "1793943824"
-  },
-  {
-   "count": "4247",
+   "count": "5278",
    "host": "uf-linux-01",
    "indexes": [
     "_configtracker",
     "_internal",
     "os"
    ],
-   "lastSeen": "1793943812"
+   "lastSeen": "1793950459"
   },
   {
    "count": "80",

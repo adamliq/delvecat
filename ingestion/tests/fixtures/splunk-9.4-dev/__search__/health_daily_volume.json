@@ -3,13 +3,13 @@
  "results": [
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "14928",
+   "count": "15650",
    "index": "_audit",
    "sourcetype": "audittrail"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "374",
+   "count": "396",
    "index": "_configtracker",
    "sourcetype": "splunk_configuration_change"
   },
@@ -21,13 +21,13 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "5",
+   "count": "6",
    "index": "_dsclient",
    "sourcetype": "dsclient"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "55",
+   "count": "78",
    "index": "_dsphonehome",
    "sourcetype": "dsphonehome"
   },
@@ -39,13 +39,13 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "2210",
+   "count": "2620",
    "index": "_internal",
    "sourcetype": "mongod"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "81",
+   "count": "96",
    "index": "_internal",
    "sourcetype": "scheduler"
   },
@@ -63,7 +63,7 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "838",
+   "count": "1047",
    "index": "_internal",
    "sourcetype": "splunk_python"
   },
@@ -75,7 +75,7 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "15",
+   "count": "18",
    "index": "_internal",
    "sourcetype": "splunk_shc_upgrade_completion_script"
   },
@@ -87,37 +87,37 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "4",
+   "count": "5",
    "index": "_internal",
    "sourcetype": "splunk_web_access"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "868",
+   "count": "1085",
    "index": "_internal",
    "sourcetype": "splunk_web_service"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "33081",
+   "count": "38305",
    "index": "_internal",
    "sourcetype": "splunkd"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "4726",
+   "count": "5278",
    "index": "_internal",
    "sourcetype": "splunkd_access"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "8",
+   "count": "10",
    "index": "_internal",
    "sourcetype": "splunkd_conf"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "10",
+   "count": "12",
    "index": "_internal",
    "sourcetype": "splunkd_stderr"
   },
@@ -129,19 +129,19 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "4",
+   "count": "5",
    "index": "_internal",
    "sourcetype": "splunkd_ui_access"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "28",
+   "count": "35",
    "index": "_internal",
    "sourcetype": "sup-pkg-agent-manager-stdout-too_small"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "45",
+   "count": "68",
    "index": "_internal",
    "sourcetype": "sup-pkg-identity-stdout-2"
   },
@@ -153,7 +153,7 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "122",
+   "count": "183",
    "index": "_internal",
    "sourcetype": "supervisor-2"
   },
@@ -165,31 +165,31 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "86",
+   "count": "97",
    "index": "_introspection",
    "sourcetype": "http_event_collector_metrics"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "897",
+   "count": "1040",
    "index": "_introspection",
    "sourcetype": "kvstore"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "389",
+   "count": "446",
    "index": "_introspection",
    "sourcetype": "search_telemetry"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "353",
+   "count": "411",
    "index": "_introspection",
    "sourcetype": "splunk_disk_objects"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "5821",
+   "count": "6524",
    "index": "_introspection",
    "sourcetype": "splunk_resource_usage"
   },
@@ -219,13 +219,13 @@
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "147",
+   "count": "170",
    "index": "main",
    "sourcetype": "acme:app"
   },
   {
    "_time": "2026-11-06T00:00:00.000+00:00",
-   "count": "2371",
+   "count": "2763",
    "index": "os",
    "sourcetype": "acme:uf:splunkd"
   },

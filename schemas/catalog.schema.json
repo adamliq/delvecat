@@ -80,6 +80,32 @@
     },
     "annotationSource": {
       "$ref": "#/$defs/AnnotationSource"
+    },
+    "classifications": {
+      "description": "Classification taxonomy from annotations.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Classification"
+      }
+    },
+    "redaction": {
+      "description": "Present when the bundle was redacted for publishing.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "profile": {
+          "type": "string"
+        },
+        "stablePseudonyms": {
+          "type": "boolean"
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -423,6 +449,30 @@
               }
             }
           }
+        },
+        "permissions": {
+          "description": "Splunk object permissions: roles that may read / write it ('*' = every role).",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "read": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "write": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "governance": {
+          "description": "Derived governance facts: effective classifications with provenance, and who can reach sensitive data.",
+          "type": "object",
+          "additionalProperties": true
         }
       }
     },
@@ -711,6 +761,30 @@
           "type": "string"
         },
         "path": {
+          "type": "string"
+        }
+      }
+    },
+    "Classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sensitive": {
+          "type": "boolean"
+        },
+        "propagate": {
+          "type": "boolean"
+        },
+        "source": {
           "type": "string"
         }
       }

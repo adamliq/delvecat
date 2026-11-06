@@ -53,6 +53,7 @@ class Entry:
 class AnnotationSet:
     entries: list[Entry] = field(default_factory=list)
     glossary: list[dict[str, Any]] = field(default_factory=list)
+    classifications: list[dict[str, Any]] = field(default_factory=list)
     files: int = 0
 
 
@@ -103,6 +104,8 @@ def load_annotations(directory: Path) -> AnnotationSet:
         for i, term in enumerate(data.get("glossary", [])):
             line = term_lines[i] if i < len(term_lines) else 0
             result.glossary.append({**term, "source": f"{rel}:{line}"})
+        for c in data.get("classifications", []):
+            result.classifications.append({**c, "source": rel})
     seen: dict[str, str] = {}
     for term in result.glossary:
         key = term["term"].lower()
@@ -185,6 +188,13 @@ def apply_annotations(
         bundle.pop("glossary", None)
     if source:
         bundle["annotationSource"] = source
+    if annotations.classifications:
+        bundle["classifications"] = sorted(annotations.classifications, key=lambda c: c["name"])
+    else:
+        bundle.pop("classifications", None)
+    from .governance import apply_governance  # classifications drive governance
+
+    apply_governance(bundle)
 
     # Terms used on entities but not defined anywhere are worth flagging too.
     defined = {t["term"].lower() for t in annotations.glossary}

@@ -194,7 +194,7 @@ are confirmed against a live instance before their connector ships.
 | **4. Ingestion products** ✅ | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
 | **5. Security suite** ✅ | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
 | **6. Usage & health** ✅ | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
-| **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
+| **7. Governance** ✅ | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
 | Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
 
 ### Phase 1 notes (done)
@@ -372,6 +372,33 @@ are confirmed against a live instance before their connector ships.
   (Splunk-authored and product apps) hidden unless asked; CSV export.
 - Web: Health page, usage & health panel with daily-volume sparkline on
   entity pages, Health and Usage facets, home summary.
+
+### Phase 7 notes (done)
+
+- **Classification taxonomy** in `annotations/` (`classifications:` with
+  `sensitive` and `propagate`; `PII` covers `PII.*`).
+- **Effective classifications** (`entity.governance.classifications`): annotated,
+  from a classified field to its sourcetype, from a sourcetype to the indexes
+  it feeds, and carried through lineage to derived data stores (summary
+  indexes, lookups written by searches, ES notable/risk, data models, indexes
+  fed from classified DB tables), each with provenance. Searches and
+  dashboards that read classified data directly are listed as consumers.
+- **Who can see it** (`governance.access`, `governance.sensitiveAccess`): roles
+  through effective search access (inherited roles included) or object read
+  permissions (now catalogued as `entity.permissions`, `*` = every role);
+  users through their roles; row-level search filters reported; objects
+  readable by every role flagged. Approximations: app-level visibility and
+  capabilities such as `admin_all_objects` are not modelled.
+- **Redaction profiles** (`build --redact-profile`, `delvecat-ingest redact`):
+  `internal` drops real names; `public` also pseudonymizes users, hosts and
+  sources with keyed hashes (stable with `DELVECAT_REDACT_SALT`), masks IPs,
+  drops internal URLs and DB hosts, and rewrites ids and edges consistently.
+  Custom YAML profiles can extend either. The Pages workflow publishes the
+  demo with `public`; CI checks the redacted demo validates. Names inside SPL
+  text and input stanza paths are not rewritten.
+- Web: Governance page ("who can see …", access matrix, exposure, consumers,
+  taxonomy), governance panel on entity pages, Sensitivity facet, redaction
+  notice in the footer.
 
 ## 8. Repository layout
 

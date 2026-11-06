@@ -19,9 +19,9 @@
   },
   {
    "app": "acme_secops",
-   "last": "1793943011.106679",
-   "runs": "5",
-   "runtime": "0.59",
+   "last": "1793943911.140626",
+   "runs": "6",
+   "runtime": "0.68",
    "savedsearch_name": "Firewall - Denied Outbound to Rare Ports",
    "users": "1"
   },
@@ -43,9 +43,9 @@
   },
   {
    "app": "splunk_monitoring_console",
-   "last": "1793942591.122624",
-   "runs": "4",
-   "runtime": "0.41",
+   "last": "1793950407.674184",
+   "runs": "5",
+   "runtime": "0.52",
    "savedsearch_name": "DMC Asset - Build Standalone Asset Table",
    "users": "1"
   }

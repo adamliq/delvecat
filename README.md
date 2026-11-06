@@ -21,7 +21,11 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    CIM data models, and lists detections that cannot fire.
 4. A **Health** page shows stale or anomalous data, ingestion and scheduler
    problems, and a cleanup report of objects nobody uses.
-5. Descriptions, owners, tags, classifications and the glossary live in
+5. A **Governance** page answers "who can see PII?": classifications spread
+   through lineage to derived data, and roles and users are traced to the
+   sensitive data they can search or read. Bundles can be redacted
+   (`--redact-profile public`) before publishing.
+6. Descriptions, owners, tags, classifications and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.
 
@@ -74,7 +78,8 @@ Within about a minute it phones home, receives `acme_all_outputs` and
 
 ## Hosting on GitHub Pages
 
-`.github/workflows/pages.yml` publishes the app with the **demo** bundle.
+`.github/workflows/pages.yml` publishes the app with the **demo** bundle,
+redacted with the `public` profile.
 Enable it under *Settings → Pages → Source: GitHub Actions*. Public Pages
 sites are visible to anyone, so do not publish real bundles there unless
 access is restricted; load them with **Open file** / **Open folder** instead.

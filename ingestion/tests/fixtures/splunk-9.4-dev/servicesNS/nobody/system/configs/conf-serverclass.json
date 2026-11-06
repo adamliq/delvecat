@@ -49,7 +49,7 @@
     "list": "/servicesNS/nobody/system/configs/conf-serverclass/global"
    },
    "name": "global",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -92,7 +92,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders"
    },
    "name": "serverClass:all_forwarders",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -136,7 +136,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs"
    },
    "name": "serverClass:all_forwarders:app:acme_all_outputs",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -180,7 +180,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts"
    },
    "name": "serverClass:linux_hosts",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -224,7 +224,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs"
    },
    "name": "serverClass:linux_hosts:app:acme_linux_inputs",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -267,7 +267,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers"
    },
    "name": "serverClass:web_servers",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -311,7 +311,7 @@
     "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs"
    },
    "name": "serverClass:web_servers:app:acme_web_inputs",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   }
  ],
  "generator": {
@@ -323,5 +323,5 @@
   "offset": 0,
   "total": 7
  },
- "updated": "2026-11-06T05:43:51+00:00"
+ "updated": "2026-11-06T07:34:41+00:00"
 }

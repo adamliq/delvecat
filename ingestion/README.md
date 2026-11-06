@@ -69,6 +69,28 @@ and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
 
+## Publishing safely
+
+Bundles can be redacted before they go anywhere public:
+
+```bash
+export DELVECAT_REDACT_SALT=...   # keep secret; stable pseudonyms across builds
+uv run delvecat-ingest build ... --redact-profile public --out catalog/
+uv run delvecat-ingest redact catalog/ --redact-profile public --out public/   # after the fact
+```
+
+| Setting | `internal` | `public` |
+|---|---|---|
+| real names | drop | drop |
+| user names, owners | keep | pseudonymize |
+| hosts, forwarders, clients | keep | pseudonymize |
+| source paths | keep | pseudonymize |
+| IP addresses | keep | mask |
+| internal URLs, DB hosts | keep | drop |
+
+A YAML file (`--redact-profile-file`) can `extends: public` and change any
+setting. Names inside SPL text are not rewritten.
+
 ## Safety
 
 The HTTP client refuses any request that could change Splunk: only `GET` is

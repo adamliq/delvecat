@@ -112,6 +112,21 @@ export interface CatalogBundle {
   shards?: Shard[];
   glossary?: GlossaryTerm[];
   annotationSource?: AnnotationSource;
+  /**
+   * Classification taxonomy from annotations.
+   */
+  classifications?: Classification[];
+  /**
+   * Present when the bundle was redacted for publishing.
+   */
+  redaction?: {
+    profile?: string;
+    stablePseudonyms?: boolean;
+    counts?: {
+      [k: string]: number;
+    };
+    [k: string]: unknown;
+  };
 }
 export interface Instance {
   id: string;
@@ -214,6 +229,19 @@ export interface Entity {
       message: string;
     }[];
   };
+  /**
+   * Splunk object permissions: roles that may read / write it ('*' = every role).
+   */
+  permissions?: {
+    read?: string[];
+    write?: string[];
+  };
+  /**
+   * Derived governance facts: effective classifications with provenance, and who can reach sensitive data.
+   */
+  governance?: {
+    [k: string]: unknown;
+  };
 }
 /**
  * Human-curated metadata merged from annotations/*.yaml. Never comes from Splunk.
@@ -290,4 +318,11 @@ export interface AnnotationSource {
   repoUrl: string;
   branch: string;
   path: string;
+}
+export interface Classification {
+  name: string;
+  description?: string;
+  sensitive?: boolean;
+  propagate?: boolean;
+  source?: string;
 }

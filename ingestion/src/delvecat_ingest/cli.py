@@ -23,7 +23,9 @@ from .connectors import (
     ueba,
 )
 from .connectors.splunk import Options
+from .governance import apply_governance
 from .model import merge_facts
+from .redaction import load_profile, redact_bundle
 from .transport import FixtureTransport, HttpTransport, RecordingTransport, Transport
 
 
@@ -169,6 +171,10 @@ def _build(args: argparse.Namespace) -> int:
     if args.annotations and (code := _annotate_into(bundle, args)) is not None:
         return code
 
+    if not args.annotations:
+        apply_governance(bundle)  # access facts are useful even without classifications
+    if (code := _redact_into(bundle, args)) is not None:
+        return code
     problems = validate(bundle)
     if problems:
         print("bundle failed validation:", *problems[:50], sep="\n  ", file=sys.stderr)
@@ -213,6 +219,43 @@ def _annotate_into(bundle: dict[str, Any], args: argparse.Namespace) -> int | No
         print(f"annotations: {report.get('message')}", file=sys.stderr)
         return 3
     return None
+
+
+def _redact_into(bundle: dict[str, Any], args: argparse.Namespace) -> int | None:
+    if not (args.redact_profile or args.redact_profile_file):
+        return None
+    try:
+        profile = load_profile(
+            args.redact_profile,
+            Path(args.redact_profile_file) if args.redact_profile_file else None,
+        )
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    counts = redact_bundle(bundle, profile)
+    if not bundle["redaction"]["stablePseudonyms"] and profile.users == "pseudonymize":
+        print(
+            "note: DELVECAT_REDACT_SALT is not set, so pseudonyms change on every build",
+            file=sys.stderr,
+        )
+    print(f"  redaction ({profile.name}): {counts}")
+    return None
+
+
+def _redact(args: argparse.Namespace) -> int:
+    bundle = load_bundle(Path(args.bundle))
+    if (code := _redact_into(bundle, args)) is not None:
+        return code
+    if "redaction" not in bundle:
+        print("error: redact requires --redact-profile or --redact-profile-file", file=sys.stderr)
+        return 2
+    problems = validate(bundle)
+    if problems:
+        print("bundle failed validation:", *problems[:50], sep="\n  ", file=sys.stderr)
+        return 1
+    files = write_bundle(bundle, Path(args.out), shard=args.shard, pretty=args.pretty)
+    print(f"wrote {files[0]}")
+    return 0
 
 
 def _annotate(args: argparse.Namespace) -> int:
@@ -331,6 +374,18 @@ def main(argv: list[str] | None = None) -> int:
         g.add_argument("--annotation-branch", default="main")
 
     annotation_args(b)
+
+    def redaction_args(p: argparse.ArgumentParser) -> None:
+        g = p.add_argument_group("redaction (for publishing)")
+        g.add_argument(
+            "--redact-profile",
+            choices=["internal", "public"],
+            help="internal: drop personal names; public: also pseudonymize users, "
+            "hosts and sources, mask IPs, drop internal URLs",
+        )
+        g.add_argument("--redact-profile-file", help="YAML profile (see redaction.py)")
+
+    redaction_args(b)
     prod = b.add_argument_group("Splunk products")
     prod.add_argument(
         "--products",
@@ -392,6 +447,14 @@ def main(argv: list[str] | None = None) -> int:
         help="exit 3 if an entry matches nothing or a term is undefined",
     )
     a.set_defaults(func=_annotate)
+
+    rd = sub.add_parser("redact", help="redact an existing bundle for publishing")
+    rd.add_argument("bundle", help="bundle file, manifest or directory")
+    redaction_args(rd)
+    rd.add_argument("--out", required=True)
+    rd.add_argument("--shard", action="store_true")
+    rd.add_argument("--pretty", action="store_true")
+    rd.set_defaults(func=_redact)
 
     la = sub.add_parser("lint-annotations", help="validate annotation files")
     la.add_argument("annotations", help="annotations directory")

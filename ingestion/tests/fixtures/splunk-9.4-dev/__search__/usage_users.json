@@ -2,13 +2,13 @@
  "earliest": "-30d",
  "results": [
   {
-   "last": "1793943821.132628",
-   "searches": "331",
+   "last": "1793950407.683282",
+   "searches": "343",
    "user": "admin"
   },
   {
-   "last": "1793942591.133098",
-   "searches": "41",
+   "last": "1793950407.674184",
+   "searches": "47",
    "user": "splunk-system-user"
   }
  ],

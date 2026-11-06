@@ -43,7 +43,7 @@
     "remove": "/servicesNS/nobody/DA-ESS-ContentUpdate/configs/conf-analyticstories/Command%20and%20Control"
    },
    "name": "Command and Control",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -89,7 +89,7 @@
     "remove": "/servicesNS/nobody/DA-ESS-ContentUpdate/configs/conf-analyticstories/Credential%20Access%20via%20Brute%20Force"
    },
    "name": "Credential Access via Brute Force",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   }
  ],
  "generator": {
@@ -101,5 +101,5 @@
   "offset": 0,
   "total": 2
  },
- "updated": "2026-11-06T05:43:51+00:00"
+ "updated": "2026-11-06T07:34:41+00:00"
 }

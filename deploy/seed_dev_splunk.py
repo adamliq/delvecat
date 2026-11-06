@@ -200,6 +200,9 @@ def main() -> None:
     post("/services/authorization/roles", {
         "name": "acme_web_analyst", "imported_roles": "user", "srchIndexesAllowed": "web*;summary_*"})
     record("role", "acme_web_analyst")
+    # Phase 7: least privilege for the default role, and a row-level filter for analysts.
+    post("/services/authorization/roles/user", {"srchIndexesAllowed": "main;os"})
+    post("/services/authorization/roles/acme_web_analyst", {"srchFilter": "NOT uri_path=/admin*"})
     for user, roles, real in [("jlee", ["acme_soc"], "Jordan Lee"),
                               ("mpatel", ["acme_web_analyst"], "Mira Patel")]:
         post("/services/authentication/users", {

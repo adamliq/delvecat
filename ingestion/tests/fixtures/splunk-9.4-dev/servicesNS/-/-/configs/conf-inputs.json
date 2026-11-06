@@ -54,7 +54,7 @@
     "list": "/servicesNS/nobody/splunk_httpinput/configs/conf-inputs/http"
    },
    "name": "http",
-   "updated": "2026-11-06T05:22:56+00:00"
+   "updated": "2026-11-06T07:33:05+00:00"
   },
   {
    "acl": {
@@ -151,7 +151,7 @@
     "remove": "/servicesNS/nobody/SA-IdentityManagement/configs/conf-inputs/identity_manager%3A%252F%252Facme_assets"
    },
    "name": "identity_manager://acme_assets",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -289,7 +289,7 @@
     "remove": "/servicesNS/nobody/SA-ThreatIntelligence/configs/conf-inputs/threatlist%3A%252F%252Facme_blocklist"
    },
    "name": "threatlist://acme_blocklist",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -332,7 +332,7 @@
     "remove": "/servicesNS/nobody/SA-ThreatIntelligence/configs/conf-inputs/threatlist%3A%252F%252Fopen_phish"
    },
    "name": "threatlist://open_phish",
-   "updated": "2026-11-06T05:23:01+00:00"
+   "updated": "2026-11-06T07:33:09+00:00"
   },
   {
    "acl": {
@@ -392,5 +392,5 @@
   "offset": 0,
   "total": 8
  },
- "updated": "2026-11-06T05:43:51+00:00"
+ "updated": "2026-11-06T07:34:41+00:00"
 }
