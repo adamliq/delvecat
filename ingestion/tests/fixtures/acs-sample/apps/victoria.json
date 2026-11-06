@@ -1,0 +1,2 @@
+{"apps": [{"name": "acme_web", "label": "Acme Web Analytics", "version": "1.4.0", "status": "installed", "appID": "acme_web"},
+          {"name": "Splunk_TA_aws", "label": "Splunk Add-on for AWS", "version": "7.9.0", "status": "installed", "splunkbaseID": "1876"}]}

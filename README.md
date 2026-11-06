@@ -12,9 +12,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
 1. `delvecat-ingest` (Python, `ingestion/`) reads metadata from Splunk with a
    read-only client and writes a JSON **catalog bundle** that conforms to
    [`schemas/catalog.schema.json`](schemas/catalog.schema.json).
-2. The web app (`web/`) loads `catalog.json` and provides search, browsing
-   and entity pages entirely in the browser. **Open bundle** loads a local
-   file without uploading it; `?bundle=<url>` loads a bundle from elsewhere.
+2. The web app (`web/`) loads `catalog/catalog.json` (single file or sharded)
+   and provides search, browsing, entity pages and relationships entirely in
+   the browser. **Open file** / **Open folder** load a local bundle without
+   uploading it; `?bundle=<url>` loads a bundle from elsewhere.
 
 ## Quick start
 
@@ -22,7 +23,7 @@ Requires [uv](https://docs.astral.sh/uv/) and Node 22+.
 
 ```bash
 make install
-make dev      # builds the demo bundle from fixtures and starts Vite
+make dev      # builds the demo bundle (recorded from a real Splunk 9.4) and starts Vite
 make test     # lint + tests for both packages
 ```
 
@@ -34,11 +35,22 @@ cd ingestion && uv run delvecat-ingest build --url https://splunk.example.com:80
   --instance prod --out catalog.json
 ```
 
-For a local Splunk to develop against, see `deploy/docker-compose.yml`.
+Splunk Cloud: add `--acs-stack <stack>` (ACS token in `DELVECAT_ACS_TOKEN`).
+See [ingestion/README.md](ingestion/README.md) for all options.
+
+### Local Splunk for development
+
+```bash
+export SPLUNK_PASSWORD='choose-a-dev-password'
+docker compose -f deploy/docker-compose.yml up -d        # wait until healthy
+uv run --project ingestion python deploy/seed_dev_splunk.py   # sample content + API token
+DELVECAT_SPLUNK_TOKEN=$(cat deploy/.dev-token) uv run --project ingestion \
+  delvecat-ingest build --url https://localhost:8089 --insecure --instance dev --out catalog.json
+```
 
 ## Hosting on GitHub Pages
 
 `.github/workflows/pages.yml` publishes the app with the **demo** bundle.
 Enable it under *Settings → Pages → Source: GitHub Actions*. Public Pages
 sites are visible to anyone, so do not publish real bundles there unless
-access is restricted; load them with **Open bundle** instead.
+access is restricted; load them with **Open file** / **Open folder** instead.

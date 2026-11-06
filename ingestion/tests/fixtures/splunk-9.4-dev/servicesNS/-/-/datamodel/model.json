@@ -1,0 +1,77 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "acceleration": "{\"enabled\":false,\"earliest_time\":\"\",\"cron_schedule\":\"*/5 * * * *\",\"max_time\":3600,\"backfill_time\":\"\",\"source_guid\":\"\",\"manual_rebuilds\":false,\"poll_buckets_until_maxtime\":false,\"max_concurrent\":3,\"allow_skew\":\"0\",\"schedule_priority\":\"default\",\"allow_old_summaries\":false,\"hunk.file_format\":\"\",\"hunk.dfs_block_size\":0,\"hunk.compression_codec\":\"\",\"workload_pool\":\"\"}",
+    "acceleration.allowed": true,
+    "acceleration.hunk.compression_codec": "",
+    "dataset.commands": "",
+    "dataset.description": "",
+    "dataset.display.currentCommand": "",
+    "dataset.display.datasummary.earliestTime": "",
+    "dataset.display.datasummary.latestTime": "",
+    "dataset.display.diversity": "latest",
+    "dataset.display.limiting": "100000",
+    "dataset.display.mode": "table",
+    "dataset.display.sample_ratio": "1",
+    "dataset.fields": "",
+    "dataset.type": "",
+    "description": "{\"modelName\":\"Acme_Web\",\"displayName\":\"Acme Web\",\"description\":\"Storefront traffic\",\"objectSummary\":{\"Event-Based\":1,\"Transaction-Based\":0,\"Search-Based\":0},\"objects\":[{\"objectName\":\"Requests\",\"displayName\":\"Requests\",\"parentName\":\"BaseEvent\",\"comment\":\"\",\"fields\":[{\"fieldName\":\"status\",\"owner\":\"Requests\",\"type\":\"number\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":true,\"displayName\":\"status\",\"comment\":\"\"},{\"fieldName\":\"_time\",\"owner\":\"BaseEvent\",\"type\":\"timestamp\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":false,\"displayName\":\"_time\",\"comment\":\"\"},{\"fieldName\":\"host\",\"owner\":\"BaseEvent\",\"type\":\"string\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":false,\"displayName\":\"host\",\"comment\":\"\"},{\"fieldName\":\"source\",\"owner\":\"BaseEvent\",\"type\":\"string\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":false,\"displayName\":\"source\",\"comment\":\"\"},{\"fieldName\":\"sourcetype\",\"owner\":\"BaseEvent\",\"type\":\"string\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":false,\"displayName\":\"sourcetype\",\"comment\":\"\"},{\"fieldName\":\"Requests\",\"owner\":\"Requests\",\"type\":\"objectCount\",\"fieldSearch\":\"\",\"required\":false,\"multivalue\":false,\"hidden\":false,\"editable\":false,\"displayName\":\"Requests\",\"comment\":\"\"}],\"calculations\":[],\"constraints\":[{\"search\":\"index=web sourcetype=access_combined\",\"owner\":\"Requests\"}],\"lineage\":\"Requests\",\"objectSearchNoFields\":\"| search (index=* OR index=_*) (index=web sourcetype=access_combined)  | fields \\\"_time\\\" \\\"host\\\" \\\"source\\\" \\\"sourcetype\\\" \\\"status\\\"\",\"objectSearch\":\"| search (index=* OR index=_*) (index=web sourcetype=access_combined)  | rename status AS Requests.status | fields \\\"_time\\\" \\\"host\\\" \\\"source\\\" \\\"sourcetype\\\" \\\"Requests.status\\\" | fields Requests.status, _time, host, source, sourcetype, Requests\",\"autoextractSearch\":\"| search (index=* OR index=_*) (index=web sourcetype=access_combined)\",\"previewSearch\":\"| search (index=* OR index=_*) (index=web sourcetype=access_combined)  | fields \\\"_time\\\" \\\"host\\\" \\\"source\\\" \\\"sourcetype\\\" \\\"status\\\"\",\"objectAccelerationSearch\":\"| search (index=* OR index=_*) (index=web sourcetype=access_combined) | eval nodename = \\\"Requests\\\" | rename status AS Requests.status | fields nodename, _time, host, source, sourcetype, Requests.status\",\"indexScopeWarning\":false,\"tsidxNamespace\":\"\"}],\"objectNameList\":[\"Requests\"]}",
+    "disabled": false,
+    "displayName": "Acme Web",
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:digest": "089efe6760939f3cd743f0c4cc01443a",
+    "eai:type": "datamodel",
+    "eai:userName": "nobody",
+    "strict_fields": "true",
+    "tags_whitelist": null
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/datamodel/model/Acme_Web",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web/_reload",
+    "alternate": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web",
+    "disable": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web/disable",
+    "edit": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web",
+    "list": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web",
+    "move": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web/move",
+    "remove": "/servicesNS/nobody/acme_web/datamodel/model/Acme_Web"
+   },
+   "name": "Acme_Web",
+   "updated": "2026-11-06T01:54:21+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 1
+ },
+ "updated": "2026-11-06T02:00:09+00:00"
+}

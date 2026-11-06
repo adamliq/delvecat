@@ -1,0 +1,142 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "TA-acme-firewall",
+    "eai:userName": "nobody",
+    "fields_array": [
+     "ip",
+     "owner"
+    ],
+    "fields_list": "ip,owner",
+    "filename": "asset_owners.csv",
+    "type": "file"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners"
+   },
+   "name": "asset_owners",
+   "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "acme_secops",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "collection": "threat_hosts",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_secops",
+    "eai:userName": "nobody",
+    "external_type": "kvstore",
+    "fields_array": [
+     "_key",
+     "ip",
+     "score"
+    ],
+    "fields_list": "_key, ip, score",
+    "type": "kvstore"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup/_reload",
+    "alternate": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup",
+    "disable": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup/disable",
+    "edit": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup",
+    "list": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup",
+    "move": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup/move",
+    "remove": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup"
+   },
+   "name": "threat_hosts_lookup",
+   "updated": "2026-11-06T01:54:28+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 2
+ },
+ "updated": "2026-11-06T02:00:09+00:00"
+}

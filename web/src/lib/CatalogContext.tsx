@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CatalogBundle } from "../generated/catalog";
-import { Catalog, defaultBundleUrl, fetchBundle, parseBundle } from "./catalog";
+import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
 import { EntitySearch } from "./search";
 
 type State =
@@ -10,7 +10,7 @@ type State =
 
 interface Ctx {
   state: State;
-  openFile: (file: File) => Promise<void>;
+  openFiles: (files: File[]) => Promise<void>;
 }
 
 const CatalogCtx = createContext<Ctx | null>(null);
@@ -30,15 +30,16 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Local files are parsed in the browser and never uploaded anywhere.
-  const openFile = useCallback(async (file: File) => {
+  const openFiles = useCallback(async (files: File[]) => {
     try {
-      setState(ready(parseBundle(await file.text()), `local file: ${file.name}`));
+      const { bundle, label } = await openLocalFiles(files);
+      setState(ready(bundle, label));
     } catch (err) {
       setState({ status: "error", message: (err as Error).message });
     }
   }, []);
 
-  const value = useMemo(() => ({ state, openFile }), [state, openFile]);
+  const value = useMemo(() => ({ state, openFiles }), [state, openFiles]);
   return <CatalogCtx.Provider value={value}>{children}</CatalogCtx.Provider>;
 }
 

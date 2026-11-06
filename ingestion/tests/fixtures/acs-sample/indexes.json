@@ -1,0 +1,4 @@
+{"__list__": [
+  {"name": "web", "datatype": "event", "searchableDays": 90, "maxDataSizeMB": 0, "totalEventCount": "391220144", "totalRawSizeMB": "48210", "splunkArchivalRetentionDays": 365},
+  {"name": "cloud_only_audit", "datatype": "event", "searchableDays": 400, "maxDataSizeMB": 512000, "totalEventCount": "1200", "totalRawSizeMB": "3"}
+]}

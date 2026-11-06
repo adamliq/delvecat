@@ -21,11 +21,12 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pytest -q
       - name: Build demo bundle
-        run: uv run delvecat-ingest build --fixtures tests/fixtures/acme --instance acme --instance-name "Acme (demo)" --out ../web/public/catalog.json
+        run: uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard --strict --instance-name "Acme (demo)" --out ../web/public/catalog
+      - run: uv run delvecat-ingest validate ../web/public/catalog
       - uses: actions/upload-artifact@v4
         with:
           name: demo-catalog
-          path: web/public/catalog.json
+          path: web/public/catalog
 
   web:
     runs-on: ubuntu-latest

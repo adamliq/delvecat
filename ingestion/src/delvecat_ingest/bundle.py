@@ -1,7 +1,8 @@
-"""Assemble and validate catalog bundles."""
+"""Assemble, version, validate and write catalog bundles."""
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -11,8 +12,10 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
 from .model import ExtractResult
+from .resolve import Resolver
 
 SCHEMA_RELATIVE = Path("schemas") / "catalog.schema.json"
+_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash")
 
 
 def find_schema(start: Path | None = None) -> Path:
@@ -25,28 +28,139 @@ def find_schema(start: Path | None = None) -> Path:
     raise FileNotFoundError(f"could not find {SCHEMA_RELATIVE}")
 
 
+# --- merging --------------------------------------------------------------------------
+
+
+def _merge_value(a: Any, b: Any) -> Any:
+    if a in (None, "", [], {}):
+        return b
+    if isinstance(a, dict) and isinstance(b, dict):
+        out = dict(a)
+        for k, v in b.items():
+            out[k] = _merge_value(a.get(k), v) if k in a else v
+        return out
+    if isinstance(a, list) and isinstance(b, list):
+        return a + [x for x in b if x not in a]
+    return a
+
+
+def merge_entities(entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Combine entities that share an id (e.g. a sourcetype from props.conf and from tstats,
+    or an index from REST and from ACS). The first non-empty value wins; dicts and lists merge.
+    """
+    merged: dict[str, dict[str, Any]] = {}
+    for e in entities:
+        if e["id"] in merged:
+            merged[e["id"]] = _merge_value(merged[e["id"]], e)
+        else:
+            merged[e["id"]] = e
+    return list(merged.values())
+
+
+# --- versioning -----------------------------------------------------------------------
+
+
+def content_hash(entity: dict[str, Any]) -> str:
+    """Hash of what an entity *is*, ignoring run-to-run measurements and bookkeeping."""
+    core = {k: v for k, v in entity.items() if k not in (*_VERSION_FIELDS, "updatedAt")}
+    if isinstance(core.get("properties"), dict):
+        core["properties"] = {k: v for k, v in core["properties"].items() if k != "observed"}
+    raw = json.dumps(core, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+
+def apply_versions(
+    entities: list[dict[str, Any]], generated_at: str, previous: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    prev = {e["id"]: e for e in (previous or {}).get("entities", [])}
+    added, modified = [], []
+    for e in entities:
+        h = content_hash(e)
+        old = prev.get(e["id"])
+        if old is None:
+            e["version"], e["firstSeenAt"] = 1, generated_at
+            added.append(e["id"])
+        else:
+            e["firstSeenAt"] = old.get("firstSeenAt", generated_at)
+            e["version"] = old.get("version", 1)
+            if old.get("contentHash") != h:
+                e["version"] += 1
+                modified.append(e["id"])
+        e["contentHash"] = h
+    if previous is None:
+        return None
+    ids = {e["id"] for e in entities}
+    removed = [
+        {"id": i, "type": o["type"], "name": o["name"]} for i, o in prev.items() if i not in ids
+    ]
+    return {
+        "previousGeneratedAt": previous["generatedAt"],
+        "added": sorted(added),
+        "removed": sorted(removed, key=lambda r: r["id"]),
+        "modified": sorted(modified),
+    }
+
+
+# --- assembly -------------------------------------------------------------------------
+
+
 def assemble(
-    instances: list[dict[str, Any]], result: ExtractResult, generated_at: datetime | None = None
+    instances: list[dict[str, Any]],
+    result: ExtractResult,
+    generated_at: datetime | None = None,
+    previous: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    ts = (generated_at or datetime.now(UTC)).astimezone(UTC).replace(microsecond=0)
+    generated = ts.isoformat().replace("+00:00", "Z")
+    entities = merge_entities(result.entities)
+    resolved, unresolved = Resolver(entities).resolve(result.refs)
+
     # Drop dangling edges (e.g. to an app that was not extracted) and duplicates.
-    ids = {e["id"] for e in result.entities}
+    ids = {e["id"] for e in entities}
     seen: set[tuple[str, str, str]] = set()
-    edges = []
-    for edge in result.edges:
+    edges, dangling = [], 0
+    for edge in [*result.edges, *resolved]:
         key = (edge["from"], edge["to"], edge["type"])
-        if edge["from"] in ids and edge["to"] in ids and key not in seen:
+        if edge["from"] not in ids or edge["to"] not in ids:
+            dangling += 1
+        elif key not in seen:
             seen.add(key)
             edges.append(edge)
-    ts = (generated_at or datetime.now(UTC)).replace(microsecond=0)
-    return {
+
+    reports = list(result.reports)
+    if result.refs:
+        examples = sorted({f"{r.target.type}:{r.target.name}" for r in unresolved})[:10]
+        reports.append(
+            {
+                "connector": "resolver",
+                "status": "ok",
+                "counts": {
+                    "references": len(result.refs),
+                    "unresolved": len(unresolved),
+                    "danglingEdges": dangling,
+                },
+                **(
+                    {"message": "unresolved targets include " + ", ".join(examples)}
+                    if examples
+                    else {}
+                ),
+            }
+        )
+
+    entities.sort(key=lambda e: e["id"])
+    changes = apply_versions(entities, generated, previous)
+    bundle: dict[str, Any] = {
         "schemaVersion": SCHEMA_VERSION,
-        "generatedAt": ts.isoformat().replace("+00:00", "Z"),
+        "generatedAt": generated,
         "generator": {"name": "delvecat-ingest", "version": __version__},
         "instances": instances,
-        "entities": sorted(result.entities, key=lambda e: e["id"]),
-        "edges": edges,
-        "ingestionReport": result.reports,
+        "entities": entities,
+        "edges": sorted(edges, key=lambda e: (e["from"], e["type"], e["to"])),
+        "ingestionReport": reports,
     }
+    if changes is not None:
+        bundle["changes"] = changes
+    return bundle
 
 
 def validate(bundle: dict[str, Any], schema_path: Path | None = None) -> list[str]:
@@ -57,7 +171,74 @@ def validate(bundle: dict[str, Any], schema_path: Path | None = None) -> list[st
         f"{'/'.join(map(str, err.absolute_path)) or '<root>'}: {err.message}"
         for err in validator.iter_errors(bundle)
     ]
-    ids = [e.get("id") for e in bundle.get("entities", [])]
-    dupes = sorted({i for i in ids if ids.count(i) > 1})
-    problems.extend(f"duplicate entity id: {d}" for d in dupes)
+    seen: set[str] = set()
+    dupes: set[str] = set()
+    for e in bundle.get("entities", []):
+        (dupes if e.get("id") in seen else seen).add(e.get("id"))
+    problems.extend(f"duplicate entity id: {d}" for d in sorted(dupes))
     return problems
+
+
+# --- reading / writing ----------------------------------------------------------------
+
+
+def _dump(data: Any, pretty: bool) -> bytes:
+    if pretty:
+        text = json.dumps(data, indent=2, ensure_ascii=False)
+    else:
+        text = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+    return (text + "\n").encode()
+
+
+def write_bundle(
+    bundle: dict[str, Any], out: Path, *, shard: bool = False, pretty: bool = False
+) -> list[Path]:
+    """Write a single-file bundle, or (``shard=True``) a directory with a manifest
+    ``catalog.json`` plus one file per entity type and one for edges."""
+    if not shard:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(_dump(bundle, pretty))
+        return [out]
+    out.mkdir(parents=True, exist_ok=True)
+    written, shards = [], []
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for e in bundle["entities"]:
+        by_type.setdefault(e["type"], []).append(e)
+    parts: list[tuple[str, str, str | None, list[dict[str, Any]]]] = [
+        (f"entities/{t}.json", "entities", t, items) for t, items in sorted(by_type.items())
+    ]
+    parts.append(("edges.json", "edges", None, bundle["edges"]))
+    for rel, kind, etype, items in parts:
+        data = _dump({kind: items}, pretty)
+        path = out / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        written.append(path)
+        shard_info = {
+            "path": rel,
+            "kind": kind,
+            "count": len(items),
+            "sha256": hashlib.sha256(data).hexdigest(),
+        }
+        if etype:
+            shard_info["entityType"] = etype
+        shards.append(shard_info)
+    manifest = {**bundle, "entities": [], "edges": [], "shards": shards}
+    (out / "catalog.json").write_bytes(_dump(manifest, pretty))
+    return [out / "catalog.json", *written]
+
+
+def load_bundle(path: Path) -> dict[str, Any]:
+    """Read a bundle file, a manifest file, or a directory containing ``catalog.json``.
+    Shards are inlined so callers always see the full bundle."""
+    if path.is_dir():
+        path = path / "catalog.json"
+    bundle = json.loads(path.read_text(encoding="utf-8"))
+    shards = bundle.pop("shards", None)
+    if shards:
+        for s in shards:
+            data = (path.parent / s["path"]).read_bytes()
+            if hashlib.sha256(data).hexdigest() != s["sha256"]:
+                raise ValueError(f"shard {s['path']} does not match its sha256")
+            bundle[s["kind"]].extend(json.loads(data)[s["kind"]])
+    return bundle

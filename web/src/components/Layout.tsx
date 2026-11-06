@@ -1,13 +1,24 @@
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { searchPath } from "../lib/routes";
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { state, openFile } = useCatalogState();
+  const { state, openFiles } = useCatalogState();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const folderInput = useRef<HTMLInputElement>(null);
+  const onPick = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = [...(e.target.files ?? [])];
+    e.target.value = "";
+    if (files.length) void openFiles(files).then(() => navigate("/"));
+  };
+
+  useEffect(() => {
+    // React does not type the non-standard directory picker attribute.
+    folderInput.current?.setAttribute("webkitdirectory", "");
+  }, []);
 
   const submit = (ev: FormEvent) => {
     ev.preventDefault();
@@ -29,20 +40,18 @@ export function Layout({ children }: { children: ReactNode }) {
             aria-label="Search the catalog"
           />
         </form>
-        <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
-          Open bundle
-        </button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="application/json,.json"
-          hidden
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void openFile(f).then(() => navigate("/"));
-            e.target.value = "";
-          }}
-        />
+        <div className="open-buttons">
+          <button type="button" className="btn" onClick={() => fileInput.current?.click()}
+            title="Open a catalog.json bundle from your computer. It is read in the browser and never uploaded.">
+            Open file
+          </button>
+          <button type="button" className="btn" onClick={() => folderInput.current?.click()}
+            title="Open a sharded bundle folder (catalog.json + entities/ + edges.json).">
+            Open folder
+          </button>
+        </div>
+        <input ref={fileInput} type="file" accept="application/json,.json" multiple hidden onChange={onPick} />
+        <input ref={folderInput} type="file" hidden onChange={onPick} />
       </header>
       <main className="content">{children}</main>
       <footer className="footer">

@@ -10,11 +10,13 @@ from .transport import Transport
 PAGE_SIZE = 500
 
 
-def iter_entries(transport: Transport, path: str) -> Iterator[dict[str, Any]]:
+def iter_entries(
+    transport: Transport, path: str, params: dict[str, Any] | None = None
+) -> Iterator[dict[str, Any]]:
     """Yield every ``entry`` of a collection endpoint, following ``paging``."""
     offset = 0
     while True:
-        body = transport.get(path, {"count": PAGE_SIZE, "offset": offset})
+        body = transport.get(path, {**(params or {}), "count": PAGE_SIZE, "offset": offset})
         entries = body.get("entry", [])
         yield from entries
         paging = body.get("paging") or {}

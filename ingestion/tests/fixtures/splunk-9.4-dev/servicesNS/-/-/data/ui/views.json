@@ -1,0 +1,115 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "acme_secops",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_secops",
+    "eai:data": "<dashboard version=\"2\" theme=\"dark\"><label>SOC Overview</label><definition><![CDATA[{\"dataSources\": {\"ds1\": {\"type\": \"ds.search\", \"options\": {\"query\": \"index=firewall action=blocked | timechart count\"}}}, \"visualizations\": {}, \"layout\": {\"type\": \"absolute\", \"structure\": []}, \"title\": \"SOC Overview\"}]]></definition></dashboard>",
+    "eai:digest": "09f9ac50c37f9b522da1bde66faad762",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "SOC Overview",
+    "rootNode": "dashboard",
+    "version": "2"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_secops/data/ui/views/soc_overview",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview/_reload",
+    "alternate": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview",
+    "edit": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview",
+    "list": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview",
+    "move": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview/move",
+    "remove": "/servicesNS/nobody/acme_secops/data/ui/views/soc_overview"
+   },
+   "name": "soc_overview",
+   "updated": "2026-11-06T01:54:21+00:00"
+  },
+  {
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "description": "Error rates and top failing pages for the storefront.",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:data": "<dashboard version=\"1.1\"><label>Storefront Health</label><description>Error rates and top failing pages for the storefront.</description><row><panel><table><search ref=\"Web - Top Error Pages\"/></table></panel></row></dashboard>",
+    "eai:digest": "5a65d1ffd69be70ace8f3efa860f93e4",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Storefront Health",
+    "rootNode": "dashboard",
+    "version": "1.1"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/ui/views/storefront_health",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health/_reload",
+    "alternate": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health",
+    "edit": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health",
+    "list": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health",
+    "move": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health/move",
+    "remove": "/servicesNS/nobody/acme_web/data/ui/views/storefront_health"
+   },
+   "name": "storefront_health",
+   "updated": "2026-11-06T01:54:21+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 2
+ },
+ "updated": "2026-11-06T02:00:09+00:00"
+}

@@ -118,3 +118,24 @@ h2 { font-size: 1.1rem; margin: 0 0 0.6rem; }
   .facts { grid-template-columns: 1fr; gap: 2px; }
   .facts dd { margin-bottom: 8px; }
 }
+
+h3 { font-size: 0.95rem; margin: 0 0 0.4rem; }
+.small { font-size: 0.85rem; }
+.open-buttons { display: flex; gap: 8px; }
+.btn-small { padding: 3px 8px; font-size: 0.85rem; margin-top: 4px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.card-title { font-weight: 650; }
+.card details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--accent); }
+.rel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px 24px; }
+.rel-group { min-width: 0; }
+.rel-type { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.chip { background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 0 6px; font-size: 0.85rem; }
+.table-wrap { overflow-x: auto; max-width: 100%; }
+.mini-table { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
+.mini-table th, .mini-table td { overflow-wrap: normal; word-break: normal; text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.mini-table th { color: var(--muted); font-weight: 600; }
+.facts.nested { grid-template-columns: max-content 1fr; gap: 2px 12px; }
+.facts dd, .facts dt { min-width: 0; }

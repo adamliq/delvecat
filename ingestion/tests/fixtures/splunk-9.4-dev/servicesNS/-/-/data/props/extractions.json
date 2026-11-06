@@ -1,0 +1,100 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "attribute": "EXTRACT-action",
+    "eai:acl": null,
+    "stanza": "acme:fw",
+    "type": "Inline",
+    "value": "action=(?<action>\\w+)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action"
+   },
+   "name": "acme:fw : EXTRACT-action",
+   "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "attribute": "REPORT-fw_kv",
+    "eai:acl": null,
+    "stanza": "acme:fw",
+    "type": "Uses transform",
+    "value": "acme_fw_kv"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv"
+   },
+   "name": "acme:fw : REPORT-fw_kv",
+   "updated": "2026-11-06T01:54:28+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 2
+ },
+ "updated": "2026-11-06T02:00:09+00:00"
+}

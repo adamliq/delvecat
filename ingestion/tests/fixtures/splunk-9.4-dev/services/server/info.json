@@ -1,0 +1,105 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": []
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "system",
+   "content": {
+    "activeLicenseGroup": "Trial",
+    "activeLicenseSubgroup": "Production",
+    "addOns": {
+     "hadoop": {
+      "parameters": {
+       "erp_type": "report",
+       "guid": "6F416E61-B40E-461C-A782-CBC186E98133",
+       "maxNodes": "200"
+      },
+      "type": "external_results_provider"
+     }
+    },
+    "build": "1b0c587000b8",
+    "conf_generation": 103,
+    "cpu_arch": "x86_64",
+    "eai:acl": null,
+    "federated_search_enabled": true,
+    "fips_mode": false,
+    "guid": "93D348A9-E8C3-401C-9360-FD5FFB5B0B89",
+    "health_info": "red",
+    "health_version": 1699404762,
+    "host": "9306d2af8296",
+    "host_fqdn": "9306d2af8296",
+    "host_resolved": "9306d2af8296",
+    "isConverged": false,
+    "isForwarding": false,
+    "isFree": false,
+    "isTrial": true,
+    "kvStoreStatus": "ready",
+    "licenseKeys": [
+     "5C52DA5145AD67B8188604C49962D12F2C3B2CF1B82A6878E46F68CA2812807B"
+    ],
+    "licenseSignature": "80101758a3f3319324ffecd90bdfb89f",
+    "licenseState": "OK",
+    "license_labels": [
+     "Splunk Enterprise   Splunk Analytics for Hadoop Download Trial"
+    ],
+    "manager_guid": "93D348A9-E8C3-401C-9360-FD5FFB5B0B89",
+    "manager_uri": "self",
+    "master_guid": "93D348A9-E8C3-401C-9360-FD5FFB5B0B89",
+    "master_uri": "self",
+    "max_users": 4294967295,
+    "mode": "normal",
+    "numberOfCores": 4,
+    "numberOfVirtualCores": 4,
+    "os_build": "#1 SMP PREEMPT_DYNAMIC @0",
+    "os_name": "Linux",
+    "os_name_extended": "Linux",
+    "os_version": "6.18.44-fc-v242",
+    "physicalMemoryMB": 16086,
+    "product_type": "enterprise",
+    "rtsearch_enabled": true,
+    "serverName": "9306d2af8296",
+    "server_roles": [
+     "indexer",
+     "license_master",
+     "license_manager",
+     "kv_store"
+    ],
+    "shutting_down": "0",
+    "startup_time": 1793929820,
+    "staticAssetId": "F5F74B10EEC4232E9D3D65D00AAC892F72762E3C5AC362733E0CA674CD88EE1A",
+    "version": "9.4.17",
+    "versionControlEnabled": true
+   },
+   "id": "https://localhost:8089/services/server/info/server-info",
+   "links": {
+    "alternate": "/services/server/info/server-info",
+    "list": "/services/server/info/server-info"
+   },
+   "name": "server-info",
+   "updated": "1970-01-01T00:00:00+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 1
+ },
+ "updated": "2026-11-06T02:00:08+00:00"
+}

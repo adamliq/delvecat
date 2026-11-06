@@ -1,4 +1,4 @@
-"""Drop credentials before anything reaches a bundle."""
+"""Drop credentials and email addresses before anything reaches a bundle or fixture."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Any
 
 SENSITIVE_KEY = re.compile(
     r"(passw(or)?d|secret|token|api[_-]?key|credential|private[_-]?key|auth[_-]?header|"
-    r"clear_password|ph-auth)",
+    r"clear_password|ph-auth|e-?mail)",
     re.IGNORECASE,
 )
 

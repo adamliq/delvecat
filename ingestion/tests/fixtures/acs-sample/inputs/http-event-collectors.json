@@ -1,0 +1,4 @@
+{"http-event-collectors": [
+  {"spec": {"name": "acme_storefront", "defaultIndex": "web", "allowedIndexes": ["web", "summary_web"], "defaultSourcetype": "access_combined", "disabled": false, "useAck": false}, "token": "00000000-1111-2222-3333-444444444444"},
+  {"spec": {"name": "mobile_app", "defaultIndex": "cloud_only_audit", "allowedIndexes": [], "defaultSourcetype": "acme:mobile", "disabled": true}, "token": "55555555-6666-7777-8888-999999999999"}
+]}

@@ -13,6 +13,7 @@ export const PRODUCT_LABELS: Record<Product, string> = {
 
 const SPECIAL: Partial<Record<EntityType, string>> = {
   kvCollection: "KV Store Collection",
+  automaticLookup: "Automatic Lookup",
   soarApp: "SOAR App",
   soarAsset: "SOAR Asset",
   soarPlaybook: "SOAR Playbook",

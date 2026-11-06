@@ -1,0 +1,195 @@
+[
+  {
+    "type": "app",
+    "name": "acme_web"
+  },
+  {
+    "type": "app",
+    "name": "acme_secops"
+  },
+  {
+    "type": "app",
+    "name": "TA-acme-firewall"
+  },
+  {
+    "type": "index",
+    "name": "web"
+  },
+  {
+    "type": "index",
+    "name": "firewall"
+  },
+  {
+    "type": "index",
+    "name": "wineventlog"
+  },
+  {
+    "type": "index",
+    "name": "summary_web"
+  },
+  {
+    "type": "index",
+    "name": "infra_metrics"
+  },
+  {
+    "type": "sourcetype",
+    "name": "acme:fw"
+  },
+  {
+    "type": "fieldExtraction",
+    "name": "acme:fw : EXTRACT-action",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "fieldExtraction",
+    "name": "acme:fw : REPORT-fw_kv",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "fieldAlias",
+    "name": "acme:fw : FIELDALIAS-src",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "calculatedField",
+    "name": "acme:fw : EVAL-vendor_product",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "automaticLookup",
+    "name": "acme:fw : LOOKUP-asset_owner",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "transform",
+    "name": "acme_fw_kv",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "sourcetype",
+    "name": "acme:app"
+  },
+  {
+    "type": "lookup",
+    "name": "asset_owners.csv",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "lookup",
+    "name": "asset_owners",
+    "app": "TA-acme-firewall"
+  },
+  {
+    "type": "kvCollection",
+    "name": "threat_hosts",
+    "app": "acme_secops"
+  },
+  {
+    "type": "lookup",
+    "name": "threat_hosts_lookup",
+    "app": "acme_secops"
+  },
+  {
+    "type": "macro",
+    "name": "web_status_buckets",
+    "app": "acme_web"
+  },
+  {
+    "type": "macro",
+    "name": "rare_port_threshold(1)",
+    "app": "acme_secops"
+  },
+  {
+    "type": "eventtype",
+    "name": "acme_failed_login",
+    "app": "acme_secops"
+  },
+  {
+    "type": "tag",
+    "name": "authentication"
+  },
+  {
+    "type": "tag",
+    "name": "failure"
+  },
+  {
+    "type": "tag",
+    "name": "network"
+  },
+  {
+    "type": "tag",
+    "name": "firewall"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Hourly Status Summary",
+    "app": "acme_web"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Top Error Pages",
+    "app": "acme_web"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Firewall - Denied Outbound to Rare Ports",
+    "app": "acme_secops"
+  },
+  {
+    "type": "role",
+    "name": "acme_soc"
+  },
+  {
+    "type": "role",
+    "name": "acme_web_analyst"
+  },
+  {
+    "type": "user",
+    "name": "jlee"
+  },
+  {
+    "type": "user",
+    "name": "mpatel"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Windows - Failed Logons by User",
+    "app": "acme_secops",
+    "owner": "jlee"
+  },
+  {
+    "type": "dashboard",
+    "name": "storefront_health",
+    "app": "acme_web"
+  },
+  {
+    "type": "dashboard",
+    "name": "soc_overview",
+    "app": "acme_secops"
+  },
+  {
+    "type": "dataModel",
+    "name": "Acme_Web",
+    "app": "acme_web"
+  },
+  {
+    "type": "workflowAction",
+    "name": "acme_whois",
+    "app": "acme_secops"
+  },
+  {
+    "type": "input",
+    "name": "http://acme_storefront",
+    "app": "splunk_httpinput"
+  },
+  {
+    "type": "input",
+    "name": "monitor:///opt/splunk/var/log/splunk/splunkd-utility.log",
+    "app": "acme_web"
+  },
+  {
+    "type": "input",
+    "name": "udp://5514",
+    "app": "TA-acme-firewall"
+  }
+]

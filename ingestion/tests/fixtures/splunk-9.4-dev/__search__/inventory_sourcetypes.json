@@ -1,0 +1,195 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "count": "841",
+   "firstSeen": "1793929820",
+   "index": "_audit",
+   "lastSeen": "1793930400",
+   "sourcetype": "audittrail"
+  },
+  {
+   "count": "243",
+   "firstSeen": "1793929830",
+   "index": "_configtracker",
+   "lastSeen": "1793930076",
+   "sourcetype": "splunk_configuration_change"
+  },
+  {
+   "count": "4",
+   "firstSeen": "1793929809",
+   "index": "_internal",
+   "lastSeen": "1793929809",
+   "sourcetype": "first_install-too_small"
+  },
+  {
+   "count": "874",
+   "firstSeen": "1793929829",
+   "index": "_internal",
+   "lastSeen": "1793930373",
+   "sourcetype": "mongod"
+  },
+  {
+   "count": "13",
+   "firstSeen": "1793929829",
+   "index": "_internal",
+   "lastSeen": "1793930400",
+   "sourcetype": "scheduler"
+  },
+  {
+   "count": "211",
+   "firstSeen": "1793929810",
+   "index": "_internal",
+   "lastSeen": "1793929834",
+   "sourcetype": "splunk_python"
+  },
+  {
+   "count": "4",
+   "firstSeen": "1793929889",
+   "index": "_internal",
+   "lastSeen": "1793930099",
+   "sourcetype": "splunk_search_messages"
+  },
+  {
+   "count": "3",
+   "firstSeen": "1793929831",
+   "index": "_internal",
+   "lastSeen": "1793929831",
+   "sourcetype": "splunk_shc_upgrade_completion_script"
+  },
+  {
+   "count": "1",
+   "firstSeen": "1793929830",
+   "index": "_internal",
+   "lastSeen": "1793929830",
+   "sourcetype": "splunk_version"
+  },
+  {
+   "count": "1",
+   "firstSeen": "1793929834",
+   "index": "_internal",
+   "lastSeen": "1793929834",
+   "sourcetype": "splunk_web_access"
+  },
+  {
+   "count": "217",
+   "firstSeen": "1793929832",
+   "index": "_internal",
+   "lastSeen": "1793929834",
+   "sourcetype": "splunk_web_service"
+  },
+  {
+   "count": "3616",
+   "firstSeen": "1793929818",
+   "index": "_internal",
+   "lastSeen": "1793930402",
+   "sourcetype": "splunkd"
+  },
+  {
+   "count": "706",
+   "firstSeen": "1793929830",
+   "index": "_internal",
+   "lastSeen": "1793930400",
+   "sourcetype": "splunkd_access"
+  },
+  {
+   "count": "1",
+   "firstSeen": "1793929829",
+   "index": "_internal",
+   "lastSeen": "1793929829",
+   "sourcetype": "splunkd_conf"
+  },
+  {
+   "count": "1",
+   "firstSeen": "1793929820",
+   "index": "_internal",
+   "lastSeen": "1793929820",
+   "sourcetype": "splunkd_stderr"
+  },
+  {
+   "count": "1",
+   "firstSeen": "1793929835",
+   "index": "_internal",
+   "lastSeen": "1793929835",
+   "sourcetype": "splunkd_ui_access"
+  },
+  {
+   "count": "7",
+   "firstSeen": "1793929830",
+   "index": "_internal",
+   "lastSeen": "1793929831",
+   "sourcetype": "sup-pkg-agent-manager-stdout-too_small"
+  },
+  {
+   "count": "21",
+   "firstSeen": "1793929830",
+   "index": "_internal",
+   "lastSeen": "1793930400",
+   "sourcetype": "sup-pkg-identity-stdout-too_small"
+  },
+  {
+   "count": "62",
+   "firstSeen": "1793929829",
+   "index": "_internal",
+   "lastSeen": "1793929832",
+   "sourcetype": "supervisor-too_small"
+  },
+  {
+   "count": "8",
+   "firstSeen": "1793929899",
+   "index": "_introspection",
+   "lastSeen": "1793930367",
+   "sourcetype": "http_event_collector_metrics"
+  },
+  {
+   "count": "41",
+   "firstSeen": "1793929831",
+   "index": "_introspection",
+   "lastSeen": "1793930397",
+   "sourcetype": "kvstore"
+  },
+  {
+   "count": "68",
+   "firstSeen": "1793929840",
+   "index": "_introspection",
+   "lastSeen": "1793930400",
+   "sourcetype": "search_telemetry"
+  },
+  {
+   "count": "19",
+   "firstSeen": "1793929829",
+   "index": "_introspection",
+   "lastSeen": "1793929829",
+   "sourcetype": "splunk_disk_objects"
+  },
+  {
+   "count": "541",
+   "firstSeen": "1793929840",
+   "index": "_introspection",
+   "lastSeen": "1793930400",
+   "sourcetype": "splunk_resource_usage"
+  },
+  {
+   "count": "30",
+   "firstSeen": "1793929198",
+   "index": "firewall",
+   "lastSeen": "1793930068",
+   "sourcetype": "acme:fw"
+  },
+  {
+   "count": "40",
+   "firstSeen": "1793927728",
+   "index": "web",
+   "lastSeen": "1793930068",
+   "sourcetype": "access_combined"
+  },
+  {
+   "count": "20",
+   "firstSeen": "1793928358",
+   "index": "wineventlog",
+   "lastSeen": "1793930068",
+   "sourcetype": "WinEventLog:Security"
+  }
+ ],
+ "spl": "| tstats count min(_time) as firstSeen max(_time) as lastSeen where (index=* OR index=_*) by index, sourcetype"
+}

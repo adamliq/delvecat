@@ -5,8 +5,8 @@ install:
 	cd web && npm install
 
 demo:  ## build the demo catalog bundle from fixtures
-	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/acme --instance acme \
-		--instance-name "Acme (demo)" --out ../web/public/catalog.json
+	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard \
+		--instance-name "Acme (demo)" --out ../web/public/catalog
 
 dev: demo
 	cd web && npm run dev

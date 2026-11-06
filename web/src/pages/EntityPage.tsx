@@ -1,18 +1,49 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { Edge } from "../generated/catalog";
+import { PropValue } from "../components/PropValue";
 import { TypeBadge } from "../components/EntityBits";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
+import { relationGroups, type RelationGroup } from "../lib/relations";
 import { entityPath, searchPath } from "../lib/routes";
 
-function formatValue(v: unknown): string {
-  if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
-  if (v === null || v === undefined || v === "") return "—";
-  if (typeof v === "object") return JSON.stringify(v);
-  return String(v);
-}
+/** Properties shown as code blocks rather than in the property table. */
+const CODE: Record<string, string> = {
+  search: "SPL",
+  definition: "Definition",
+  expression: "Eval expression",
+  REGEX: "Regex",
+  srchFilter: "Search filter",
+  linkUri: "Link URI",
+};
 
-const LONG_TEXT = new Set(["search", "definition"]);
+const GROUP_LIMIT = 25;
+
+function Group({ group }: { group: RelationGroup }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? group.entities : group.entities.slice(0, GROUP_LIMIT);
+  return (
+    <div className="rel-group">
+      <h3>
+        {group.label} <span className="muted">({group.entities.length})</span>
+      </h3>
+      <ul className="plain-list">
+        {shown.map((e) => (
+          <li key={e.id}>
+            <span className="muted rel-type">{typeLabel(e.type)}</span>{" "}
+            <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
+            {e.app && <span className="muted"> · {e.app}</span>}
+          </li>
+        ))}
+      </ul>
+      {group.entities.length > GROUP_LIMIT && (
+        <button type="button" className="btn btn-small" onClick={() => setAll(!all)}>
+          {all ? "Show fewer" : `Show all ${group.entities.length}`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function EntityPage() {
   const { id = "" } = useParams();
@@ -28,13 +59,12 @@ export function EntityPage() {
     );
   }
 
-  const props = Object.entries(entity.properties ?? {});
-  const code = props.filter(([k, v]) => LONG_TEXT.has(k) && typeof v === "string");
-  const scalars = props.filter(([k]) => !LONG_TEXT.has(k));
-  const related = (edges: Edge[], end: "from" | "to") =>
-    edges.map((edge) => ({ edge, other: catalog.byId.get(edge[end]) })).filter((r) => r.other);
-  const upstream = related(catalog.edgesTo(entity.id), "from");
-  const downstream = related(catalog.edgesFrom(entity.id), "to");
+  const { observed, ...props } = (entity.properties ?? {}) as Record<string, unknown>;
+  const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
+  const rest = Object.entries(props).filter(([k]) => !(k in CODE));
+  const groups = relationGroups(catalog, entity.id);
+  const ownerUser = entity.owner ? catalog.byId.get(`${entity.instance}:user:${entity.owner}`) : undefined;
+  const instance = catalog.bundle.instances.find((i) => i.id === entity.instance);
 
   return (
     <div className="stack">
@@ -49,53 +79,62 @@ export function EntityPage() {
       </div>
 
       <dl className="facts">
-        <dt>Product</dt><dd><Link to={searchPath({ product: entity.product })}>{PRODUCT_LABELS[entity.product]}</Link></dd>
-        <dt>Instance</dt><dd>{entity.instance}</dd>
+        <dt>Product</dt>
+        <dd><Link to={searchPath({ product: entity.product })}>{PRODUCT_LABELS[entity.product]}</Link></dd>
+        <dt>Instance</dt><dd>{instance?.name ?? entity.instance}</dd>
         {entity.app && (<><dt>App</dt><dd><Link to={searchPath({ app: entity.app })}>{entity.app}</Link></dd></>)}
-        {entity.owner && (<><dt>Owner</dt><dd>{entity.owner}</dd></>)}
+        {entity.owner && (
+          <><dt>Owner</dt><dd>{ownerUser ? <Link to={entityPath(ownerUser.id)}>{entity.owner}</Link> : entity.owner}</dd></>
+        )}
         {entity.sharing && (<><dt>Sharing</dt><dd>{entity.sharing}</dd></>)}
         <dt>Status</dt><dd>{entity.disabled ? "Disabled" : "Enabled"}</dd>
-        {entity.updatedAt && (<><dt>Updated</dt><dd>{new Date(entity.updatedAt).toLocaleString()}</dd></>)}
+        {entity.updatedAt && (<><dt>Updated in Splunk</dt><dd>{new Date(entity.updatedAt).toLocaleString()}</dd></>)}
+        {entity.version !== undefined && (
+          <>
+            <dt>Catalog version</dt>
+            <dd>
+              v{entity.version}
+              {entity.firstSeenAt && <span className="muted"> · first seen {new Date(entity.firstSeenAt).toLocaleDateString()}</span>}
+            </dd>
+          </>
+        )}
       </dl>
 
       {code.map(([k, v]) => (
         <section key={k}>
-          <h2>{k === "search" ? "SPL" : "Definition"}</h2>
+          <h2>{CODE[k]}</h2>
           <pre className="code">{v as string}</pre>
         </section>
       ))}
 
-      {scalars.length > 0 && (
+      {rest.length > 0 && (
         <section>
           <h2>Properties</h2>
           <dl className="facts">
-            {scalars.map(([k, v]) => (
-              <div key={k} className="fact-pair"><dt>{k}</dt><dd>{formatValue(v)}</dd></div>
+            {rest.map(([k, v]) => (
+              <div key={k} className="fact-pair"><dt>{k}</dt><dd><PropValue value={v} /></dd></div>
             ))}
           </dl>
         </section>
       )}
 
+      {observed !== undefined && (
+        <section>
+          <h2>Observed</h2>
+          <p className="muted small">Measured when the bundle was generated ({new Date(catalog.bundle.generatedAt).toLocaleString()}).</p>
+          <PropValue value={observed} />
+        </section>
+      )}
+
       <section>
         <h2>Relationships</h2>
-        {upstream.length + downstream.length === 0 && (
-          <p className="muted">No relationships yet. SPL lineage arrives in Phase 3.</p>
+        {groups.length === 0 ? (
+          <p className="muted">No relationships found.</p>
+        ) : (
+          <div className="rel-grid">
+            {groups.map((g) => <Group key={`${g.direction}:${g.edgeType}`} group={g} />)}
+          </div>
         )}
-        <ul className="plain-list">
-          {upstream.map(({ edge, other }) => (
-            <li key={`u-${other!.id}-${edge.type}`}>
-              <Link to={entityPath(other!.id)}>{other!.displayName ?? other!.name}</Link>{" "}
-              <span className="muted">({typeLabel(other!.type)}) {edge.type} this</span>
-            </li>
-          ))}
-          {downstream.map(({ edge, other }) => (
-            <li key={`d-${other!.id}-${edge.type}`}>
-              <span className="muted">this {edge.type}</span>{" "}
-              <Link to={entityPath(other!.id)}>{other!.displayName ?? other!.name}</Link>{" "}
-              <span className="muted">({typeLabel(other!.type)})</span>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );

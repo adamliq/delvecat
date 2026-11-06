@@ -63,9 +63,12 @@ document and classify what they find — **without ever writing back to Splunk**
 
 ## 3. Entity model
 
-Fully qualified name (FQN): `<instance>:<type>:<app>/<owner>/<name>` for
-knowledge objects (Splunk scopes them by app, owner and sharing), and
-`<instance>:<type>:<name>` for global objects (indexes, hosts, roles).
+Fully qualified name (FQN), mirroring how Splunk makes names unique:
+`<instance>:<type>:<name>` for global objects (indexes, sourcetypes, hosts,
+roles, users, apps); `<instance>:<type>:<app>/<name>` for shared knowledge
+objects (sharing app/global); `<instance>:<type>:<app>/@<owner>/<name>` for
+private ones. The owner of a shared object is metadata only (it can be
+reassigned), so it is not part of the identity.
 
 Common aspects on every entity: `description`, `owners`, `tags`,
 `classifications` (e.g. `PII.Email`, `MITRE.T1078`), `glossaryTerms`,
@@ -181,8 +184,8 @@ are confirmed against a live instance before their connector ships.
 
 | Phase | Scope | Exit criteria |
 |---|---|---|
-| **0. Skeleton** | Monorepo, JSON Schemas, read-only client + fixture transport, ingest CLI producing a validated bundle from fixtures, web shell (search + entity page), CI, Pages deploy, docker-compose Splunk for dev | `make demo` builds a bundle and the site renders it; CI green; Pages workflow deploys the demo |
-| **1. Core inventory** | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
+| **0. Skeleton** ✅ | Monorepo, JSON Schemas, read-only client + fixture transport, ingest CLI producing a validated bundle from fixtures, web shell (search + entity page), CI, Pages deploy, docker-compose Splunk for dev | `make demo` builds a bundle and the site renders it; CI green; Pages workflow deploys the demo |
+| **1. Core inventory** ✅ | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
 | **2. UI MVP + annotations** | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
 | **3. SPL lineage** | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
 | **4. Ingestion products** | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
@@ -190,6 +193,41 @@ are confirmed against a live instance before their connector ships.
 | **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
 | **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
 | Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
+
+### Phase 1 notes (done)
+
+- Verified against a live Splunk Enterprise 9.4 container seeded by
+  `deploy/seed_dev_splunk.py`; `tests/test_live_splunk.py` checks that every
+  seeded object (`deploy/seed_manifest.json`) is catalogued. The same run is
+  recorded as `ingestion/tests/fixtures/splunk-9.4-dev` (via `--record`, then
+  `tools/slim_fixtures.py`), which drives the offline tests and the demo site.
+- Extractors: server info, apps, users, roles, indexes (event + metric),
+  sourcetype definitions, observed sourcetypes/hosts/sources (`tstats`),
+  inputs (monitor, TCP, splunktcp, UDP, script, HEC), forwarders
+  (`tcpin_connections`), saved searches, dashboards, macros, eventtypes, tags,
+  field extractions, field aliases, calculated fields, automatic lookups,
+  transforms, lookup files and definitions, KV store collections, data models,
+  workflow actions, and opt-in field discovery (`--fields`, `fieldsummary`).
+- Splunk Cloud: ACS connector (indexes, HEC token metadata, apps, IP
+  allow-list *counts*) merges into the same instance. ACS response shapes are
+  covered by a hand-written fixture and still need a check against a real
+  Cloud stack.
+- Relationships resolved after extraction: app contains object; role →
+  index (effective, incl. inherited and wildcard patterns, `*` excluding
+  internal indexes as Splunk does); user → role; role → imported role;
+  sourcetype → props objects; extraction → transform; automatic lookup →
+  lookup definition → file / KV collection; tag → eventtype/sourcetype/host;
+  input/host/source/sourcetype → index; summary-indexing search → index.
+- Versioning: `--previous` assigns per-entity `version`, `firstSeenAt` and a
+  bundle-level change summary. Run-to-run measurements live under
+  `properties.observed` and do not count as changes.
+- Sharding: `--shard` writes `catalog.json` + `entities/<type>.json` +
+  `edges.json` with sha256 checks; the web app loads either form and can open
+  a bundle folder from disk.
+- Safety: GETs that act (`_reload`, `control`, `dispatch`, ...) are refused
+  alongside all writes; email addresses are dropped with credentials.
+- Deferred: SPL-derived lineage (Phase 3), dashboard panel parsing (Phase 3),
+  data model acceleration status and `_audit` usage (Phase 6).
 
 ## 8. Repository layout
 

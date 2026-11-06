@@ -12,6 +12,7 @@ export type EntityType =
   | "field"
   | "dataModel"
   | "lookup"
+  | "automaticLookup"
   | "kvCollection"
   | "savedSearch"
   | "macro"
@@ -73,6 +74,9 @@ export type Product =
   | "deploymentServer"
   | "dbConnect";
 export type Sharing = "user" | "app" | "global" | "system";
+/**
+ * Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...).
+ */
 export type EdgeType =
   | "reads"
   | "writes"
@@ -83,7 +87,9 @@ export type EdgeType =
   | "triggers"
   | "accelerates"
   | "mapsTo"
-  | "grantsAccess";
+  | "grantsAccess"
+  | "memberOf"
+  | "inherits";
 
 /**
  * A DelveCat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.
@@ -99,6 +105,11 @@ export interface CatalogBundle {
   entities: Entity[];
   edges: Edge[];
   ingestionReport?: ConnectorReport[];
+  changes?: ChangeSummary;
+  /**
+   * When present, entities and edges live in these files (paths relative to this manifest) and the entities/edges arrays here are empty.
+   */
+  shards?: Shard[];
 }
 export interface Instance {
   id: string;
@@ -107,6 +118,13 @@ export interface Instance {
   version?: string;
   webUrl?: string;
   roles?: string[];
+  /**
+   * Instance-level facts (e.g. server roles, Cloud IP allow-list counts). Never contains credentials.
+   */
+  properties?: {
+    [k: string]: unknown;
+  };
+  product?: string;
 }
 export interface Entity {
   /**
@@ -135,6 +153,18 @@ export interface Entity {
   properties?: {
     [k: string]: unknown;
   };
+  /**
+   * Increments when the entity's content changes between ingestion runs.
+   */
+  version?: number;
+  /**
+   * When DelveCat first saw this entity.
+   */
+  firstSeenAt?: string;
+  /**
+   * Hash of the entity's extracted content, used to detect changes.
+   */
+  contentHash?: string;
 }
 export interface Edge {
   from: string;
@@ -152,4 +182,22 @@ export interface ConnectorReport {
   counts?: {
     [k: string]: number;
   };
+}
+export interface ChangeSummary {
+  previousGeneratedAt: string;
+  added: string[];
+  removed: RemovedEntity[];
+  modified: string[];
+}
+export interface RemovedEntity {
+  id: string;
+  type: EntityType;
+  name: string;
+}
+export interface Shard {
+  path: string;
+  kind: "entities" | "edges";
+  entityType?: EntityType;
+  count: number;
+  sha256: string;
 }
