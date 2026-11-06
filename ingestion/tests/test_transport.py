@@ -127,7 +127,9 @@ def test_http_search_uses_oneshot_and_raises_on_fatal_messages():
 
 def test_http_search_prefixes_plain_queries():
     def handler(req):
-        assert dict(httpx.QueryParams(req.content.decode()))["search"] == "search index=x"
+        sent = dict(httpx.QueryParams(req.content.decode()))["search"]
+        # DelveCat tags its own searches so usage reports can exclude them
+        assert sent == "search index=x ```delvecat-ingest```"
         return httpx.Response(200, json={"results": []})
 
     _http(handler).search("q", "index=x")

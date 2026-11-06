@@ -31,14 +31,14 @@
      }
     },
     "build": "1b0c587000b8",
-    "conf_generation": 81,
+    "conf_generation": 94,
     "cpu_arch": "x86_64",
     "eai:acl": null,
     "federated_search_enabled": true,
     "fips_mode": false,
     "guid": "93D348A9-E8C3-401C-9360-FD5FFB5B0B89",
-    "health_info": "red",
-    "health_version": 111537976,
+    "health_info": "green",
+    "health_version": 111537983,
     "host": "splunk",
     "host_fqdn": "splunk",
     "host_resolved": "splunk",
@@ -102,5 +102,5 @@
   "offset": 0,
   "total": 1
  },
- "updated": "2026-11-06T05:27:11+00:00"
+ "updated": "2026-11-06T05:43:46+00:00"
 }

@@ -14,6 +14,8 @@ export const FACETS = {
   sharing: (e: Entity) => (e.sharing ? [e.sharing] : []),
   status: (e: Entity) => [e.disabled ? "disabled" : "enabled"],
   documented: (e: Entity) => [effectiveDescription(e) ? "yes" : "no"],
+  health: (e: Entity) => (e.health ? [e.health.status] : []),
+  usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   issue: (e: Entity) => [
     ...(e.lineage?.unresolved?.length ? ["broken reference"] : []),
     ...(e.lineage?.implicitIndex ? ["no index specified"] : []),

@@ -22,6 +22,9 @@ _POST_ALLOWLIST = (
 )
 
 
+SEARCH_MARKER = "```delvecat-ingest```"
+
+
 class WriteAttemptError(RuntimeError):
     """Raised when code tries to send a request that could modify Splunk."""
 
@@ -84,6 +87,13 @@ class FixtureTransport:
 
     def __init__(self, root: Path) -> None:
         self.root = root
+        meta = root / "__meta__.json"
+        # When the responses were captured: "now" for health checks on replayed data.
+        self.as_of: str | None = (
+            json.loads(meta.read_text(encoding="utf-8")).get("recordedAt")
+            if meta.is_file()
+            else None
+        )
 
     def _load(self, relative: str, label: str) -> dict[str, Any]:
         file = self.root / (relative.strip("/") + ".json")
@@ -171,6 +181,8 @@ class HttpTransport:
             query = stripped
         else:
             query = f"search {stripped}"
+        # Tag DelveCat's own searches so usage reports can leave them out (SPL comment).
+        query = f"{query} {SEARCH_MARKER}"
         resp = self.request(
             "POST",
             "/services/search/jobs",
@@ -203,9 +215,14 @@ class RecordingTransport:
     """
 
     def __init__(self, inner: Transport, root: Path) -> None:
+        from datetime import UTC, datetime
+
         self.inner = inner
         self.root = root
         self._pages: dict[str, dict[str, Any]] = {}
+        root.mkdir(parents=True, exist_ok=True)
+        now = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        (root / "__meta__.json").write_text(json.dumps({"recordedAt": now}) + "\n", "utf-8")
 
     def _write(self, relative: str, body: dict[str, Any]) -> None:
         from .redact import redact

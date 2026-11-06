@@ -60,6 +60,9 @@ def _build(args: argparse.Namespace) -> int:
         max_sources=args.max_sources,
         fields=args.fields,
         max_field_sourcetypes=args.max_field_sourcetypes,
+        usage=not args.no_usage,
+        usage_window=args.usage_window,
+        health_window=args.health_window,
     )
     only = set(args.only.split(",")) if args.only else None
     if only and (unknown := only - set(splunk.EXTRACTORS)):
@@ -301,6 +304,22 @@ def main(argv: list[str] | None = None) -> int:
         help="sample events per sourcetype to discover fields (slower)",
     )
     inv.add_argument("--max-field-sourcetypes", type=int, default=100)
+    use = b.add_argument_group("usage and health")
+    use.add_argument(
+        "--no-usage",
+        action="store_true",
+        help="skip usage and health searches over _audit and _internal",
+    )
+    use.add_argument(
+        "--usage-window",
+        default="-30d",
+        help="time range for audit usage, dashboard views, license (default -30d)",
+    )
+    use.add_argument(
+        "--health-window",
+        default="-7d",
+        help="time range for scheduler and parsing checks (default -7d)",
+    )
 
     def annotation_args(p: argparse.ArgumentParser) -> None:
         g = p.add_argument_group("annotations")

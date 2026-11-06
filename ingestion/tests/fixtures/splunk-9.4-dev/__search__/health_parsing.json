@@ -1,0 +1,11 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "component": "AggregatorMiningProcessor",
+   "count": "2",
+   "data_sourcetype": "splunk_migration"
+  }
+ ],
+ "spl": "index=_internal sourcetype=splunkd log_level=WARN (component=DateParserVerbose OR component=LineBreakingProcessor OR component=AggregatorMiningProcessor) data_sourcetype=* | stats count by component, data_sourcetype"
+}

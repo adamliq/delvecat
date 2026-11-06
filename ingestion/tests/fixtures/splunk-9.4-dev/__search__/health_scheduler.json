@@ -1,0 +1,90 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "app": "DA-ESS-ContentUpdate",
+   "avgRuntime": "0.082",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793943000.682",
+   "last": "1793943000.682",
+   "maxRuntime": "0.082",
+   "savedsearch_name": "ESCU - Brute Force Access Behavior Detected",
+   "skipped": "0",
+   "success": "1",
+   "total": "1",
+   "user": "admin"
+  },
+  {
+   "app": "DA-ESS-ContentUpdate",
+   "avgRuntime": "0.129",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793943000.582",
+   "last": "1793943000.582",
+   "maxRuntime": "0.129",
+   "savedsearch_name": "ESCU - Rare Outbound Port Traffic",
+   "skipped": "0",
+   "success": "1",
+   "total": "1",
+   "user": "admin"
+  },
+  {
+   "app": "acme_secops",
+   "avgRuntime": "0.1036",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793930400.252",
+   "last": "1793943000.690",
+   "maxRuntime": "0.136",
+   "savedsearch_name": "Firewall - Denied Outbound to Rare Ports",
+   "skipped": "0",
+   "success": "5",
+   "total": "5",
+   "user": "admin"
+  },
+  {
+   "app": "acme_web",
+   "avgRuntime": "0.115",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793930700.316",
+   "last": "1793930700.316",
+   "maxRuntime": "0.115",
+   "savedsearch_name": "Web - Hourly Status Summary",
+   "skipped": "0",
+   "success": "1",
+   "total": "1",
+   "user": "admin"
+  },
+  {
+   "app": "splunk_archiver",
+   "avgRuntime": "1.373",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793931421.660",
+   "last": "1793931421.660",
+   "maxRuntime": "1.373",
+   "savedsearch_name": "Bucket Copy Trigger",
+   "skipped": "0",
+   "success": "1",
+   "total": "1",
+   "user": "nobody"
+  },
+  {
+   "app": "splunk_monitoring_console",
+   "avgRuntime": "0.08875000000000001",
+   "continued": "0",
+   "failed": "0",
+   "first": "1793929860.376",
+   "last": "1793942561.774",
+   "maxRuntime": "0.112",
+   "savedsearch_name": "DMC Asset - Build Standalone Asset Table",
+   "skipped": "0",
+   "success": "4",
+   "total": "4",
+   "user": "nobody"
+  }
+ ],
+ "spl": "index=_internal sourcetype=scheduler savedsearch_name=* | stats count(eval(status=\"success\")) as success count(eval(status=\"skipped\")) as skipped count(eval(status=\"continued\")) as continued count(eval(like(status, \"%fail%\") OR status=\"abandoned\")) as failed count as total avg(run_time) as avgRuntime max(run_time) as maxRuntime min(_time) as first max(_time) as last latest(reason) as lastReason by app, savedsearch_name, user"
+}

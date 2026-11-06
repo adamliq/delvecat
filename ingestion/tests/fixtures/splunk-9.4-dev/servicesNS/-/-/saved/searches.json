@@ -1763,7 +1763,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 05:30:00 UTC",
+    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Authentication.Authentication where Authentication.action=failure by Authentication.src | where count > 10",
     "realtime_schedule": true,
@@ -2033,7 +2033,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 05:30:00 UTC",
+    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Network_Traffic.All_Traffic by All_Traffic.src All_Traffic.dest_port | where count < 3",
     "realtime_schedule": true,
@@ -2306,7 +2306,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 05:30:00 UTC",
+    "next_scheduled_time": "2026-11-06 06:00:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": " tstats count from datamodel=Endpoint.Processes where Processes.process_name=\"powershell.exe\" by Processes.dest",
     "realtime_schedule": true,
@@ -2566,7 +2566,7 @@
     "is_scheduled": true,
     "is_visible": true,
     "max_concurrent": 1,
-    "next_scheduled_time": "2026-11-06 05:30:00 UTC",
+    "next_scheduled_time": "2026-11-06 05:45:00 UTC",
     "precalculate_required_fields_for_alerts": "1",
     "qualifiedSearch": "search index=firewall sourcetype=acme:fw action=blocked NOT dest_port IN (80,443,53) | `rare_port_threshold(5)`",
     "realtime_schedule": true,
@@ -5914,5 +5914,5 @@
   "offset": 0,
   "total": 23
  },
- "updated": "2026-11-06T05:27:12+00:00"
+ "updated": "2026-11-06T05:43:46+00:00"
 }

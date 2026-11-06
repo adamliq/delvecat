@@ -33,7 +33,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "3",
+    "currentDBSizeMB": "4",
     "datatype": "event",
     "defaultDatabase": "main",
     "disabled": false,
@@ -75,7 +75,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:26:41+0000",
+    "maxTime": "2026-11-06T05:43:41+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -117,7 +117,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/audit/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 13742,
+    "totalEventCount": 14826,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -137,7 +137,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_audit"
    },
    "name": "_audit",
-   "updated": "2026-11-06T05:26:47+00:00"
+   "updated": "2026-11-06T05:43:42+00:00"
   },
   {
    "acl": {
@@ -276,7 +276,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_configtracker"
    },
    "name": "_configtracker",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -415,7 +415,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsappevent"
    },
    "name": "_dsappevent",
-   "updated": "2026-11-06T05:26:30+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -554,7 +554,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsclient"
    },
    "name": "_dsclient",
-   "updated": "2026-11-06T05:26:28+00:00"
+   "updated": "2026-11-06T05:43:31+00:00"
   },
   {
    "acl": {
@@ -631,7 +631,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:26:58+0000",
+    "maxTime": "2026-11-06T05:43:28+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -673,7 +673,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_dsphonehome/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 21,
+    "totalEventCount": 55,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -693,7 +693,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsphonehome"
    },
    "name": "_dsphonehome",
-   "updated": "2026-11-06T05:27:04+00:00"
+   "updated": "2026-11-06T05:43:31+00:00"
   },
   {
    "acl": {
@@ -728,7 +728,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "5",
+    "currentDBSizeMB": "6",
     "datatype": "event",
     "defaultDatabase": "main",
     "disabled": false,
@@ -770,7 +770,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:27:00+0000",
+    "maxTime": "2026-11-06T05:43:41+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -812,7 +812,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_internaldb/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 36177,
+    "totalEventCount": 42375,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -832,7 +832,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_internal"
    },
    "name": "_internal",
-   "updated": "2026-11-06T05:27:03+00:00"
+   "updated": "2026-11-06T05:43:37+00:00"
   },
   {
    "acl": {
@@ -867,7 +867,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "24",
+    "currentDBSizeMB": "27",
     "datatype": "event",
     "defaultDatabase": "main",
     "disabled": false,
@@ -909,7 +909,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:27:01+0000",
+    "maxTime": "2026-11-06T05:43:41+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -951,7 +951,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_introspection/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 6057,
+    "totalEventCount": 7535,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -971,7 +971,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_introspection"
    },
    "name": "_introspection",
-   "updated": "2026-11-06T05:27:08+00:00"
+   "updated": "2026-11-06T05:43:43+00:00"
   },
   {
    "acl": {
@@ -1048,7 +1048,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:27:01+0000",
+    "maxTime": "2026-11-06T05:43:41+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -1090,7 +1090,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_metrics/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 19785,
+    "totalEventCount": 25183,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -1110,7 +1110,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_metrics"
    },
    "name": "_metrics",
-   "updated": "2026-11-06T05:27:08+00:00"
+   "updated": "2026-11-06T05:43:43+00:00"
   },
   {
    "acl": {
@@ -1388,7 +1388,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_telemetry"
    },
    "name": "_telemetry",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -1667,7 +1667,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/db_orders"
    },
    "name": "db_orders",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -1807,7 +1807,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/indexes/firewall"
    },
    "name": "firewall",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -2225,7 +2225,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/main"
    },
    "name": "main",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -2442,7 +2442,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T05:26:58+0000",
+    "maxTime": "2026-11-06T05:43:28+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -2484,7 +2484,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/os/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 1453,
+    "totalEventCount": 2370,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -2505,7 +2505,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/os"
    },
    "name": "os",
-   "updated": "2026-11-06T05:27:03+00:00"
+   "updated": "2026-11-06T05:43:31+00:00"
   },
   {
    "acl": {
@@ -2920,7 +2920,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/stream"
    },
    "name": "stream",
-   "updated": "2026-11-06T05:26:28+00:00"
+   "updated": "2026-11-06T05:43:31+00:00"
   },
   {
    "acl": {
@@ -3199,7 +3199,7 @@
     "remove": "/servicesNS/nobody/acme_web/data/indexes/summary_web"
    },
    "name": "summary_web",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -3339,7 +3339,7 @@
     "remove": "/servicesNS/nobody/acme_web/data/indexes/web"
    },
    "name": "web",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   },
   {
    "acl": {
@@ -3479,7 +3479,7 @@
     "remove": "/servicesNS/nobody/acme_secops/data/indexes/wineventlog"
    },
    "name": "wineventlog",
-   "updated": "2026-11-06T05:26:24+00:00"
+   "updated": "2026-11-06T05:43:30+00:00"
   }
  ],
  "generator": {
@@ -3491,5 +3491,5 @@
   "offset": 0,
   "total": 25
  },
- "updated": "2026-11-06T05:27:08+00:00"
+ "updated": "2026-11-06T05:43:43+00:00"
 }

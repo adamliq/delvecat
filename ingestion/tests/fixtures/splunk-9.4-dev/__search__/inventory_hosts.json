@@ -15,7 +15,7 @@
    "lastSeen": "1793933610"
   },
   {
-   "count": "21985",
+   "count": "29722",
    "host": "splunk",
    "indexes": [
     "_audit",
@@ -28,17 +28,17 @@
     "_telemetry",
     "main"
    ],
-   "lastSeen": "1793942830"
+   "lastSeen": "1793943824"
   },
   {
-   "count": "2269",
+   "count": "4247",
    "host": "uf-linux-01",
    "indexes": [
     "_configtracker",
     "_internal",
     "os"
    ],
-   "lastSeen": "1793942818"
+   "lastSeen": "1793943812"
   },
   {
    "count": "80",

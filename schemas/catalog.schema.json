@@ -326,6 +326,103 @@
               }
             }
           }
+        },
+        "usage": {
+          "description": "How people and the scheduler use the object, from _audit and _internal. Derived; never changes the catalog version.",
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "runs": {
+              "type": "integer"
+            },
+            "users": {
+              "type": "integer"
+            },
+            "views": {
+              "type": "integer"
+            },
+            "viewers": {
+              "type": "integer"
+            },
+            "searches": {
+              "type": "integer"
+            },
+            "adhocSearches": {
+              "type": "integer"
+            },
+            "panelSearchRuns": {
+              "type": "integer"
+            },
+            "lastUsed": {
+              "type": "string"
+            },
+            "runtimeSecs": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "scheduler": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "unused": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "builtin": {
+              "type": "boolean"
+            }
+          }
+        },
+        "health": {
+          "description": "Health checks evaluated when the bundle was built. Derived.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "checks"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "warning",
+                "critical"
+              ]
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "check",
+                  "status",
+                  "message"
+                ],
+                "properties": {
+                  "check": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ok",
+                      "warning",
+                      "critical"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },

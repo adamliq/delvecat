@@ -246,3 +246,13 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .chain { margin: 0; padding-left: 1.3rem; }
 .chain li { padding: 2px 0; }
 .detection h3 { margin-top: 14px; }
+
+/* Phase 6: health */
+.status-label.status-critical::before { background: var(--status-critical); }
+.spark { display: inline-flex; align-items: center; gap: 6px; }
+.spark-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.spark-base { stroke: var(--border); stroke-width: 1; }
+.spark-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.spark-hit { fill: transparent; }
+.spark-hit:hover { fill: var(--accent-soft); fill-opacity: 0.5; }
+.spark-value { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }

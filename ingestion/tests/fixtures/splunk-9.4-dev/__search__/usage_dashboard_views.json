@@ -1,0 +1,5 @@
+{
+ "earliest": "-30d",
+ "results": [],
+ "spl": "index=_internal sourcetype=splunk_web_access uri_path=\"*/app/*/*\" status<400 | rex field=uri_path \"/app/(?<app>[^/]+)/(?<view>[^/?]+)\" | stats count as views dc(user) as users max(_time) as last by app, view"
+}

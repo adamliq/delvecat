@@ -19,7 +19,9 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
 
 3. A **Coverage** page grades your detections against MITRE ATT&CK and the
    CIM data models, and lists detections that cannot fire.
-4. Descriptions, owners, tags, classifications and the glossary live in
+4. A **Health** page shows stale or anomalous data, ingestion and scheduler
+   problems, and a cleanup report of objects nobody uses.
+5. Descriptions, owners, tags, classifications and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.
 

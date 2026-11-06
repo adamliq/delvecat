@@ -2,106 +2,142 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "actions_triggered",
-   "numeric_count": "6"
+   "field": "abandoned_channels",
+   "numeric_count": "7"
   },
   {
-   "count": "9",
-   "distinct_count": "1",
-   "field": "active",
-   "numeric_count": "9"
-  },
-  {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "active_hist_searches",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "active_realtime_searches",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "alert_cycle_max",
-   "numeric_count": "6"
+   "count": "30",
+   "distinct_count": "23",
+   "field": "average_kbps",
+   "numeric_count": "30"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "alert_cycle_total",
-   "numeric_count": "6"
+   "count": "106",
+   "distinct_count": "42",
+   "field": "avg_cpu_time_per_event_ms",
+   "numeric_count": "106"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "alert_cycles",
-   "numeric_count": "6"
-  },
-  {
-   "count": "189",
-   "distinct_count": "68",
-   "field": "avg_age",
-   "numeric_count": "189"
-  },
-  {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "avg_time_spent_in_queue",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "bundles",
-   "numeric_count": "6"
-  },
-  {
-   "count": "182",
-   "distinct_count": "3",
-   "field": "color",
-   "numeric_count": "0"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "completed",
-   "numeric_count": "6"
-  },
-  {
-   "count": "1000",
-   "distinct_count": "14",
-   "field": "component",
-   "numeric_count": "0"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "concurrency",
-   "numeric_count": "6"
+   "count": "53",
+   "distinct_count": "4",
+   "field": "blocked_count",
+   "numeric_count": "53"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "confkey",
+   "field": "bundle_dir_reaper_max_ms",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "bundle_dir_reaper_mean_ms",
+   "numeric_count": "1"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "busiest_thread_name",
    "numeric_count": "0"
   },
   {
-   "count": "21",
-   "distinct_count": "2",
-   "field": "current_queue_size",
-   "numeric_count": "21"
+   "count": "129",
+   "distinct_count": "70",
+   "field": "bytes",
+   "numeric_count": "129"
   },
   {
-   "count": "98",
+   "count": "161",
+   "distinct_count": "1",
+   "field": "color",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "6",
+   "field": "component",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "compute_search_quota_max_ms",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "compute_search_quota_mean_ms",
+   "numeric_count": "7"
+  },
+  {
+   "count": "14",
+   "distinct_count": "1",
+   "field": "connectionType",
+   "numeric_count": "0"
+  },
+  {
+   "count": "14",
+   "distinct_count": "8",
+   "field": "connectionid",
+   "numeric_count": "14"
+  },
+  {
+   "count": "159",
+   "distinct_count": "10",
+   "field": "cpu_seconds",
+   "numeric_count": "159"
+  },
+  {
+   "count": "106",
+   "distinct_count": "52",
+   "field": "cpu_time_ms",
+   "numeric_count": "106"
+  },
+  {
+   "count": "159",
+   "distinct_count": "49",
+   "field": "cumulative_hits",
+   "numeric_count": "159"
+  },
+  {
+   "count": "26",
+   "distinct_count": "2",
+   "field": "current_queue_size",
+   "numeric_count": "26"
+  },
+  {
+   "count": "103",
    "distinct_count": "9",
    "field": "current_size",
-   "numeric_count": "98"
+   "numeric_count": "103"
+  },
+  {
+   "count": "53",
+   "distinct_count": "2",
+   "field": "current_size_kb",
+   "numeric_count": "53"
   },
   {
    "count": "1000",
@@ -117,7 +153,7 @@
   },
   {
    "count": "1000",
-   "distinct_count": "5",
+   "distinct_count": "4",
    "field": "date_minute",
    "numeric_count": "1000"
   },
@@ -129,7 +165,7 @@
   },
   {
    "count": "1000",
-   "distinct_count": "15",
+   "distinct_count": "14",
    "field": "date_second",
    "numeric_count": "1000"
   },
@@ -152,136 +188,148 @@
    "numeric_count": "1000"
   },
   {
-   "count": "6",
+   "count": "21",
    "distinct_count": "1",
-   "field": "delayed",
-   "numeric_count": "6"
+   "field": "destPort",
+   "numeric_count": "21"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "disp_advance_next_runtime",
-   "numeric_count": "6"
+   "field": "discarded_new",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "disp_auto_summary_updates",
-   "numeric_count": "6"
+   "field": "discarded_old",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
+   "count": "1",
    "distinct_count": "1",
-   "field": "disp_determine_can_run",
-   "numeric_count": "6"
+   "field": "dispatch_dir_reaper_max_ms",
+   "numeric_count": "1"
   },
   {
-   "count": "6",
+   "count": "1",
    "distinct_count": "1",
-   "field": "disp_dispatch_job",
-   "numeric_count": "6"
+   "field": "dispatch_dir_reaper_mean_ms",
+   "numeric_count": "1"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "disp_get_next_runtime",
-   "numeric_count": "6"
+   "field": "drop_count",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "disp_update_logging",
-   "numeric_count": "6"
+   "field": "dropped_records",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "disp_window_lag_calc",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "dispatched",
-   "numeric_count": "6"
-  },
-  {
-   "count": "111",
+   "count": "112",
    "distinct_count": "16",
    "field": "due_to_stanza",
    "numeric_count": "0"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "dutycycle_control",
-   "numeric_count": "6"
+   "count": "7",
+   "distinct_count": "3",
+   "field": "dutycycle_ratio",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "dutycycle_launching",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "dutycycle_reaping",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "eligible",
-   "numeric_count": "6"
-  },
-  {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "enqueue_seaches_count",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "189",
-   "distinct_count": "76",
-   "field": "eps",
-   "numeric_count": "189"
-  },
-  {
-   "count": "244",
-   "distinct_count": "111",
+   "count": "234",
+   "distinct_count": "94",
    "field": "ev",
-   "numeric_count": "244"
+   "numeric_count": "234"
+  },
+  {
+   "count": "106",
+   "distinct_count": "46",
+   "field": "event_count",
+   "numeric_count": "106"
   },
   {
    "count": "1000",
-   "distinct_count": "646",
+   "distinct_count": "644",
    "field": "event_message",
    "numeric_count": "0"
   },
   {
-   "count": "21",
+   "count": "11",
    "distinct_count": "1",
    "field": "eventtype",
    "numeric_count": "0"
   },
   {
-   "count": "175",
+   "count": "159",
+   "distinct_count": "48",
+   "field": "executes",
+   "numeric_count": "159"
+  },
+  {
+   "count": "8",
+   "distinct_count": "3",
+   "field": "fd_cache_size",
+   "numeric_count": "8"
+  },
+  {
+   "count": "154",
    "distinct_count": "22",
    "field": "feature",
    "numeric_count": "0"
   },
   {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "generation",
-   "numeric_count": "6"
+   "count": "7",
+   "distinct_count": "1",
+   "field": "file",
+   "numeric_count": "0"
   },
   {
-   "count": "793",
-   "distinct_count": "49",
+   "count": "16",
+   "distinct_count": "6",
+   "field": "files_queued",
+   "numeric_count": "16"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "finished",
+   "numeric_count": "1"
+  },
+  {
+   "count": "824",
+   "distinct_count": "50",
    "field": "group",
    "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "history_records_added",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "history_records_updated",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "hits",
+   "numeric_count": "7"
   },
   {
    "count": "1000",
@@ -290,10 +338,10 @@
    "numeric_count": "0"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "idle",
-   "numeric_count": "6"
+   "field": "inactive_channels",
+   "numeric_count": "7"
   },
   {
    "count": "1000",
@@ -302,40 +350,40 @@
    "numeric_count": "0"
   },
   {
-   "count": "36",
+   "count": "7",
    "distinct_count": "1",
-   "field": "jobs_added",
-   "numeric_count": "36"
+   "field": "ingest_pipe",
+   "numeric_count": "7"
   },
   {
-   "count": "36",
-   "distinct_count": "1",
-   "field": "jobs_finished",
-   "numeric_count": "36"
+   "count": "30",
+   "distinct_count": "20",
+   "field": "instantaneous_eps",
+   "numeric_count": "30"
   },
   {
-   "count": "236",
-   "distinct_count": "136",
+   "count": "30",
+   "distinct_count": "14",
+   "field": "instantaneous_kbps",
+   "numeric_count": "30"
+  },
+  {
+   "count": "232",
+   "distinct_count": "127",
    "field": "kb",
-   "numeric_count": "236"
+   "numeric_count": "232"
   },
   {
-   "count": "189",
-   "distinct_count": "95",
-   "field": "kbps",
-   "numeric_count": "189"
-  },
-  {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "largest_queue_size",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "92",
-   "distinct_count": "32",
+   "count": "96",
+   "distinct_count": "34",
    "field": "largest_size",
-   "numeric_count": "92"
+   "numeric_count": "96"
   },
   {
    "count": "1000",
@@ -344,322 +392,208 @@
    "numeric_count": "1000"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "load_auto_summarized",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "load_cycles",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "3",
-   "field": "load_deferred_calculation",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "load_dma",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "load_priority_calculation",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "3",
-   "field": "load_saved_searches",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "3",
-   "field": "load_search_cycle_max",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "3",
-   "field": "load_search_cycle_total",
-   "numeric_count": "6"
+   "count": "11",
+   "distinct_count": "9",
+   "field": "load_average",
+   "numeric_count": "11"
   },
   {
    "count": "1000",
-   "distinct_count": "3",
+   "distinct_count": "1",
    "field": "log_level",
    "numeric_count": "0"
   },
   {
-   "count": "189",
-   "distinct_count": "5",
-   "field": "max_age",
-   "numeric_count": "189"
-  },
-  {
-   "count": "36",
-   "distinct_count": "1",
-   "field": "max_idle_workers",
-   "numeric_count": "36"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "max_lag",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "max_running",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "max_runtime",
-   "numeric_count": "6"
-  },
-  {
-   "count": "43",
+   "count": "16",
    "distinct_count": "3",
-   "field": "max_size",
-   "numeric_count": "43"
+   "field": "max_queue_size",
+   "numeric_count": "16"
   },
   {
-   "count": "9",
+   "count": "53",
+   "distinct_count": "5",
+   "field": "max_size_kb",
+   "numeric_count": "53"
+  },
+  {
+   "count": "10",
    "distinct_count": "1",
    "field": "max_time_spent_in_queue",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "36",
-   "distinct_count": "1",
-   "field": "max_workers",
-   "numeric_count": "36"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "metrics_interval",
-   "numeric_count": "0"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "metrics_module",
-   "numeric_count": "0"
-  },
-  {
-   "count": "9",
-   "distinct_count": "2",
+   "count": "10",
+   "distinct_count": "3",
    "field": "mgmt_httpd",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "min_queue_size",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "360",
-   "distinct_count": "47",
+   "count": "7",
+   "distinct_count": "2",
+   "field": "misses",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "nCurrent",
+   "numeric_count": "7"
+  },
+  {
+   "count": "433",
+   "distinct_count": "51",
    "field": "name",
    "numeric_count": "0"
   },
   {
-   "count": "36",
-   "distinct_count": "1",
-   "field": "new_workers",
-   "numeric_count": "36"
+   "count": "7",
+   "distinct_count": "5",
+   "field": "new_channels",
+   "numeric_count": "7"
   },
   {
-   "count": "177",
-   "distinct_count": "4",
+   "count": "16",
+   "distinct_count": "3",
+   "field": "new_files_queued",
+   "numeric_count": "16"
+  },
+  {
+   "count": "161",
+   "distinct_count": "23",
+   "field": "node_path",
+   "numeric_count": "0"
+  },
+  {
+   "count": "161",
+   "distinct_count": "3",
    "field": "node_type",
    "numeric_count": "0"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "periodic_reaper_wakeups",
-   "numeric_count": "6"
+   "field": "num_evictions",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "processes_created",
-   "numeric_count": "6"
+   "count": "159",
+   "distinct_count": "29",
+   "field": "processor",
+   "numeric_count": "0"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "processes_exited",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reaped_accumulated_time",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "processes_reaped_after_control",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reaped_ran_too_long",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reaped_ran_too_many_searches",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reaped_surplus",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reaped_with_old_bundle",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "processes_reaped_with_old_config",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "processes_reused_different_user",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "processes_reused_same_user",
-   "numeric_count": "6"
+   "field": "product",
+   "numeric_count": "0"
   },
   {
    "count": "1000",
-   "distinct_count": "91",
+   "distinct_count": "70",
    "field": "punct",
    "numeric_count": "0"
   },
   {
-   "count": "35",
-   "distinct_count": "15",
+   "count": "10",
+   "distinct_count": "1",
+   "field": "qsize",
+   "numeric_count": "10"
+  },
+  {
+   "count": "10",
+   "distinct_count": "1",
+   "field": "qwork_units",
+   "numeric_count": "10"
+  },
+  {
+   "count": "43",
+   "distinct_count": "16",
    "field": "ratio",
-   "numeric_count": "35"
+   "numeric_count": "43"
   },
   {
-   "count": "36",
-   "distinct_count": "1",
-   "field": "reaped_workers",
-   "numeric_count": "36"
-  },
-  {
-   "count": "9",
-   "distinct_count": "2",
+   "count": "10",
+   "distinct_count": "3",
    "field": "reaper",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "saved_search_fetcher",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "savedsplunker",
-   "numeric_count": "6"
+   "field": "reclaimed_channels",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
+   "count": "7",
+   "distinct_count": "3",
+   "field": "removed_channels",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "requests_last_period",
+   "numeric_count": "7"
+  },
+  {
+   "count": "1",
    "distinct_count": "1",
-   "field": "schedule_search_cycle_max",
-   "numeric_count": "6"
+   "field": "running",
+   "numeric_count": "1"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "schedule_search_cycle_total",
-   "numeric_count": "6"
+   "field": "sent_records",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
-   "distinct_count": "4",
-   "field": "scheduler_cycle_max",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "4",
-   "field": "scheduler_cycle_total",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "2",
-   "field": "scheduler_cycles",
-   "numeric_count": "6"
-  },
-  {
-   "count": "358",
-   "distinct_count": "48",
+   "count": "310",
+   "distinct_count": "46",
    "field": "series",
    "numeric_count": "0"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "size",
-   "numeric_count": "6"
+   "field": "share",
+   "numeric_count": "7"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "skipped",
-   "numeric_count": "6"
-  },
-  {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "skipped_dma_ra",
-   "numeric_count": "6"
-  },
-  {
-   "count": "92",
+   "count": "96",
    "distinct_count": "1",
    "field": "smallest_size",
-   "numeric_count": "92"
+   "numeric_count": "96"
   },
   {
    "count": "1000",
    "distinct_count": "5",
    "field": "source",
    "numeric_count": "0"
+  },
+  {
+   "count": "14",
+   "distinct_count": "1",
+   "field": "sourceHost",
+   "numeric_count": "0"
+  },
+  {
+   "count": "14",
+   "distinct_count": "1",
+   "field": "sourceIp",
+   "numeric_count": "0"
+  },
+  {
+   "count": "28",
+   "distinct_count": "10",
+   "field": "sourcePort",
+   "numeric_count": "28"
   },
   {
    "count": "1000",
@@ -680,28 +614,70 @@
    "numeric_count": "0"
   },
   {
-   "count": "9",
+   "count": "10",
    "distinct_count": "1",
    "field": "tail",
-   "numeric_count": "9"
-  },
-  {
-   "count": "35",
-   "distinct_count": "8",
-   "field": "thread",
-   "numeric_count": "0"
+   "numeric_count": "10"
   },
   {
    "count": "21",
-   "distinct_count": "7",
-   "field": "thread_id",
+   "distinct_count": "19",
+   "field": "tcp_Bps",
    "numeric_count": "21"
   },
   {
    "count": "21",
-   "distinct_count": "6",
+   "distinct_count": "16",
+   "field": "tcp_KBps",
+   "numeric_count": "21"
+  },
+  {
+   "count": "21",
+   "distinct_count": "11",
+   "field": "tcp_Kprocessed",
+   "numeric_count": "21"
+  },
+  {
+   "count": "21",
+   "distinct_count": "16",
+   "field": "tcp_avg_thruput",
+   "numeric_count": "21"
+  },
+  {
+   "count": "21",
+   "distinct_count": "18",
+   "field": "tcp_eps",
+   "numeric_count": "21"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "terminated",
+   "numeric_count": "1"
+  },
+  {
+   "count": "43",
+   "distinct_count": "11",
+   "field": "thread",
+   "numeric_count": "0"
+  },
+  {
+   "count": "11",
+   "distinct_count": "2",
+   "field": "thread_id",
+   "numeric_count": "11"
+  },
+  {
+   "count": "11",
+   "distinct_count": "2",
    "field": "thread_name",
    "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "timedout_channels",
+   "numeric_count": "7"
   },
   {
    "count": "1000",
@@ -716,34 +692,58 @@
    "numeric_count": "1000"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "total_lag",
-   "numeric_count": "6"
+   "count": "30",
+   "distinct_count": "20",
+   "field": "total_k_processed",
+   "numeric_count": "30"
   },
   {
-   "count": "6",
+   "count": "7",
    "distinct_count": "1",
-   "field": "total_runtime",
-   "numeric_count": "6"
+   "field": "udp_avg_thruput",
+   "numeric_count": "7"
   },
   {
-   "count": "9",
+   "count": "7",
+   "distinct_count": "1",
+   "field": "udp_bps",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "udp_eps",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "udp_kbps",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "udp_kprocessed",
+   "numeric_count": "7"
+  },
+  {
+   "count": "10",
    "distinct_count": "1",
    "field": "udpin",
-   "numeric_count": "9"
+   "numeric_count": "10"
   },
   {
-   "count": "6",
+   "count": "4",
    "distinct_count": "1",
-   "field": "window_max_lag",
-   "numeric_count": "6"
+   "field": "volumeCompletedKB",
+   "numeric_count": "4"
   },
   {
-   "count": "6",
-   "distinct_count": "1",
-   "field": "window_total_lag",
-   "numeric_count": "6"
+   "count": "10",
+   "distinct_count": "2",
+   "field": "workers",
+   "numeric_count": "10"
   }
  ],
  "spl": "(index=* OR index=_*) sourcetype=\"splunkd\" | head 1000 | fieldsummary maxvals=0 | fields field count distinct_count numeric_count"

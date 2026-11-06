@@ -182,6 +182,38 @@ export interface Entity {
     unresolved?: string[];
     warnings?: string[];
   };
+  /**
+   * How people and the scheduler use the object, from _audit and _internal. Derived; never changes the catalog version.
+   */
+  usage?: {
+    runs?: number;
+    users?: number;
+    views?: number;
+    viewers?: number;
+    searches?: number;
+    adhocSearches?: number;
+    panelSearchRuns?: number;
+    lastUsed?: string;
+    runtimeSecs?: number | null;
+    scheduler?: {
+      [k: string]: unknown;
+    };
+    unused?: boolean;
+    reason?: string;
+    builtin?: boolean;
+    [k: string]: unknown;
+  };
+  /**
+   * Health checks evaluated when the bundle was built. Derived.
+   */
+  health?: {
+    status: "ok" | "warning" | "critical";
+    checks: {
+      check: string;
+      status: "ok" | "warning" | "critical";
+      message: string;
+    }[];
+  };
 }
 /**
  * Human-curated metadata merged from annotations/*.yaml. Never comes from Splunk.

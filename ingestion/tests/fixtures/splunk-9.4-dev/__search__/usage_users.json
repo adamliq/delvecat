@@ -1,0 +1,16 @@
+{
+ "earliest": "-30d",
+ "results": [
+  {
+   "last": "1793943821.132628",
+   "searches": "331",
+   "user": "admin"
+  },
+  {
+   "last": "1793942591.133098",
+   "searches": "41",
+   "user": "splunk-system-user"
+  }
+ ],
+ "spl": "index=_audit action=search info=completed NOT search=\"*delvecat-ingest*\" | stats count as searches max(_time) as last by user"
+}

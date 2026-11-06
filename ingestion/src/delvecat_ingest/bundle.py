@@ -12,13 +12,22 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
+from .health import apply_usage, evaluate_health, mark_unused
 from .lineage import derive, record_unresolved
 from .link import link_hosts
 from .model import ExtractResult
 from .resolve import Resolver
 
 # Bookkeeping and human annotations never count as a change to the Splunk object.
-_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash", "annotations", "lineage")
+_VERSION_FIELDS = (
+    "version",
+    "firstSeenAt",
+    "contentHash",
+    "annotations",
+    "lineage",
+    "usage",
+    "health",
+)
 
 
 def find_schema(start: Path | None = None, name: str = "catalog.schema.json") -> Path:
@@ -167,6 +176,34 @@ def assemble(
                     if examples
                     else {}
                 ),
+            }
+        )
+
+    # Usage, health and cleanup (derived; outside the content hash).
+    available = {
+        r["connector"].split(".", 1)[1]
+        for r in result.reports
+        if r["status"] == "ok" and r["connector"].startswith("splunk.")
+    }
+    apply_usage(entities, result.usage, result.adhoc_searches)
+    instance_since = [(i.get("properties") or {}).get("schedulerLogSince") for i in instances]
+    since = (result.instance_facts.get("properties") or {}).get("schedulerLogSince") or next(
+        (x for x in instance_since if x), None
+    )
+    evaluate_health(entities, result.as_of or generated, since)
+    unused = mark_unused(entities, edges, available)
+    if result.usage or result.adhoc_searches or any(k.startswith("health") for k in available):
+        statuses = [e["health"]["status"] for e in entities if e.get("health")]
+        reports.append(
+            {
+                "connector": "health",
+                "status": "ok",
+                "counts": {
+                    "critical": statuses.count("critical"),
+                    "warning": statuses.count("warning"),
+                    "unused": unused,
+                },
+                "message": f"as of {result.as_of or generated}",
             }
         )
 

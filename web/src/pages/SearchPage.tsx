@@ -21,6 +21,8 @@ const FACET_TITLES: Record<Facet, string> = {
   status: "Status",
   documented: "Has description",
   issue: "Search issues",
+  health: "Health",
+  usage: "Usage",
 };
 
 function valueLabel(facet: Facet, value: string): string {

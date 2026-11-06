@@ -1,0 +1,264 @@
+{
+ "earliest": "-14d@d",
+ "results": [
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "14928",
+   "index": "_audit",
+   "sourcetype": "audittrail"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "374",
+   "index": "_configtracker",
+   "sourcetype": "splunk_configuration_change"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "6",
+   "index": "_dsappevent",
+   "sourcetype": "dsappevent"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "5",
+   "index": "_dsclient",
+   "sourcetype": "dsclient"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "55",
+   "index": "_dsphonehome",
+   "sourcetype": "dsphonehome"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "4",
+   "index": "_internal",
+   "sourcetype": "first_install-too_small"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "2210",
+   "index": "_internal",
+   "sourcetype": "mongod"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "81",
+   "index": "_internal",
+   "sourcetype": "scheduler"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "1",
+   "index": "_internal",
+   "sourcetype": "splunk_archiver-too_small"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "128",
+   "index": "_internal",
+   "sourcetype": "splunk_migration"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "838",
+   "index": "_internal",
+   "sourcetype": "splunk_python"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "5",
+   "index": "_internal",
+   "sourcetype": "splunk_search_messages"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "15",
+   "index": "_internal",
+   "sourcetype": "splunk_shc_upgrade_completion_script"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "1",
+   "index": "_internal",
+   "sourcetype": "splunk_version"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "4",
+   "index": "_internal",
+   "sourcetype": "splunk_web_access"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "868",
+   "index": "_internal",
+   "sourcetype": "splunk_web_service"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "33081",
+   "index": "_internal",
+   "sourcetype": "splunkd"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "4726",
+   "index": "_internal",
+   "sourcetype": "splunkd_access"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "8",
+   "index": "_internal",
+   "sourcetype": "splunkd_conf"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "10",
+   "index": "_internal",
+   "sourcetype": "splunkd_stderr"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "15",
+   "index": "_internal",
+   "sourcetype": "splunkd_stdout"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "4",
+   "index": "_internal",
+   "sourcetype": "splunkd_ui_access"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "28",
+   "index": "_internal",
+   "sourcetype": "sup-pkg-agent-manager-stdout-too_small"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "45",
+   "index": "_internal",
+   "sourcetype": "sup-pkg-identity-stdout-2"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "147",
+   "index": "_internal",
+   "sourcetype": "sup-pkg-identity-stdout-too_small"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "122",
+   "index": "_internal",
+   "sourcetype": "supervisor-2"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "142",
+   "index": "_internal",
+   "sourcetype": "supervisor-too_small"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "86",
+   "index": "_introspection",
+   "sourcetype": "http_event_collector_metrics"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "897",
+   "index": "_introspection",
+   "sourcetype": "kvstore"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "389",
+   "index": "_introspection",
+   "sourcetype": "search_telemetry"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "353",
+   "index": "_introspection",
+   "sourcetype": "splunk_disk_objects"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "5821",
+   "index": "_introspection",
+   "sourcetype": "splunk_resource_usage"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "20",
+   "index": "_introspection",
+   "sourcetype": "splunk_telemetry"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "3",
+   "index": "_telemetry",
+   "sourcetype": "splunk_telemetry_log"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "15",
+   "index": "db_orders",
+   "sourcetype": "mysql:orders"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "60",
+   "index": "firewall",
+   "sourcetype": "acme:fw"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "147",
+   "index": "main",
+   "sourcetype": "acme:app"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "2371",
+   "index": "os",
+   "sourcetype": "acme:uf:splunkd"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "10",
+   "index": "stream",
+   "sourcetype": "stream:dns"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "12",
+   "index": "stream",
+   "sourcetype": "stream:http"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "2",
+   "index": "summary_web",
+   "sourcetype": "stash"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "80",
+   "index": "web",
+   "sourcetype": "access_combined"
+  },
+  {
+   "_time": "2026-11-06T00:00:00.000+00:00",
+   "count": "40",
+   "index": "wineventlog",
+   "sourcetype": "WinEventLog:Security"
+  }
+ ],
+ "spl": "| tstats count where (index=* OR index=_*) by _time span=1d, index, sourcetype"
+}

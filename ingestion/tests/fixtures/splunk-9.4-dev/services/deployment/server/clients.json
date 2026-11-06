@@ -71,7 +71,7 @@
     "instanceId": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
     "instanceName": "uf-linux-01",
     "ip": "172.18.0.3",
-    "lastPhoneHomeTime": 1793942818,
+    "lastPhoneHomeTime": 1793943808,
     "mgmt": "8089",
     "name": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
     "package": "universal_forwarder",
@@ -120,5 +120,5 @@
   "offset": 0,
   "total": 1
  },
- "updated": "2026-11-06T05:27:15+00:00"
+ "updated": "2026-11-06T05:43:51+00:00"
 }

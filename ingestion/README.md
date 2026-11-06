@@ -32,6 +32,8 @@ Useful options:
 | `--products` | `deploymentServer,dbConnect,stream`, `all` (default) or `none`; each is skipped when not installed |
 | `--deployment-apps-dir` | the Deployment Server's deployment-apps folder, to catalogue the inputs each app pushes |
 | `--record DIR` | save every response as replayable fixtures (secrets and emails removed) |
+| `--no-usage` | skip the usage and health searches over `_audit` and `_internal` |
+| `--usage-window` / `--health-window` | time ranges for usage (default `-30d`) and scheduler/parsing checks (`-7d`) |
 | `--strict` | exit 3 if any extractor failed |
 
 ## Lineage
@@ -58,6 +60,14 @@ short name against FQDN), so lineage answers "which forwarders, databases and
 streams feed index X". Run against each instance that holds a product (for
 example the Deployment Server and the DB Connect heavy forwarder); combining
 several instances into one bundle is on the roadmap.
+
+## Usage and health
+
+Usage comes from `_audit` and `_internal`, so the service account needs to
+search them. DelveCat's own searches carry the comment ```` ```delvecat-ingest``` ````
+and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
+counts, never the searches. A `--record`ing does contain it, so never commit
+recordings taken from production.
 
 ## Safety
 

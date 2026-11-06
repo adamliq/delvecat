@@ -53,6 +53,9 @@ export function Home() {
   const detections = bundle.entities.filter(isDetection).map((e) => detectionStatus(catalog, e));
   const firing = detections.filter((d) => d.state === "ready").length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
+  const healthReport = bundle.ingestionReport?.find((r) => r.connector === "health");
+  const unhealthy = bundle.entities.filter((e) => e.health);
+  const unusedCustom = bundle.entities.filter((e) => e.usage?.unused && !e.usage.builtin).length;
   const noIndex = bundle.entities.filter((e) => e.lineage?.implicitIndex).length;
   const coverage: [string, number][] = [
     ["have a description", described],
@@ -115,6 +118,17 @@ export function Home() {
             {detections.length} detections, <strong>{firing}</strong> can fire
             {detections.length - firing > 0 && <>, <strong>{detections.length - firing}</strong> cannot (disabled, broken or without data)</>}.{" "}
             <Link to="/coverage">See ATT&CK and CIM coverage</Link>
+          </p>
+        </section>
+      )}
+
+      {healthReport && (
+        <section>
+          <h2>Health</h2>
+          <p>
+            {unhealthy.filter((e) => e.health!.status === "critical").length} critical and{" "}
+            {unhealthy.filter((e) => e.health!.status === "warning").length} warning findings,{" "}
+            {unusedCustom} unused objects in custom apps. <Link to="/health">Open the health report</Link>
           </p>
         </section>
       )}

@@ -1,0 +1,54 @@
+{
+ "earliest": "-30d",
+ "results": [
+  {
+   "app": "DA-ESS-ContentUpdate",
+   "last": "1793943011.105921",
+   "runs": "1",
+   "runtime": "0.09",
+   "savedsearch_name": "ESCU - Brute Force Access Behavior Detected",
+   "users": "1"
+  },
+  {
+   "app": "DA-ESS-ContentUpdate",
+   "last": "1793943011.105079",
+   "runs": "1",
+   "runtime": "0.14",
+   "savedsearch_name": "ESCU - Rare Outbound Port Traffic",
+   "users": "1"
+  },
+  {
+   "app": "acme_secops",
+   "last": "1793943011.106679",
+   "runs": "5",
+   "runtime": "0.59",
+   "savedsearch_name": "Firewall - Denied Outbound to Rare Ports",
+   "users": "1"
+  },
+  {
+   "app": "acme_web",
+   "last": "1793930729.848583",
+   "runs": "1",
+   "runtime": "0.13",
+   "savedsearch_name": "Web - Hourly Status Summary",
+   "users": "1"
+  },
+  {
+   "app": "splunk_archiver",
+   "last": "1793931449.848198",
+   "runs": "1",
+   "runtime": "1.38",
+   "savedsearch_name": "Bucket Copy Trigger",
+   "users": "1"
+  },
+  {
+   "app": "splunk_monitoring_console",
+   "last": "1793942591.122624",
+   "runs": "4",
+   "runtime": "0.41",
+   "savedsearch_name": "DMC Asset - Build Standalone Asset Table",
+   "users": "1"
+  }
+ ],
+ "spl": "index=_audit action=search info=completed savedsearch_name=* savedsearch_name!=\"\" NOT search=\"*delvecat-ingest*\" | stats count as runs dc(user) as users max(_time) as last sum(total_run_time) as runtime by app, savedsearch_name"
+}

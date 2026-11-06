@@ -1,0 +1,62 @@
+{
+ "earliest": "-30d",
+ "results": [
+  {
+   "bytes": "870",
+   "first": "1793936147.200",
+   "idx": "db_orders",
+   "last": "1793936147.200",
+   "st": "mysql:orders"
+  },
+  {
+   "bytes": "5140",
+   "first": "1793930071.736",
+   "idx": "firewall",
+   "last": "1793930678.736",
+   "st": "acme:fw"
+  },
+  {
+   "bytes": "14763",
+   "first": "1793932900.901",
+   "idx": "main",
+   "last": "1793942593.858",
+   "st": "acme:app"
+  },
+  {
+   "bytes": "422769",
+   "first": "1793936812.200",
+   "idx": "os",
+   "last": "1793943803.858",
+   "st": "acme:uf:splunkd"
+  },
+  {
+   "bytes": "1070",
+   "first": "1793936147.200",
+   "idx": "stream",
+   "last": "1793936147.200",
+   "st": "stream:dns"
+  },
+  {
+   "bytes": "1384",
+   "first": "1793936147.200",
+   "idx": "stream",
+   "last": "1793936147.200",
+   "st": "stream:http"
+  },
+  {
+   "bytes": "5880",
+   "first": "1793930071.736",
+   "idx": "web",
+   "last": "1793930678.736",
+   "st": "access_combined"
+  },
+  {
+   "bytes": "2420",
+   "first": "1793930071.736",
+   "idx": "wineventlog",
+   "last": "1793930678.736",
+   "st": "WinEventLog:Security"
+  }
+ ],
+ "spl": "index=_internal source=*license_usage.log* type=Usage | stats sum(b) as bytes min(_time) as first max(_time) as last by idx, st"
+}

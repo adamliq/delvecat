@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
+import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
@@ -160,6 +161,8 @@ export function EntityPage() {
 
           {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
 
+          <UsagePanel entity={entity} />
+
           {(entity.type === "index" || entity.type === "sourcetype") && (
             <DataSources catalog={catalog} entity={entity} />
           )}
@@ -197,7 +200,8 @@ export function EntityPage() {
             <section>
               <h2>Observed</h2>
               <p className="muted small">Measured when the bundle was generated ({new Date(catalog.bundle.generatedAt).toLocaleString()}).</p>
-              <PropValue value={observed} />
+              <PropValue value={Object.fromEntries(Object.entries((observed ?? {}) as Record<string, unknown>)
+            .filter(([k]) => k !== "dailyEvents"))} />
             </section>
           )}
         </div>

@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from ...model import ExtractResult
 from ...transport import EndpointForbidden, EndpointNotFound, Transport
-from . import access, data, knowledge, server
+from . import access, data, knowledge, server, usage
 from .common import Ctx, Options
 
 # An extractor returns its entity count, or (count, message) when it only partly succeeded.
@@ -42,6 +42,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "dataModels": knowledge.extract_data_models,
     "workflowActions": knowledge.extract_workflow_actions,
     "fields": data.extract_fields,
+    **usage.USAGE_EXTRACTORS,
 }
 
 
@@ -99,7 +100,11 @@ def extract(
     selected = {k: v for k, v in EXTRACTORS.items() if not only or k in only}
     if not ctx.options.fields:
         selected.pop("fields", None)
+    if not ctx.options.usage:
+        for name in usage.USAGE_EXTRACTORS:
+            selected.pop(name, None)
     out = ExtractResult()
+    out.as_of = getattr(transport, "as_of", None) or usage.now_iso()
     run_extractors(ctx, selected, "splunk", out)
     return out
 

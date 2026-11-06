@@ -193,7 +193,7 @@ are confirmed against a live instance before their connector ships.
 | **3. SPL lineage** ✅ | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
 | **4. Ingestion products** ✅ | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
 | **5. Security suite** ✅ | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
-| **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
+| **6. Usage & health** ✅ | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
 | **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
 | Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
 
@@ -344,6 +344,34 @@ are confirmed against a live instance before their connector ships.
   the response chain.
 - Credentials embedded in URLs (`https://user:pass@host`) are stripped
   everywhere.
+
+### Phase 6 notes (done)
+
+- Read-only searches over `_audit` (saved search runs, ad-hoc and dashboard
+  searches, user activity), `_internal` (scheduler outcomes, web views,
+  license usage, parsing warnings) and `tstats` (daily volume per index and
+  sourcetype, ingest delay). Field names verified on Splunk 9.4. DelveCat tags
+  its own searches with an SPL comment (```` ```delvecat-ingest``` ````) and
+  leaves them out of usage (requires Splunk 8.1+ comment syntax).
+- Ad-hoc search text is analyzed with the same SPL analyzer and macro
+  library as lineage, so indexes, macros, lookups and data models used only
+  interactively count as used. The text itself is never stored in a bundle
+  (recordings of production instances would contain it: do not commit them).
+- `entity.usage` (runs, views, ad-hoc references, last use, scheduler
+  results) and `entity.health` (`ok` / `warning` / `critical` checks) are
+  derived and never change catalog versions. Health is judged as of the
+  capture time (live: now; recordings: `__meta__.json`).
+- Checks: stale data (24 h / 7 d), volume drop or spike against the median
+  day (needs 5 days), ingest delay (10 / 60 min, summary `stash` exempt),
+  parsing warnings, skipped (10% / 50%), failed and slow scheduled runs,
+  scheduled searches that should have run (cron-aware, against how far back
+  the scheduler log goes), silent forwarders and deployment clients, failed
+  app deployments.
+- Cleanup report: objects nothing depends on and nobody used in the window,
+  only judged where the relevant usage source was available; vendor content
+  (Splunk-authored and product apps) hidden unless asked; CSV export.
+- Web: Health page, usage & health panel with daily-volume sparkline on
+  entity pages, Health and Usage facets, home summary.
 
 ## 8. Repository layout
 

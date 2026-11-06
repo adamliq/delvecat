@@ -148,12 +148,20 @@ class ExtractResult:
     refs: list[Ref] = field(default_factory=list)
     reports: list[dict[str, Any]] = field(default_factory=list)
     instance_facts: dict[str, Any] = field(default_factory=dict)
+    # Usage measurements keyed by object name (ids of knowledge objects are only known
+    # after merging), ad-hoc searches to analyze, and the time the data was captured.
+    usage: list[dict[str, Any]] = field(default_factory=list)
+    adhoc_searches: list[dict[str, Any]] = field(default_factory=list)
+    as_of: str | None = None
 
     def extend(self, other: ExtractResult) -> None:
         self.entities.extend(other.entities)
         self.edges.extend(other.edges)
         self.refs.extend(other.refs)
         self.reports.extend(other.reports)
+        self.usage.extend(other.usage)
+        self.adhoc_searches.extend(other.adhoc_searches)
+        self.as_of = self.as_of or other.as_of
         merge_facts(self.instance_facts, other.instance_facts)
 
 
