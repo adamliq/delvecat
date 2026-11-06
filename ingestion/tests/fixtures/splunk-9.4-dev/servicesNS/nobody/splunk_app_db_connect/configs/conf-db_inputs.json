@@ -1,0 +1,114 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "splunk_app_db_connect",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "connection": "orders_mysql",
+    "disabled": true,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_db_connect",
+    "eai:userName": "nobody",
+    "index": "db_orders",
+    "interval": "0 3 * * *",
+    "mode": "batch",
+    "sourcetype": "mysql:customers",
+    "table_name": "shop.customers"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch",
+    "edit": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch",
+    "enable": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch/enable",
+    "list": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch",
+    "move": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch/move",
+    "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/customers_batch"
+   },
+   "name": "customers_batch",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "splunk_app_db_connect",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "connection": "orders_mysql",
+    "description": "New and updated storefront orders.",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_db_connect",
+    "eai:userName": "nobody",
+    "index": "db_orders",
+    "interval": "*/5 * * * *",
+    "mode": "rising",
+    "query": "SELECT order_id, status, amount, updated_at FROM shop.orders WHERE updated_at > ? ORDER BY updated_at ASC",
+    "sourcetype": "mysql:orders",
+    "tail_rising_column_name": "updated_at"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising",
+    "disable": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising/disable",
+    "edit": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising",
+    "list": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising",
+    "move": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising/move",
+    "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_inputs/orders_rising"
+   },
+   "name": "orders_rising",
+   "updated": "2026-11-06T03:35:04+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 2
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

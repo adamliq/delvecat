@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
 from .lineage import derive, record_unresolved
+from .link import link_hosts
 from .model import ExtractResult
 from .resolve import Resolver
 
@@ -116,6 +117,7 @@ def assemble(
     generated = ts.isoformat().replace("+00:00", "Z")
     entities = merge_entities(result.entities)
     spl_refs = derive(entities)
+    result.edges.extend(link_hosts(entities))
     resolved, unresolved = Resolver(entities).resolve([*result.refs, *spl_refs])
     broken = record_unresolved({e["id"]: e for e in entities}, unresolved)
 

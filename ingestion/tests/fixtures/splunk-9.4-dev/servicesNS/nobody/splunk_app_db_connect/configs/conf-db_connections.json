@@ -1,0 +1,111 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "splunk_app_db_connect",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "connection_type": "oracle",
+    "database": "ERP",
+    "disabled": true,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_db_connect",
+    "eai:userName": "nobody",
+    "host": "ora-legacy.internal.example",
+    "identity": "orders_reader",
+    "port": "1521"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle",
+    "edit": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle",
+    "enable": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle/enable",
+    "list": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle",
+    "move": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle/move",
+    "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle"
+   },
+   "name": "legacy_oracle",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "splunk_app_db_connect",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "connection_type": "mysql",
+    "database": "shop",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_db_connect",
+    "eai:userName": "nobody",
+    "host": "mysql.internal.example",
+    "identity": "orders_reader",
+    "port": "3306",
+    "readonly": "1"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql",
+    "disable": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql/disable",
+    "edit": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql",
+    "list": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql",
+    "move": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql/move",
+    "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql"
+   },
+   "name": "orders_mysql",
+   "updated": "2026-11-06T03:35:04+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 2
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

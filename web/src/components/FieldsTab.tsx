@@ -90,6 +90,20 @@ export function fieldsTable(catalog: Catalog, e: Entity): Table | null {
         })),
       };
     }
+    case "streamDefinition": {
+      const fields = (p.fields ?? []) as string[];
+      if (!fields.length) return null;
+      return { caption: `Fields captured by this stream (sourcetype ${String(p.sourcetype ?? "")})`,
+        columns: ["Field"], rows: fields.map((f) => ({ key: f, cells: [f] })) };
+    }
+    case "dbLookup": {
+      const inputs = (p.inputFields ?? []) as string[];
+      const outputs = (p.outputFields ?? []) as string[];
+      if (!inputs.length && !outputs.length) return null;
+      return { caption: "Lookup fields", columns: ["Field", "Role"],
+        rows: [...inputs.map((f) => ({ key: `in:${f}`, cells: [f, "input"] })),
+               ...outputs.map((f) => ({ key: `out:${f}`, cells: [f, "output"] }))] };
+    }
     case "lookup": {
       const fields = (p.fields ?? []) as string[];
       if (!fields.length) return null;

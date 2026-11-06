@@ -1,0 +1,20 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "count": "10",
+   "host": "streamfwd-dmz-01",
+   "index": "stream",
+   "lastSeen": "1793936105",
+   "sourcetype": "stream:dns"
+  },
+  {
+   "count": "12",
+   "host": "streamfwd-dmz-01",
+   "index": "stream",
+   "lastSeen": "1793936105",
+   "sourcetype": "stream:http"
+  }
+ ],
+ "spl": "| tstats count max(_time) as lastSeen where (index=* OR index=_*) sourcetype=stream:* by host, sourcetype, index"
+}

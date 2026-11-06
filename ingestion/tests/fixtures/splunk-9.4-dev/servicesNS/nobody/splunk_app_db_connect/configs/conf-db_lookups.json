@@ -1,0 +1,61 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "splunk_app_db_connect",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "connection": "orders_mysql",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_db_connect",
+    "eai:userName": "nobody",
+    "input_fields": "customer_id",
+    "lookupSQL": "SELECT customer_id, tier FROM shop.customers WHERE customer_id = ?",
+    "output_fields": "tier"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier",
+    "disable": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier/disable",
+    "edit": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier",
+    "list": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier",
+    "move": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier/move",
+    "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_lookups/customer_tier"
+   },
+   "name": "customer_tier",
+   "updated": "2026-11-06T03:35:04+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 1
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

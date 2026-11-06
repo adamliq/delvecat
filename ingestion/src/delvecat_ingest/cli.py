@@ -12,7 +12,7 @@ from typing import Any
 from . import __version__
 from .annotations import AnnotationError, apply_annotations, load_annotations
 from .bundle import assemble, load_bundle, validate, write_bundle
-from .connectors import splunk, splunk_cloud_acs
+from .connectors import db_connect, deployment_server, splunk, splunk_cloud_acs, stream
 from .connectors.splunk import Options
 from .model import merge_facts
 from .transport import FixtureTransport, HttpTransport, RecordingTransport, Transport
@@ -29,6 +29,9 @@ def _verify(args: argparse.Namespace) -> bool | str:
     if args.insecure:
         return False
     return args.ca_bundle or True
+
+
+PRODUCTS = {"deploymentServer", "dbConnect", "stream"}
 
 
 def _build(args: argparse.Namespace) -> int:
@@ -54,6 +57,19 @@ def _build(args: argparse.Namespace) -> int:
         print(f"error: unknown extractor(s): {', '.join(sorted(unknown))}", file=sys.stderr)
         return 2
     result = splunk.extract(transport, args.instance, options, only)
+    # --only narrows the run to the named platform extractors unless products are asked for.
+    chosen = args.products or ("none" if only else "all")
+    products = PRODUCTS if chosen == "all" else set(filter(None, chosen.split(",")))
+    if unknown := products - PRODUCTS - {"none"}:
+        print(f"error: unknown product(s): {', '.join(sorted(unknown))}", file=sys.stderr)
+        return 2
+    if "deploymentServer" in products:
+        apps_dir = Path(args.deployment_apps_dir) if args.deployment_apps_dir else None
+        result.extend(deployment_server.extract(transport, args.instance, apps_dir))
+    if "dbConnect" in products:
+        result.extend(db_connect.extract(transport, args.instance))
+    if "stream" in products:
+        result.extend(stream.extract(transport, args.instance))
 
     if args.acs_fixtures or args.acs_stack:
         if args.acs_fixtures:
@@ -243,6 +259,17 @@ def main(argv: list[str] | None = None) -> int:
         g.add_argument("--annotation-branch", default="main")
 
     annotation_args(b)
+    prod = b.add_argument_group("Splunk products")
+    prod.add_argument(
+        "--products",
+        help="comma-separated: deploymentServer,dbConnect,stream, 'all' (the default "
+        "without --only) or 'none'. Each is skipped when not installed.",
+    )
+    prod.add_argument(
+        "--deployment-apps-dir",
+        help="Deployment Server's deployment-apps folder, to catalogue the "
+        "inputs each app pushes to forwarders",
+    )
     b.add_argument("--only", help="comma-separated extractor names to run")
     b.add_argument("--record", help="save every response under this directory as fixtures")
     b.add_argument("--previous", help="previous bundle (file or directory) for versioning")

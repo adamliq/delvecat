@@ -236,5 +236,90 @@
     "type": "dashboard",
     "name": "web_explorer",
     "app": "acme_web"
+  },
+  {
+    "type": "index",
+    "name": "os"
+  },
+  {
+    "type": "index",
+    "name": "db_orders"
+  },
+  {
+    "type": "index",
+    "name": "stream"
+  },
+  {
+    "type": "serverClass",
+    "name": "all_forwarders"
+  },
+  {
+    "type": "serverClass",
+    "name": "linux_hosts"
+  },
+  {
+    "type": "serverClass",
+    "name": "web_servers"
+  },
+  {
+    "type": "deploymentApp",
+    "name": "acme_all_outputs"
+  },
+  {
+    "type": "deploymentApp",
+    "name": "acme_linux_inputs"
+  },
+  {
+    "type": "deploymentApp",
+    "name": "acme_web_inputs"
+  },
+  {
+    "type": "dbIdentity",
+    "name": "orders_reader"
+  },
+  {
+    "type": "dbConnection",
+    "name": "orders_mysql"
+  },
+  {
+    "type": "dbConnection",
+    "name": "legacy_oracle"
+  },
+  {
+    "type": "dbInput",
+    "name": "orders_rising"
+  },
+  {
+    "type": "dbInput",
+    "name": "customers_batch"
+  },
+  {
+    "type": "dbOutput",
+    "name": "fraud_flags_out"
+  },
+  {
+    "type": "dbLookup",
+    "name": "customer_tier"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Orders vs Errors",
+    "app": "acme_web"
+  },
+  {
+    "type": "streamDefinition",
+    "name": "http"
+  },
+  {
+    "type": "streamDefinition",
+    "name": "dns"
+  },
+  {
+    "type": "streamDefinition",
+    "name": "smtp"
+  },
+  {
+    "type": "streamGroup",
+    "name": "dmz_sensors"
   }
 ]

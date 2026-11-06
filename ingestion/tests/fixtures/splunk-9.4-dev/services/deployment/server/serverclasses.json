@@ -1,0 +1,194 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "blacklist-size": 0,
+    "currentDownloads": "0",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadTime": 1793936762,
+    "machineTypesFilter": "",
+    "packageTypesFilter": "",
+    "repositoryList": {
+     "acme_all_outputs": null,
+     "acme_linux_inputs": null,
+     "acme_web_inputs": null
+    },
+    "repositoryLocation": "/opt/delvecat-deployment-apps",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": false,
+    "stateOnClient": "enabled",
+    "updaterRunningFilter": "",
+    "whitelist-size": 1,
+    "whitelist.0": "*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders/_reload",
+    "alternate": "/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders",
+    "applications": "/servicesNS/nobody/system/deployment/serverclasses/all_forwarders/applications",
+    "clients": "/servicesNS/nobody/system/deployment/serverclasses/all_forwarders/clients",
+    "edit": "/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders",
+    "list": "/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders",
+    "reload": "/servicesNS/nobody/system/deployment/serverclasses/all_forwarders/reload",
+    "remove": "/servicesNS/nobody/system/deployment/server/serverclasses/all_forwarders"
+   },
+   "name": "all_forwarders",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "blacklist-size": 0,
+    "currentDownloads": "0",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadTime": 1793936762,
+    "machineTypesFilter": "linux-x86_64",
+    "packageTypesFilter": "",
+    "repositoryList": {
+     "acme_all_outputs": null,
+     "acme_linux_inputs": null,
+     "acme_web_inputs": null
+    },
+    "repositoryLocation": "/opt/delvecat-deployment-apps",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": false,
+    "stateOnClient": "enabled",
+    "updaterRunningFilter": "",
+    "whitelist-size": 1,
+    "whitelist.0": "uf-linux-*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts/_reload",
+    "alternate": "/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts",
+    "applications": "/servicesNS/nobody/system/deployment/serverclasses/linux_hosts/applications",
+    "clients": "/servicesNS/nobody/system/deployment/serverclasses/linux_hosts/clients",
+    "edit": "/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts",
+    "list": "/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts",
+    "reload": "/servicesNS/nobody/system/deployment/serverclasses/linux_hosts/reload",
+    "remove": "/servicesNS/nobody/system/deployment/server/serverclasses/linux_hosts"
+   },
+   "name": "linux_hosts",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "blacklist-size": 0,
+    "currentDownloads": "0",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadTime": 1793936762,
+    "machineTypesFilter": "",
+    "packageTypesFilter": "",
+    "repositoryList": {
+     "acme_all_outputs": null,
+     "acme_linux_inputs": null,
+     "acme_web_inputs": null
+    },
+    "repositoryLocation": "/opt/delvecat-deployment-apps",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": false,
+    "stateOnClient": "enabled",
+    "updaterRunningFilter": "",
+    "whitelist-size": 1,
+    "whitelist.0": "web-*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/deployment/server/serverclasses/web_servers",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/deployment/server/serverclasses/web_servers/_reload",
+    "alternate": "/servicesNS/nobody/system/deployment/server/serverclasses/web_servers",
+    "applications": "/servicesNS/nobody/system/deployment/serverclasses/web_servers/applications",
+    "clients": "/servicesNS/nobody/system/deployment/serverclasses/web_servers/clients",
+    "edit": "/servicesNS/nobody/system/deployment/server/serverclasses/web_servers",
+    "list": "/servicesNS/nobody/system/deployment/server/serverclasses/web_servers",
+    "reload": "/servicesNS/nobody/system/deployment/serverclasses/web_servers/reload",
+    "remove": "/servicesNS/nobody/system/deployment/server/serverclasses/web_servers"
+   },
+   "name": "web_servers",
+   "updated": "1970-01-01T00:00:00+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 3
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

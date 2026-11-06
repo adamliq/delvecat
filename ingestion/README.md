@@ -28,7 +28,9 @@ Useful options:
 | `--shard` | write a directory: `catalog.json` manifest + per-type shards |
 | `--fields` | sample events per sourcetype to discover fields (`--max-field-sourcetypes`) |
 | `--inventory-window` | time range for observed sourcetypes/hosts/sources (default `-7d`) |
-| `--only a,b` | run selected extractors |
+| `--only a,b` | run selected platform extractors (product connectors are skipped unless `--products` is given) |
+| `--products` | `deploymentServer,dbConnect,stream`, `all` (default) or `none`; each is skipped when not installed |
+| `--deployment-apps-dir` | the Deployment Server's deployment-apps folder, to catalogue the inputs each app pushes |
 | `--record DIR` | save every response as replayable fixtures (secrets and emails removed) |
 | `--strict` | exit 3 if any extractor failed |
 
@@ -39,6 +41,20 @@ eventtypes, macros, data models and workflow actions (no extra Splunk calls).
 Objects that reference something missing or not shared get
 `entity.lineage.unresolved`; searches without an index get
 `entity.lineage.implicitIndex`.
+
+## Products
+
+| Connector | Source | Notes |
+|---|---|---|
+| Deployment Server | `deployment/server/{serverclasses,applications,clients}`, `configs/conf-serverclass`, optional deployment-apps folder | verified against Splunk 9.4 with a real universal forwarder |
+| DB Connect | `configs/conf-{identities,db_connections,db_inputs,db_outputs,db_lookups}` in `splunk_app_db_connect` | identity user names and passwords are never collected; key names follow DB Connect 3.x docs and should be checked against your version |
+| Stream | KV store collections `streams`, `streamforwardergroups` in `splunk_app_stream`; forwarders from `stream:*` data | document fields follow the Stream app and should be checked against your version |
+
+Machines are tied to the `host` values in the data by hostname (case-insensitive,
+short name against FQDN), so lineage answers "which forwarders, databases and
+streams feed index X". Run against each instance that holds a product (for
+example the Deployment Server and the DB Connect heavy forwarder); combining
+several instances into one bundle is on the roadmap.
 
 ## Safety
 

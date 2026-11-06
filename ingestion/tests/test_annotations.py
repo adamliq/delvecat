@@ -10,6 +10,7 @@ from delvecat_ingest.model import ExtractResult, entity
 
 REPO_ANNOTATIONS = Path(__file__).parents[2] / "annotations"
 RECORDED = Path(__file__).parent / "fixtures" / "splunk-9.4-dev"
+DEPLOYMENT_APPS = Path(__file__).parents[2] / "deploy" / "deployment-apps"
 
 
 def make_bundle():
@@ -186,8 +187,10 @@ def test_repo_annotations_are_valid_and_all_match_the_demo(tmp_path):
                 "--instance",
                 "acme",
                 "--fields",
+                "--deployment-apps-dir",
+                str(DEPLOYMENT_APPS),
                 "--max-field-sourcetypes",
-                "3",
+                "10",
                 "--strict",
                 "--annotations",
                 str(REPO_ANNOTATIONS),
@@ -222,7 +225,7 @@ def test_cli_annotate_and_lint(tmp_path, capsys):
                 "acme",
                 "--fields",
                 "--max-field-sourcetypes",
-                "3",
+                "10",
                 "--out",
                 str(base),
             ]

@@ -168,12 +168,13 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
                     "useAck": as_bool(c.get("useACK", False)) if kind == "http" else None,
                 },
             )
-            index = c.get("index")
-            targets = {index if index and index != "default" else "main"}
-            targets.update(split_list(c.get("indexes")))
-            out.refs.extend(ref(ent["id"], "index", i, "feeds") for i in sorted(targets))
-            if c.get("sourcetype"):
-                out.refs.append(ref(ent["id"], "sourcetype", c["sourcetype"], "feeds"))
+            if not ent.get("disabled"):  # a disabled input does not feed anything
+                index = c.get("index")
+                targets = {index if index and index != "default" else "main"}
+                targets.update(split_list(c.get("indexes")))
+                out.refs.extend(ref(ent["id"], "index", i, "feeds") for i in sorted(targets))
+                if c.get("sourcetype"):
+                    out.refs.append(ref(ent["id"], "sourcetype", c["sourcetype"], "feeds"))
             n += 1
     return n
 

@@ -8,7 +8,8 @@ install:
 	cd web && npm install
 
 demo:  ## build the demo catalog bundle from fixtures
-	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard --strict \
+	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --shard --strict \
+		--deployment-apps-dir ../deploy/deployment-apps \
 		--annotations ../annotations --annotation-repo $(ANNOTATION_REPO) \
 		--instance-name "Acme (demo)" --out ../web/public/catalog
 

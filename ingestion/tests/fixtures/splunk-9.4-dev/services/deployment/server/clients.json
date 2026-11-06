@@ -1,0 +1,123 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "system",
+    "perms": {
+     "read": [
+      "admin",
+      "splunk-system-role"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "system",
+   "content": {
+    "applications": {
+     "acme_all_outputs": {
+      "action": "Install",
+      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793936762.bundle",
+      "checksum": "16194101533353802738",
+      "excludeFromUpdate": "",
+      "failedReason": "''",
+      "issueReload": false,
+      "restartIfNeeded": false,
+      "restartSplunkWeb": false,
+      "restartSplunkd": true,
+      "result": "Ok",
+      "serverclasses": [
+       "all_forwarders"
+      ],
+      "size": "10240",
+      "stateOnClient": "enabled",
+      "timestamp": "Fri Nov  6 03:46:28 2026"
+     },
+     "acme_linux_inputs": {
+      "action": "Unknown",
+      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793936762.bundle",
+      "checksum": "0",
+      "excludeFromUpdate": "",
+      "failedReason": "",
+      "issueReload": false,
+      "restartIfNeeded": false,
+      "restartSplunkWeb": false,
+      "restartSplunkd": true,
+      "result": "Ok",
+      "serverclasses": [
+       "linux_hosts"
+      ],
+      "size": "10240",
+      "stateOnClient": "enabled"
+     }
+    },
+    "averagePhoneHomeInterval": 30,
+    "build": "1b0c587000b8",
+    "clientName": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "dns": "deploy-forwarder-1.deploy_default",
+    "eai:acl": null,
+    "guid": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "hostname": "uf-linux-01",
+    "id": "connection_172.18.0.3_8089_deploy-forwarder-1.deploy%default_uf-linux-01_linux-x86%64_CD93342B-03EB-4531-8E8B-E9D3D89DD71F_CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "instanceId": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "instanceName": "uf-linux-01",
+    "ip": "172.18.0.3",
+    "lastPhoneHomeTime": 1793936998,
+    "mgmt": "8089",
+    "name": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "package": "universal_forwarder",
+    "packageType": "tgz",
+    "serverClasses": {
+     "all_forwarders": {
+      "excludeFromUpdate": "",
+      "issueReload": false,
+      "loadTime": 1793936762,
+      "repositoryLocation": "/opt/delvecat-deployment-apps",
+      "restartIfNeeded": false,
+      "restartSplunkWeb": false,
+      "restartSplunkd": false,
+      "stateOnClient": "enabled"
+     },
+     "linux_hosts": {
+      "excludeFromUpdate": "",
+      "issueReload": false,
+      "loadTime": 1793936762,
+      "repositoryLocation": "/opt/delvecat-deployment-apps",
+      "restartIfNeeded": false,
+      "restartSplunkWeb": false,
+      "restartSplunkd": false,
+      "stateOnClient": "enabled"
+     }
+    },
+    "splunkVersion": "9.4.17",
+    "utsname": "linux-x86_64"
+   },
+   "id": "https://localhost:8089/services/deployment/server/clients/CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+   "links": {
+    "alternate": "/services/deployment/server/clients/CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "list": "/services/deployment/server/clients/CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+    "remove": "/services/deployment/server/clients/CD93342B-03EB-4531-8E8B-E9D3D89DD71F"
+   },
+   "name": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
+   "updated": "1970-01-01T00:00:00+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 1
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

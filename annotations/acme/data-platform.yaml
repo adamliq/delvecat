@@ -1,0 +1,33 @@
+annotations:
+  - match: {product: dbConnect}
+    owners: [data-platform]
+  - match: {product: deploymentServer}
+    owners: [splunk-admins]
+  - match: {product: stream}
+    owners: [network-engineering]
+    glossaryTerms: [Perimeter firewall]
+
+  - id: acme:dbConnection:orders_mysql
+    description: Read-only replica of the storefront order database.
+    classifications: [Confidential]
+    glossaryTerms: [Storefront]
+    links:
+      - title: Database runbook
+        url: https://wiki.example.com/runbooks/orders-mysql
+
+  - id: acme:externalTable:orders_mysql/shop.orders
+    description: One row per order; updated_at drives the rising-column input.
+    classifications: [Confidential]
+
+  - id: acme:index:os
+    description: Operating system and forwarder logs from Linux hosts managed by the Deployment Server.
+    owners: [splunk-admins]
+
+  - id: acme:index:db_orders
+    description: Orders and customers copied from the storefront database by DB Connect.
+    owners: [data-platform]
+    classifications: [Confidential]
+    glossaryTerms: [Storefront]
+
+  - id: acme:index:stream
+    description: Wire data (HTTP and DNS) captured by Splunk Stream sensors in the DMZ.

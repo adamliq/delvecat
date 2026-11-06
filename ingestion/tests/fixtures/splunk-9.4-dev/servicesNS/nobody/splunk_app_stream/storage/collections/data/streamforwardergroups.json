@@ -1,0 +1,16 @@
+{
+ "__list__": [
+  {
+   "_key": "dmz_sensors",
+   "_user": "nobody",
+   "description": "DMZ taps",
+   "name": "dmz_sensors",
+   "rule": "streamfwd-dmz-.*",
+   "streams": [
+    "http",
+    "dns",
+    "smtp"
+   ]
+  }
+ ]
+}

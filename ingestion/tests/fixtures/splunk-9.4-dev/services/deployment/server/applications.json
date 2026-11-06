@@ -1,0 +1,146 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "system",
+    "perms": {
+     "read": [
+      "admin",
+      "splunk-system-role"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "system",
+   "content": {
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793936762.bundle",
+    "checksum": "16194101533353802738",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": true,
+    "serverclasses": [
+     "all_forwarders"
+    ],
+    "size": "10240",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/services/deployment/server/applications/acme_all_outputs",
+   "links": {
+    "alternate": "/services/deployment/server/applications/acme_all_outputs"
+   },
+   "name": "acme_all_outputs",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "system",
+    "perms": {
+     "read": [
+      "admin",
+      "splunk-system-role"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "system",
+   "content": {
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793936762.bundle",
+    "checksum": "5019075835286561291",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": true,
+    "serverclasses": [
+     "linux_hosts"
+    ],
+    "size": "10240",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/services/deployment/server/applications/acme_linux_inputs",
+   "links": {
+    "alternate": "/services/deployment/server/applications/acme_linux_inputs"
+   },
+   "name": "acme_linux_inputs",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "system",
+    "perms": {
+     "read": [
+      "admin",
+      "splunk-system-role"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "system",
+   "content": {
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_web_inputs-1793936762.bundle",
+    "checksum": "3727375036806695942",
+    "eai:acl": null,
+    "excludeFromUpdate": "",
+    "issueReload": false,
+    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "restartIfNeeded": false,
+    "restartSplunkWeb": false,
+    "restartSplunkd": true,
+    "serverclasses": [
+     "web_servers"
+    ],
+    "size": "10240",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/services/deployment/server/applications/acme_web_inputs",
+   "links": {
+    "alternate": "/services/deployment/server/applications/acme_web_inputs"
+   },
+   "name": "acme_web_inputs",
+   "updated": "1970-01-01T00:00:00+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 3
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

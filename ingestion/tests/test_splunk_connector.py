@@ -14,6 +14,7 @@ HERE = Path(__file__).parent
 RECORDED = HERE / "fixtures" / "splunk-9.4-dev"
 ACS = HERE / "fixtures" / "acs-sample"
 SEED_MANIFEST = HERE.parent.parent / "deploy" / "seed_manifest.json"
+DEPLOYMENT_APPS = HERE.parent.parent / "deploy" / "deployment-apps"
 
 
 def seed_ids(instance: str) -> list[str]:
@@ -56,10 +57,23 @@ def test_bundle_is_valid_and_every_extractor_ran(bundle):
     assert set(statuses) >= {f"splunk.{n}" for n in splunk.EXTRACTORS if n != "fields"}
 
 
-def test_every_seeded_object_is_in_the_bundle(by_id):
-    """Phase 1 exit criterion: all knowledge objects in the test instance are catalogued."""
-    missing = [i for i in seed_ids("dev") if i not in by_id]
-    assert missing == []
+def test_every_seeded_object_is_in_the_bundle():
+    """Exit criterion: every object seeded into the test instance is catalogued,
+    across the platform and the Deployment Server, DB Connect and Stream connectors."""
+    from delvecat_ingest.connectors import db_connect, deployment_server, stream
+
+    t = FixtureTransport(RECORDED)
+    result = splunk.extract(t, "dev")
+    result.extend(deployment_server.extract(t, "dev", DEPLOYMENT_APPS))
+    result.extend(db_connect.extract(t, "dev"))
+    result.extend(stream.extract(t, "dev"))
+    ids = {
+        e["id"]
+        for e in assemble([{"id": "dev", "name": "dev", "kind": "splunkEnterprise"}], result)[
+            "entities"
+        ]
+    }
+    assert [i for i in seed_ids("dev") if i not in ids] == []
 
 
 def test_no_secrets_or_emails(bundle):
@@ -212,7 +226,7 @@ def test_forbidden_and_missing_endpoints_are_skipped(tmp_path):
 
 
 def test_field_discovery_from_sampled_events():
-    opts = splunk.Options(fields=True, max_field_sourcetypes=3)
+    opts = splunk.Options(fields=True, max_field_sourcetypes=10)
     b = assemble(
         [{"id": "dev", "name": "dev", "kind": "splunkEnterprise"}],
         splunk.extract(FixtureTransport(RECORDED), "dev", opts),
@@ -232,7 +246,7 @@ def test_field_discovery_from_sampled_events():
 
 
 def test_field_sampling_failures_are_partial_not_fatal():
-    opts = splunk.Options(fields=True, max_field_sourcetypes=10)  # only 3 were recorded
+    opts = splunk.Options(fields=True, max_field_sourcetypes=30)  # only 10 were recorded
     result = splunk.extract(FixtureTransport(RECORDED), "dev", opts, only=None)
     report = next(r for r in result.reports if r["connector"] == "splunk.fields")
     assert report["status"] == "partial"

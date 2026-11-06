@@ -191,7 +191,7 @@ are confirmed against a live instance before their connector ships.
 | **1. Core inventory** ✅ | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
 | **2. UI MVP + annotations** ✅ | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
 | **3. SPL lineage** ✅ | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
-| **4. Ingestion products** | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
+| **4. Ingestion products** ✅ | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
 | **5. Security suite** | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
 | **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
 | **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
@@ -280,6 +280,36 @@ are confirmed against a live instance before their connector ships.
   adjustable depth, scrolls to the focused object), full upstream and impact
   lists, diagnostics; "Search issues" facet; search health on the home page.
 - Deferred: field-level lineage; `map search="..."` strings; SPL2.
+
+### Phase 4 notes (done)
+
+- **Deployment Server**: server classes (white/blacklists, machine-type
+  filters), class → app mapping from `serverclass.conf`, deployment apps,
+  clients (phone-home, installed apps, class membership), and, with
+  `--deployment-apps-dir`, the inputs and output targets inside each app
+  (`default/` and `local/` layered like Splunk). Verified end to end: the dev
+  compose file runs a universal forwarder that phones home to the dev Splunk,
+  receives two apps and forwards data.
+- **DB Connect**: identities (names only), connections, inputs (batch /
+  rising), outputs (with SPL lineage of their search), lookups, and external
+  tables found from table names and SQL. `dbxquery`, `dbxoutput` and
+  `dbxlookup` in SPL link searches to connections, tables, outputs and
+  lookups; tables named only in `dbxquery` are catalogued under their
+  connection. Read from DB Connect's `.conf` files through Splunk's generic
+  config endpoint (no Java service needed); a stand-in app in the dev
+  container exercises the real endpoint.
+- **Stream**: stream definitions and forwarder groups from the Stream app's KV
+  store collections, Stream forwarders from `stream:*` data, group rules
+  matched against forwarder hostnames.
+- **Linking**: deployment clients, forwarders and Stream forwarders feed the
+  `host` values in the data (by hostname), so "which forwarders, databases and
+  streams feed index X" is answered by lineage and by the new "Where this data
+  comes from" panel on index and sourcetype pages.
+- Disabled inputs (platform, deployment app, DB Connect, Stream) no longer
+  count as feeding an index. User names are redacted alongside passwords.
+- To verify on real installs: DB Connect key names across versions, Stream KV
+  document fields. Deferred: combining bundles from several instances (the DS,
+  heavy forwarders and search heads) into one catalog.
 
 ## 8. Repository layout
 

@@ -306,6 +306,104 @@ def main() -> None:
         )})
     record("dashboard", "web_explorer", "acme_web")
 
+    # --- Phase 4: Deployment Server, DB Connect, Stream ---------------------------------
+    for idx in ("os", "db_orders", "stream"):
+        post(f"{ns('search')}/data/indexes", {"name": idx})
+        record("index", idx)
+    post("/services/data/inputs/tcp/cooked", {"name": "9997"})  # receive from forwarders
+
+    # This instance doubles as a Deployment Server. Apps live in the mounted folder.
+    conf("system", "serverclass", "global",
+         repositoryLocation="/opt/delvecat-deployment-apps")
+    classes = {
+        "all_forwarders": ({"whitelist.0": "*"}, ["acme_all_outputs"]),
+        "linux_hosts": ({"whitelist.0": "uf-linux-*", "machineTypesFilter": "linux-x86_64"},
+                        ["acme_linux_inputs"]),
+        "web_servers": ({"whitelist.0": "web-*"}, ["acme_web_inputs"]),
+    }
+    for name, (attrs, apps) in classes.items():
+        conf("system", "serverclass", f"serverClass:{name}", **attrs)
+        record("serverClass", name)
+        for app in apps:
+            conf("system", "serverclass", f"serverClass:{name}:app:{app}",
+                 restartSplunkd="true", stateOnClient="enabled")
+    for app in ("acme_all_outputs", "acme_linux_inputs", "acme_web_inputs"):
+        record("deploymentApp", app)
+    client.post("/services/deployment/server/config/_reload")  # seed only
+
+    # DB Connect keeps its configuration in .conf files of its app. Real installs also
+    # run a Java service; DelveCat only needs the configuration.
+    post("/services/apps/local", {"name": "splunk_app_db_connect", "template": "barebones",
+                                  "label": "Splunk DB Connect (dev stand-in)",
+                                  "visible": "true"})
+    dbx = "splunk_app_db_connect"
+    conf(dbx, "identities", "orders_reader", username="splunk_ro", password="dev-only-secret")
+    record("dbIdentity", "orders_reader")
+    conf(dbx, "db_connections", "orders_mysql", connection_type="mysql",
+         host="mysql.internal.example", port="3306", database="shop", identity="orders_reader",
+         readonly="true", disabled="0")
+    conf(dbx, "db_connections", "legacy_oracle", connection_type="oracle",
+         host="ora-legacy.internal.example", port="1521", database="ERP", identity="orders_reader",
+         disabled="1")
+    for c in ("orders_mysql", "legacy_oracle"):
+        record("dbConnection", c)
+    conf(dbx, "db_inputs", "orders_rising", connection="orders_mysql", mode="rising",
+         query="SELECT order_id, status, amount, updated_at FROM shop.orders "
+               "WHERE updated_at > ? ORDER BY updated_at ASC",
+         tail_rising_column_name="updated_at", index="db_orders", sourcetype="mysql:orders",
+         interval="*/5 * * * *", disabled="0",
+         description="New and updated storefront orders.")
+    conf(dbx, "db_inputs", "customers_batch", connection="orders_mysql", mode="batch",
+         table_name="shop.customers", index="db_orders", sourcetype="mysql:customers",
+         interval="0 3 * * *", disabled="1")
+    for i in ("orders_rising", "customers_batch"):
+        record("dbInput", i)
+    conf(dbx, "db_outputs", "fraud_flags_out", connection="orders_mysql",
+         table_name="shop.fraud_flags",
+         search="index=db_orders sourcetype=mysql:orders amount>100 | table order_id amount",
+         interval="0 * * * *", disabled="0")
+    record("dbOutput", "fraud_flags_out")
+    conf(dbx, "db_lookups", "customer_tier", connection="orders_mysql",
+         lookupSQL="SELECT customer_id, tier FROM shop.customers WHERE customer_id = ?",
+         input_fields="customer_id", output_fields="tier")
+    record("dbLookup", "customer_tier")
+    # Splunk checks command names when a search is saved: declare dbxquery like DB Connect.
+    conf(dbx, "commands", "dbxquery", filename="dbxquery.py", generating="true",
+         supports_rawargs="true")
+    post(f"{ns(dbx)}/configs/conf-commands/dbxquery/acl", {"sharing": "global", "owner": "nobody"})
+    search("acme_web", "Web - Orders vs Errors",
+           '| dbxquery connection="orders_mysql" query="SELECT o.order_id, c.tier FROM '
+           'shop.orders o JOIN shop.customers c ON o.customer_id = c.id" '
+           "| join order_id [search index=web status>=500]",
+           "Joins live order data from MySQL with web errors.")
+
+    # Splunk Stream keeps stream definitions in KV store collections of its app.
+    post("/services/apps/local", {"name": "splunk_app_stream", "template": "barebones",
+                                  "label": "Splunk Stream (dev stand-in)", "visible": "true"})
+    stream_ns = ns("splunk_app_stream")
+    for coll in ("streams", "streamforwardergroups"):
+        post(f"{stream_ns}/storage/collections/config", {"name": coll})
+    streams = [
+        {"_key": "http", "id": "http", "protocolName": "http", "enabled": True,
+         "index": "stream", "streamType": "event", "category": "Application Layer",
+         "description": "HTTP requests seen at the DMZ.",
+         "fields": [{"name": f, "enabled": True} for f in ("src_ip", "dest_ip", "uri_path",
+                                                          "status")]},
+        {"_key": "dns", "id": "dns", "protocolName": "dns", "enabled": True, "index": "stream",
+         "streamType": "event", "fields": [{"name": "query", "enabled": True}]},
+        {"_key": "smtp", "id": "smtp", "protocolName": "smtp", "enabled": False,
+         "index": None, "streamType": "event", "fields": []},
+    ]
+    groups = [{"_key": "dmz_sensors", "name": "dmz_sensors", "description": "DMZ taps",
+               "rule": "streamfwd-dmz-.*", "streams": ["http", "dns", "smtp"]}]
+    for coll, docs in (("streams", streams), ("streamforwardergroups", groups)):
+        r = client.post(f"{stream_ns}/storage/collections/data/{coll}/batch_save",
+                        json=docs, headers={"Content-Type": "application/json"})
+        r.raise_for_status()
+    for st in ("http", "dns", "smtp"):
+        record("streamDefinition", st)
+    record("streamGroup", "dmz_sensors")
+
     # Data so that the tstats inventory has something to find
     now = int(time.time())
     batches = [
@@ -319,9 +417,25 @@ def main() -> None:
          [f"{time.strftime('%m/%d/%Y %I:%M:%S %p', time.gmtime(now - i * 90))} EventCode=4625 "
           f"user=svc{i % 4} src=10.1.0.{i}" for i in range(20)]),
     ]
+    batches += [
+        ("db_orders", "mysql:orders", "dbx-hf-01",
+         [f"{time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(now - i * 120))} order_id={1000 + i} "
+          f"status={'shipped' if i % 3 else 'pending'} amount={10 + i}" for i in range(15)]),
+        ("stream", "stream:http", "streamfwd-dmz-01",
+         [f'{{"timestamp":"{time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now - i * 45))}",'
+          f'"src_ip":"198.51.100.{i}","dest_ip":"10.0.0.5","uri_path":"/cart/{i}","status":200}}'
+          for i in range(12)]),
+        ("stream", "stream:dns", "streamfwd-dmz-01",
+         [f'{{"timestamp":"{time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now - i * 50))}",'
+          f'"src_ip":"10.0.0.{i}","query":"host{i}.example.com","reply_code":"NoError"}}'
+          for i in range(10)]),
+    ]
     for index, st, host, events in batches:
-        info = client.get(f"/services/data/indexes/{index}", params={"output_mode": "json"})
-        if int(info.json()["entry"][0]["content"].get("totalEventCount", 0) or 0) > 0:
+        existing = client.post("/services/search/jobs", data={
+            "search": f'| tstats count where index="{index}" sourcetype="{st}"',
+            "exec_mode": "oneshot", "output_mode": "json", "earliest_time": "0"})
+        rows = existing.json().get("results") or [{}]
+        if int(rows[0].get("count", 0) or 0) > 0:
             continue  # already seeded: keep counts stable across re-runs
         r = client.post("/services/receivers/simple",
                         params={"index": index, "sourcetype": st, "host": host},

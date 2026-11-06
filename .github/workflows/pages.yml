@@ -31,7 +31,8 @@ jobs:
         working-directory: ingestion
         run: |
           uv sync --locked
-          uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard \
+          uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --shard \
+            --deployment-apps-dir ../deploy/deployment-apps \
             --instance-name "Acme (demo)" --strict --annotations ../annotations \
             --annotation-repo "${{ github.server_url }}/${{ github.repository }}" \
             --annotation-branch "${{ github.ref_name }}" --out ../web/public/catalog

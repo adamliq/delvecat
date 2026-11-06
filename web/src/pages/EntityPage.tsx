@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnnotationsTab } from "../components/AnnotationsTab";
+import { DataSources } from "../components/DataSources";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LineageTab } from "../components/LineageTab";
@@ -19,6 +20,7 @@ const CODE: Record<string, string> = {
   REGEX: "Regex",
   srchFilter: "Search filter",
   linkUri: "Link URI",
+  query: "SQL",
 };
 
 const GROUP_LIMIT = 25;
@@ -152,6 +154,10 @@ export function EntityPage() {
               </>
             )}
           </dl>
+
+          {(entity.type === "index" || entity.type === "sourcetype") && (
+            <DataSources catalog={catalog} entity={entity} />
+          )}
 
           {a?.links?.length ? (
             <section>

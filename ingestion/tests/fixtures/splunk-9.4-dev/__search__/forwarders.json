@@ -1,5 +1,15 @@
 {
  "earliest": "-24h",
- "results": [],
+ "results": [
+  {
+   "arch": "x86_64",
+   "fwdType": "uf",
+   "hostname": "uf-linux-01",
+   "kb": "329.488",
+   "lastSeen": "1793937025.200",
+   "os": "Linux",
+   "version": "9.4.17"
+  }
+ ],
  "spl": "index=_internal sourcetype=splunkd group=tcpin_connections | stats latest(_time) as lastSeen latest(fwdType) as fwdType latest(version) as version latest(os) as os latest(arch) as arch sum(kb) as kb by hostname | sort 0 - kb | head 10000"
 }

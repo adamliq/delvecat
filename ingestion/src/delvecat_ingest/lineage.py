@@ -65,6 +65,8 @@ def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
         return [(p["search"], False, "search")]
     if t in ("eventtype",):
         return [(p.get("search") or "", True, "search")]
+    if t == "dbOutput" and p.get("search"):
+        return [(p["search"], False, "search")]
     if t == "macro":
         return [(p.get("definition") or "", True, "definition")]
     if t == "dataModel":
@@ -159,7 +161,41 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
             e["lineage"] = lineage
         else:
             e.pop("lineage", None)
+    _tables_for_dbxquery(entities, refs)
     return refs
+
+
+def _tables_for_dbxquery(entities: list[dict[str, Any]], refs: list[Ref]) -> None:
+    """``dbxquery`` names tables that DB Connect's own configuration may not mention.
+    Catalogue them under their connection so lineage can reach the database."""
+    ids = {e["id"] for e in entities}
+    for r in refs:
+        if r.target.type != "externalTable":
+            continue
+        instance = r.known.split(":", 1)[0]
+        connection, _, table = r.target.name.partition("/")
+        conn_id = f"{instance}:dbConnection:{connection}"
+        table_id = f"{instance}:externalTable:{r.target.name}"
+        if conn_id in ids and table_id not in ids:
+            entities.append(
+                {
+                    "id": table_id,
+                    "type": "externalTable",
+                    "name": r.target.name,
+                    "displayName": table,
+                    "product": "dbConnect",
+                    "instance": instance,
+                    "properties": {
+                        "connection": connection,
+                        "table": table,
+                        "discoveredFrom": "dbxquery",
+                    },
+                }
+            )
+            ids.add(table_id)
+            refs.append(
+                Ref(conn_id, Target("externalTable", r.target.name), "contains", origin="spl")
+            )
 
 
 def record_unresolved(entities_by_id: dict[str, dict[str, Any]], unresolved: list[Ref]) -> int:
@@ -168,6 +204,8 @@ def record_unresolved(entities_by_id: dict[str, dict[str, Any]], unresolved: lis
     for ref in unresolved:
         # Patterns may legitimately match nothing; written lookups appear on first run.
         if ref.origin != "spl" or ref.target.pattern or ref.edge_type == "writes":
+            continue
+        if ref.target.type == "externalTable":  # tables are created on demand, see derive()
             continue
         e = entities_by_id.get(ref.known)
         if e is None:

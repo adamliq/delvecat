@@ -883,6 +883,110 @@
    },
    "author": "nobody",
    "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Splunk DB Connect (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/splunk_app_db_connect",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect",
+    "disable": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect",
+    "list": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect",
+    "package": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect/package",
+    "remove": "/servicesNS/nobody/system/apps/local/splunk_app_db_connect"
+   },
+   "name": "splunk_app_db_connect",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Splunk Stream (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/splunk_app_stream",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/splunk_app_stream/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/splunk_app_stream",
+    "disable": "/servicesNS/nobody/system/apps/local/splunk_app_stream/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/splunk_app_stream",
+    "list": "/servicesNS/nobody/system/apps/local/splunk_app_stream",
+    "package": "/servicesNS/nobody/system/apps/local/splunk_app_stream/package",
+    "remove": "/servicesNS/nobody/system/apps/local/splunk_app_stream"
+   },
+   "name": "splunk_app_stream",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
     "author": "Splunk Inc",
     "check_for_updates": true,
     "configured": true,
@@ -1573,7 +1677,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 31
+  "total": 33
  },
- "updated": "2026-11-06T02:42:26+00:00"
+ "updated": "2026-11-06T03:51:38+00:00"
 }

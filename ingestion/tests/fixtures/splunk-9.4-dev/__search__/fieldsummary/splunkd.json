@@ -1,0 +1,750 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "actions_triggered",
+   "numeric_count": "7"
+  },
+  {
+   "count": "10",
+   "distinct_count": "1",
+   "field": "active",
+   "numeric_count": "10"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "active_hist_searches",
+   "numeric_count": "9"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "active_realtime_searches",
+   "numeric_count": "9"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "alert_cycle_max",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "alert_cycle_total",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "alert_cycles",
+   "numeric_count": "7"
+  },
+  {
+   "count": "212",
+   "distinct_count": "81",
+   "field": "avg_age",
+   "numeric_count": "212"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "avg_time_spent_in_queue",
+   "numeric_count": "9"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "bundles",
+   "numeric_count": "7"
+  },
+  {
+   "count": "184",
+   "distinct_count": "1",
+   "field": "color",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "completed",
+   "numeric_count": "7"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "6",
+   "field": "component",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "concurrency",
+   "numeric_count": "7"
+  },
+  {
+   "count": "21",
+   "distinct_count": "2",
+   "field": "current_queue_size",
+   "numeric_count": "21"
+  },
+  {
+   "count": "119",
+   "distinct_count": "7",
+   "field": "current_size",
+   "numeric_count": "119"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_hour",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_mday",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "5",
+   "field": "date_minute",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_month",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "14",
+   "field": "date_second",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_wday",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_year",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "date_zone",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "delayed",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_advance_next_runtime",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_auto_summary_updates",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_determine_can_run",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_dispatch_job",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_get_next_runtime",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_update_logging",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "disp_window_lag_calc",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "dispatched",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "dutycycle_control",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "dutycycle_launching",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "dutycycle_reaping",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "eligible",
+   "numeric_count": "7"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "enqueue_seaches_count",
+   "numeric_count": "9"
+  },
+  {
+   "count": "212",
+   "distinct_count": "100",
+   "field": "eps",
+   "numeric_count": "212"
+  },
+  {
+   "count": "258",
+   "distinct_count": "120",
+   "field": "ev",
+   "numeric_count": "258"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "647",
+   "field": "event_message",
+   "numeric_count": "0"
+  },
+  {
+   "count": "11",
+   "distinct_count": "1",
+   "field": "eventtype",
+   "numeric_count": "0"
+  },
+  {
+   "count": "176",
+   "distinct_count": "22",
+   "field": "feature",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "generation",
+   "numeric_count": "7"
+  },
+  {
+   "count": "802",
+   "distinct_count": "49",
+   "field": "group",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "2",
+   "field": "host",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "idle",
+   "numeric_count": "7"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "index",
+   "numeric_count": "0"
+  },
+  {
+   "count": "26",
+   "distinct_count": "19",
+   "field": "instantaneous_eps",
+   "numeric_count": "26"
+  },
+  {
+   "count": "26",
+   "distinct_count": "20",
+   "field": "instantaneous_kbps",
+   "numeric_count": "26"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "jobs_added",
+   "numeric_count": "42"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "jobs_finished",
+   "numeric_count": "42"
+  },
+  {
+   "count": "255",
+   "distinct_count": "162",
+   "field": "kb",
+   "numeric_count": "255"
+  },
+  {
+   "count": "212",
+   "distinct_count": "118",
+   "field": "kbps",
+   "numeric_count": "212"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "largest_queue_size",
+   "numeric_count": "9"
+  },
+  {
+   "count": "114",
+   "distinct_count": "32",
+   "field": "largest_size",
+   "numeric_count": "114"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "linecount",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "load_auto_summarized",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "load_cycles",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "load_deferred_calculation",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "load_dma",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "load_priority_calculation",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "load_saved_searches",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "load_search_cycle_max",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "load_search_cycle_total",
+   "numeric_count": "7"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "log_level",
+   "numeric_count": "0"
+  },
+  {
+   "count": "212",
+   "distinct_count": "2",
+   "field": "max_age",
+   "numeric_count": "212"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "max_idle_workers",
+   "numeric_count": "42"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "max_lag",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "max_running",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "max_runtime",
+   "numeric_count": "7"
+  },
+  {
+   "count": "47",
+   "distinct_count": "3",
+   "field": "max_size",
+   "numeric_count": "47"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "max_time_spent_in_queue",
+   "numeric_count": "9"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "max_workers",
+   "numeric_count": "42"
+  },
+  {
+   "count": "9",
+   "distinct_count": "3",
+   "field": "mgmt_httpd",
+   "numeric_count": "9"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "min_queue_size",
+   "numeric_count": "9"
+  },
+  {
+   "count": "423",
+   "distinct_count": "51",
+   "field": "name",
+   "numeric_count": "0"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "new_workers",
+   "numeric_count": "42"
+  },
+  {
+   "count": "184",
+   "distinct_count": "23",
+   "field": "node_path",
+   "numeric_count": "0"
+  },
+  {
+   "count": "184",
+   "distinct_count": "3",
+   "field": "node_type",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "periodic_reaper_wakeups",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "processes_created",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_exited",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reaped_accumulated_time",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "processes_reaped_after_control",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reaped_ran_too_long",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reaped_ran_too_many_searches",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reaped_surplus",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reaped_with_old_bundle",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "3",
+   "field": "processes_reaped_with_old_config",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "processes_reused_different_user",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "processes_reused_same_user",
+   "numeric_count": "7"
+  },
+  {
+   "count": "8",
+   "distinct_count": "1",
+   "field": "product",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "64",
+   "field": "punct",
+   "numeric_count": "0"
+  },
+  {
+   "count": "47",
+   "distinct_count": "18",
+   "field": "ratio",
+   "numeric_count": "47"
+  },
+  {
+   "count": "42",
+   "distinct_count": "1",
+   "field": "reaped_workers",
+   "numeric_count": "42"
+  },
+  {
+   "count": "9",
+   "distinct_count": "3",
+   "field": "reaper",
+   "numeric_count": "9"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "saved_search_fetcher",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "savedsplunker",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "schedule_search_cycle_max",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "schedule_search_cycle_total",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "scheduler_cycle_max",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "4",
+   "field": "scheduler_cycle_total",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "2",
+   "field": "scheduler_cycles",
+   "numeric_count": "7"
+  },
+  {
+   "count": "309",
+   "distinct_count": "52",
+   "field": "series",
+   "numeric_count": "0"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "size",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "skipped",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "skipped_dma_ra",
+   "numeric_count": "7"
+  },
+  {
+   "count": "114",
+   "distinct_count": "1",
+   "field": "smallest_size",
+   "numeric_count": "114"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "5",
+   "field": "source",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "sourcetype",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "splunk_server",
+   "numeric_count": "0"
+  },
+  {
+   "count": "0",
+   "distinct_count": "0",
+   "field": "splunk_server_group",
+   "numeric_count": "0"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "tail",
+   "numeric_count": "9"
+  },
+  {
+   "count": "47",
+   "distinct_count": "10",
+   "field": "thread",
+   "numeric_count": "0"
+  },
+  {
+   "count": "11",
+   "distinct_count": "2",
+   "field": "thread_id",
+   "numeric_count": "11"
+  },
+  {
+   "count": "11",
+   "distinct_count": "2",
+   "field": "thread_name",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "timeendpos",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "timestartpos",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "total_lag",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "total_runtime",
+   "numeric_count": "7"
+  },
+  {
+   "count": "9",
+   "distinct_count": "1",
+   "field": "udpin",
+   "numeric_count": "9"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "window_max_lag",
+   "numeric_count": "7"
+  },
+  {
+   "count": "7",
+   "distinct_count": "1",
+   "field": "window_total_lag",
+   "numeric_count": "7"
+  }
+ ],
+ "spl": "(index=* OR index=_*) sourcetype=\"splunkd\" | head 1000 | fieldsummary maxvals=0 | fields field count distinct_count numeric_count"
+}

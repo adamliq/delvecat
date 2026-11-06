@@ -1,0 +1,58 @@
+{
+ "__list__": [
+  {
+   "_key": "dns",
+   "_user": "nobody",
+   "enabled": true,
+   "fields": [
+    {
+     "enabled": true,
+     "name": "query"
+    }
+   ],
+   "id": "dns",
+   "index": "stream",
+   "protocolName": "dns",
+   "streamType": "event"
+  },
+  {
+   "_key": "http",
+   "_user": "nobody",
+   "category": "Application Layer",
+   "description": "HTTP requests seen at the DMZ.",
+   "enabled": true,
+   "fields": [
+    {
+     "enabled": true,
+     "name": "src_ip"
+    },
+    {
+     "enabled": true,
+     "name": "dest_ip"
+    },
+    {
+     "enabled": true,
+     "name": "uri_path"
+    },
+    {
+     "enabled": true,
+     "name": "status"
+    }
+   ],
+   "id": "http",
+   "index": "stream",
+   "protocolName": "http",
+   "streamType": "event"
+  },
+  {
+   "_key": "smtp",
+   "_user": "nobody",
+   "enabled": false,
+   "fields": [],
+   "id": "smtp",
+   "index": null,
+   "protocolName": "smtp",
+   "streamType": "event"
+  }
+ ]
+}

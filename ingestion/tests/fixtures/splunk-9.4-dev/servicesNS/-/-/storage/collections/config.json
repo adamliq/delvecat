@@ -2,6 +2,102 @@
  "entry": [
   {
    "acl": {
+    "app": "splunk_app_stream",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_stream",
+    "eai:userName": "nobody",
+    "profilingEnabled": "false",
+    "profilingThresholdMs": "1000",
+    "replicate": "false",
+    "replication_dump_maximum_file_size": "10240",
+    "replication_dump_strategy": "auto",
+    "type": "undefined"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups",
+    "disable": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups/disable",
+    "edit": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups",
+    "list": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups",
+    "remove": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streamforwardergroups"
+   },
+   "name": "streamforwardergroups",
+   "updated": "2026-11-06T03:35:05+00:00"
+  },
+  {
+   "acl": {
+    "app": "splunk_app_stream",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "splunk_app_stream",
+    "eai:userName": "nobody",
+    "profilingEnabled": "false",
+    "profilingThresholdMs": "1000",
+    "replicate": "false",
+    "replication_dump_maximum_file_size": "10240",
+    "replication_dump_strategy": "auto",
+    "type": "undefined"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams",
+   "links": {
+    "_reload": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams/_reload",
+    "alternate": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams",
+    "disable": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams/disable",
+    "edit": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams",
+    "list": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams",
+    "remove": "/servicesNS/nobody/splunk_app_stream/storage/collections/config/streams"
+   },
+   "name": "streams",
+   "updated": "2026-11-06T03:35:05+00:00"
+  },
+  {
+   "acl": {
     "app": "acme_secops",
     "can_change_perms": true,
     "can_list": true,
@@ -59,7 +155,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 1
+  "total": 3
  },
- "updated": "2026-11-06T02:42:28+00:00"
+ "updated": "2026-11-06T03:51:39+00:00"
 }

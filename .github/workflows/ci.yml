@@ -21,7 +21,7 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run pytest -q
       - name: Build demo bundle
-        run: uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard --strict --instance-name "Acme (demo)" --annotations ../annotations --out ../web/public/catalog
+        run: uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 10 --deployment-apps-dir ../deploy/deployment-apps --shard --strict --instance-name "Acme (demo)" --annotations ../annotations --out ../web/public/catalog
       - run: uv run delvecat-ingest validate ../web/public/catalog
       - name: Annotations are valid and all match an object
         run: uv run delvecat-ingest lint-annotations ../annotations --bundle ../web/public/catalog

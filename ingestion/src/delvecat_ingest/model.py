@@ -9,7 +9,31 @@ from .redact import redact
 
 # Types whose FQN is not scoped by app/owner.
 GLOBAL_TYPES = frozenset(
-    {"app", "index", "sourcetype", "source", "host", "role", "user", "tag", "forwarder", "field"}
+    {
+        "app",
+        "index",
+        "sourcetype",
+        "source",
+        "host",
+        "role",
+        "user",
+        "tag",
+        "forwarder",
+        "field",
+        # Product objects whose names are unique within their product on an instance.
+        "serverClass",
+        "deploymentApp",
+        "deploymentClient",
+        "dbConnection",
+        "dbIdentity",
+        "dbInput",
+        "dbOutput",
+        "dbLookup",
+        "externalTable",
+        "streamDefinition",
+        "streamGroup",
+        "streamForwarder",
+    }
 )
 
 

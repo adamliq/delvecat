@@ -1,0 +1,327 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "continueMatching": "1",
+    "crossServerChecksum": "0",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "endpoint": "$deploymentServerUri$/services/streams/deployment?name=$tenantName$:$serverClassName$:$appName$",
+    "filterType": "whitelist",
+    "issueReload": "0",
+    "repositoryLocation": "/opt/delvecat-deployment-apps",
+    "restartSplunkWeb": "0",
+    "restartSplunkd": "0",
+    "stateOnClient": "enabled",
+    "targetRepositoryLocation": "$SPLUNK_HOME/etc/apps",
+    "tmpFolder": "$SPLUNK_HOME/var/run/tmp"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/global",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/global/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/global",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/global/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/global",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/global"
+   },
+   "name": "global",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "whitelist.0": "*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders"
+   },
+   "name": "serverClass:all_forwarders",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "restartSplunkd": "1",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aall_forwarders%3Aapp%3Aacme_all_outputs"
+   },
+   "name": "serverClass:all_forwarders:app:acme_all_outputs",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "machineTypesFilter": "linux-x86_64",
+    "whitelist.0": "uf-linux-*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts"
+   },
+   "name": "serverClass:linux_hosts",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "restartSplunkd": "1",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Alinux_hosts%3Aapp%3Aacme_linux_inputs"
+   },
+   "name": "serverClass:linux_hosts:app:acme_linux_inputs",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "whitelist.0": "web-*"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers"
+   },
+   "name": "serverClass:web_servers",
+   "updated": "2026-11-06T03:35:04+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "system"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "restartSplunkd": "1",
+    "stateOnClient": "enabled"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs/_reload",
+    "alternate": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs",
+    "disable": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs/disable",
+    "edit": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs",
+    "list": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs",
+    "move": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs/move",
+    "remove": "/servicesNS/nobody/system/configs/conf-serverclass/serverClass%3Aweb_servers%3Aapp%3Aacme_web_inputs"
+   },
+   "name": "serverClass:web_servers:app:acme_web_inputs",
+   "updated": "2026-11-06T03:35:04+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 7
+ },
+ "updated": "2026-11-06T03:51:41+00:00"
+}

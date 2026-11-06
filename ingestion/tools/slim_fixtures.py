@@ -17,6 +17,10 @@ KEEP_WHOLE = (
     "services/server/info",
     "services/apps/local",
     "services/data/indexes",
+    "services/deployment/server/serverclasses",
+    "services/deployment/server/applications",
+    "services/deployment/server/clients",
+    "servicesNS/nobody/system/configs/conf-serverclass",
     "services/authentication/users",
     "services/authorization/roles",
 )

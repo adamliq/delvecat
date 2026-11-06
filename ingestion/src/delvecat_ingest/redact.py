@@ -7,7 +7,7 @@ from typing import Any
 
 SENSITIVE_KEY = re.compile(
     r"(passw(or)?d|secret|token|api[_-]?key|credential|private[_-]?key|auth[_-]?header|"
-    r"clear_password|ph-auth|e-?mail)",
+    r"clear_password|ph-auth|e-?mail|^username$)",
     re.IGNORECASE,
 )
 

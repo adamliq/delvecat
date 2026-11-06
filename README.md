@@ -49,8 +49,24 @@ export SPLUNK_PASSWORD='choose-a-dev-password'
 docker compose -f deploy/docker-compose.yml up -d        # wait until healthy
 uv run --project ingestion python deploy/seed_dev_splunk.py   # sample content + API token
 DELVECAT_SPLUNK_TOKEN=$(cat deploy/.dev-token) uv run --project ingestion \
-  delvecat-ingest build --url https://localhost:8089 --insecure --instance dev --out catalog.json
+  delvecat-ingest build --url https://localhost:8089 --insecure --instance dev \
+  --deployment-apps-dir deploy/deployment-apps --out catalog.json
 ```
+
+Optional universal forwarder managed by the dev Splunk acting as Deployment Server
+(after seeding, so the server classes exist):
+
+```bash
+docker compose -f deploy/docker-compose.yml --profile forwarder up -d forwarder
+docker cp deploy/forwarder/deploymentclient.conf \
+  deploy-forwarder-1:/opt/splunkforwarder/etc/system/local/deploymentclient.conf
+docker exec -u root deploy-forwarder-1 chown splunk:splunk \
+  /opt/splunkforwarder/etc/system/local/deploymentclient.conf
+docker exec -u splunk deploy-forwarder-1 /opt/splunkforwarder/bin/splunk restart
+```
+
+Within about a minute it phones home, receives `acme_all_outputs` and
+`acme_linux_inputs`, and forwards its `splunkd.log` into the `os` index.
 
 ## Hosting on GitHub Pages
 

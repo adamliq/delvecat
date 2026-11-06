@@ -4,11 +4,12 @@ DELVECAT_LIVE_URL=https://localhost:8089 DELVECAT_SPLUNK_TOKEN=... uv run pytest
 """
 
 import os
+from pathlib import Path
 
 import pytest
 
 from delvecat_ingest.bundle import assemble, validate
-from delvecat_ingest.connectors import splunk
+from delvecat_ingest.connectors import db_connect, deployment_server, splunk, stream
 from delvecat_ingest.transport import HttpTransport
 
 from .test_splunk_connector import seed_ids
@@ -24,6 +25,10 @@ def test_live_instance_is_fully_catalogued():
         verify=os.environ.get("DELVECAT_LIVE_VERIFY", "0") == "1",
     )
     result = splunk.extract(transport, "live", splunk.Options(fields=True, max_field_sourcetypes=5))
+    apps = Path(__file__).parents[2] / "deploy" / "deployment-apps"
+    result.extend(deployment_server.extract(transport, "live", apps))
+    result.extend(db_connect.extract(transport, "live"))
+    result.extend(stream.extract(transport, "live"))
     bundle = assemble([{"id": "live", "name": "live", "kind": "splunkEnterprise"}], result)
     assert validate(bundle) == []
     failed = [r for r in bundle["ingestionReport"] if r["status"] == "failed"]

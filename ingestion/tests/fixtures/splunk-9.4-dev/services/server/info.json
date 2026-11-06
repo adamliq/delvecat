@@ -31,17 +31,17 @@
      }
     },
     "build": "1b0c587000b8",
-    "conf_generation": 50,
+    "conf_generation": 65,
     "cpu_arch": "x86_64",
     "eai:acl": null,
     "federated_search_enabled": true,
     "fips_mode": false,
     "guid": "93D348A9-E8C3-401C-9360-FD5FFB5B0B89",
     "health_info": "green",
-    "health_version": 324100004,
-    "host": "9306d2af8296",
-    "host_fqdn": "9306d2af8296",
-    "host_resolved": "9306d2af8296",
+    "health_version": 1809952884,
+    "host": "splunk",
+    "host_fqdn": "splunk",
+    "host_resolved": "splunk",
     "isConverged": false,
     "isForwarding": false,
     "isFree": false,
@@ -50,7 +50,7 @@
     "licenseKeys": [
      "5C52DA5145AD67B8188604C49962D12F2C3B2CF1B82A6878E46F68CA2812807B"
     ],
-    "licenseSignature": "af0e3a19b2baef495f2e5579e99682d0",
+    "licenseSignature": "1a77c3e6e45c543aab6ef8e2cdca7ad9",
     "licenseState": "OK",
     "license_labels": [
      "Splunk Enterprise   Splunk Analytics for Hadoop Download Trial"
@@ -75,10 +75,11 @@
      "indexer",
      "license_master",
      "license_manager",
+     "deployment_server",
      "kv_store"
     ],
     "shutting_down": "0",
-    "startup_time": 1793932890,
+    "startup_time": 1793936015,
     "staticAssetId": "F5F74B10EEC4232E9D3D65D00AAC892F72762E3C5AC362733E0CA674CD88EE1A",
     "version": "9.4.17",
     "versionControlEnabled": true
@@ -101,5 +102,5 @@
   "offset": 0,
   "total": 1
  },
- "updated": "2026-11-06T02:42:26+00:00"
+ "updated": "2026-11-06T03:51:38+00:00"
 }

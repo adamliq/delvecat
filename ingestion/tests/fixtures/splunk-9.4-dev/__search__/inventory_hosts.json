@@ -2,7 +2,7 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "29548",
+   "count": "33822",
    "host": "9306d2af8296",
    "indexes": [
     "_audit",
@@ -12,7 +12,33 @@
     "main",
     "summary_web"
    ],
-   "lastSeen": "1793932946"
+   "lastSeen": "1793933610"
+  },
+  {
+   "count": "11052",
+   "host": "splunk",
+   "indexes": [
+    "_audit",
+    "_configtracker",
+    "_dsappevent",
+    "_dsclient",
+    "_dsphonehome",
+    "_internal",
+    "_introspection",
+    "_telemetry",
+    "main"
+   ],
+   "lastSeen": "1793937095"
+  },
+  {
+   "count": "1312",
+   "host": "uf-linux-01",
+   "indexes": [
+    "_configtracker",
+    "_internal",
+    "os"
+   ],
+   "lastSeen": "1793937012"
   },
   {
    "count": "80",
@@ -31,6 +57,24 @@
    "host": "dc01",
    "indexes": "wineventlog",
    "lastSeen": "1793930665"
+  },
+  {
+   "count": "22",
+   "host": "streamfwd-dmz-01",
+   "indexes": "stream",
+   "lastSeen": "1793936105"
+  },
+  {
+   "count": "15",
+   "host": "dbx-hf-01",
+   "indexes": "db_orders",
+   "lastSeen": "1793936105"
+  },
+  {
+   "count": "2",
+   "host": "127.0.0.1",
+   "indexes": "_introspection",
+   "lastSeen": "1793936761"
   }
  ],
  "spl": "| tstats count max(_time) as lastSeen where (index=* OR index=_*) by host, index | stats sum(count) as count max(lastSeen) as lastSeen values(index) as indexes by host | sort 0 - count | head 5000"

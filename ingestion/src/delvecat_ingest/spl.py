@@ -15,6 +15,8 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from .sql import tables as _sql_tables
+
 MAX_MACRO_DEPTH = 10
 
 # (edge type, target type, name, is wildcard pattern)
@@ -411,6 +413,17 @@ def _command(name: str, args: str, out: SplAnalysis) -> None:
             "index",
             _options(args).get("index") or ("summary" if name == "collect" else None),
         )
+    elif name == "dbxquery":
+        opts = _options(args)
+        conn = opts.get("connection")
+        ref("uses", "dbConnection", conn)
+        if conn and "$" not in conn:
+            for t in [opts["table"]] if opts.get("table") else _sql_tables(opts.get("query")):
+                ref("reads", "externalTable", f"{conn}/{t}")
+    elif name == "dbxoutput":
+        ref("writes", "dbOutput", _options(args).get("output"))
+    elif name == "dbxlookup":
+        ref("uses", "dbLookup", _options(args).get("lookup"))
     elif name == "savedsearch":
         pos = _positional(args)
         ref("reads", "savedSearch", pos[0] if pos else None)

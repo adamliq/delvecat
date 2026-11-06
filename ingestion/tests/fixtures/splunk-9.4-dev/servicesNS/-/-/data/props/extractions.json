@@ -41,7 +41,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action"
    },
    "name": "acme:fw : EXTRACT-action",
-   "updated": "2026-11-06T02:42:17+00:00"
+   "updated": "2026-11-06T03:35:03+00:00"
   },
   {
    "acl": {
@@ -84,7 +84,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv"
    },
    "name": "acme:fw : REPORT-fw_kv",
-   "updated": "2026-11-06T02:42:17+00:00"
+   "updated": "2026-11-06T03:35:03+00:00"
   },
   {
    "acl": {
@@ -219,5 +219,5 @@
   "offset": 0,
   "total": 5
  },
- "updated": "2026-11-06T02:42:28+00:00"
+ "updated": "2026-11-06T03:51:39+00:00"
 }
