@@ -9,6 +9,7 @@ from typing import Any
 from ...dashboards import parse_dashboard
 from ...model import ExtractResult
 from ...splunk_rest import as_bool, iter_entries
+from . import security
 from .common import (
     NS,
     Ctx,
@@ -35,12 +36,15 @@ def extract_saved_searches(ctx: Ctx, out: ExtractResult) -> int:
     for e in iter_entries(ctx.transport, f"{NS}/saved/searches"):
         c = content(e)
         actions = split_list(c.get("actions"))
+        detection = security.is_detection(c)
         ent = add_ko(
             ctx,
             out,
-            "savedSearch",
+            "correlationSearch" if detection else "savedSearch",
             e,
+            display_name=c.get("action.correlationsearch.label") if detection else None,
             properties={
+                **(security.detection_properties(c) if detection else {}),
                 "kind": _saved_search_kind(c),
                 "search": c.get("search"),
                 "isScheduled": as_bool(c.get("is_scheduled", False)),
@@ -58,9 +62,70 @@ def extract_saved_searches(ctx: Ctx, out: ExtractResult) -> int:
             },
             observed={"nextScheduledTime": c.get("next_scheduled_time") or None},
         )
+        if detection:
+            ent["product"] = "enterpriseSecurity"
         if "summary_index" in actions:
             target = c.get("action.summary_index._name") or "summary"
             out.refs.append(ref(ent["id"], "index", target, "writes"))
+        _action_lineage(ctx, out, ent, c, actions)
+        n += 1
+    return n
+
+
+def _action_lineage(
+    ctx: Ctx, out: ExtractResult, ent: dict[str, Any], c: dict[str, Any], actions: list[str]
+) -> None:
+    """Alert actions a search triggers, what ES writes for it, and where SOAR picks it up."""
+    for action in actions:
+        out.refs.append(ref(ent["id"], "adaptiveResponseAction", action, "triggers"))
+    if "notable" in actions or as_bool(c.get("action.notable", False)):
+        out.refs.append(
+            ref(ent["id"], "index", c.get("action.notable.param.index") or "notable", "writes")
+        )
+    if "risk" in actions or as_bool(c.get("action.risk", False)):
+        out.refs.append(
+            ref(ent["id"], "index", c.get("action.risk.param.index") or "risk", "writes")
+        )
+    labels, playbooks = security.soar_targets(c, actions)
+    out.refs.extend(ref(ent["id"], "soarLabel", label, "triggers") for label in labels)
+    out.refs.extend(ref(ent["id"], "soarPlaybook", p, "triggers") for p in playbooks)
+    props = ent.setdefault("properties", {})
+    if labels:
+        props["soarLabels"] = labels
+    if playbooks:
+        props["soarPlaybooks"] = playbooks
+    for story in props.get("analyticStories", []):
+        add_global(ctx, out, "analyticStory", story, product="enterpriseSecurity")
+        out.edges.append(
+            {
+                "from": f"{ctx.instance}:analyticStory:{story}",
+                "to": ent["id"],
+                "type": "contains",
+                "origin": "config",
+            }
+        )
+
+
+def extract_alert_actions(ctx: Ctx, out: ExtractResult) -> int:
+    """Alert actions (adaptive response actions in ES), including custom ones from apps."""
+    n = 0
+    for e in iter_entries(ctx.transport, f"{NS}/alerts/alert_actions"):
+        c = content(e)
+        app, _, _ = acl(e)
+        add_global(
+            ctx,
+            out,
+            "adaptiveResponseAction",
+            e["name"],
+            app=app,
+            displayName=c.get("label") or None,
+            description=c.get("description") or None,
+            disabled=as_bool(c.get("disabled", False)),
+            properties={
+                "custom": as_bool(c.get("is_custom", False)),
+                "payloadFormat": c.get("payload_format") or None,
+            },
+        )
         n += 1
     return n
 

@@ -33,6 +33,20 @@ GLOBAL_TYPES = frozenset(
         "streamDefinition",
         "streamGroup",
         "streamForwarder",
+        "adaptiveResponseAction",
+        "analyticStory",
+        "threatIntelSource",
+        "assetIdentitySource",
+        "soarPlaybook",
+        "soarCustomFunction",
+        "soarApp",
+        "soarAsset",
+        "soarLabel",
+        "uebaDataSource",
+        "uebaModel",
+        "uebaAnomalyType",
+        "uebaThreatRule",
+        "uebaOutputConnector",
     }
 )
 

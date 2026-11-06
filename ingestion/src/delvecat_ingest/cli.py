@@ -12,7 +12,16 @@ from typing import Any
 from . import __version__
 from .annotations import AnnotationError, apply_annotations, load_annotations
 from .bundle import assemble, load_bundle, validate, write_bundle
-from .connectors import db_connect, deployment_server, splunk, splunk_cloud_acs, stream
+from .connectors import (
+    db_connect,
+    deployment_server,
+    enterprise_security,
+    soar,
+    splunk,
+    splunk_cloud_acs,
+    stream,
+    ueba,
+)
 from .connectors.splunk import Options
 from .model import merge_facts
 from .transport import FixtureTransport, HttpTransport, RecordingTransport, Transport
@@ -31,7 +40,7 @@ def _verify(args: argparse.Namespace) -> bool | str:
     return args.ca_bundle or True
 
 
-PRODUCTS = {"deploymentServer", "dbConnect", "stream"}
+PRODUCTS = {"deploymentServer", "dbConnect", "stream", "enterpriseSecurity"}
 
 
 def _build(args: argparse.Namespace) -> int:
@@ -70,6 +79,48 @@ def _build(args: argparse.Namespace) -> int:
         result.extend(db_connect.extract(transport, args.instance))
     if "stream" in products:
         result.extend(stream.extract(transport, args.instance))
+    if "enterpriseSecurity" in products:
+        result.extend(enterprise_security.extract(transport, args.instance))
+
+    # SOAR and UBA are separate servers: each becomes its own instance in the bundle.
+    extra_instances: list[dict[str, Any]] = []
+    for kind, label in (("soar", "SOAR"), ("ueba", "UBA")):
+        fixtures, url = getattr(args, f"{kind}_fixtures"), getattr(args, f"{kind}_url")
+        if not (fixtures or url):
+            continue
+        if fixtures:
+            server: Transport = FixtureTransport(Path(fixtures))
+        else:
+            if not (server_token := _token(getattr(args, f"{kind}_token_env"))):
+                return 2
+            header = ("ph-auth-token", "") if kind == "soar" else ("Authorization", "Bearer ")
+            server = HttpTransport(
+                url,
+                server_token,
+                verify=_verify(args),
+                splunk_json=False,
+                auth_header=header[0],
+                auth_prefix=header[1],
+            )
+            if args.record:
+                server = RecordingTransport(server, Path(args.record) / f"__{kind}__")
+        inst_id = getattr(args, f"{kind}_instance")
+        if kind == "soar":
+            sub = soar.extract(server, inst_id)
+        else:
+            paths = dict(p.split("=", 1) for p in args.ueba_path or [])
+            sub = ueba.extract(server, inst_id, paths)
+        facts, sub.instance_facts = sub.instance_facts, {}
+        extra_instances.append(
+            {
+                "id": inst_id,
+                "name": f"{label} ({inst_id})",
+                "kind": facts.get("kind", "soar" if kind == "soar" else "uba"),
+                **({"version": facts["version"]} if facts.get("version") else {}),
+                **({"webUrl": url} if url else {}),
+            }
+        )
+        result.extend(sub)
 
     if args.acs_fixtures or args.acs_stack:
         if args.acs_fixtures:
@@ -100,6 +151,8 @@ def _build(args: argparse.Namespace) -> int:
     if isinstance(instance.get("properties"), dict):
         instance["properties"] = {k: v for k, v in instance["properties"].items() if v is not None}
 
+    instances = [instance, *extra_instances]
+
     previous = None
     if args.previous:
         prev_path = Path(args.previous)
@@ -109,7 +162,7 @@ def _build(args: argparse.Namespace) -> int:
             print(f"note: previous bundle {prev_path} not found; starting fresh", file=sys.stderr)
 
     generated_at = datetime.fromisoformat(args.generated_at) if args.generated_at else None
-    bundle = assemble([instance], result, generated_at, previous)
+    bundle = assemble(instances, result, generated_at, previous)
     if args.annotations and (code := _annotate_into(bundle, args)) is not None:
         return code
 
@@ -262,8 +315,28 @@ def main(argv: list[str] | None = None) -> int:
     prod = b.add_argument_group("Splunk products")
     prod.add_argument(
         "--products",
-        help="comma-separated: deploymentServer,dbConnect,stream, 'all' (the default "
-        "without --only) or 'none'. Each is skipped when not installed.",
+        help="comma-separated: deploymentServer,dbConnect,stream,enterpriseSecurity; 'all' "
+        "(the default without --only) or 'none'. Each is skipped when not installed.",
+    )
+    for kind, label, env in (
+        ("soar", "Splunk SOAR", "DELVECAT_SOAR_TOKEN"),
+        ("ueba", "Splunk UBA", "DELVECAT_UEBA_TOKEN"),
+    ):
+        g = b.add_argument_group(label)
+        g.add_argument(f"--{kind}-url", help=f"{label} base URL, e.g. https://{kind}.example.com")
+        g.add_argument(f"--{kind}-token-env", default=env)
+        g.add_argument(f"--{kind}-fixtures", help=f"directory of recorded {label} responses")
+        g.add_argument(
+            f"--{kind}-instance",
+            default="soar" if kind == "soar" else "uba",
+            help="instance id for its objects",
+        )
+    b.add_argument(
+        "--ueba-path",
+        action="append",
+        metavar="KIND=/PATH",
+        help="override a UBA endpoint (dataSources, models, threatRules, "
+        "outputConnectors); unverified defaults otherwise",
     )
     prod.add_argument(
         "--deployment-apps-dir",

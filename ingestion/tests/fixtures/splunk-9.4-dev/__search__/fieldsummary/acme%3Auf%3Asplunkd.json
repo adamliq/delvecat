@@ -2,40 +2,28 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "1",
+   "count": "3",
    "distinct_count": "1",
-   "field": "C",
-   "numeric_count": "0"
+   "field": "MaxSize",
+   "numeric_count": "3"
   },
   {
-   "count": "2",
+   "count": "3",
+   "distinct_count": "3",
+   "field": "Warnings",
+   "numeric_count": "3"
+  },
+  {
+   "count": "3",
    "distinct_count": "1",
-   "field": "CN",
-   "numeric_count": "0"
+   "field": "WinSz",
+   "numeric_count": "3"
   },
   {
-   "count": "2",
-   "distinct_count": "1",
-   "field": "O",
-   "numeric_count": "0"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "abt",
-   "numeric_count": "1"
-  },
-  {
-   "count": "2",
-   "distinct_count": "2",
-   "field": "after",
-   "numeric_count": "2"
-  },
-  {
-   "count": "8",
+   "count": "17",
    "distinct_count": "1",
    "field": "autoBatch",
-   "numeric_count": "8"
+   "numeric_count": "17"
   },
   {
    "count": "1",
@@ -44,16 +32,10 @@
    "numeric_count": "1"
   },
   {
-   "count": "6",
+   "count": "13",
    "distinct_count": "2",
    "field": "channel",
    "numeric_count": "0"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "cm_ct",
-   "numeric_count": "1"
   },
   {
    "count": "2",
@@ -64,7 +46,19 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "count",
+   "field": "connection_timeout",
+   "numeric_count": "1"
+  },
+  {
+   "count": "17",
+   "distinct_count": "4",
+   "field": "connid",
+   "numeric_count": "17"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "cpu_time_used",
    "numeric_count": "1"
   },
   {
@@ -74,63 +68,69 @@
    "numeric_count": "2"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "curves",
-   "numeric_count": "0"
-  },
-  {
-   "count": "877",
-   "distinct_count": "1",
+   "count": "1000",
+   "distinct_count": "2",
    "field": "date_hour",
-   "numeric_count": "877"
+   "numeric_count": "1000"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "date_mday",
-   "numeric_count": "877"
+   "numeric_count": "1000"
   },
   {
-   "count": "877",
-   "distinct_count": "5",
+   "count": "1000",
+   "distinct_count": "11",
    "field": "date_minute",
-   "numeric_count": "877"
+   "numeric_count": "1000"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "date_month",
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "45",
    "field": "date_second",
-   "numeric_count": "877"
+   "numeric_count": "1000"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "date_wday",
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "date_year",
-   "numeric_count": "877"
+   "numeric_count": "1000"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "date_zone",
-   "numeric_count": "877"
+   "numeric_count": "1000"
+  },
+  {
+   "count": "4",
+   "distinct_count": "2",
+   "field": "defaulting",
+   "numeric_count": "3"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "dft",
+   "field": "delay",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "disableSSLShutdown",
    "numeric_count": "1"
   },
   {
@@ -160,7 +160,13 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "duration",
+   "field": "enableTeleportSupervisor",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "enable_search_process_long_lifespan",
    "numeric_count": "1"
   },
   {
@@ -176,9 +182,15 @@
    "numeric_count": "2"
   },
   {
-   "count": "5",
+   "count": "12",
    "distinct_count": "1",
    "field": "err",
+   "numeric_count": "0"
+  },
+  {
+   "count": "2",
+   "distinct_count": "1",
+   "field": "event",
    "numeric_count": "0"
   },
   {
@@ -188,8 +200,8 @@
    "numeric_count": "0"
   },
   {
-   "count": "427",
-   "distinct_count": "25",
+   "count": "414",
+   "distinct_count": "24",
    "field": "file",
    "numeric_count": "0"
   },
@@ -208,8 +220,8 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "fznb",
-   "numeric_count": "1"
+   "field": "group",
+   "numeric_count": "0"
   },
   {
    "count": "2",
@@ -224,7 +236,13 @@
    "numeric_count": "2"
   },
   {
-   "count": "877",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "hideQuotaWarning",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1000",
    "distinct_count": "1",
    "field": "host",
    "numeric_count": "0"
@@ -248,20 +266,14 @@
    "numeric_count": "0"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "icps",
-   "numeric_count": "1"
-  },
-  {
    "count": "2",
-   "distinct_count": "1",
+   "distinct_count": "2",
    "field": "id",
    "numeric_count": "0"
   },
   {
-   "count": "8",
-   "distinct_count": "4",
+   "count": "25",
+   "distinct_count": "5",
    "field": "idx",
    "numeric_count": "0"
   },
@@ -272,7 +284,7 @@
    "numeric_count": "2"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "index",
    "numeric_count": "0"
@@ -284,46 +296,64 @@
    "numeric_count": "0"
   },
   {
-   "count": "2",
+   "count": "4",
    "distinct_count": "1",
    "field": "inspect_count",
-   "numeric_count": "2"
+   "numeric_count": "4"
   },
   {
-   "count": "1",
+   "count": "3",
    "distinct_count": "1",
-   "field": "invalidateSessionTokensOnLogout",
-   "numeric_count": "1"
+   "field": "isDefault",
+   "numeric_count": "3"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "ip",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "is",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "isHttpOutConfigured",
+   "count": "5",
+   "distinct_count": "5",
+   "field": "key",
    "numeric_count": "0"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "issuer",
+   "field": "label",
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "lastHBRecvTime",
+   "numeric_count": "0"
+  },
+  {
+   "count": "88",
+   "distinct_count": "88",
+   "field": "level",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "license_warnings_update_interval",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
    "distinct_count": "1",
    "field": "linecount",
-   "numeric_count": "877"
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "lm_ping_interval",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "location",
+   "numeric_count": "0"
   },
   {
    "count": "1",
@@ -358,26 +388,14 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "max_replication_jobs",
+   "field": "max_violations",
    "numeric_count": "1"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "max_replication_threads",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "mccf",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "mob",
-   "numeric_count": "1"
+   "field": "mgmtHostPort",
+   "numeric_count": "0"
   },
   {
    "count": "1",
@@ -386,16 +404,10 @@
    "numeric_count": "0"
   },
   {
-   "count": "2",
-   "distinct_count": "1",
-   "field": "mor",
-   "numeric_count": "2"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "mosr",
-   "numeric_count": "1"
+   "count": "48",
+   "distinct_count": "48",
+   "field": "name",
+   "numeric_count": "0"
   },
   {
    "count": "1",
@@ -406,20 +418,8 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "notValidAfter",
+   "field": "oneTimeClient",
    "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "notValidBefore",
-   "numeric_count": "1"
-  },
-  {
-   "count": "10",
-   "distinct_count": "10",
-   "field": "offset",
-   "numeric_count": "10"
   },
   {
    "count": "13",
@@ -432,18 +432,6 @@
    "distinct_count": "1",
    "field": "partitions",
    "numeric_count": "0"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "pass4symmkey",
-   "numeric_count": "0"
-  },
-  {
-   "count": "2",
-   "distinct_count": "1",
-   "field": "pb",
-   "numeric_count": "2"
   },
   {
    "count": "2",
@@ -464,26 +452,20 @@
    "numeric_count": "0"
   },
   {
-   "count": "2",
-   "distinct_count": "1",
-   "field": "pptr",
-   "numeric_count": "2"
-  },
-  {
    "count": "1",
    "distinct_count": "1",
-   "field": "pptrl",
-   "numeric_count": "1"
+   "field": "policy",
+   "numeric_count": "0"
   },
   {
-   "count": "8",
+   "count": "17",
    "distinct_count": "1",
    "field": "pset",
-   "numeric_count": "8"
+   "numeric_count": "17"
   },
   {
-   "count": "877",
-   "distinct_count": "157",
+   "count": "1000",
+   "distinct_count": "169",
    "field": "punct",
    "numeric_count": "0"
   },
@@ -496,44 +478,32 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "replication_check_deletes",
+   "field": "receive_timeout",
    "numeric_count": "1"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "replication_enabled",
+   "field": "refCount",
    "numeric_count": "1"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "replication_max_check_time_secs",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "replication_max_wait_time_secs",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "replication_min_check_time_secs",
-   "numeric_count": "1"
-  },
-  {
-   "count": "2",
+   "count": "4",
    "distinct_count": "1",
    "field": "restart_count",
-   "numeric_count": "2"
+   "numeric_count": "4"
   },
   {
-   "count": "8",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "retries",
+   "numeric_count": "1"
+  },
+  {
+   "count": "17",
    "distinct_count": "1",
    "field": "reuse",
-   "numeric_count": "8"
+   "numeric_count": "17"
   },
   {
    "count": "2",
@@ -578,34 +548,40 @@
    "numeric_count": "2"
   },
   {
-   "count": "1",
+   "count": "2",
    "distinct_count": "1",
-   "field": "sbs",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "serial",
+   "field": "runContext_splunkd",
    "numeric_count": "0"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "sf",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "sfrt",
-   "numeric_count": "1"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "sha256_fingerprint",
+   "field": "scsEvironment",
    "numeric_count": "0"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "send_timeout",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "serverName",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "shared_services_generation",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "shared_services_population",
+   "numeric_count": "1"
   },
   {
    "count": "3",
@@ -614,19 +590,25 @@
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1",
+   "distinct_count": "1",
+   "field": "slaveId",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1000",
    "distinct_count": "1",
    "field": "source",
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "sourcetype",
    "numeric_count": "0"
   },
   {
-   "count": "877",
+   "count": "1000",
    "distinct_count": "1",
    "field": "splunk_server",
    "numeric_count": "0"
@@ -638,10 +620,22 @@
    "numeric_count": "0"
   },
   {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "squash_threshold",
+   "numeric_count": "1"
+  },
+  {
    "count": "2",
    "distinct_count": "1",
    "field": "st",
    "numeric_count": "2"
+  },
+  {
+   "count": "2",
+   "distinct_count": "2",
+   "field": "stack",
+   "numeric_count": "0"
   },
   {
    "count": "13",
@@ -650,22 +644,16 @@
    "numeric_count": "0"
   },
   {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "subject",
-   "numeric_count": "0"
+   "count": "2",
+   "distinct_count": "2",
+   "field": "state",
+   "numeric_count": "1"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "subjectAltName",
-   "numeric_count": "0"
-  },
-  {
-   "count": "1",
-   "distinct_count": "1",
-   "field": "suite",
-   "numeric_count": "0"
+   "field": "strict_pool_quota",
+   "numeric_count": "1"
   },
   {
    "count": "1",
@@ -674,25 +662,31 @@
    "numeric_count": "0"
   },
   {
-   "count": "32",
+   "count": "1",
    "distinct_count": "1",
-   "field": "targetUri",
+   "field": "supportsACK",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "timeendpos",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "1000",
+   "distinct_count": "1",
+   "field": "timestartpos",
+   "numeric_count": "1000"
+  },
+  {
+   "count": "2",
+   "distinct_count": "2",
+   "field": "type",
    "numeric_count": "0"
   },
   {
-   "count": "877",
-   "distinct_count": "1",
-   "field": "timeendpos",
-   "numeric_count": "877"
-  },
-  {
-   "count": "877",
-   "distinct_count": "1",
-   "field": "timestartpos",
-   "numeric_count": "877"
-  },
-  {
-   "count": "14",
+   "count": "31",
    "distinct_count": "1",
    "field": "uri",
    "numeric_count": "0"
@@ -706,13 +700,19 @@
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "versions",
+   "field": "volumes",
    "numeric_count": "0"
   },
   {
    "count": "1",
    "distinct_count": "1",
-   "field": "volumes",
+   "field": "wallclock_elapsed_msec",
+   "numeric_count": "1"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "window_period",
    "numeric_count": "0"
   }
  ],

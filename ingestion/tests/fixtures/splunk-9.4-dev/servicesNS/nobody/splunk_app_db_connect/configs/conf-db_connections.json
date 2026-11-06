@@ -46,7 +46,7 @@
     "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/legacy_oracle"
    },
    "name": "legacy_oracle",
-   "updated": "2026-11-06T03:35:04+00:00"
+   "updated": "2026-11-06T05:22:57+00:00"
   },
   {
    "acl": {
@@ -95,7 +95,7 @@
     "remove": "/servicesNS/nobody/splunk_app_db_connect/configs/conf-db_connections/orders_mysql"
    },
    "name": "orders_mysql",
-   "updated": "2026-11-06T03:35:04+00:00"
+   "updated": "2026-11-06T05:22:57+00:00"
   }
  ],
  "generator": {
@@ -107,5 +107,5 @@
   "offset": 0,
   "total": 2
  },
- "updated": "2026-11-06T03:51:41+00:00"
+ "updated": "2026-11-06T05:27:15+00:00"
 }

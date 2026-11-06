@@ -73,6 +73,7 @@ export function LineageGraph({ catalog, id, up, down }: { catalog: Catalog; id: 
   if (graph.nodes.length <= 1) return <p className="muted">No lineage found for this object.</p>;
 
   return (
+    <>
     <div ref={scroller} className="lineage-scroll" role="img" aria-label="Lineage graph: upstream sources on the left, downstream consumers on the right">
       <div className="lineage-canvas" style={{ width, height }}>
         <svg width={width} height={height} className="lineage-svg" aria-hidden>
@@ -106,12 +107,13 @@ export function LineageGraph({ catalog, id, up, down }: { catalog: Catalog; id: 
           </div>
         ))}
       </div>
+    </div>
       {(graph.hasMoreUp || graph.hasMoreDown) && (
         <p className="muted small">
           {graph.hasMoreUp && "More upstream objects beyond this depth. "}
           {graph.hasMoreDown && "More downstream objects beyond this depth."}
         </p>
       )}
-    </div>
+    </>
   );
 }

@@ -1,0 +1,5 @@
+{"__list__": [
+  {"name": "Windows Security (Splunk Direct)", "type": "Splunk Direct", "format": "Windows Event Log", "index": "wineventlog", "sourcetype": "WinEventLog:Security", "status": "running", "enabled": true},
+  {"name": "Perimeter Firewall", "type": "Splunk Direct", "format": "Firewall", "index": "firewall", "sourcetype": "acme:fw", "status": "running", "enabled": true},
+  {"name": "Legacy Proxy", "type": "Raw Events", "index": "legacy_proxy", "status": "stopped", "enabled": false}
+]}

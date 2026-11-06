@@ -59,7 +59,7 @@ def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
     """(spl, is_fragment, label) for every search held by an entity."""
     p = e.get("properties") or {}
     t = e["type"]
-    if t == "savedSearch":
+    if t in ("savedSearch", "correlationSearch"):
         return [(p.get("search") or "", False, "search")]
     if t == "workflowAction" and p.get("search"):
         return [(p["search"], False, "search")]
@@ -141,7 +141,12 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
                     f"macro {m} exists in {', '.join(apps)} but is not shared with {app}"
                 )
         lineage: dict[str, Any] = {}
-        if combined.implicit_index and e["type"] in ("savedSearch", "dashboard", "workflowAction"):
+        if combined.implicit_index and e["type"] in (
+            "savedSearch",
+            "correlationSearch",
+            "dashboard",
+            "workflowAction",
+        ):
             lineage["implicitIndex"] = True
         if combined.dynamic and e["type"] in ("dashboard", "workflowAction"):
             lineage["dynamic"] = True
@@ -150,7 +155,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         warnings = [
             w
             for w in combined.warnings
-            if e["type"] in ("savedSearch", "dashboard", "workflowAction")
+            if e["type"] in ("savedSearch", "correlationSearch", "dashboard", "workflowAction")
             or "not shared" in w
             or "too deep" in w
             or "could not parse" in w

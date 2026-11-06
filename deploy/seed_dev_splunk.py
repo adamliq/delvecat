@@ -62,6 +62,20 @@ def _q(s: str) -> str:
     return quote(s, safe="")
 
 
+CONTAINER = os.environ.get("SPLUNK_CONTAINER", "deploy-splunk-1")
+
+
+def container_file(relative: str, text: str) -> None:
+    """Write a file under $SPLUNK_HOME in the dev container (dev seeding only)."""
+    import subprocess
+
+    path = f"/opt/splunk/{relative}"
+    subprocess.run(
+        ["docker", "exec", "-i", "-u", "splunk", CONTAINER, "sh", "-c",
+         f'mkdir -p "$(dirname "{path}")" && cat > "{path}"'],
+        input=text.encode(), check=True)
+
+
 def oneshot(app: str, spl: str) -> None:
     r = client.post(f"{ns(app)}/search/jobs", data={
         "search": spl, "exec_mode": "oneshot", "output_mode": "json"})
@@ -403,6 +417,134 @@ def main() -> None:
     for st in ("http", "dns", "smtp"):
         record("streamDefinition", st)
     record("streamGroup", "dmz_sensors")
+
+    # --- Phase 5: Enterprise Security content (stand-in apps; ES itself is conf-based) ----
+    for app, label in (("SplunkEnterpriseSecuritySuite", "Enterprise Security (dev stand-in)"),
+                       ("SA-ThreatIntelligence", "Threat Intelligence (dev stand-in)"),
+                       ("SA-IdentityManagement", "Identity Management (dev stand-in)"),
+                       ("DA-ESS-ContentUpdate", "ES Content Update (dev stand-in)"),
+                       ("Splunk_SA_CIM", "Common Information Model (dev stand-in)"),
+                       ("phantom", "Splunk App for SOAR Export (dev stand-in)")):
+        post("/services/apps/local", {"name": app, "template": "barebones", "label": label,
+                                      "visible": "true"})
+    for idx in ("notable", "risk"):
+        post(f"{ns('SA-ThreatIntelligence')}/data/indexes", {"name": idx})
+        record("index", idx)
+    # Alert actions ES detections use (normally shipped by ES and the SOAR export app).
+    # Splunk's REST API cannot create alert actions (apps ship them as files), so the
+    # stand-in files are written straight into the dev container.
+    by_app: dict[str, list[str]] = {}
+    for app, action, label in (("SA-ThreatIntelligence", "notable", "Notable"),
+                               ("SA-ThreatIntelligence", "risk", "Risk Analysis"),
+                               ("SplunkEnterpriseSecuritySuite", "correlationsearch",
+                                "Correlation Search"),
+                               ("phantom", "sendtophantom", "Send to SOAR")):
+        by_app.setdefault(app, []).append(
+            f"[{action}]\nlabel = {label}\ndescription = {label} (dev stand-in)\n"
+            "is_custom = 1\npayload_format = json\n")
+        record("adaptiveResponseAction", action)
+    for app, stanzas in by_app.items():
+        container_file(f"etc/apps/{app}/default/alert_actions.conf", "\n".join(stanzas))
+        container_file(f"etc/apps/{app}/metadata/default.meta",
+                       "[alert_actions]\nexport = system\n\n[savedsearches]\nexport = system\n")
+    client.get("/servicesNS/nobody/system/alerts/alert_actions/_reload")  # seed only
+
+    # CIM data models used by detections (constraints by tag, as in the real CIM).
+    for name, constraint, dataset in (("Authentication", "tag=authentication", "Authentication"),
+                                      ("Network_Traffic", "tag=network tag=communicate",
+                                       "All_Traffic")):
+        model = {"modelName": name, "displayName": name.replace("_", " "),
+                 "description": f"CIM {name} (dev stand-in)",
+                 "objects": [{"objectName": dataset, "displayName": dataset,
+                              "parentName": "BaseEvent", "fields": [],
+                              "calculations": [], "lineage": dataset,
+                              "constraints": [{"search": constraint, "owner": dataset}]}],
+                 "objectNameList": [dataset]}
+        post(f"{ns('Splunk_SA_CIM')}/datamodel/model", {"name": name,
+                                                        "description": json.dumps(model)})
+        post(f"{ns('Splunk_SA_CIM')}/datamodel/model/{name}/acl",
+             {"sharing": "global", "owner": "nobody"})
+        record("dataModel", name, "Splunk_SA_CIM")
+    conf("acme_secops", "tags", "eventtype=acme_failed_login", authentication="enabled")
+    conf("TA-acme-firewall", "tags", "sourcetype=acme:fw", communicate="enabled")
+    record("tag", "communicate")
+
+    def detection(app: str, name: str, spl: str, *, mitre: list[str], stories: list[str],
+                  domain: str, severity: str, risk: bool = True, soar_label: str | None = None,
+                  enabled: bool = True, kill_chain: list[str] | None = None) -> None:
+        annotations = {"mitre_attack": mitre, "analytic_story": stories,
+                       "kill_chain_phases": kill_chain or [], "cis20": ["CIS 10"],
+                       "nist": ["DE.CM"]}
+        actions = ["notable"] + (["risk"] if risk else []) + (["sendtophantom"] if soar_label else [])
+        attrs = {
+            "search": spl, "cron_schedule": "*/30 * * * *", "enableSched": "1",
+            "disabled": "0" if enabled else "1",
+            "dispatch.earliest_time": "-24h", "dispatch.latest_time": "now",
+            "description": f"{name} (dev ES detection).",
+            "action.correlationsearch.enabled": "1",
+            "action.correlationsearch.label": name,
+            "action.correlationsearch.annotations": json.dumps(annotations),
+            "action.notable": "1",
+            "action.notable.param.rule_title": f"{name} on $src$",
+            "action.notable.param.security_domain": domain,
+            "action.notable.param.severity": severity,
+            "action.notable.param.recommended_actions": "risk,sendtophantom",
+            "actions": ",".join(actions),
+        }
+        if risk:
+            attrs["action.risk"] = "1"
+            attrs["action.risk.param._risk"] = json.dumps(
+                [{"risk_object_field": "src", "risk_object_type": "system", "risk_score": 40}])
+        if soar_label:
+            attrs["action.sendtophantom"] = "1"
+            attrs["action.sendtophantom.param.label"] = soar_label
+            attrs["action.sendtophantom.param.sensitivity"] = "amber"
+        conf(app, "savedsearches", name, **attrs)
+        record("correlationSearch", name, app)
+
+    escu = "DA-ESS-ContentUpdate"
+    detection(escu, "ESCU - Brute Force Access Behavior Detected",
+              "| tstats count from datamodel=Authentication.Authentication "
+              "where Authentication.action=failure by Authentication.src | where count > 10",
+              mitre=["T1110", "T1110.001"], stories=["Credential Access via Brute Force"],
+              domain="access", severity="high", soar_label="brute_force",
+              kill_chain=["Exploitation"])
+    detection(escu, "ESCU - Rare Outbound Port Traffic",
+              "| tstats count from datamodel=Network_Traffic.All_Traffic "
+              "by All_Traffic.src All_Traffic.dest_port | where count < 3",
+              mitre=["T1571"], stories=["Command and Control"], domain="network",
+              severity="medium", kill_chain=["Command and Control"])
+    detection(escu, "ESCU - Suspicious PowerShell Execution",
+              "| tstats count from datamodel=Endpoint.Processes "
+              'where Processes.process_name="powershell.exe" by Processes.dest',
+              mitre=["T1059.001"], stories=["Malicious PowerShell"], domain="endpoint",
+              severity="high", soar_label="malware")  # no Endpoint data model: blind
+    detection("SplunkEnterpriseSecuritySuite", "Access - Excessive Failed Logins - Rule",
+              "index=wineventlog EventCode=4625 | stats count by src user | where count > 20",
+              mitre=["T1110.003"], stories=["Credential Access via Brute Force"],
+              domain="access", severity="medium", enabled=False)
+    conf(escu, "analyticstories", "Credential Access via Brute Force",
+         category="Adversary Tactics", description="Detect password guessing and spraying.",
+         narrative="Attackers guess passwords against exposed services.")
+    conf(escu, "analyticstories", "Command and Control", category="Adversary Tactics",
+         description="Detect hosts talking to command and control infrastructure.")
+    for story in ("Credential Access via Brute Force", "Command and Control",
+                  "Malicious PowerShell"):
+        record("analyticStory", story)
+
+    # Threat intelligence and asset/identity sources are modular inputs in ES.
+    conf("SA-ThreatIntelligence", "inputs", "threatlist://acme_blocklist",
+         description="Internal IP blocklist", type="threatlist", weight="60",
+         url="https://intel.example.com/blocklist.csv", interval="43200", disabled="0")
+    conf("SA-ThreatIntelligence", "inputs", "threatlist://open_phish",
+         description="Phishing URLs", type="threatlist", weight="40",
+         url="https://user:secret@feeds.example.org/phish.csv", interval="86400", disabled="1")
+    record("threatIntelSource", "acme_blocklist")
+    record("threatIntelSource", "open_phish")
+    conf("SA-IdentityManagement", "inputs", "identity_manager://acme_assets",
+         description="Asset owners from the firewall add-on", category="asset",
+         target="asset", url="lookup://asset_owners", disabled="0")
+    record("assetIdentitySource", "acme_assets")
 
     # Data so that the tstats inventory has something to find
     now = int(time.time())

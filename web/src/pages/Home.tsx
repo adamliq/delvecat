@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import type { EntityType } from "../generated/catalog";
 import { PropValue } from "../components/PropValue";
 import { effectiveDescription } from "../lib/annotate";
+import { detectionStatus, isDetection } from "../lib/coverage";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
@@ -49,6 +50,8 @@ export function Home() {
   const described = bundle.entities.filter((e) => effectiveDescription(e)).length;
   const owned = bundle.entities.filter((e) => e.annotations?.owners?.length).length;
   const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
+  const detections = bundle.entities.filter(isDetection).map((e) => detectionStatus(catalog, e));
+  const firing = detections.filter((d) => d.state === "ready").length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
   const noIndex = bundle.entities.filter((e) => e.lineage?.implicitIndex).length;
   const coverage: [string, number][] = [
@@ -104,6 +107,17 @@ export function Home() {
           <Link to="/glossary">Glossary ({(bundle.glossary ?? []).length} terms)</Link>
         </p>
       </section>
+
+      {detections.length > 0 && (
+        <section>
+          <h2>Security detections</h2>
+          <p>
+            {detections.length} detections, <strong>{firing}</strong> can fire
+            {detections.length - firing > 0 && <>, <strong>{detections.length - firing}</strong> cannot (disabled, broken or without data)</>}.{" "}
+            <Link to="/coverage">See ATT&CK and CIM coverage</Link>
+          </p>
+        </section>
+      )}
 
       {(broken > 0 || noIndex > 0) && (
         <section>

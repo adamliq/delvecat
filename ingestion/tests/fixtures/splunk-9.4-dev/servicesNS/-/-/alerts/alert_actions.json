@@ -1,0 +1,218 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "SplunkEnterpriseSecuritySuite",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "command": "sendalert $action_name$ results_file=\"$results.file$\" results_link=\"$results.url$\"",
+    "description": "Correlation Search (dev stand-in)",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "SplunkEnterpriseSecuritySuite",
+    "eai:userName": "nobody",
+    "forceCsvResults": "auto",
+    "hostname": "",
+    "is_custom": "1",
+    "label": "Correlation Search",
+    "maxresults": 10000,
+    "maxtime": "5m",
+    "payload_format": "json",
+    "track_alert": false,
+    "ttl": 0
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch",
+   "links": {
+    "_reload": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch/_reload",
+    "alternate": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch",
+    "disable": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch/disable",
+    "edit": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch",
+    "list": "/servicesNS/nobody/SplunkEnterpriseSecuritySuite/alerts/alert_actions/correlationsearch"
+   },
+   "name": "correlationsearch",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "command": "sendalert $action_name$ results_file=\"$results.file$\" results_link=\"$results.url$\"",
+    "description": "Notable (dev stand-in)",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "SA-ThreatIntelligence",
+    "eai:userName": "nobody",
+    "forceCsvResults": "auto",
+    "hostname": "",
+    "is_custom": "1",
+    "label": "Notable",
+    "maxresults": 10000,
+    "maxtime": "5m",
+    "payload_format": "json",
+    "track_alert": false,
+    "ttl": 0
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable",
+   "links": {
+    "_reload": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable/_reload",
+    "alternate": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable",
+    "disable": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable/disable",
+    "edit": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable",
+    "list": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/notable"
+   },
+   "name": "notable",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "command": "sendalert $action_name$ results_file=\"$results.file$\" results_link=\"$results.url$\"",
+    "description": "Risk Analysis (dev stand-in)",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "SA-ThreatIntelligence",
+    "eai:userName": "nobody",
+    "forceCsvResults": "auto",
+    "hostname": "",
+    "is_custom": "1",
+    "label": "Risk Analysis",
+    "maxresults": 10000,
+    "maxtime": "5m",
+    "payload_format": "json",
+    "track_alert": false,
+    "ttl": 0
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk",
+   "links": {
+    "_reload": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk/_reload",
+    "alternate": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk",
+    "disable": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk/disable",
+    "edit": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk",
+    "list": "/servicesNS/nobody/SA-ThreatIntelligence/alerts/alert_actions/risk"
+   },
+   "name": "risk",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "phantom",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "*"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "command": "sendalert $action_name$ results_file=\"$results.file$\" results_link=\"$results.url$\"",
+    "description": "Send to SOAR (dev stand-in)",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "phantom",
+    "eai:userName": "nobody",
+    "forceCsvResults": "auto",
+    "hostname": "",
+    "is_custom": "1",
+    "label": "Send to SOAR",
+    "maxresults": 10000,
+    "maxtime": "5m",
+    "payload_format": "json",
+    "track_alert": false,
+    "ttl": 0
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom",
+   "links": {
+    "_reload": "/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom/_reload",
+    "alternate": "/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom",
+    "disable": "/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom/disable",
+    "edit": "/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom",
+    "list": "/servicesNS/nobody/phantom/alerts/alert_actions/sendtophantom"
+   },
+   "name": "sendtophantom",
+   "updated": "1970-01-01T00:00:00+00:00"
+  }
+ ],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "messages": [],
+ "paging": {
+  "offset": 0,
+  "total": 4
+ },
+ "updated": "2026-11-06T05:27:12+00:00"
+}

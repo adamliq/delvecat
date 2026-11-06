@@ -60,8 +60,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -75,7 +75,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:51:14+0000",
+    "maxTime": "2026-11-06T05:26:41+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -117,7 +117,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/audit/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 12640,
+    "totalEventCount": 13742,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -137,7 +137,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_audit"
    },
    "name": "_audit",
-   "updated": "2026-11-06T03:51:16+00:00"
+   "updated": "2026-11-06T05:26:47+00:00"
   },
   {
    "acl": {
@@ -199,8 +199,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -214,7 +214,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:46:28+0000",
+    "maxTime": "2026-11-06T05:23:02+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -256,7 +256,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_configtracker/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 327,
+    "totalEventCount": 374,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -276,7 +276,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_configtracker"
    },
    "name": "_configtracker",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -338,8 +338,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -353,7 +353,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:46:28+0000",
+    "maxTime": "2026-11-06T05:26:28+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -395,7 +395,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_dsappevent/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 4,
+    "totalEventCount": 6,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -415,7 +415,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsappevent"
    },
    "name": "_dsappevent",
-   "updated": "2026-11-06T03:51:14+00:00"
+   "updated": "2026-11-06T05:26:30+00:00"
   },
   {
    "acl": {
@@ -477,8 +477,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -492,7 +492,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:46:55+0000",
+    "maxTime": "2026-11-06T05:22:22+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -534,7 +534,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_dsclient/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 3,
+    "totalEventCount": 5,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -554,7 +554,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsclient"
    },
    "name": "_dsclient",
-   "updated": "2026-11-06T03:51:14+00:00"
+   "updated": "2026-11-06T05:26:28+00:00"
   },
   {
    "acl": {
@@ -616,8 +616,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -631,7 +631,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:49:58+0000",
+    "maxTime": "2026-11-06T05:26:58+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -673,7 +673,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_dsphonehome/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 13,
+    "totalEventCount": 21,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -693,7 +693,7 @@
     "list": "/servicesNS/nobody/SplunkDeploymentServerConfig/data/indexes/_dsphonehome"
    },
    "name": "_dsphonehome",
-   "updated": "2026-11-06T03:51:14+00:00"
+   "updated": "2026-11-06T05:27:04+00:00"
   },
   {
    "acl": {
@@ -728,7 +728,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "4",
+    "currentDBSizeMB": "5",
     "datatype": "event",
     "defaultDatabase": "main",
     "disabled": false,
@@ -755,8 +755,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -770,7 +770,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:51:35+0000",
+    "maxTime": "2026-11-06T05:27:00+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -812,7 +812,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_internaldb/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 27154,
+    "totalEventCount": 36177,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -832,7 +832,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_internal"
    },
    "name": "_internal",
-   "updated": "2026-11-06T03:51:33+00:00"
+   "updated": "2026-11-06T05:27:03+00:00"
   },
   {
    "acl": {
@@ -867,7 +867,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "18",
+    "currentDBSizeMB": "24",
     "datatype": "event",
     "defaultDatabase": "main",
     "disabled": false,
@@ -894,8 +894,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -909,7 +909,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:51:35+0000",
+    "maxTime": "2026-11-06T05:27:01+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -951,7 +951,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_introspection/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 4908,
+    "totalEventCount": 6057,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -971,7 +971,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_introspection"
    },
    "name": "_introspection",
-   "updated": "2026-11-06T03:51:34+00:00"
+   "updated": "2026-11-06T05:27:08+00:00"
   },
   {
    "acl": {
@@ -1006,7 +1006,7 @@
     "coldToFrozenDir": "",
     "coldToFrozenScript": "",
     "compressRawdata": true,
-    "currentDBSizeMB": "9",
+    "currentDBSizeMB": "10",
     "datatype": "metric",
     "defaultDatabase": "main",
     "disabled": false,
@@ -1033,8 +1033,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1048,7 +1048,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:51:35+0000",
+    "maxTime": "2026-11-06T05:27:01+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -1090,7 +1090,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_metrics/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 15978,
+    "totalEventCount": 19785,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -1110,7 +1110,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_metrics"
    },
    "name": "_metrics",
-   "updated": "2026-11-06T03:51:34+00:00"
+   "updated": "2026-11-06T05:27:08+00:00"
   },
   {
    "acl": {
@@ -1172,8 +1172,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1249,7 +1249,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_metrics_rollup"
    },
    "name": "_metrics_rollup",
-   "updated": "2026-11-06T03:33:44+00:00"
+   "updated": "2026-11-06T05:22:11+00:00"
   },
   {
    "acl": {
@@ -1311,8 +1311,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1326,7 +1326,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:46:14+0000",
+    "maxTime": "2026-11-06T03:56:16+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -1368,7 +1368,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/_telemetry/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 2,
+    "totalEventCount": 3,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -1388,7 +1388,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_telemetry"
    },
    "name": "_telemetry",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -1450,8 +1450,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1527,7 +1527,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/_thefishbucket"
    },
    "name": "_thefishbucket",
-   "updated": "2026-11-06T03:33:44+00:00"
+   "updated": "2026-11-06T05:22:11+00:00"
   },
   {
    "acl": {
@@ -1589,8 +1589,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1667,7 +1667,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/db_orders"
    },
    "name": "db_orders",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -1729,8 +1729,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1807,7 +1807,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/indexes/firewall"
    },
    "name": "firewall",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -1869,8 +1869,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -1946,7 +1946,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/history"
    },
    "name": "history",
-   "updated": "2026-11-06T03:33:44+00:00"
+   "updated": "2026-11-06T05:22:11+00:00"
   },
   {
    "acl": {
@@ -2008,8 +2008,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2086,7 +2086,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/infra_metrics"
    },
    "name": "infra_metrics",
-   "updated": "2026-11-06T03:33:44+00:00"
+   "updated": "2026-11-06T05:22:11+00:00"
   },
   {
    "acl": {
@@ -2148,8 +2148,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2163,7 +2163,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:33:34+0000",
+    "maxTime": "2026-11-06T05:22:02+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -2205,7 +2205,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/defaultdb/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 101,
+    "totalEventCount": 147,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -2225,7 +2225,147 @@
     "list": "/servicesNS/nobody/system/data/indexes/main"
    },
    "name": "main",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
+  },
+  {
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "assureUTF8": false,
+    "bucketMerge.maxMergeSizeMB": 1000,
+    "bucketMerge.maxMergeTimeSpanSecs": 7776000,
+    "bucketMerge.minMergeSizeMB": 750,
+    "bucketMerging": false,
+    "bucketRebuildMemoryHint": 0,
+    "coldPath": "$SPLUNK_DB/notable/colddb",
+    "coldPath.maxDataSizeMB": 0,
+    "coldPath_expanded": "/opt/splunk/var/lib/splunk/notable/colddb",
+    "coldToFrozenDir": "",
+    "coldToFrozenScript": "",
+    "compressRawdata": true,
+    "currentDBSizeMB": "1",
+    "datatype": "event",
+    "defaultDatabase": "main",
+    "disabled": false,
+    "eai:acl": null,
+    "enableDataIntegrityControl": false,
+    "enableOnlineBucketRepair": true,
+    "enableRealtimeSearch": true,
+    "enableTsidxReduction": false,
+    "federated.dataset": "",
+    "federated.provider": "",
+    "fileSystemExecutorWorkers": 5,
+    "frozenTimePeriodInSecs": 188697600,
+    "homePath": "$SPLUNK_DB/notable/db",
+    "homePath.maxDataSizeMB": 0,
+    "homePath_expanded": "/opt/splunk/var/lib/splunk/notable/db",
+    "hotBucketStreaming.deleteHotsAfterRestart": false,
+    "hotBucketStreaming.extraBucketBuildingCmdlineArgs": null,
+    "hotBucketStreaming.removeRemoteSlicesOnRoll": false,
+    "hotBucketStreaming.reportStatus": false,
+    "hotBucketStreaming.sendSlices": false,
+    "hotBucketTimeRefreshInterval": 10,
+    "indexThreads": "auto",
+    "isInternal": false,
+    "isReady": true,
+    "isVirtual": false,
+    "journalCompression": "zstd",
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
+    "maxBloomBackfillBucketAge": "30d",
+    "maxBucketSizeCacheEntries": 0,
+    "maxConcurrentOptimizes": 6,
+    "maxDataSize": "auto",
+    "maxGlobalDataSizeMB": 0,
+    "maxGlobalRawDataSizeMB": 0,
+    "maxHotBuckets": "auto",
+    "maxHotIdleSecs": 0,
+    "maxHotSpanSecs": 7776000,
+    "maxMemMB": 5,
+    "maxMetaEntries": 1000000,
+    "maxRunningProcessGroups": 0,
+    "maxRunningProcessGroupsLowPriority": 1,
+    "maxTime": "",
+    "maxTimeUnreplicatedNoAcks": 300,
+    "maxTimeUnreplicatedWithAcks": 60,
+    "maxTotalDataSizeMB": 500000,
+    "maxWarmDBCount": 300,
+    "memPoolMB": "auto",
+    "metric.compressionBlockSize": 1024,
+    "metric.enableFloatingPointCompression": true,
+    "metric.maxHotBuckets": "auto",
+    "metric.splitByIndexKeys": "",
+    "metric.stubOutRawdataJournal": true,
+    "metric.timestampResolution": "s",
+    "metric.tsidxTargetSizeMB": 1500,
+    "minHotIdleSecsBeforeForceRoll": 0,
+    "minRawFileSyncSecs": "disable",
+    "minStreamGroupQueueSize": 2000,
+    "minTime": "",
+    "partialServiceMetaPeriod": 0,
+    "processTrackerServiceInterval": 1,
+    "quarantineFutureSecs": 2592000,
+    "quarantinePastSecs": 77760000,
+    "rawChunkSizeBytes": 131072,
+    "repFactor": 0,
+    "rotatePeriodInSecs": 60,
+    "rtRouterQueueSize": null,
+    "rtRouterThreads": null,
+    "selfStorageThreads": null,
+    "serviceInactiveIndexesPeriod": 60,
+    "serviceMetaPeriod": 25,
+    "serviceOnlyAsNeeded": true,
+    "serviceSubtaskTimingPeriod": 30,
+    "splitByIndexKeys": "",
+    "streamingTargetTsidxSyncPeriodMsec": 5000,
+    "summaryHomePath_expanded": "/opt/splunk/var/lib/splunk/notable/summary",
+    "suppressBannerList": "",
+    "suspendHotRollByDeleteQuery": false,
+    "sync": 0,
+    "syncMeta": true,
+    "thawedPath": "$SPLUNK_DB/notable/thaweddb",
+    "thawedPath_expanded": "/opt/splunk/var/lib/splunk/notable/thaweddb",
+    "throttleCheckPeriod": 15,
+    "timePeriodInSecBeforeTsidxReduction": 604800,
+    "totalEventCount": 0,
+    "tsidxDedupPostingsListMaxTermsLimit": 8388608,
+    "tsidxReductionCheckPeriodInSec": 600,
+    "tsidxTargetSizeMB": 1500,
+    "tsidxWritingLevel": null,
+    "tstatsHomePath": "volume:_splunk_summaries/$_index_name/datamodel_summary",
+    "tstatsHomePath_expanded": "/opt/splunk/var/lib/splunk/notable/datamodel_summary",
+    "waitPeriodInSecsForManifestWrite": 60,
+    "warmToColdScript": "",
+    "zstdCompressionStrategy": null
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable",
+   "links": {
+    "_reload": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable/_reload",
+    "alternate": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable",
+    "disable": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable/disable",
+    "edit": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable",
+    "list": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable",
+    "remove": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/notable"
+   },
+   "name": "notable",
+   "updated": "2026-11-06T05:22:37+00:00"
   },
   {
    "acl": {
@@ -2287,8 +2427,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2302,7 +2442,7 @@
     "maxMetaEntries": 1000000,
     "maxRunningProcessGroups": 0,
     "maxRunningProcessGroupsLowPriority": 1,
-    "maxTime": "2026-11-06T03:50:11+0000",
+    "maxTime": "2026-11-06T05:26:58+0000",
     "maxTimeUnreplicatedNoAcks": 300,
     "maxTimeUnreplicatedWithAcks": 60,
     "maxTotalDataSizeMB": 500000,
@@ -2344,7 +2484,7 @@
     "thawedPath_expanded": "/opt/splunk/var/lib/splunk/os/thaweddb",
     "throttleCheckPeriod": 15,
     "timePeriodInSecBeforeTsidxReduction": 604800,
-    "totalEventCount": 877,
+    "totalEventCount": 1453,
     "tsidxDedupPostingsListMaxTermsLimit": 8388608,
     "tsidxReductionCheckPeriodInSec": 600,
     "tsidxTargetSizeMB": 1500,
@@ -2365,7 +2505,147 @@
     "remove": "/servicesNS/nobody/search/data/indexes/os"
    },
    "name": "os",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:27:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "can_list": true,
+    "can_write": true,
+    "modifiable": false,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "splunk-system-role"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "assureUTF8": false,
+    "bucketMerge.maxMergeSizeMB": 1000,
+    "bucketMerge.maxMergeTimeSpanSecs": 7776000,
+    "bucketMerge.minMergeSizeMB": 750,
+    "bucketMerging": false,
+    "bucketRebuildMemoryHint": 0,
+    "coldPath": "$SPLUNK_DB/risk/colddb",
+    "coldPath.maxDataSizeMB": 0,
+    "coldPath_expanded": "/opt/splunk/var/lib/splunk/risk/colddb",
+    "coldToFrozenDir": "",
+    "coldToFrozenScript": "",
+    "compressRawdata": true,
+    "currentDBSizeMB": "1",
+    "datatype": "event",
+    "defaultDatabase": "main",
+    "disabled": false,
+    "eai:acl": null,
+    "enableDataIntegrityControl": false,
+    "enableOnlineBucketRepair": true,
+    "enableRealtimeSearch": true,
+    "enableTsidxReduction": false,
+    "federated.dataset": "",
+    "federated.provider": "",
+    "fileSystemExecutorWorkers": 5,
+    "frozenTimePeriodInSecs": 188697600,
+    "homePath": "$SPLUNK_DB/risk/db",
+    "homePath.maxDataSizeMB": 0,
+    "homePath_expanded": "/opt/splunk/var/lib/splunk/risk/db",
+    "hotBucketStreaming.deleteHotsAfterRestart": false,
+    "hotBucketStreaming.extraBucketBuildingCmdlineArgs": null,
+    "hotBucketStreaming.removeRemoteSlicesOnRoll": false,
+    "hotBucketStreaming.reportStatus": false,
+    "hotBucketStreaming.sendSlices": false,
+    "hotBucketTimeRefreshInterval": 10,
+    "indexThreads": "auto",
+    "isInternal": false,
+    "isReady": true,
+    "isVirtual": false,
+    "journalCompression": "zstd",
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
+    "maxBloomBackfillBucketAge": "30d",
+    "maxBucketSizeCacheEntries": 0,
+    "maxConcurrentOptimizes": 6,
+    "maxDataSize": "auto",
+    "maxGlobalDataSizeMB": 0,
+    "maxGlobalRawDataSizeMB": 0,
+    "maxHotBuckets": "auto",
+    "maxHotIdleSecs": 0,
+    "maxHotSpanSecs": 7776000,
+    "maxMemMB": 5,
+    "maxMetaEntries": 1000000,
+    "maxRunningProcessGroups": 0,
+    "maxRunningProcessGroupsLowPriority": 1,
+    "maxTime": "",
+    "maxTimeUnreplicatedNoAcks": 300,
+    "maxTimeUnreplicatedWithAcks": 60,
+    "maxTotalDataSizeMB": 500000,
+    "maxWarmDBCount": 300,
+    "memPoolMB": "auto",
+    "metric.compressionBlockSize": 1024,
+    "metric.enableFloatingPointCompression": true,
+    "metric.maxHotBuckets": "auto",
+    "metric.splitByIndexKeys": "",
+    "metric.stubOutRawdataJournal": true,
+    "metric.timestampResolution": "s",
+    "metric.tsidxTargetSizeMB": 1500,
+    "minHotIdleSecsBeforeForceRoll": 0,
+    "minRawFileSyncSecs": "disable",
+    "minStreamGroupQueueSize": 2000,
+    "minTime": "",
+    "partialServiceMetaPeriod": 0,
+    "processTrackerServiceInterval": 1,
+    "quarantineFutureSecs": 2592000,
+    "quarantinePastSecs": 77760000,
+    "rawChunkSizeBytes": 131072,
+    "repFactor": 0,
+    "rotatePeriodInSecs": 60,
+    "rtRouterQueueSize": null,
+    "rtRouterThreads": null,
+    "selfStorageThreads": null,
+    "serviceInactiveIndexesPeriod": 60,
+    "serviceMetaPeriod": 25,
+    "serviceOnlyAsNeeded": true,
+    "serviceSubtaskTimingPeriod": 30,
+    "splitByIndexKeys": "",
+    "streamingTargetTsidxSyncPeriodMsec": 5000,
+    "summaryHomePath_expanded": "/opt/splunk/var/lib/splunk/risk/summary",
+    "suppressBannerList": "",
+    "suspendHotRollByDeleteQuery": false,
+    "sync": 0,
+    "syncMeta": true,
+    "thawedPath": "$SPLUNK_DB/risk/thaweddb",
+    "thawedPath_expanded": "/opt/splunk/var/lib/splunk/risk/thaweddb",
+    "throttleCheckPeriod": 15,
+    "timePeriodInSecBeforeTsidxReduction": 604800,
+    "totalEventCount": 0,
+    "tsidxDedupPostingsListMaxTermsLimit": 8388608,
+    "tsidxReductionCheckPeriodInSec": 600,
+    "tsidxTargetSizeMB": 1500,
+    "tsidxWritingLevel": null,
+    "tstatsHomePath": "volume:_splunk_summaries/$_index_name/datamodel_summary",
+    "tstatsHomePath_expanded": "/opt/splunk/var/lib/splunk/risk/datamodel_summary",
+    "waitPeriodInSecsForManifestWrite": 60,
+    "warmToColdScript": "",
+    "zstdCompressionStrategy": null
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk",
+   "links": {
+    "_reload": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk/_reload",
+    "alternate": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk",
+    "disable": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk/disable",
+    "edit": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk",
+    "list": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk",
+    "remove": "/servicesNS/nobody/SA-ThreatIntelligence/data/indexes/risk"
+   },
+   "name": "risk",
+   "updated": "2026-11-06T05:22:37+00:00"
   },
   {
    "acl": {
@@ -2562,8 +2842,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2640,7 +2920,7 @@
     "remove": "/servicesNS/nobody/search/data/indexes/stream"
    },
    "name": "stream",
-   "updated": "2026-11-06T03:51:14+00:00"
+   "updated": "2026-11-06T05:26:28+00:00"
   },
   {
    "acl": {
@@ -2702,8 +2982,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2779,7 +3059,7 @@
     "list": "/servicesNS/nobody/system/data/indexes/summary"
    },
    "name": "summary",
-   "updated": "2026-11-06T03:33:44+00:00"
+   "updated": "2026-11-06T05:22:11+00:00"
   },
   {
    "acl": {
@@ -2841,8 +3121,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -2919,7 +3199,7 @@
     "remove": "/servicesNS/nobody/acme_web/data/indexes/summary_web"
    },
    "name": "summary_web",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -2981,8 +3261,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -3059,7 +3339,7 @@
     "remove": "/servicesNS/nobody/acme_web/data/indexes/web"
    },
    "name": "web",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   },
   {
    "acl": {
@@ -3121,8 +3401,8 @@
     "isReady": true,
     "isVirtual": false,
     "journalCompression": "zstd",
-    "lastInitSequenceNumber": 4,
-    "lastInitTime": 1793936092,
+    "lastInitSequenceNumber": 3,
+    "lastInitTime": 1793942557,
     "maxBloomBackfillBucketAge": "30d",
     "maxBucketSizeCacheEntries": 0,
     "maxConcurrentOptimizes": 6,
@@ -3199,7 +3479,7 @@
     "remove": "/servicesNS/nobody/acme_secops/data/indexes/wineventlog"
    },
    "name": "wineventlog",
-   "updated": "2026-11-06T03:51:13+00:00"
+   "updated": "2026-11-06T05:26:24+00:00"
   }
  ],
  "generator": {
@@ -3209,7 +3489,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 23
+  "total": 25
  },
- "updated": "2026-11-06T03:51:34+00:00"
+ "updated": "2026-11-06T05:27:08+00:00"
 }

@@ -316,6 +316,58 @@
     "owner": "nobody",
     "perms": {
      "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "ES Content Update (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate",
+    "disable": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate",
+    "list": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate",
+    "package": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate/package",
+    "remove": "/servicesNS/nobody/system/apps/local/DA-ESS-ContentUpdate"
+   },
+   "name": "DA-ESS-ContentUpdate",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
       "admin"
      ],
      "write": [
@@ -560,6 +612,58 @@
     "owner": "nobody",
     "perms": {
      "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Splunk App for SOAR Export (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/phantom",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/phantom/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/phantom",
+    "disable": "/servicesNS/nobody/system/apps/local/phantom/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/phantom",
+    "list": "/servicesNS/nobody/system/apps/local/phantom",
+    "package": "/servicesNS/nobody/system/apps/local/phantom/package",
+    "remove": "/servicesNS/nobody/system/apps/local/phantom"
+   },
+   "name": "phantom",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
       "admin",
       "sc_admin"
      ],
@@ -599,6 +703,110 @@
     "remove": "/servicesNS/nobody/system/apps/local/python_upgrade_readiness_app"
    },
    "name": "python_upgrade_readiness_app",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Identity Management (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/SA-IdentityManagement",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement",
+    "disable": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement",
+    "list": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement",
+    "package": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement/package",
+    "remove": "/servicesNS/nobody/system/apps/local/SA-IdentityManagement"
+   },
+   "name": "SA-IdentityManagement",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Threat Intelligence (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence",
+    "disable": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence",
+    "list": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence",
+    "package": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence/package",
+    "remove": "/servicesNS/nobody/system/apps/local/SA-ThreatIntelligence"
+   },
+   "name": "SA-ThreatIntelligence",
    "updated": "1970-01-01T00:00:00+00:00"
   },
   {
@@ -1437,6 +1645,58 @@
      ],
      "write": [
       "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Common Information Model (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/Splunk_SA_CIM",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM",
+    "disable": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM",
+    "list": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM",
+    "package": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM/package",
+    "remove": "/servicesNS/nobody/system/apps/local/Splunk_SA_CIM"
+   },
+   "name": "Splunk_SA_CIM",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
       "sc_admin"
      ]
     },
@@ -1519,6 +1779,58 @@
     "remove": "/servicesNS/nobody/system/apps/local/SplunkDeploymentServerConfig"
    },
    "name": "SplunkDeploymentServerConfig",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "author": "",
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Enterprise Security (dev stand-in)",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "1.0.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite",
+    "disable": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite",
+    "list": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite",
+    "package": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite/package",
+    "remove": "/servicesNS/nobody/system/apps/local/SplunkEnterpriseSecuritySuite"
+   },
+   "name": "SplunkEnterpriseSecuritySuite",
    "updated": "1970-01-01T00:00:00+00:00"
   },
   {
@@ -1677,7 +1989,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 33
+  "total": 39
  },
- "updated": "2026-11-06T03:51:38+00:00"
+ "updated": "2026-11-06T05:27:11+00:00"
 }

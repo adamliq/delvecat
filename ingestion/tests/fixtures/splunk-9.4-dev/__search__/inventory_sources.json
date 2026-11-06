@@ -2,82 +2,94 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "12640",
-   "indexes": "_audit",
-   "lastSeen": "1793937074",
-   "source": "audittrail"
-  },
-  {
-   "count": "12156",
+   "count": "15082",
    "indexes": "_internal",
-   "lastSeen": "1793937085",
+   "lastSeen": "1793942811",
    "source": "/opt/splunk/var/log/splunk/metrics.log"
   },
   {
-   "count": "5344",
+   "count": "13750",
+   "indexes": "_audit",
+   "lastSeen": "1793942831",
+   "source": "audittrail"
+  },
+  {
+   "count": "8491",
    "indexes": "_internal",
-   "lastSeen": "1793937077",
+   "lastSeen": "1793942831",
    "source": "/opt/splunk/var/log/splunk/splunkd.log"
   },
   {
-   "count": "3869",
+   "count": "4695",
    "indexes": "_introspection",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942831",
    "source": "/opt/splunk/var/log/introspection/resource_usage.log"
   },
   {
-   "count": "3038",
+   "count": "3660",
    "indexes": "_internal",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942823",
    "source": "/opt/splunk/var/log/splunk/health.log"
   },
   {
-   "count": "2666",
+   "count": "3573",
    "indexes": "_internal",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942831",
    "source": "/opt/splunk/var/log/splunk/splunkd_access.log"
   },
   {
-   "count": "1746",
+   "count": "2168",
    "indexes": "_internal",
-   "lastSeen": "1793937047",
+   "lastSeen": "1793942774",
    "source": "/opt/splunk/var/log/splunk/mongod.log"
   },
   {
-   "count": "877",
+   "count": "1455",
    "indexes": "os",
-   "lastSeen": "1793937011",
+   "lastSeen": "1793942818",
    "source": "/opt/splunkforwarder/var/log/splunk/splunkd.log"
   },
   {
-   "count": "651",
+   "count": "868",
    "indexes": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "source": "/opt/splunk/var/log/splunk/web_service.log"
   },
   {
-   "count": "629",
+   "count": "838",
    "indexes": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "source": "/opt/splunk/var/log/splunk/python.log"
   },
   {
-   "count": "580",
+   "count": "732",
    "indexes": "_introspection",
-   "lastSeen": "1793937078",
+   "lastSeen": "1793942831",
    "source": "/opt/splunk/var/log/introspection/kvstore.log"
   },
   {
-   "count": "325",
+   "count": "638",
+   "indexes": "_internal",
+   "lastSeen": "1793942812",
+   "source": "/opt/splunkforwarder/var/log/splunk/metrics.log"
+  },
+  {
+   "count": "372",
    "indexes": "_configtracker",
-   "lastSeen": "1793936106",
+   "lastSeen": "1793942582",
    "source": "/opt/splunk/var/log/splunk/configuration_change.log"
   },
   {
-   "count": "299",
+   "count": "295",
+   "indexes": "_introspection",
+   "lastSeen": "1793942531",
+   "source": "/opt/splunk/var/log/introspection/disk_objects.log"
+  },
+  {
+   "count": "264",
    "indexes": "_internal",
-   "lastSeen": "1793937004",
-   "source": "/opt/splunkforwarder/var/log/splunk/metrics.log"
+   "lastSeen": "1793942534",
+   "source": "/opt/splunk/var/log/splunk/supervisor.log"
   },
   {
    "count": "217",
@@ -92,21 +104,18 @@
    "source": "http-simple"
   },
   {
-   "count": "214",
-   "indexes": "_introspection",
-   "lastSeen": "1793936624",
-   "source": "/opt/splunk/var/log/introspection/disk_objects.log"
+   "count": "171",
+   "indexes": [
+    "_internal",
+    "main"
+   ],
+   "lastSeen": "1793942522",
+   "source": "/opt/splunk/var/log/splunk/splunkd-utility.log"
   },
   {
-   "count": "203",
+   "count": "158",
    "indexes": "_internal",
-   "lastSeen": "1793936027",
-   "source": "/opt/splunk/var/log/splunk/supervisor.log"
-  },
-  {
-   "count": "130",
-   "indexes": "_internal",
-   "lastSeen": "1793937075",
+   "lastSeen": "1793942803",
    "source": "/opt/splunk/var/log/splunk/sup-pkg-identity-stdout.log"
   },
   {
@@ -116,49 +125,58 @@
    "source": "/opt/splunk/var/log/splunk/migration.log.2026-11-06.03-33-26"
   },
   {
-   "count": "125",
-   "indexes": [
-    "_internal",
-    "main"
-   ],
-   "lastSeen": "1793936014",
-   "source": "/opt/splunk/var/log/splunk/splunkd-utility.log"
-  },
-  {
-   "count": "98",
+   "count": "104",
    "indexes": "_internal",
-   "lastSeen": "1793937010",
+   "lastSeen": "1793937012",
    "source": "/opt/splunkforwarder/var/log/splunk/splunkd_access.log"
   },
   {
-   "count": "58",
+   "count": "70",
    "indexes": "_introspection",
-   "lastSeen": "1793937063",
+   "lastSeen": "1793942815",
    "source": "/opt/splunk/var/log/introspection/http_event_collector_metrics.log"
   },
   {
-   "count": "52",
+   "count": "70",
    "indexes": "_internal",
-   "lastSeen": "1793936700",
+   "lastSeen": "1793942561",
    "source": "/opt/splunk/var/log/splunk/scheduler.log"
+  },
+  {
+   "count": "36",
+   "indexes": "_internal",
+   "lastSeen": "1793942481",
+   "source": "/opt/splunkforwarder/var/log/splunk/splunkd-utility.log"
+  },
+  {
+   "count": "28",
+   "indexes": "_internal",
+   "lastSeen": "1793942533",
+   "source": "/opt/splunk/var/log/splunk/sup-pkg-agent-manager-stdout.log"
+  },
+  {
+   "count": "22",
+   "indexes": "_dsphonehome",
+   "lastSeen": "1793942818",
+   "source": "/opt/splunk/var/log/client_events/phonehomes_93D348A9-E8C3-401C-9360-FD5FFB5B0B89.log"
   },
   {
    "count": "21",
    "indexes": "_internal",
-   "lastSeen": "1793936026",
-   "source": "/opt/splunk/var/log/splunk/sup-pkg-agent-manager-stdout.log"
+   "lastSeen": "1793942774",
+   "source": "/opt/splunk/var/log/splunk/license_usage.log"
   },
   {
-   "count": "16",
+   "count": "21",
    "indexes": "_internal",
-   "lastSeen": "1793937054",
-   "source": "/opt/splunk/var/log/splunk/license_usage.log"
+   "lastSeen": "1793942538",
+   "source": "/opt/splunk/var/log/watchdog/watchdog.log"
   },
   {
    "count": "15",
    "indexes": "_internal",
-   "lastSeen": "1793936512",
-   "source": "/opt/splunk/var/log/watchdog/watchdog.log"
+   "lastSeen": "1793942533",
+   "source": "/opt/splunk/var/log/splunk/splunk_shc_upgrade_completion_script.log"
   },
   {
    "count": "15",
@@ -167,40 +185,40 @@
    "source": "/opt/splunkforwarder/var/log/splunk/splunkd_stdout.log"
   },
   {
-   "count": "13",
-   "indexes": "_dsphonehome",
-   "lastSeen": "1793936998",
-   "source": "/opt/splunk/var/log/client_events/phonehomes_93D348A9-E8C3-401C-9360-FD5FFB5B0B89.log"
-  },
-  {
    "count": "12",
-   "indexes": "_internal",
-   "lastSeen": "1793936026",
-   "source": "/opt/splunk/var/log/splunk/splunk_shc_upgrade_completion_script.log"
-  },
-  {
-   "count": "12",
-   "indexes": "_internal",
-   "lastSeen": "1793936793",
-   "source": "/opt/splunkforwarder/var/log/splunk/splunkd-utility.log"
-  },
-  {
-   "count": "11",
    "indexes": "_introspection",
-   "lastSeen": "1793936624",
+   "lastSeen": "1793937224",
    "source": "telemetry_api"
   },
   {
-   "count": "4",
+   "count": "6",
    "indexes": "_dsappevent",
-   "lastSeen": "1793936788",
+   "lastSeen": "1793942788",
    "source": "/opt/splunk/var/log/client_events/appevents_93D348A9-E8C3-401C-9360-FD5FFB5B0B89.log"
   },
   {
-   "count": "4",
+   "count": "6",
    "indexes": "_internal",
-   "lastSeen": "1793936024",
+   "lastSeen": "1793942530",
    "source": "/opt/splunk/var/log/splunk/conf.log"
+  },
+  {
+   "count": "6",
+   "indexes": "_internal",
+   "lastSeen": "1793942523",
+   "source": "/opt/splunk/var/log/splunk/splunkd_stderr.log"
+  },
+  {
+   "count": "6",
+   "indexes": "_internal",
+   "lastSeen": "1793942481",
+   "source": "/opt/splunkforwarder/var/log/watchdog/watchdog.log"
+  },
+  {
+   "count": "5",
+   "indexes": "_dsclient",
+   "lastSeen": "1793942542",
+   "source": "/opt/splunk/var/log/client_events/clients_93D348A9-E8C3-401C-9360-FD5FFB5B0B89.log"
   },
   {
    "count": "4",
@@ -217,44 +235,50 @@
   {
    "count": "4",
    "indexes": "_internal",
-   "lastSeen": "1793936015",
-   "source": "/opt/splunk/var/log/splunk/splunkd_stderr.log"
-  },
-  {
-   "count": "3",
-   "indexes": "_dsclient",
-   "lastSeen": "1793936815",
-   "source": "/opt/splunk/var/log/client_events/clients_93D348A9-E8C3-401C-9360-FD5FFB5B0B89.log"
-  },
-  {
-   "count": "3",
-   "indexes": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "source": "/opt/splunk/var/log/splunk/splunkd_ui_access.log"
   },
   {
-   "count": "3",
+   "count": "4",
    "indexes": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "source": "/opt/splunk/var/log/splunk/web_access.log"
   },
   {
-   "count": "3",
+   "count": "4",
    "indexes": "_internal",
-   "lastSeen": "1793937012",
+   "lastSeen": "1793942482",
+   "source": "/opt/splunkforwarder/var/log/splunk/scheduler.log"
+  },
+  {
+   "count": "4",
+   "indexes": "_internal",
+   "lastSeen": "1793942481",
    "source": "/opt/splunkforwarder/var/log/splunk/splunkd_stderr.log"
   },
   {
+   "count": "4",
+   "indexes": "_introspection",
+   "lastSeen": "1793937362",
+   "source": "http-stream"
+  },
+  {
    "count": "3",
-   "indexes": "_internal",
-   "lastSeen": "1793936793",
-   "source": "/opt/splunkforwarder/var/log/watchdog/watchdog.log"
+   "indexes": "_telemetry",
+   "lastSeen": "1793937376",
+   "source": "instrumentation_scripted_input"
   },
   {
    "count": "2",
    "indexes": "_introspection",
    "lastSeen": "1793930068",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/b9d540de1bac9d0a_1793930068.6_search_telemetry.json"
+  },
+  {
+   "count": "2",
+   "indexes": "_internal",
+   "lastSeen": "1793942482",
+   "source": "/opt/splunkforwarder/var/log/splunk/conf.log"
   },
   {
    "count": "2",
@@ -265,26 +289,14 @@
   {
    "count": "2",
    "indexes": "_internal",
-   "lastSeen": "1793936794",
-   "source": "/opt/splunkforwarder/var/log/splunk/scheduler.log"
+   "lastSeen": "1793942541",
+   "source": "/opt/splunkforwarder/var/log/splunk/health.log"
   },
   {
    "count": "2",
    "indexes": "summary_web",
    "lastSeen": "1793926800",
    "source": "Web - Hourly Status Summary"
-  },
-  {
-   "count": "2",
-   "indexes": "_introspection",
-   "lastSeen": "1793936761",
-   "source": "http-stream"
-  },
-  {
-   "count": "2",
-   "indexes": "_telemetry",
-   "lastSeen": "1793936774",
-   "source": "instrumentation_scripted_input"
   },
   {
    "count": "1",
@@ -319,8 +331,20 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937278",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/013c496d3749cc7e_1793937278.102_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930082",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/019e9e729636dd03_1793930082.8_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937279",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/0455f61ce6756302_1793937278.104_search_telemetry.json"
   },
   {
    "count": "1",
@@ -373,6 +397,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937101",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/0b16bbf546438f47_1793937101.83_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933294",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/0bbb2bd2087dd2de_1793933293.37_search_telemetry.json"
   },
@@ -381,6 +411,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793933294",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/0bd048819b0480dc_1793933294.38_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942786",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/0c219e80caf2efcf_1793942785.14_search_telemetry.json"
   },
   {
    "count": "1",
@@ -411,6 +447,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793930342",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/11eeb2bbb8aededf_1793930342.44_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942787",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/122fe3fdf6ff1cda_1793942786.18_search_telemetry.json"
   },
   {
    "count": "1",
@@ -481,6 +523,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937189",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/16d4003913b1b31f_1793937189.96_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930343",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/18759a237f884f0b_1793930342.46_search_telemetry.json"
   },
@@ -519,6 +567,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793936174",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/1e0932057b998777_1793936174.14_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942786",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/214c9f67d0bbe83f_1793942786.16_search_telemetry.json"
   },
   {
    "count": "1",
@@ -595,6 +649,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937279",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/2fbef29484404601_1793937279.107_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936700",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/30b362aa16686e85_scheduler__admin_YWNtZV9zZWNvcHM__RMD5951d4df69b4e1e8f_at_1793936700_1_search_telemetry.json"
   },
@@ -619,6 +679,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942786",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/31e02e7f1ac908f1_1793942786.17_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930311",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/32340437bfc45934_1793930311.30_search_telemetry.json"
   },
@@ -637,8 +703,20 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937188",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/36713538d07d444e_1793937188.90_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793932909",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/36f6b8fc2cc19cac_alertsmanager_1793932909.1_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937100",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/37c4bf8236dee271_1793937100.79_search_telemetry.json"
   },
   {
    "count": "1",
@@ -661,6 +739,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942788",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/3ca19609c95d77ad_DeploymentServer_1793942788.24_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793937037",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/3cb272ab3f7272d5_1793937037.44_search_telemetry.json"
   },
@@ -675,6 +759,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793937037",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/408ef4478598b740_1793937037.45_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937187",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/409ac982aebeb50f_1793937187.87_search_telemetry.json"
   },
   {
    "count": "1",
@@ -739,8 +829,38 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937362",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/4b59033c5d8afe05_1793937362.111_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937099",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/4cf5813703ad1712_1793937099.75_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930375",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/4d2a25c52f4db99e_1793930375.56_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942581",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/4d73914fe23e396a_1793942581.6_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942551",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/4e32e4c82ff09426_1793942551.2_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942561",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/4e38d087b396f714_scheduler__nobody_c3BsdW5rX21vbml0b3JpbmdfY29uc29sZQ__RMD54740dfff07b17ef1_at_1793942530_0_search_telemetry.json"
   },
   {
    "count": "1",
@@ -763,6 +883,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937102",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/5202567883f7c24a_1793937101.85_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933038",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/538a27b912e9b901_1793933038.17_search_telemetry.json"
   },
@@ -771,6 +897,18 @@
    "indexes": "_introspection",
    "lastSeen": "1793937074",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/54883da184d6f5c9_1793937074.69_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937100",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/54e0cb790dfcfee2_1793937100.80_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937189",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/55a98fda3368768a_1793937188.93_search_telemetry.json"
   },
   {
    "count": "1",
@@ -811,8 +949,20 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937363",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/59e2f6276c7bd9f9_1793937362.112_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793937039",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/5a32804bf16e6e35_1793937039.49_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937278",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/5b8e4cf467d4dd34_1793937278.101_search_telemetry.json"
   },
   {
    "count": "1",
@@ -835,6 +985,24 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937187",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/60bd31e7bcb797e7_1793937187.88_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937361",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/610a3e6a61520ed2_1793937361.108_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942787",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/6205e968e2877bef_1793942787.21_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930310",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/620c81675426f62a_1793930310.27_search_telemetry.json"
   },
@@ -847,8 +1015,32 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937277",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/65160aa6e74e584d_1793937277.99_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930355",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/66ab09cf8a95fffd_1793930354.48_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937098",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/676aedc0318537b1_1793937098.72_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942785",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/677d597c88546179_1793942784.13_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937098",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/69eeffe2b1c68e91_1793937098.70_search_telemetry.json"
   },
   {
    "count": "1",
@@ -859,8 +1051,26 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937189",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/6dda1b8f644484a4_DeploymentServer_1793937189.95_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793931421",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/6df1a2962ea1b310_1793931420.91_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937362",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/6e1635c9840fe583_1793937362.110_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942787",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/6e192f2636dabe7e_1793942787.20_search_telemetry.json"
   },
   {
    "count": "1",
@@ -879,6 +1089,18 @@
    "indexes": "_introspection",
    "lastSeen": "1793931630",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/6f9bbdf41dd18695_SummaryDirector_1793931630.92_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937278",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/70d6e33f2bfbab29_1793937278.103_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937188",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/71e0321204b3fd73_1793937188.92_search_telemetry.json"
   },
   {
    "count": "1",
@@ -931,6 +1153,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942788",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/7a91614a692a0639_1793942788.25_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936161",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/7ac5d953f23a6ae7_1793936160.12_search_telemetry.json"
   },
@@ -961,6 +1189,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942582",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/7fa6aadb7ffc3919_1793942581.9_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930186",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/803ed4c324b28634_1793930186.20_search_telemetry.json"
   },
@@ -975,6 +1209,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793933038",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/814bb5e7f8d0b694_1793933038.18_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942581",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/83d6bf1bcf388716_1793942581.7_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1045,6 +1285,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937279",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/8ef446b29bd2d2ec_1793937279.105_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933052",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/8f5ec329e161ea95_1793933052.23_search_telemetry.json"
   },
@@ -1071,6 +1317,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793930082",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/925c57064b2284a2_1793930082.9_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942576",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/92f7b4954b4dd0db_1793942576.3_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1105,6 +1357,24 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937187",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/99d6730012c5f48e_1793937187.86_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942541",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/99fec0fd2c8017ae_alertsmanager_1793942541.1_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937101",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/9a9ea3cd914a2302_DeploymentServer_1793937101.84_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793931421",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/9b4bc09bfbb8e443_scheduler__nobody_c3BsdW5rX2FyY2hpdmVy__RMD5473cbac83d6c9db7_at_1793931420_4_search_telemetry.json"
   },
@@ -1135,8 +1405,32 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942581",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/a48f33763585ec43_1793942581.5_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937363",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/a71e38aaf6c1d795_1793937363.113_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793931300",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/a8430952818749eb_scheduler__admin_YWNtZV9zZWNvcHM__RMD5951d4df69b4e1e8f_at_1793931300_3_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937188",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/aac08fd68edccf5a_1793937188.91_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942787",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/ab76b7e07b70b760_1793942787.22_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1177,8 +1471,32 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937100",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/b3b1d0a01caa3e39_1793937099.76_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936035",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/b4ebd1d0dcc6e02f_alertsmanager_1793936035.1_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937098",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/b531573f6e111853_1793937098.71_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937361",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/b5db7ef33b4f75be_1793937361.109_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937279",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/b6c20ff891534cc2_DeploymentServer_1793937279.106_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1189,8 +1507,26 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937187",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/b8eefcea6743d83b_1793937187.89_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933293",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/baeb0f1ba03b8def_1793933293.36_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942581",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/bb9229ec7af5a541_1793942581.8_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937277",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/bbdb5aa9d3560327_1793937277.97_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1219,6 +1555,18 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937100",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/c196a7e2583c2cad_1793937100.78_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942786",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/c237e378b2fa8277_1793942786.15_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933052",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/c25f379aeaf83259_1793933052.21_search_telemetry.json"
   },
@@ -1227,6 +1575,18 @@
    "indexes": "_introspection",
    "lastSeen": "1793933038",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/c6ddc2704fe5c559_1793933037.15_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942788",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/c84c112a24779179_1793942787.23_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942787",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/c91880ed317f9295_1793942787.19_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1245,6 +1605,18 @@
    "indexes": "_introspection",
    "lastSeen": "1793930409",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/caa9c9fe02503344_1793930409.74_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937101",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/cc164d2b756e03c1_1793937101.82_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937277",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/ceea2857973a55a7_1793937277.100_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1273,6 +1645,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942784",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/d4c7fe28f73231a8_1793942784.10_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936573",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/d532d125c2796c49_DeploymentServer_1793936572.22_search_telemetry.json"
   },
@@ -1285,14 +1663,32 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937100",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/d8018c65fd786ebe_1793937100.77_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793933054",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/d86a31641f15d4d6_1793933054.28_search_telemetry.json"
   },
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937277",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/da25cfef24e54903_1793937277.98_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936160",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/da902853e5282d07_1793936160.11_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937101",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/dbe1352272ba68f6_1793937100.81_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1315,6 +1711,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937189",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/e088a05e0fa195b6_1793937189.94_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793937056",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/e08f72df544afeae_DeploymentServer_1793937056.59_search_telemetry.json"
   },
@@ -1333,6 +1735,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937099",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/e103b4c29a925324_1793937099.74_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793936105",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/e17cdb09e17cf885_1793936105.5_search_telemetry.json"
   },
@@ -1341,6 +1749,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793936491",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/e19bcfb0316dd289_DeploymentServer_1793936491.15_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793937098",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/e29811f40353f3c6_1793937098.73_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1387,6 +1801,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942784",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/eb3ae4b51441cd58_1793942784.12_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930672",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/ed2abfa2ed4bba29_1793930672.84_search_telemetry.json"
   },
@@ -1405,6 +1825,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793942581",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/f16793d65a438b4a_1793942581.4_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930187",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/f22a44b8dfdb8428_1793930187.23_search_telemetry.json"
   },
@@ -1419,6 +1845,12 @@
    "indexes": "_introspection",
    "lastSeen": "1793930053",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/f5796b4bd80dbbe8_1793930053.4_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
+   "lastSeen": "1793942784",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/f6b7aad217ab2619_1793942784.11_search_telemetry.json"
   },
   {
    "count": "1",
@@ -1465,6 +1897,12 @@
   {
    "count": "1",
    "indexes": "_introspection",
+   "lastSeen": "1793937376",
+   "source": "/opt/splunk/var/run/splunk/search_telemetry/fdfa1675a58a5da0_1793937376.114_search_telemetry.json"
+  },
+  {
+   "count": "1",
+   "indexes": "_introspection",
    "lastSeen": "1793930395",
    "source": "/opt/splunk/var/run/splunk/search_telemetry/fe5ba1e9aed0e971_1793930394.64_search_telemetry.json"
   },
@@ -1477,8 +1915,8 @@
   {
    "count": "1",
    "indexes": "_internal",
-   "lastSeen": "1793936794",
-   "source": "/opt/splunkforwarder/var/log/splunk/conf.log"
+   "lastSeen": "1793942478",
+   "source": "/opt/splunkforwarder/var/log/splunk/migration.log.2026-11-06.05-21-17"
   }
  ],
  "spl": "| tstats count max(_time) as lastSeen where (index=* OR index=_*) by source, index | stats sum(count) as count max(lastSeen) as lastSeen values(index) as indexes by source | sort 0 - count | head 5000"

@@ -17,7 +17,9 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    the browser. **Open file** / **Open folder** load a local bundle without
    uploading it; `?bundle=<url>` loads a bundle from elsewhere.
 
-3. Descriptions, owners, tags, classifications and the glossary live in
+3. A **Coverage** page grades your detections against MITRE ATT&CK and the
+   CIM data models, and lists detections that cannot fire.
+4. Descriptions, owners, tags, classifications and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.
 
@@ -47,7 +49,7 @@ See [ingestion/README.md](ingestion/README.md) for all options.
 ```bash
 export SPLUNK_PASSWORD='choose-a-dev-password'
 docker compose -f deploy/docker-compose.yml up -d        # wait until healthy
-uv run --project ingestion python deploy/seed_dev_splunk.py   # sample content + API token
+uv run --project ingestion python deploy/seed_dev_splunk.py   # sample content + API token (uses docker exec for ES stand-in files)
 DELVECAT_SPLUNK_TOKEN=$(cat deploy/.dev-token) uv run --project ingestion \
   delvecat-ingest build --url https://localhost:8089 --insecure --instance dev \
   --deployment-apps-dir deploy/deployment-apps --out catalog.json

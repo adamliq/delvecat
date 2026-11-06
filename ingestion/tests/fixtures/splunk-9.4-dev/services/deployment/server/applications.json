@@ -22,12 +22,12 @@
    },
    "author": "system",
    "content": {
-    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793936762.bundle",
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793942576.bundle",
     "checksum": "16194101533353802738",
     "eai:acl": null,
     "excludeFromUpdate": "",
     "issueReload": false,
-    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "loadtime": "Fri Nov  6 05:22:56 2026",
     "restartIfNeeded": false,
     "restartSplunkWeb": false,
     "restartSplunkd": true,
@@ -66,12 +66,12 @@
    },
    "author": "system",
    "content": {
-    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793936762.bundle",
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793942576.bundle",
     "checksum": "5019075835286561291",
     "eai:acl": null,
     "excludeFromUpdate": "",
     "issueReload": false,
-    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "loadtime": "Fri Nov  6 05:22:56 2026",
     "restartIfNeeded": false,
     "restartSplunkWeb": false,
     "restartSplunkd": true,
@@ -110,12 +110,12 @@
    },
    "author": "system",
    "content": {
-    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_web_inputs-1793936762.bundle",
+    "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_web_inputs-1793942576.bundle",
     "checksum": "3727375036806695942",
     "eai:acl": null,
     "excludeFromUpdate": "",
     "issueReload": false,
-    "loadtime": "Fri Nov  6 03:46:02 2026",
+    "loadtime": "Fri Nov  6 05:22:56 2026",
     "restartIfNeeded": false,
     "restartSplunkWeb": false,
     "restartSplunkd": true,
@@ -142,5 +142,5 @@
   "offset": 0,
   "total": 3
  },
- "updated": "2026-11-06T03:51:41+00:00"
+ "updated": "2026-11-06T05:27:15+00:00"
 }

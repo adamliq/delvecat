@@ -2,16 +2,16 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "actions_triggered",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "10",
+   "count": "9",
    "distinct_count": "1",
    "field": "active",
-   "numeric_count": "10"
+   "numeric_count": "9"
   },
   {
    "count": "9",
@@ -26,28 +26,28 @@
    "numeric_count": "9"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "alert_cycle_max",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "alert_cycle_total",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "alert_cycles",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "212",
-   "distinct_count": "81",
+   "count": "189",
+   "distinct_count": "68",
    "field": "avg_age",
-   "numeric_count": "212"
+   "numeric_count": "189"
   },
   {
    "count": "9",
@@ -56,34 +56,40 @@
    "numeric_count": "9"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "bundles",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "184",
-   "distinct_count": "1",
+   "count": "182",
+   "distinct_count": "3",
    "field": "color",
    "numeric_count": "0"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "completed",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
    "count": "1000",
-   "distinct_count": "6",
+   "distinct_count": "14",
    "field": "component",
    "numeric_count": "0"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "2",
    "field": "concurrency",
-   "numeric_count": "7"
+   "numeric_count": "6"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "confkey",
+   "numeric_count": "0"
   },
   {
    "count": "21",
@@ -92,10 +98,10 @@
    "numeric_count": "21"
   },
   {
-   "count": "119",
-   "distinct_count": "7",
+   "count": "98",
+   "distinct_count": "9",
    "field": "current_size",
-   "numeric_count": "119"
+   "numeric_count": "98"
   },
   {
    "count": "1000",
@@ -123,7 +129,7 @@
   },
   {
    "count": "1000",
-   "distinct_count": "14",
+   "distinct_count": "15",
    "field": "date_second",
    "numeric_count": "1000"
   },
@@ -146,82 +152,88 @@
    "numeric_count": "1000"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "delayed",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_advance_next_runtime",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_auto_summary_updates",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_determine_can_run",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_dispatch_job",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_get_next_runtime",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_update_logging",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "disp_window_lag_calc",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "dispatched",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "111",
+   "distinct_count": "16",
+   "field": "due_to_stanza",
+   "numeric_count": "0"
+  },
+  {
+   "count": "6",
    "distinct_count": "1",
    "field": "dutycycle_control",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "dutycycle_launching",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "dutycycle_reaping",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "1",
+   "count": "6",
+   "distinct_count": "2",
    "field": "eligible",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
    "count": "9",
@@ -230,43 +242,43 @@
    "numeric_count": "9"
   },
   {
-   "count": "212",
-   "distinct_count": "100",
+   "count": "189",
+   "distinct_count": "76",
    "field": "eps",
-   "numeric_count": "212"
+   "numeric_count": "189"
   },
   {
-   "count": "258",
-   "distinct_count": "120",
+   "count": "244",
+   "distinct_count": "111",
    "field": "ev",
-   "numeric_count": "258"
+   "numeric_count": "244"
   },
   {
    "count": "1000",
-   "distinct_count": "647",
+   "distinct_count": "646",
    "field": "event_message",
    "numeric_count": "0"
   },
   {
-   "count": "11",
+   "count": "21",
    "distinct_count": "1",
    "field": "eventtype",
    "numeric_count": "0"
   },
   {
-   "count": "176",
+   "count": "175",
    "distinct_count": "22",
    "field": "feature",
    "numeric_count": "0"
   },
   {
-   "count": "7",
-   "distinct_count": "4",
+   "count": "6",
+   "distinct_count": "2",
    "field": "generation",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "802",
+   "count": "793",
    "distinct_count": "49",
    "field": "group",
    "numeric_count": "0"
@@ -278,10 +290,10 @@
    "numeric_count": "0"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "idle",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
    "count": "1000",
@@ -290,40 +302,28 @@
    "numeric_count": "0"
   },
   {
-   "count": "26",
-   "distinct_count": "19",
-   "field": "instantaneous_eps",
-   "numeric_count": "26"
-  },
-  {
-   "count": "26",
-   "distinct_count": "20",
-   "field": "instantaneous_kbps",
-   "numeric_count": "26"
-  },
-  {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "jobs_added",
-   "numeric_count": "42"
+   "numeric_count": "36"
   },
   {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "jobs_finished",
-   "numeric_count": "42"
+   "numeric_count": "36"
   },
   {
-   "count": "255",
-   "distinct_count": "162",
+   "count": "236",
+   "distinct_count": "136",
    "field": "kb",
-   "numeric_count": "255"
+   "numeric_count": "236"
   },
   {
-   "count": "212",
-   "distinct_count": "118",
+   "count": "189",
+   "distinct_count": "95",
    "field": "kbps",
-   "numeric_count": "212"
+   "numeric_count": "189"
   },
   {
    "count": "9",
@@ -332,10 +332,10 @@
    "numeric_count": "9"
   },
   {
-   "count": "114",
+   "count": "92",
    "distinct_count": "32",
    "field": "largest_size",
-   "numeric_count": "114"
+   "numeric_count": "92"
   },
   {
    "count": "1000",
@@ -344,94 +344,94 @@
    "numeric_count": "1000"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "load_auto_summarized",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "2",
    "field": "load_cycles",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "3",
    "field": "load_deferred_calculation",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "load_dma",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "1",
+   "count": "6",
+   "distinct_count": "2",
    "field": "load_priority_calculation",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "4",
+   "count": "6",
+   "distinct_count": "3",
    "field": "load_saved_searches",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "4",
+   "count": "6",
+   "distinct_count": "3",
    "field": "load_search_cycle_max",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "4",
+   "count": "6",
+   "distinct_count": "3",
    "field": "load_search_cycle_total",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
    "count": "1000",
-   "distinct_count": "1",
+   "distinct_count": "3",
    "field": "log_level",
    "numeric_count": "0"
   },
   {
-   "count": "212",
-   "distinct_count": "2",
+   "count": "189",
+   "distinct_count": "5",
    "field": "max_age",
-   "numeric_count": "212"
+   "numeric_count": "189"
   },
   {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "max_idle_workers",
-   "numeric_count": "42"
+   "numeric_count": "36"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "max_lag",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "max_running",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "max_runtime",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "47",
+   "count": "43",
    "distinct_count": "3",
    "field": "max_size",
-   "numeric_count": "47"
+   "numeric_count": "43"
   },
   {
    "count": "9",
@@ -440,14 +440,26 @@
    "numeric_count": "9"
   },
   {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "max_workers",
-   "numeric_count": "42"
+   "numeric_count": "36"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "metrics_interval",
+   "numeric_count": "0"
+  },
+  {
+   "count": "1",
+   "distinct_count": "1",
+   "field": "metrics_module",
+   "numeric_count": "0"
   },
   {
    "count": "9",
-   "distinct_count": "3",
+   "distinct_count": "2",
    "field": "mgmt_httpd",
    "numeric_count": "9"
   },
@@ -458,202 +470,190 @@
    "numeric_count": "9"
   },
   {
-   "count": "423",
-   "distinct_count": "51",
+   "count": "360",
+   "distinct_count": "47",
    "field": "name",
    "numeric_count": "0"
   },
   {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "new_workers",
-   "numeric_count": "42"
+   "numeric_count": "36"
   },
   {
-   "count": "184",
-   "distinct_count": "23",
-   "field": "node_path",
-   "numeric_count": "0"
-  },
-  {
-   "count": "184",
-   "distinct_count": "3",
+   "count": "177",
+   "distinct_count": "4",
    "field": "node_type",
    "numeric_count": "0"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "periodic_reaper_wakeups",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "3",
+   "count": "6",
+   "distinct_count": "2",
    "field": "processes_created",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_exited",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reaped_accumulated_time",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "3",
+   "count": "6",
+   "distinct_count": "2",
    "field": "processes_reaped_after_control",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reaped_ran_too_long",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reaped_ran_too_many_searches",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reaped_surplus",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reaped_with_old_bundle",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "3",
+   "count": "6",
+   "distinct_count": "2",
    "field": "processes_reaped_with_old_config",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "processes_reused_different_user",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
-   "distinct_count": "4",
+   "count": "6",
+   "distinct_count": "2",
    "field": "processes_reused_same_user",
-   "numeric_count": "7"
-  },
-  {
-   "count": "8",
-   "distinct_count": "1",
-   "field": "product",
-   "numeric_count": "0"
+   "numeric_count": "6"
   },
   {
    "count": "1000",
-   "distinct_count": "64",
+   "distinct_count": "91",
    "field": "punct",
    "numeric_count": "0"
   },
   {
-   "count": "47",
-   "distinct_count": "18",
+   "count": "35",
+   "distinct_count": "15",
    "field": "ratio",
-   "numeric_count": "47"
+   "numeric_count": "35"
   },
   {
-   "count": "42",
+   "count": "36",
    "distinct_count": "1",
    "field": "reaped_workers",
-   "numeric_count": "42"
+   "numeric_count": "36"
   },
   {
    "count": "9",
-   "distinct_count": "3",
+   "distinct_count": "2",
    "field": "reaper",
    "numeric_count": "9"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "2",
    "field": "saved_search_fetcher",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "savedsplunker",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "schedule_search_cycle_max",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "schedule_search_cycle_total",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "4",
    "field": "scheduler_cycle_max",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "4",
    "field": "scheduler_cycle_total",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "2",
    "field": "scheduler_cycles",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "309",
-   "distinct_count": "52",
+   "count": "358",
+   "distinct_count": "48",
    "field": "series",
    "numeric_count": "0"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "size",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "skipped",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "skipped_dma_ra",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "114",
+   "count": "92",
    "distinct_count": "1",
    "field": "smallest_size",
-   "numeric_count": "114"
+   "numeric_count": "92"
   },
   {
    "count": "1000",
@@ -686,20 +686,20 @@
    "numeric_count": "9"
   },
   {
-   "count": "47",
-   "distinct_count": "10",
+   "count": "35",
+   "distinct_count": "8",
    "field": "thread",
    "numeric_count": "0"
   },
   {
-   "count": "11",
-   "distinct_count": "2",
+   "count": "21",
+   "distinct_count": "7",
    "field": "thread_id",
-   "numeric_count": "11"
+   "numeric_count": "21"
   },
   {
-   "count": "11",
-   "distinct_count": "2",
+   "count": "21",
+   "distinct_count": "6",
    "field": "thread_name",
    "numeric_count": "0"
   },
@@ -716,16 +716,16 @@
    "numeric_count": "1000"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "total_lag",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "total_runtime",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
    "count": "9",
@@ -734,16 +734,16 @@
    "numeric_count": "9"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "window_max_lag",
-   "numeric_count": "7"
+   "numeric_count": "6"
   },
   {
-   "count": "7",
+   "count": "6",
    "distinct_count": "1",
    "field": "window_total_lag",
-   "numeric_count": "7"
+   "numeric_count": "6"
   }
  ],
  "spl": "(index=* OR index=_*) sourcetype=\"splunkd\" | head 1000 | fieldsummary maxvals=0 | fields field count distinct_count numeric_count"

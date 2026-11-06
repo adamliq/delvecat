@@ -11,6 +11,7 @@ from typing import Any
 from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
+from .attribute import attribute_products
 from .lineage import derive, record_unresolved
 from .link import link_hosts
 from .model import ExtractResult
@@ -116,6 +117,7 @@ def assemble(
     ts = (generated_at or datetime.now(UTC)).astimezone(UTC).replace(microsecond=0)
     generated = ts.isoformat().replace("+00:00", "Z")
     entities = merge_entities(result.entities)
+    attribute_products(entities)
     spl_refs = derive(entities)
     result.edges.extend(link_hosts(entities))
     resolved, unresolved = Resolver(entities).resolve([*result.refs, *spl_refs])

@@ -1,0 +1,6 @@
+{"count": 4, "num_pages": 1, "data": [
+  {"id": 201, "name": "brute_force_response", "scm_name": "local", "category": "Credential Access", "labels": ["brute_force"], "tags": ["identity"], "active": true, "playbook_type": "automation", "python_version": "3", "version": 4, "description": "Lock the account and block the source IP.", "update_time": "2026-10-28T09:15:00.000Z"},
+  {"id": 202, "name": "malware_triage", "scm_name": "community", "category": "Malware", "labels": ["malware", "events"], "active": true, "playbook_type": "automation", "python_version": "3", "version": 2, "description": "Enrich hashes and quarantine the endpoint."},
+  {"id": 203, "name": "enrich_everything", "scm_name": "local", "labels": ["*"], "active": false, "playbook_type": "automation", "python_version": "3"},
+  {"id": 204, "name": "notify_owner", "scm_name": "local", "labels": [], "active": true, "playbook_type": "input", "python_version": "3", "description": "Sub-playbook: emails the asset owner."}
+]}

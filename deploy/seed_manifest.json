@@ -321,5 +321,87 @@
   {
     "type": "streamGroup",
     "name": "dmz_sensors"
+  },
+  {
+    "type": "index",
+    "name": "notable"
+  },
+  {
+    "type": "index",
+    "name": "risk"
+  },
+  {
+    "type": "adaptiveResponseAction",
+    "name": "notable"
+  },
+  {
+    "type": "adaptiveResponseAction",
+    "name": "risk"
+  },
+  {
+    "type": "adaptiveResponseAction",
+    "name": "correlationsearch"
+  },
+  {
+    "type": "adaptiveResponseAction",
+    "name": "sendtophantom"
+  },
+  {
+    "type": "dataModel",
+    "name": "Authentication",
+    "app": "Splunk_SA_CIM"
+  },
+  {
+    "type": "dataModel",
+    "name": "Network_Traffic",
+    "app": "Splunk_SA_CIM"
+  },
+  {
+    "type": "tag",
+    "name": "communicate"
+  },
+  {
+    "type": "correlationSearch",
+    "name": "ESCU - Brute Force Access Behavior Detected",
+    "app": "DA-ESS-ContentUpdate"
+  },
+  {
+    "type": "correlationSearch",
+    "name": "ESCU - Rare Outbound Port Traffic",
+    "app": "DA-ESS-ContentUpdate"
+  },
+  {
+    "type": "correlationSearch",
+    "name": "ESCU - Suspicious PowerShell Execution",
+    "app": "DA-ESS-ContentUpdate"
+  },
+  {
+    "type": "correlationSearch",
+    "name": "Access - Excessive Failed Logins - Rule",
+    "app": "SplunkEnterpriseSecuritySuite"
+  },
+  {
+    "type": "analyticStory",
+    "name": "Credential Access via Brute Force"
+  },
+  {
+    "type": "analyticStory",
+    "name": "Command and Control"
+  },
+  {
+    "type": "analyticStory",
+    "name": "Malicious PowerShell"
+  },
+  {
+    "type": "threatIntelSource",
+    "name": "acme_blocklist"
+  },
+  {
+    "type": "threatIntelSource",
+    "name": "open_phish"
+  },
+  {
+    "type": "assetIdentitySource",
+    "name": "acme_assets"
   }
 ]

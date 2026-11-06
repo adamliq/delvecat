@@ -1,0 +1,3 @@
+{"__list__": [
+  {"name": "Enterprise Security", "type": "ES", "enabled": true, "index": "notable", "sends": ["threats"]}
+]}

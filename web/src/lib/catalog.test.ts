@@ -85,7 +85,9 @@ describe("helpers", () => {
     expect(typeLabel("savedSearch")).toBe("Saved Search");
     expect(typeLabel("soarPlaybook")).toBe("SOAR Playbook");
     expect(pluralTypeLabel("index")).toBe("Indexes");
-    expect(pluralTypeLabel("correlationSearch")).toBe("Correlation Searches");
+    expect(pluralTypeLabel("correlationSearch")).toBe("Detections");
+    expect(pluralTypeLabel("macro")).toBe("Macros");
+    expect(pluralTypeLabel("savedSearch")).toBe("Saved Searches");
     expect(pluralTypeLabel("dashboard")).toBe("Dashboards");
   });
   it("lets ?bundle= override the bundle url", () => {

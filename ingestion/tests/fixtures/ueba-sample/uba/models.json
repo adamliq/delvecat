@@ -1,0 +1,4 @@
+{"__list__": [
+  {"name": "Unusual Logon Activity", "type": "streaming", "enabled": true, "description": "Learns normal logon patterns per user.", "dataSources": ["Windows Security (Splunk Direct)"], "anomalyTypes": ["Unusual Logon Time", "Excessive Failed Logins"]},
+  {"name": "Beaconing Detection", "type": "batch", "enabled": true, "dataSources": ["Perimeter Firewall"], "anomalyTypes": ["Beaconing Activity"]}
+]}

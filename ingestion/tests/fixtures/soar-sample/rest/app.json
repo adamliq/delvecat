@@ -1,0 +1,5 @@
+{"count": 3, "num_pages": 1, "data": [
+  {"id": 101, "name": "Splunk", "appid": "91883aa8-9c81-470b-97a1-5d8f7995f560", "product_vendor": "Splunk Inc.", "product_name": "Splunk Enterprise", "app_version": "2.18.0", "publisher": "Splunk", "type": "siem", "enabled": true, "description": "Run searches and send events to Splunk."},
+  {"id": 102, "name": "Palo Alto Networks Firewall", "appid": "c6b7f5b2-0000-4d1c-8c2e-123456789abc", "product_vendor": "Palo Alto Networks", "product_name": "Firewall", "app_version": "3.1.2", "publisher": "Splunk", "type": "firewall", "enabled": true},
+  {"id": 103, "name": "Active Directory LDAP", "appid": "a0b1c2d3-0000-4e5f-8a9b-abcdefabcdef", "product_vendor": "Microsoft", "product_name": "Active Directory", "app_version": "2.4.0", "publisher": "Splunk", "type": "directory", "enabled": true}
+]}

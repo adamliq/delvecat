@@ -1,0 +1,4 @@
+{"__list__": [
+  {"name": "Compromised Account", "enabled": true, "threatType": "Account Takeover", "anomalyTypes": ["Unusual Logon Time", "Excessive Failed Logins"], "score": 8},
+  {"name": "Malware Beaconing", "enabled": true, "threatType": "Malware", "anomalyTypes": ["Beaconing Activity"], "score": 7}
+]}

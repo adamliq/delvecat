@@ -1,0 +1,5 @@
+{"count": 3, "num_pages": 1, "data": [
+  {"id": 11, "name": "es_search_head", "app": 101, "product_vendor": "Splunk Inc.", "product_name": "Splunk Enterprise", "type": "siem", "description": "Enterprise Security search head", "tags": ["prod"], "configuration": {"device": "es.example.com", "username": "soar_svc", "password": "SHOULD-NEVER-APPEAR"}},
+  {"id": 12, "name": "edge_firewall", "app": 102, "product_vendor": "Palo Alto Networks", "product_name": "Firewall", "type": "firewall", "description": "Perimeter firewall for block actions", "tags": ["prod", "network"], "configuration": {"device": "fw.example.com", "api_key": "SHOULD-NEVER-APPEAR"}},
+  {"id": 13, "name": "corp_ad", "app": 103, "product_vendor": "Microsoft", "product_name": "Active Directory", "type": "directory", "disabled": true, "configuration": {"server": "dc01.example.com"}}
+]}

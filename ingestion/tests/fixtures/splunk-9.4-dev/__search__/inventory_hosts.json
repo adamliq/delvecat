@@ -15,7 +15,7 @@
    "lastSeen": "1793933610"
   },
   {
-   "count": "11052",
+   "count": "21985",
    "host": "splunk",
    "indexes": [
     "_audit",
@@ -28,17 +28,17 @@
     "_telemetry",
     "main"
    ],
-   "lastSeen": "1793937095"
+   "lastSeen": "1793942830"
   },
   {
-   "count": "1312",
+   "count": "2269",
    "host": "uf-linux-01",
    "indexes": [
     "_configtracker",
     "_internal",
     "os"
    ],
-   "lastSeen": "1793937012"
+   "lastSeen": "1793942818"
   },
   {
    "count": "80",
@@ -71,10 +71,10 @@
    "lastSeen": "1793936105"
   },
   {
-   "count": "2",
+   "count": "4",
    "host": "127.0.0.1",
    "indexes": "_introspection",
-   "lastSeen": "1793936761"
+   "lastSeen": "1793937362"
   }
  ],
  "spl": "| tstats count max(_time) as lastSeen where (index=* OR index=_*) by host, index | stats sum(count) as count max(lastSeen) as lastSeen values(index) as indexes by host | sort 0 - count | head 5000"

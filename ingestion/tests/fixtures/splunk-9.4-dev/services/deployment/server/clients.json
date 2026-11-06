@@ -25,7 +25,7 @@
     "applications": {
      "acme_all_outputs": {
       "action": "Install",
-      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793936762.bundle",
+      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_all_outputs-1793942576.bundle",
       "checksum": "16194101533353802738",
       "excludeFromUpdate": "",
       "failedReason": "''",
@@ -39,14 +39,14 @@
       ],
       "size": "10240",
       "stateOnClient": "enabled",
-      "timestamp": "Fri Nov  6 03:46:28 2026"
+      "timestamp": "Fri Nov  6 05:26:28 2026"
      },
      "acme_linux_inputs": {
-      "action": "Unknown",
-      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793936762.bundle",
-      "checksum": "0",
+      "action": "Install",
+      "archive": "/opt/splunk/var/run/tmp/_global_bundles/acme_linux_inputs-1793942576.bundle",
+      "checksum": "5019075835286561291",
       "excludeFromUpdate": "",
-      "failedReason": "",
+      "failedReason": "''",
       "issueReload": false,
       "restartIfNeeded": false,
       "restartSplunkWeb": false,
@@ -56,7 +56,8 @@
        "linux_hosts"
       ],
       "size": "10240",
-      "stateOnClient": "enabled"
+      "stateOnClient": "enabled",
+      "timestamp": "Fri Nov  6 05:26:28 2026"
      }
     },
     "averagePhoneHomeInterval": 30,
@@ -70,7 +71,7 @@
     "instanceId": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
     "instanceName": "uf-linux-01",
     "ip": "172.18.0.3",
-    "lastPhoneHomeTime": 1793936998,
+    "lastPhoneHomeTime": 1793942818,
     "mgmt": "8089",
     "name": "CD93342B-03EB-4531-8E8B-E9D3D89DD71F",
     "package": "universal_forwarder",
@@ -79,7 +80,7 @@
      "all_forwarders": {
       "excludeFromUpdate": "",
       "issueReload": false,
-      "loadTime": 1793936762,
+      "loadTime": 1793942576,
       "repositoryLocation": "/opt/delvecat-deployment-apps",
       "restartIfNeeded": false,
       "restartSplunkWeb": false,
@@ -89,7 +90,7 @@
      "linux_hosts": {
       "excludeFromUpdate": "",
       "issueReload": false,
-      "loadTime": 1793936762,
+      "loadTime": 1793942576,
       "repositoryLocation": "/opt/delvecat-deployment-apps",
       "restartIfNeeded": false,
       "restartSplunkWeb": false,
@@ -119,5 +120,5 @@
   "offset": 0,
   "total": 1
  },
- "updated": "2026-11-06T03:51:41+00:00"
+ "updated": "2026-11-06T05:27:15+00:00"
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { DataSources } from "../components/DataSources";
+import { DetectionPanel } from "../components/DetectionPanel";
+import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LineageTab } from "../components/LineageTab";
@@ -70,7 +72,8 @@ export function EntityPage() {
 
   const { observed, ...props } = (entity.properties ?? {}) as Record<string, unknown>;
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
-  const rest = Object.entries(props).filter(([k]) => !(k in CODE));
+  const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
+  const rest = Object.entries(props).filter(([k]) => !(k in CODE) && !(isDetection(entity) && DETECTION_KEYS.has(k)));
   const groups = relationGroups(catalog, entity.id);
   const relCount = groups.reduce((n, g) => n + g.entities.length, 0);
   const fields = fieldsTable(catalog, entity);
@@ -154,6 +157,8 @@ export function EntityPage() {
               </>
             )}
           </dl>
+
+          {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
 
           {(entity.type === "index" || entity.type === "sourcetype") && (
             <DataSources catalog={catalog} entity={entity} />

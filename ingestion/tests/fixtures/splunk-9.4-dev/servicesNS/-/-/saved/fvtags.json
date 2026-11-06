@@ -47,7 +47,7 @@
     "remove": "/servicesNS/nobody/acme_secops/saved/fvtags/eventtype%3Dacme_failed_login"
    },
    "name": "eventtype=acme_failed_login",
-   "updated": "2026-11-06T03:35:03+00:00"
+   "updated": "2026-11-06T05:23:01+00:00"
   },
   {
    "acl": {
@@ -78,9 +78,11 @@
     "eai:acl": null,
     "eai:appName": "TA-acme-firewall",
     "eai:userName": "nobody",
+    "tag.communicate": "communicate",
     "tag.firewall": "firewall",
     "tag.network": "network",
     "tags": [
+     "communicate",
      "firewall",
      "network"
     ]
@@ -94,7 +96,7 @@
     "list": "/servicesNS/nobody/TA-acme-firewall/saved/fvtags/sourcetype%3Dacme%3Afw"
    },
    "name": "sourcetype=acme:fw",
-   "updated": "2026-11-06T03:35:03+00:00"
+   "updated": "2026-11-06T05:23:01+00:00"
   }
  ],
  "generator": {
@@ -106,5 +108,5 @@
   "offset": 0,
   "total": 2
  },
- "updated": "2026-11-06T03:51:39+00:00"
+ "updated": "2026-11-06T05:27:12+00:00"
 }

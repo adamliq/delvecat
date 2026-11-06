@@ -48,6 +48,9 @@ Objects that reference something missing or not shared get
 |---|---|---|
 | Deployment Server | `deployment/server/{serverclasses,applications,clients}`, `configs/conf-serverclass`, optional deployment-apps folder | verified against Splunk 9.4 with a real universal forwarder |
 | DB Connect | `configs/conf-{identities,db_connections,db_inputs,db_outputs,db_lookups}` in `splunk_app_db_connect` | identity user names and passwords are never collected; key names follow DB Connect 3.x docs and should be checked against your version |
+| Enterprise Security | saved searches (`action.correlationsearch.*`, `action.escu.*`), `alerts/alert_actions`, `configs/conf-inputs` (`threatlist://`, `identity_manager://`), `configs/conf-analyticstories` | verified against ES-format content in a dev Splunk |
+| SOAR (`--soar-url`, token in `DELVECAT_SOAR_TOKEN`) | `/rest/{version,app,asset,playbook,custom_function}` | asset configuration is never read; sample responses only so far |
+| UEBA (`--ueba-url`, token in `DELVECAT_UEBA_TOKEN`) | UBA REST, paths overridable with `--ueba-path kind=/path` | **unverified** paths and fields |
 | Stream | KV store collections `streams`, `streamforwardergroups` in `splunk_app_stream`; forwarders from `stream:*` data | document fields follow the Stream app and should be checked against your version |
 
 Machines are tied to the `host` values in the data by hostname (case-insensitive,

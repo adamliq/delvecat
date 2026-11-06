@@ -192,7 +192,7 @@ are confirmed against a live instance before their connector ships.
 | **2. UI MVP + annotations** ✅ | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
 | **3. SPL lineage** ✅ | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
 | **4. Ingestion products** ✅ | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
-| **5. Security suite** | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
+| **5. Security suite** ✅ | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
 | **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
 | **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
 | Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
@@ -310,6 +310,40 @@ are confirmed against a live instance before their connector ships.
 - To verify on real installs: DB Connect key names across versions, Stream KV
   document fields. Deferred: combining bundles from several instances (the DS,
   heavy forwarders and search heads) into one catalog.
+
+### Phase 5 notes (done)
+
+- **Enterprise Security** (verified against ES-format content in the dev
+  Splunk, since ES is configuration): saved searches with
+  `action.correlationsearch.*` (or ESCU `action.escu.*`) become
+  `correlationSearch` detections with ATT&CK techniques, kill chain, CIS/NIST,
+  analytic stories, security domain, severity and risk objects. Detections
+  write to `notable` / `risk`, trigger their alert actions, and name SOAR
+  labels or playbooks through SOAR-bound alert action parameters. Alert
+  actions, threat intel sources (`threatlist://`), asset & identity sources
+  (`identity_manager://`, linked to their lookups) and ESCU analytic stories
+  are catalogued. Objects in ES, SOAR, ARI and UEBA apps are attributed to
+  their product.
+- **SOAR** (`--soar-url`, `ph-auth-token`): apps, assets (configuration never
+  read), playbooks with their labels, custom functions; label → playbook
+  edges complete the chain detection → SOAR label → playbook. Built against
+  the documented REST API with sample responses; not yet run against a live
+  SOAR server.
+- **UEBA** (`--ueba-url`): data sources → models → anomaly types → threat
+  rules → output connectors → index. Endpoint paths and fields are a best
+  reading of the UBA documentation, overridable with `--ueba-path`, and
+  **unverified**.
+- **Asset and Risk Intelligence**: objects in ARI's apps are attributed to
+  the product and get platform lineage; dedicated ARI entity types wait for a
+  real install to confirm its data model.
+- **Coverage** page: ATT&CK Enterprise matrix (bundled reference data, v20.1,
+  compiled by `ingestion/tools/compile_attack.py`) graded covered / weak /
+  gap with sub-techniques rolled up; detections that cannot fire (disabled,
+  broken reference, no data upstream); CIM data models the detections rely on
+  (missing, no data, accelerated). Detection pages show ATT&CK, stories and
+  the response chain.
+- Credentials embedded in URLs (`https://user:pass@host`) are stripped
+  everywhere.
 
 ## 8. Repository layout
 

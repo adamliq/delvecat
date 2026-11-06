@@ -119,11 +119,13 @@ class HttpTransport:
         retries: int = 3,
         splunk_json: bool = True,
         backoff: float = 2.0,
+        auth_header: str = "Authorization",
+        auth_prefix: str = "Bearer ",
         http_transport: httpx.BaseTransport | None = None,
     ):
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"),
-            headers={"Authorization": f"Bearer {token}"},
+            headers={auth_header: f"{auth_prefix}{token}"},
             verify=verify,
             timeout=timeout,
             transport=http_transport,

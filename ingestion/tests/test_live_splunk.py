@@ -9,7 +9,13 @@ from pathlib import Path
 import pytest
 
 from delvecat_ingest.bundle import assemble, validate
-from delvecat_ingest.connectors import db_connect, deployment_server, splunk, stream
+from delvecat_ingest.connectors import (
+    db_connect,
+    deployment_server,
+    enterprise_security,
+    splunk,
+    stream,
+)
 from delvecat_ingest.transport import HttpTransport
 
 from .test_splunk_connector import seed_ids
@@ -29,6 +35,7 @@ def test_live_instance_is_fully_catalogued():
     result.extend(deployment_server.extract(transport, "live", apps))
     result.extend(db_connect.extract(transport, "live"))
     result.extend(stream.extract(transport, "live"))
+    result.extend(enterprise_security.extract(transport, "live"))
     bundle = assemble([{"id": "live", "name": "live", "kind": "splunkEnterprise"}], result)
     assert validate(bundle) == []
     failed = [r for r in bundle["ingestionReport"] if r["status"] == "failed"]

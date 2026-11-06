@@ -32,6 +32,7 @@ class Ctx:
     transport: Transport
     instance: str
     options: Options = field(default_factory=Options)
+    cache: dict[str, Any] = field(default_factory=dict)  # responses shared by extractors
 
 
 def acl(entry: dict[str, Any]) -> tuple[str | None, str | None, str | None]:

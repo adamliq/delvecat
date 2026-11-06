@@ -60,13 +60,19 @@ def test_bundle_is_valid_and_every_extractor_ran(bundle):
 def test_every_seeded_object_is_in_the_bundle():
     """Exit criterion: every object seeded into the test instance is catalogued,
     across the platform and the Deployment Server, DB Connect and Stream connectors."""
-    from delvecat_ingest.connectors import db_connect, deployment_server, stream
+    from delvecat_ingest.connectors import (
+        db_connect,
+        deployment_server,
+        enterprise_security,
+        stream,
+    )
 
     t = FixtureTransport(RECORDED)
     result = splunk.extract(t, "dev")
     result.extend(deployment_server.extract(t, "dev", DEPLOYMENT_APPS))
     result.extend(db_connect.extract(t, "dev"))
     result.extend(stream.extract(t, "dev"))
+    result.extend(enterprise_security.extract(t, "dev"))
     ids = {
         e["id"]
         for e in assemble([{"id": "dev", "name": "dev", "kind": "splunkEnterprise"}], result)[

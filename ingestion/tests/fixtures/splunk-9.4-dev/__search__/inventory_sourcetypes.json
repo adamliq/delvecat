@@ -2,38 +2,38 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "12640",
+   "count": "13743",
    "firstSeen": "1793929820",
    "index": "_audit",
-   "lastSeen": "1793937074",
+   "lastSeen": "1793942830",
    "sourcetype": "audittrail"
   },
   {
-   "count": "327",
+   "count": "374",
    "firstSeen": "1793929830",
    "index": "_configtracker",
-   "lastSeen": "1793936788",
+   "lastSeen": "1793942582",
    "sourcetype": "splunk_configuration_change"
   },
   {
-   "count": "4",
+   "count": "6",
    "firstSeen": "1793936674",
    "index": "_dsappevent",
-   "lastSeen": "1793936788",
+   "lastSeen": "1793942788",
    "sourcetype": "dsappevent"
   },
   {
-   "count": "3",
+   "count": "5",
    "firstSeen": "1793936548",
    "index": "_dsclient",
-   "lastSeen": "1793936815",
+   "lastSeen": "1793942542",
    "sourcetype": "dsclient"
   },
   {
-   "count": "13",
+   "count": "22",
    "firstSeen": "1793936584",
    "index": "_dsphonehome",
-   "lastSeen": "1793936998",
+   "lastSeen": "1793942818",
    "sourcetype": "dsphonehome"
   },
   {
@@ -44,17 +44,17 @@
    "sourcetype": "first_install-too_small"
   },
   {
-   "count": "1746",
+   "count": "2168",
    "firstSeen": "1793929829",
    "index": "_internal",
-   "lastSeen": "1793937047",
+   "lastSeen": "1793942774",
    "sourcetype": "mongod"
   },
   {
-   "count": "54",
+   "count": "74",
    "firstSeen": "1793929829",
    "index": "_internal",
-   "lastSeen": "1793936794",
+   "lastSeen": "1793942561",
    "sourcetype": "scheduler"
   },
   {
@@ -65,17 +65,17 @@
    "sourcetype": "splunk_archiver-too_small"
   },
   {
-   "count": "127",
+   "count": "128",
    "firstSeen": "1793936011",
    "index": "_internal",
-   "lastSeen": "1793936011",
+   "lastSeen": "1793942478",
    "sourcetype": "splunk_migration"
   },
   {
-   "count": "629",
+   "count": "838",
    "firstSeen": "1793929810",
    "index": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "sourcetype": "splunk_python"
   },
   {
@@ -86,10 +86,10 @@
    "sourcetype": "splunk_search_messages"
   },
   {
-   "count": "12",
+   "count": "15",
    "firstSeen": "1793929831",
    "index": "_internal",
-   "lastSeen": "1793936026",
+   "lastSeen": "1793942533",
    "sourcetype": "splunk_shc_upgrade_completion_script"
   },
   {
@@ -100,45 +100,45 @@
    "sourcetype": "splunk_version"
   },
   {
-   "count": "3",
+   "count": "4",
    "firstSeen": "1793929834",
    "index": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "sourcetype": "splunk_web_access"
   },
   {
-   "count": "651",
+   "count": "868",
    "firstSeen": "1793929832",
    "index": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "sourcetype": "splunk_web_service"
   },
   {
-   "count": "20907",
+   "count": "27980",
    "firstSeen": "1793929818",
    "index": "_internal",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942823",
    "sourcetype": "splunkd"
   },
   {
-   "count": "2764",
+   "count": "3676",
    "firstSeen": "1793929830",
    "index": "_internal",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942820",
    "sourcetype": "splunkd_access"
   },
   {
-   "count": "5",
+   "count": "8",
    "firstSeen": "1793929829",
    "index": "_internal",
-   "lastSeen": "1793936794",
+   "lastSeen": "1793942530",
    "sourcetype": "splunkd_conf"
   },
   {
-   "count": "7",
+   "count": "10",
    "firstSeen": "1793929820",
    "index": "_internal",
-   "lastSeen": "1793937012",
+   "lastSeen": "1793942523",
    "sourcetype": "splunkd_stderr"
   },
   {
@@ -149,31 +149,38 @@
    "sourcetype": "splunkd_stdout"
   },
   {
-   "count": "3",
+   "count": "4",
    "firstSeen": "1793929835",
    "index": "_internal",
-   "lastSeen": "1793936029",
+   "lastSeen": "1793942536",
    "sourcetype": "splunkd_ui_access"
   },
   {
-   "count": "21",
+   "count": "28",
    "firstSeen": "1793929830",
    "index": "_internal",
-   "lastSeen": "1793936026",
+   "lastSeen": "1793942533",
    "sourcetype": "sup-pkg-agent-manager-stdout-too_small"
   },
   {
-   "count": "130",
+   "count": "11",
+   "firstSeen": "1793942533",
+   "index": "_internal",
+   "lastSeen": "1793942803",
+   "sourcetype": "sup-pkg-identity-stdout-2"
+  },
+  {
+   "count": "147",
    "firstSeen": "1793929830",
    "index": "_internal",
-   "lastSeen": "1793937075",
+   "lastSeen": "1793937585",
    "sourcetype": "sup-pkg-identity-stdout-too_small"
   },
   {
-   "count": "61",
+   "count": "122",
    "firstSeen": "1793936025",
    "index": "_internal",
-   "lastSeen": "1793936027",
+   "lastSeen": "1793942534",
    "sourcetype": "supervisor-2"
   },
   {
@@ -184,52 +191,52 @@
    "sourcetype": "supervisor-too_small"
   },
   {
-   "count": "58",
+   "count": "70",
    "firstSeen": "1793929899",
    "index": "_introspection",
-   "lastSeen": "1793937063",
+   "lastSeen": "1793942815",
    "sourcetype": "http_event_collector_metrics"
   },
   {
-   "count": "581",
+   "count": "732",
    "firstSeen": "1793929831",
    "index": "_introspection",
-   "lastSeen": "1793937078",
+   "lastSeen": "1793942828",
    "sourcetype": "kvstore"
   },
   {
-   "count": "197",
+   "count": "268",
    "firstSeen": "1793929840",
    "index": "_introspection",
-   "lastSeen": "1793937074",
+   "lastSeen": "1793942788",
    "sourcetype": "search_telemetry"
   },
   {
-   "count": "214",
+   "count": "295",
    "firstSeen": "1793929829",
    "index": "_introspection",
-   "lastSeen": "1793936624",
+   "lastSeen": "1793942531",
    "sourcetype": "splunk_disk_objects"
   },
   {
-   "count": "3869",
+   "count": "4694",
    "firstSeen": "1793929840",
    "index": "_introspection",
-   "lastSeen": "1793937095",
+   "lastSeen": "1793942821",
    "sourcetype": "splunk_resource_usage"
   },
   {
-   "count": "13",
+   "count": "16",
    "firstSeen": "1793930429",
    "index": "_introspection",
-   "lastSeen": "1793936761",
+   "lastSeen": "1793937362",
    "sourcetype": "splunk_telemetry"
   },
   {
-   "count": "2",
+   "count": "3",
    "firstSeen": "1793936174",
    "index": "_telemetry",
-   "lastSeen": "1793936774",
+   "lastSeen": "1793937376",
    "sourcetype": "splunk_telemetry_log"
   },
   {
@@ -247,17 +254,17 @@
    "sourcetype": "acme:fw"
   },
   {
-   "count": "101",
+   "count": "147",
    "firstSeen": "1793932850",
    "index": "main",
-   "lastSeen": "1793936014",
+   "lastSeen": "1793942522",
    "sourcetype": "acme:app"
   },
   {
-   "count": "877",
+   "count": "1455",
    "firstSeen": "1793936790",
    "index": "os",
-   "lastSeen": "1793937011",
+   "lastSeen": "1793942818",
    "sourcetype": "acme:uf:splunkd"
   },
   {
