@@ -1,0 +1,45 @@
+{
+  "links": {},
+  "origin": "https://localhost:8089/servicesNS/-/-/data/ui/views",
+  "updated": "2026-10-30T14:02:11+00:00",
+  "generator": {
+    "build": "e9494146ae5c",
+    "version": "9.4.1"
+  },
+  "entry": [
+    {
+      "name": "storefront_health",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_web",
+        "owner": "nobody",
+        "sharing": "app"
+      },
+      "content": {
+        "label": "Storefront Health",
+        "eai:data": "<dashboard version=\"1.1\"><label>Storefront Health</label><row><panel><table><search ref=\"Web - Top Error Pages\"/></table></panel></row></dashboard>",
+        "disabled": false,
+        "description": "Error rates and top failing pages for the storefront."
+      }
+    },
+    {
+      "name": "soc_overview",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_secops",
+        "owner": "nobody",
+        "sharing": "app"
+      },
+      "content": {
+        "label": "SOC Overview",
+        "eai:data": "<dashboard version=\"2\" theme=\"dark\"><label>SOC Overview</label><definition><![CDATA[{\"dataSources\":{\"ds1\":{\"type\":\"ds.search\",\"options\":{\"query\":\"index=firewall action=blocked | timechart count\"}}}}]]></definition></dashboard>",
+        "disabled": false
+      }
+    }
+  ],
+  "paging": {
+    "total": 2,
+    "perPage": 500,
+    "offset": 0
+  }
+}

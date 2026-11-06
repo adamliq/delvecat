@@ -1,0 +1,56 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { CatalogBundle } from "../generated/catalog";
+import { Catalog, defaultBundleUrl, fetchBundle, parseBundle } from "./catalog";
+import { EntitySearch } from "./search";
+
+type State =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "ready"; catalog: Catalog; search: EntitySearch; origin: string };
+
+interface Ctx {
+  state: State;
+  openFile: (file: File) => Promise<void>;
+}
+
+const CatalogCtx = createContext<Ctx | null>(null);
+
+function ready(bundle: CatalogBundle, origin: string): State {
+  return { status: "ready", catalog: new Catalog(bundle), search: new EntitySearch(bundle.entities), origin };
+}
+
+export function CatalogProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<State>({ status: "loading" });
+
+  useEffect(() => {
+    const url = defaultBundleUrl();
+    fetchBundle(url)
+      .then((b) => setState(ready(b, url)))
+      .catch((err: Error) => setState({ status: "error", message: err.message }));
+  }, []);
+
+  // Local files are parsed in the browser and never uploaded anywhere.
+  const openFile = useCallback(async (file: File) => {
+    try {
+      setState(ready(parseBundle(await file.text()), `local file: ${file.name}`));
+    } catch (err) {
+      setState({ status: "error", message: (err as Error).message });
+    }
+  }, []);
+
+  const value = useMemo(() => ({ state, openFile }), [state, openFile]);
+  return <CatalogCtx.Provider value={value}>{children}</CatalogCtx.Provider>;
+}
+
+export function useCatalogState(): Ctx {
+  const ctx = useContext(CatalogCtx);
+  if (!ctx) throw new Error("useCatalogState must be used inside CatalogProvider");
+  return ctx;
+}
+
+/** For pages rendered only once the catalog is ready. */
+export function useCatalog() {
+  const { state } = useCatalogState();
+  if (state.status !== "ready") throw new Error("catalog not ready");
+  return state;
+}

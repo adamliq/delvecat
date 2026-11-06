@@ -1,0 +1,221 @@
+# DelveCat — a metadata catalog for Splunk
+
+DelveCat is an OpenMetadata-style data catalog purpose-built for the Splunk
+ecosystem. It inventories Splunk objects, traces lineage through SPL and
+across Splunk products, surfaces usage and health signals, and lets people
+document and classify what they find — **without ever writing back to Splunk**.
+
+## 1. Requirements
+
+| # | Requirement | Consequence |
+|---|---|---|
+| R1 | Splunk Enterprise **and** Splunk Cloud | Two access paths: REST (8089) everywhere; Splunk Cloud also via the Admin Config Service (ACS) API. Extractors must degrade gracefully when an endpoint is restricted. |
+| R2 | Splunk Premier security suite: **Enterprise Security, SOAR, UEBA, Asset and Risk Intelligence** | Product-specific entity types and connectors (SOAR and UBA have their own APIs, separate from Splunk REST). |
+| R3 | **Splunk Stream, Deployment Server, DB Connect** | Ingestion-side lineage: DB table → DBX input → index; serverclass → app → input → index; stream → index. |
+| R4 | Standalone web app hostable on **GitHub Pages** | No server. Static SPA + pre-built JSON *catalog bundle*. Forking OpenMetadata is ruled out (it needs a Java server, RDBMS, and Elasticsearch). |
+| R5 | Audience: **admins and analysts** | Admin views (inventory, health, cleanup, access) and analyst views (discovery, field docs, "where does this data come from"). |
+| R6 | **No write-back** to Splunk | Ingestion client is read-only by construction; annotations live in the DelveCat repo, not in Splunk. |
+
+## 2. Architecture
+
+```
+ ┌────────────────────────── where Splunk is reachable ──────────────────────────┐
+ │  delvecat-ingest (Python CLI, read-only)                                      │
+ │    connectors: splunk-rest · splunk-cloud-acs · es · soar · ueba · ari ·      │
+ │                stream · deployment-server · db-connect                        │
+ │    → normalize → redact secrets → resolve lineage → validate (JSON Schema)    │
+ │    → catalog bundle  (catalog.json [+ shards])                                │
+ └───────────────────────────────────────┬───────────────────────────────────────┘
+                                         │ committed / uploaded as build artifact
+ ┌───────────────────────────────────────▼───────────────────────────────────────┐
+ │  GitHub Actions: merge annotations/*.yaml → build web/ → deploy to Pages      │
+ └───────────────────────────────────────┬───────────────────────────────────────┘
+                                         │
+ ┌───────────────────────────────────────▼───────────────────────────────────────┐
+ │  DelveCat web (React + TS, static, HashRouter)                                │
+ │    client-side search (MiniSearch) · entity pages · lineage graph ·          │
+ │    usage & health · "open local bundle" (data never leaves the browser)       │
+ └───────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key decisions
+
+- **JSON Schema is the source of truth** (`schemas/`). TypeScript types are
+  generated from it; the ingestion CLI validates every bundle against it.
+- **Catalog bundle** = `{schemaVersion, generatedAt, instances, entities, edges}`.
+  Large estates are sharded per entity type with a pre-built search index
+  so the browser loads lazily.
+- **Annotations as code.** Descriptions, owners, glossary terms, tags and
+  classifications live in `annotations/*.yaml`, reviewed via pull request, and
+  merged into the bundle at build time. Entity pages link to "suggest an edit".
+  This gives collaboration without a server and without touching Splunk.
+- **Read-only client.** The HTTP client only permits `GET`, plus `POST` to an
+  explicit allow-list (`search/jobs` for running searches, `search/parser` for
+  SPL parsing). Anything else raises before a request is sent.
+- **Secrets never enter a bundle.** Keys matching password/token/secret/
+  credential patterns are dropped at the connector boundary (DB Connect
+  identities, SOAR asset configs, HEC tokens, alert action settings).
+- **Privacy on GitHub Pages.** Public Pages exposes everything in the bundle.
+  Supported options: (a) private Pages (GitHub Enterprise Cloud access
+  control); (b) publish the app with a demo bundle only and load real bundles
+  from a local file in the browser; (c) host the same static build on any
+  internal web server; (d) `--redact` profile that hashes hosts/users.
+
+## 3. Entity model
+
+Fully qualified name (FQN): `<instance>:<type>:<app>/<owner>/<name>` for
+knowledge objects (Splunk scopes them by app, owner and sharing), and
+`<instance>:<type>:<name>` for global objects (indexes, hosts, roles).
+
+Common aspects on every entity: `description`, `owners`, `tags`,
+`classifications` (e.g. `PII.Email`, `MITRE.T1078`), `glossaryTerms`,
+`product`, `sharing`, `disabled`, `updatedAt`, `usage`, `health`,
+`properties` (type-specific), `sourceUrl` (deep link into Splunk).
+
+### Splunk platform (Enterprise & Cloud)
+| Area | Entity types |
+|---|---|
+| Platform | `instance` (role: search head, SHC, indexer cluster, HF, DS, Cloud stack), `app`, `user`, `role` |
+| Data | `index` (events/metrics), `sourcetype`, `source`, `host`, `field`, `dataModel` (+ datasets, acceleration), `lookup` (CSV / KV store), `kvCollection` |
+| Knowledge objects | `savedSearch` (report / alert / scheduled), `macro`, `eventtype`, `tag`, `fieldAlias`, `calculatedField`, `fieldExtraction`, `transform`, `workflowAction` |
+| Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels |
+| Ingestion | `input` (monitor, HEC token *name*, scripted, modular, splunktcp), `forwarder` |
+| Cloud | ACS: indexes, HEC token metadata, IP allow lists, installed apps; Ingest Actions rulesets; Edge/Ingest Processor pipelines (SPL2) — later |
+
+### Enterprise Security
+`correlationSearch` / `detection` (ES 8), `findingType` (notable), `riskRule`
+and risk modifiers, `riskObjectType`, `threatIntelSource`,
+`assetIdentitySource`, `adaptiveResponseAction`, `analyticStory`
+(incl. ESCU content), `responseTemplate`, `investigationType`.
+Classifications: MITRE ATT&CK techniques/tactics, kill-chain phase, CIM data
+model. Coverage views: detections per data model / ATT&CK technique, and which
+detections are blind because their source data is missing or stale.
+
+### SOAR
+`soarPlaybook` (classic/modern), `soarCustomFunction`, `soarApp`
+(connector), `soarAsset` (configured instance — *no credentials*),
+`soarLabel`, `soarWorkbook`. Source: SOAR REST API (`/rest/playbook`,
+`/rest/asset`, `/rest/app`, `/rest/custom_function`, ...), token auth.
+Lineage: ES detection → adaptive response / "send to SOAR" → label →
+playbook → asset → external system.
+
+### UEBA
+`uebaDataSource`, `uebaModel` (anomaly model), `uebaAnomalyType`,
+`uebaThreatRule`, `uebaOutputConnector`. Sources: Splunk UBA REST API
+(on-prem) and the ES 8 integrated UEBA content (Cloud). Lineage:
+index/sourcetype → data source → model → anomaly → threat → ES.
+
+### Asset and Risk Intelligence (ARI)
+`ariSource` (discovery searches feeding inventory), `ariAssetType`,
+`ariField` mapping, `ariMetric`, `ariExposure`, inventory KV collections.
+Lineage: index/sourcetype → discovery search → inventory → ES asset lookup.
+
+### Splunk Stream
+`streamForwarder` (streamfwd / ISF), `streamGroup`, `streamDefinition`
+(protocol, enabled fields, filters, aggregation, target index), ephemeral
+streams. Lineage: streamforwarder → stream → index/sourcetype
+(`stream:<protocol>`).
+
+### Deployment Server
+`serverClass` (whitelist/blacklist, machine-type filters),
+`deploymentApp`, `deploymentClient` (phone-home time, OS, IP — redactable).
+Source: `/services/deployment/server/{serverclasses,applications,clients}`.
+Lineage: serverclass → deployment app → inputs it contains → index/sourcetype;
+"which forwarders send data into index X". (Customer-hosted even for Cloud.)
+
+### DB Connect
+`dbConnection` (type, host, database — never credentials), `dbIdentity`
+(name only), `dbInput` (SQL, batch/rising column, target index/sourcetype),
+`dbOutput`, `dbLookup`, `externalTable` (the database object).
+Lineage: externalTable → dbInput → index/sourcetype; savedSearch → dbOutput →
+externalTable; dbLookup ↔ externalTable.
+
+### Edges (lineage graph)
+`reads`, `writes`, `contains`, `uses` (macro/eventtype/lookup), `feeds`
+(ingestion), `deploys`, `triggers` (alert action / SOAR), `accelerates`,
+`mapsTo` (CIM / ATT&CK), `grantsAccess` (role → index).
+
+## 4. Ingestion
+
+| Extractor | Source |
+|---|---|
+| Configuration | `/servicesNS/-/-/` endpoints (`saved/searches`, `data/ui/views`, `admin/macros`, `data/props/*`, `data/transforms/*`, `datamodel/model`, `data/lookup-table-files`, `storage/collections/config`, `data/indexes`, `apps/local`, `authorization/roles`, ...) with `output_mode=json` |
+| Data inventory | `\| tstats count where index=* by index, sourcetype, host, source` (windowed), `\| metadata` |
+| Fields | `\| fieldsummary` sampled per sourcetype + props/transforms definitions |
+| Usage | `_audit` searches (who/what/how often), `_internal` scheduler, `license_usage.log` |
+| Health | latest event, `_indextime - _time` lag, parsing warnings, skipped searches |
+| Cloud | ACS API (`admin.splunk.com/<stack>/adminconfig/v2/...`) |
+| Products | ES (app conf + REST), SOAR REST, UBA REST, ARI/Stream/DBX app endpoints and KV store |
+
+Connectors are independent plugins with a shared contract:
+`extract(transport) -> Iterable[RawRecord]` then `normalize(RawRecord) -> Entity | Edge`.
+A `FixtureTransport` replays recorded REST responses, so every connector is
+unit-tested without a live Splunk. Endpoints marked *to verify* in this plan
+are confirmed against a live instance before their connector ships.
+
+## 5. Lineage
+
+1. Parse SPL with Splunk's `/services/search/parser` (macro expansion
+   included); fall back to a local Lark grammar offline.
+2. Reads: `index=`, `sourcetype=`, macros, `lookup`/`inputlookup`,
+   `datamodel`/`tstats from datamodel=`, `savedsearch`/`loadjob`,
+   `eventtype=`, `tag=`, `dbxquery connection=`.
+3. Writes: `outputlookup`, `collect`/summary indexing, `outputcsv`,
+   alert actions (incl. notable/risk/SOAR), `dbxoutput`, DM acceleration.
+4. Product edges from connectors (sections 3 above).
+5. Stretch: field-level lineage through `eval`/`rename`/`stats by`.
+
+## 6. Web app
+
+- **Home**: estate overview (counts by product/type, freshness, health alerts).
+- **Search**: full-text, faceted by product / type / app / owner / tag.
+- **Entity page** tabs: Overview · Fields/Schema · Lineage · Usage · Health ·
+  Annotations · Raw.
+- **Admin views**: unused objects, skipped searches, stale indexes, role →
+  index access matrix, deployment coverage, license by index/sourcetype.
+- **Analyst views**: "where is data about X", sourcetype field dictionary,
+  detection coverage by ATT&CK technique / data model.
+- Hash routing + relative base so it runs from any GitHub Pages path.
+
+## 7. Phases
+
+| Phase | Scope | Exit criteria |
+|---|---|---|
+| **0. Skeleton** | Monorepo, JSON Schemas, read-only client + fixture transport, ingest CLI producing a validated bundle from fixtures, web shell (search + entity page), CI, Pages deploy, docker-compose Splunk for dev | `make demo` builds a bundle and the site renders it; CI green; Pages workflow deploys the demo |
+| **1. Core inventory** | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
+| **2. UI MVP + annotations** | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
+| **3. SPL lineage** | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
+| **4. Ingestion products** | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
+| **5. Security suite** | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
+| **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
+| **7. Governance** | Glossary, classifications (PII), role → index access view, redaction profiles | "Who can see PII data?" answered |
+| Later | Field-level lineage, Edge/Ingest Processor pipelines, multi-instance merge, NL search | |
+
+## 8. Repository layout
+
+```
+delvecat/
+  schemas/            JSON Schema (source of truth)
+  ingestion/          Python package `delvecat_ingest` (CLI, connectors, transports)
+    tests/fixtures/   recorded REST responses per scenario
+  web/                React + TypeScript + Vite static app
+  annotations/        human-curated metadata (Phase 2)
+  deploy/             docker-compose for a local dev Splunk
+  docs/               plan and design notes
+  .github/workflows/  ci.yml, pages.yml
+```
+
+## 9. Risks
+
+- **SPL complexity** (subsearches, `map`, nested macros, dashboard tokens) —
+  use Splunk's parser endpoint and a real-world SPL test corpus.
+- **Load on production Splunk** — incremental, windowed usage searches; run
+  off-peak; per-connector timeouts and concurrency limits.
+- **Product API variance** across versions (ES 7 vs 8, SOAR on-prem vs Cloud,
+  UBA vs integrated UEBA) — version detection per connector; verify endpoints
+  on live instances before shipping.
+- **Splunk Cloud restrictions** — capability probe at start; report what was
+  skipped and why in the bundle's `ingestionReport`.
+- **Sensitive metadata on public Pages** — see privacy options in §2;
+  demo deploys only ever use fixtures.
+- **Bundle size** for large estates — sharding, pre-built search index, lazy load.

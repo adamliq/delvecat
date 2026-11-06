@@ -1,0 +1,149 @@
+{
+  "links": {},
+  "origin": "https://localhost:8089/services/data/indexes",
+  "updated": "2026-10-30T14:02:11+00:00",
+  "generator": {
+    "build": "e9494146ae5c",
+    "version": "9.4.1"
+  },
+  "entry": [
+    {
+      "name": "main",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "search",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 812,
+        "totalEventCount": 1204331,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "web",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_web",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 48210,
+        "totalEventCount": 391220144,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "firewall",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "TA-acme-firewall",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 120544,
+        "totalEventCount": 1802113002,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 31536000,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "wineventlog",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_secops",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 98311,
+        "totalEventCount": 902114551,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "summary_web",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_web",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 220,
+        "totalEventCount": 88412,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "infra_metrics",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "search",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "metric",
+        "currentDBSizeMB": 15400,
+        "totalEventCount": 0,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "2025-11-01T00:00:00+00:00",
+        "maxTime": "2026-11-05T23:59:01+00:00",
+        "disabled": false
+      }
+    },
+    {
+      "name": "legacy_proxy",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "search",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "datatype": "event",
+        "currentDBSizeMB": 0,
+        "totalEventCount": 0,
+        "maxTotalDataSizeMB": 500000,
+        "frozenTimePeriodInSecs": 188697600,
+        "minTime": "",
+        "maxTime": "2024-03-02T08:11:00+00:00",
+        "disabled": true
+      }
+    }
+  ],
+  "paging": {
+    "total": 7,
+    "perPage": 500,
+    "offset": 0
+  }
+}

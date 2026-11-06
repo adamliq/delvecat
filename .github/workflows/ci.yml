@@ -1,0 +1,47 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ingestion:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q
+      - name: Build demo bundle
+        run: uv run delvecat-ingest build --fixtures tests/fixtures/acme --instance acme --instance-name "Acme (demo)" --out ../web/public/catalog.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-catalog
+          path: web/public/catalog.json
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Generated types are up to date
+        run: npm run gen:types && git diff --exit-code src/generated
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build

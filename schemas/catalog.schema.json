@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delvecat.dev/schemas/catalog.schema.json",
+  "title": "CatalogBundle",
+  "description": "A DelveCat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "generator", "instances", "entities", "edges"],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^0\\.1\\.\\d+$" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "instances": { "type": "array", "items": { "$ref": "#/$defs/Instance" } },
+    "entities": { "type": "array", "items": { "$ref": "#/$defs/Entity" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/Edge" } },
+    "ingestionReport": { "type": "array", "items": { "$ref": "#/$defs/ConnectorReport" } }
+  },
+  "$defs": {
+    "Product": {
+      "description": "The Splunk product an entity belongs to.",
+      "type": "string",
+      "enum": [
+        "splunk",
+        "enterpriseSecurity",
+        "soar",
+        "ueba",
+        "assetRiskIntelligence",
+        "stream",
+        "deploymentServer",
+        "dbConnect"
+      ]
+    },
+    "EntityType": {
+      "type": "string",
+      "enum": [
+        "instance", "app", "user", "role",
+        "index", "sourcetype", "source", "host", "field", "dataModel", "lookup", "kvCollection",
+        "savedSearch", "macro", "eventtype", "tag", "fieldAlias", "calculatedField",
+        "fieldExtraction", "transform", "workflowAction",
+        "dashboard",
+        "input", "forwarder",
+        "correlationSearch", "findingType", "riskRule", "threatIntelSource", "assetIdentitySource",
+        "adaptiveResponseAction", "analyticStory", "responseTemplate",
+        "soarPlaybook", "soarCustomFunction", "soarApp", "soarAsset", "soarLabel", "soarWorkbook",
+        "uebaDataSource", "uebaModel", "uebaAnomalyType", "uebaThreatRule", "uebaOutputConnector",
+        "ariSource", "ariAssetType", "ariMetric", "ariExposure",
+        "streamForwarder", "streamGroup", "streamDefinition",
+        "serverClass", "deploymentApp", "deploymentClient",
+        "dbConnection", "dbIdentity", "dbInput", "dbOutput", "dbLookup", "externalTable"
+      ]
+    },
+    "Sharing": { "type": "string", "enum": ["user", "app", "global", "system"] },
+    "Instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+$" },
+        "name": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["splunkEnterprise", "splunkCloud", "soar", "uba", "deploymentServer"]
+        },
+        "version": { "type": "string" },
+        "webUrl": { "type": "string", "format": "uri" },
+        "roles": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "Entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "name", "product", "instance"],
+      "properties": {
+        "id": { "description": "Fully qualified name, unique within the bundle.", "type": "string", "minLength": 1 },
+        "type": { "$ref": "#/$defs/EntityType" },
+        "name": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string" },
+        "product": { "$ref": "#/$defs/Product" },
+        "instance": { "type": "string" },
+        "app": { "type": "string" },
+        "owner": { "type": "string" },
+        "sharing": { "$ref": "#/$defs/Sharing" },
+        "disabled": { "type": "boolean" },
+        "description": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "owners": { "type": "array", "items": { "type": "string" } },
+        "classifications": { "type": "array", "items": { "type": "string" } },
+        "glossaryTerms": { "type": "array", "items": { "type": "string" } },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "properties": {
+          "description": "Type-specific attributes. Never contains credentials.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "EdgeType": {
+      "type": "string",
+      "enum": [
+        "reads", "writes", "contains", "uses", "feeds", "deploys",
+        "triggers", "accelerates", "mapsTo", "grantsAccess"
+      ]
+    },
+    "Edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "type": { "$ref": "#/$defs/EdgeType" },
+        "origin": {
+          "description": "How the edge was derived.",
+          "type": "string",
+          "enum": ["config", "spl", "connector", "annotation"]
+        }
+      }
+    },
+    "ConnectorReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector", "status"],
+      "properties": {
+        "connector": { "type": "string" },
+        "status": { "type": "string", "enum": ["ok", "partial", "skipped", "failed"] },
+        "message": { "type": "string" },
+        "counts": { "type": "object", "additionalProperties": { "type": "integer" } }
+      }
+    }
+  }
+}

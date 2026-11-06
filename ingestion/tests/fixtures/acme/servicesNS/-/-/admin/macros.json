@@ -1,0 +1,47 @@
+{
+  "links": {},
+  "origin": "https://localhost:8089/servicesNS/-/-/admin/macros",
+  "updated": "2026-10-30T14:02:11+00:00",
+  "generator": {
+    "build": "e9494146ae5c",
+    "version": "9.4.1"
+  },
+  "entry": [
+    {
+      "name": "web_status_buckets",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_web",
+        "owner": "nobody",
+        "sharing": "app"
+      },
+      "content": {
+        "definition": "eval status_bucket=case(status<300,\"2xx\",status<400,\"3xx\",status<500,\"4xx\",true(),\"5xx\")",
+        "args": "",
+        "iseval": false,
+        "disabled": false,
+        "description": "Groups HTTP status codes."
+      }
+    },
+    {
+      "name": "rare_port_threshold(1)",
+      "updated": "2026-10-30T14:02:11+00:00",
+      "acl": {
+        "app": "acme_secops",
+        "owner": "nobody",
+        "sharing": "global"
+      },
+      "content": {
+        "definition": "stats count by src_ip, dest_port | where count >= $min$",
+        "args": "min",
+        "iseval": false,
+        "disabled": false
+      }
+    }
+  ],
+  "paging": {
+    "total": 2,
+    "perPage": 500,
+    "offset": 0
+  }
+}
