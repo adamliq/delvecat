@@ -3,6 +3,8 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
+import { LineageTab } from "../components/LineageTab";
+import { hasLineage } from "../lib/lineage";
 import { PropValue } from "../components/PropValue";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
@@ -47,7 +49,7 @@ function Group({ group }: { group: RelationGroup }) {
   );
 }
 
-type Tab = "overview" | "fields" | "relationships" | "annotations" | "raw";
+type Tab = "overview" | "fields" | "lineage" | "relationships" | "annotations" | "raw";
 
 export function EntityPage() {
   const { id = "" } = useParams();
@@ -77,6 +79,9 @@ export function EntityPage() {
   const tabs: [Tab, string][] = [
     ["overview", "Overview"],
     ...(fields ? [["fields", `Fields (${fields.rows.length})`] as [Tab, string]] : []),
+    ...(hasLineage(catalog, entity.id) || entity.lineage
+      ? [["lineage", entity.lineage?.unresolved?.length ? "Lineage ⚠" : "Lineage"] as [Tab, string]]
+      : []),
     ["relationships", `Relationships (${relCount})`],
     ["annotations", "Annotations"],
     ["raw", "Raw"],
@@ -188,6 +193,8 @@ export function EntityPage() {
       )}
 
       {tab === "fields" && fields && <FieldsTab table={fields} />}
+
+      {tab === "lineage" && <LineageTab catalog={catalog} entity={entity} />}
 
       {tab === "relationships" && (
         groups.length === 0 ? (

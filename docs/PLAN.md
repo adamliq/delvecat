@@ -158,8 +158,11 @@ are confirmed against a live instance before their connector ships.
 
 ## 5. Lineage
 
-1. Parse SPL with Splunk's `/services/search/parser` (macro expansion
-   included); fall back to a local Lark grammar offline.
+1. Parse SPL locally (`ingestion/src/delvecat_ingest/spl.py`), expanding
+   macros from the catalogued definitions with Splunk's visibility rules. The
+   live test suite cross-checks the expansion against Splunk's own
+   `/services/search/parser`, so no per-search API calls are needed in
+   production runs.
 2. Reads: `index=`, `sourcetype=`, macros, `lookup`/`inputlookup`,
    `datamodel`/`tstats from datamodel=`, `savedsearch`/`loadjob`,
    `eventtype=`, `tag=`, `dbxquery connection=`.
@@ -187,7 +190,7 @@ are confirmed against a live instance before their connector ships.
 | **0. Skeleton** ✅ | Monorepo, JSON Schemas, read-only client + fixture transport, ingest CLI producing a validated bundle from fixtures, web shell (search + entity page), CI, Pages deploy, docker-compose Splunk for dev | `make demo` builds a bundle and the site renders it; CI green; Pages workflow deploys the demo |
 | **1. Core inventory** ✅ | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
 | **2. UI MVP + annotations** ✅ | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
-| **3. SPL lineage** | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
+| **3. SPL lineage** ✅ | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
 | **4. Ingestion products** | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
 | **5. Security suite** | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
 | **6. Usage & health** | `_audit`/`_internal`/license extractors, freshness & volume checks, cleanup report | Health dashboard and unused-object report |
@@ -250,6 +253,33 @@ are confirmed against a live instance before their connector ships.
   Annotations, Raw); glossary pages with synonyms; documentation coverage on
   the home page; "suggest an edit" links to the entity's own entry, or a
   pre-filled new file on GitHub, plus a copyable YAML entry.
+
+### Phase 3 notes (done)
+
+- SPL analyzer: pipelines and `[subsearches]`, quoting, `NOT`/`!=`, `IN`,
+  `index::`, ```` ```comments``` ````, `tstats`/`mstats`/`metadata`,
+  `datamodel`/`pivot`/`from`, `lookup`/`inputlookup`/`outputlookup`,
+  `collect`/`mcollect`, `savedsearch`/`loadjob`; tags (`tag=`, `tag::f=`)
+  and eventtypes. Macros (with arguments, nested, `$token$`-built names) are
+  expanded using the catalog; Splunk's `/search/parser` agrees with the
+  expansion for every seeded search (`tests/test_live_splunk.py`).
+- SPL is analyzed for saved searches, eventtypes, macros, workflow actions,
+  data model dataset constraints and dashboards (Simple XML inline,
+  post-process and saved-search panels; Dashboard Studio `ds.search`,
+  `ds.savedSearch`, `ds.chain`). Dashboard XML is parsed with `defusedxml`.
+- References resolve with Splunk's visibility rules (same app, then globally
+  shared; private objects only for their owner). Edges carry
+  `origin: "spl"`.
+- Diagnostics per entity (`entity.lineage`, outside the content hash):
+  broken references (missing, deleted or unshared macros, lookups, indexes,
+  saved searches; written lookups excluded), searches without an index,
+  dynamic `$tokens$`, unparseable dashboards. On the stock Splunk 9.4
+  content this flags real issues (e.g. searches for sourcetypes with no data)
+  without false positives from comments or token-built macros.
+- Web: Lineage tab with an upstream/downstream graph (longest-path layering,
+  adjustable depth, scrolls to the focused object), full upstream and impact
+  lists, diagnostics; "Search issues" facet; search health on the home page.
+- Deferred: field-level lineage; `map search="..."` strings; SPL2.
 
 ## 8. Repository layout
 

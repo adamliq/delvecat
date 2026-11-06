@@ -191,5 +191,50 @@
     "type": "input",
     "name": "udp://5514",
     "app": "TA-acme-firewall"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Error Owners",
+    "app": "acme_web"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Auth - Failures by Tag",
+    "app": "acme_secops"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Requests by Status (Data Model)",
+    "app": "acme_web"
+  },
+  {
+    "type": "savedSearch",
+    "name": "SOC - Blocked Threat Hosts",
+    "app": "acme_secops"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Legacy - Proxy Categories",
+    "app": "search"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Errors Anywhere",
+    "app": "acme_web"
+  },
+  {
+    "type": "savedSearch",
+    "name": "Web - Uses SOC Macro",
+    "app": "acme_web"
+  },
+  {
+    "type": "macro",
+    "name": "secops_only_filter",
+    "app": "acme_secops"
+  },
+  {
+    "type": "dashboard",
+    "name": "web_explorer",
+    "app": "acme_web"
   }
 ]

@@ -2,33 +2,35 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "7504",
+   "count": "29548",
    "host": "9306d2af8296",
    "indexes": [
     "_audit",
     "_configtracker",
     "_internal",
-    "_introspection"
+    "_introspection",
+    "main",
+    "summary_web"
    ],
-   "lastSeen": "1793930402"
+   "lastSeen": "1793932946"
+  },
+  {
+   "count": "80",
+   "host": "web01",
+   "indexes": "web",
+   "lastSeen": "1793930665"
+  },
+  {
+   "count": "60",
+   "host": "fw-edge-1",
+   "indexes": "firewall",
+   "lastSeen": "1793930665"
   },
   {
    "count": "40",
-   "host": "web01",
-   "indexes": "web",
-   "lastSeen": "1793930068"
-  },
-  {
-   "count": "30",
-   "host": "fw-edge-1",
-   "indexes": "firewall",
-   "lastSeen": "1793930068"
-  },
-  {
-   "count": "20",
    "host": "dc01",
    "indexes": "wineventlog",
-   "lastSeen": "1793930068"
+   "lastSeen": "1793930665"
   }
  ],
  "spl": "| tstats count max(_time) as lastSeen where (index=* OR index=_*) by host, index | stats sum(count) as count max(lastSeen) as lastSeen values(index) as indexes by host | sort 0 - count | head 5000"

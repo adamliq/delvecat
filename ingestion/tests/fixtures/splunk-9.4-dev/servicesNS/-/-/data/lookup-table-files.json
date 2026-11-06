@@ -41,7 +41,179 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/lookup-table-files/asset_owners.csv"
    },
    "name": "asset_owners.csv",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:18+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "/opt/splunk/etc/apps/search/lookups/geo_attr_countries.csv",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv/_reload",
+    "alternate": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv",
+    "edit": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv",
+    "list": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv",
+    "move": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv/move",
+    "remove": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_countries.csv"
+   },
+   "name": "geo_attr_countries.csv",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "/opt/splunk/etc/apps/search/lookups/geo_attr_us_states.csv",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv/_reload",
+    "alternate": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv",
+    "edit": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv",
+    "list": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv",
+    "move": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv/move",
+    "remove": "/servicesNS/nobody/search/data/lookup-table-files/geo_attr_us_states.csv"
+   },
+   "name": "geo_attr_us_states.csv",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "/opt/splunk/etc/apps/search/lookups/geo_countries.kmz",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz/_reload",
+    "alternate": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz",
+    "edit": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz",
+    "list": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz",
+    "move": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz/move",
+    "remove": "/servicesNS/nobody/search/data/lookup-table-files/geo_countries.kmz"
+   },
+   "name": "geo_countries.kmz",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "/opt/splunk/etc/apps/search/lookups/geo_us_states.kmz",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz/_reload",
+    "alternate": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz",
+    "edit": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz",
+    "list": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz",
+    "move": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz/move",
+    "remove": "/servicesNS/nobody/search/data/lookup-table-files/geo_us_states.kmz"
+   },
+   "name": "geo_us_states.kmz",
+   "updated": "1970-01-01T00:00:00+00:00"
   }
  ],
  "generator": {
@@ -51,7 +223,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 1
+  "total": 5
  },
- "updated": "2026-11-06T02:00:09+00:00"
+ "updated": "2026-11-06T02:42:28+00:00"
 }

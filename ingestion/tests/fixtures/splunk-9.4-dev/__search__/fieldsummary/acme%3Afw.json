@@ -2,76 +2,76 @@
  "earliest": "-7d",
  "results": [
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "action",
    "numeric_count": "0"
   },
   {
-   "count": "30",
-   "distinct_count": "1",
+   "count": "60",
+   "distinct_count": "2",
    "field": "date_hour",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "date_mday",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
-   "distinct_count": "16",
+   "count": "60",
+   "distinct_count": "26",
    "field": "date_minute",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "date_month",
    "numeric_count": "0"
   },
   {
-   "count": "30",
-   "distinct_count": "2",
+   "count": "60",
+   "distinct_count": "4",
    "field": "date_second",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "date_wday",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "date_year",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "date_zone",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "30",
    "field": "dest",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "30",
    "field": "dest_ip",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "30",
    "field": "dest_port",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
    "count": "0",
@@ -80,49 +80,49 @@
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "host",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "index",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "linecount",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "20",
+   "count": "40",
    "distinct_count": "2",
    "field": "owner",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "punct",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "source",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "sourcetype",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "splunk_server",
    "numeric_count": "0"
@@ -134,31 +134,31 @@
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "3",
    "field": "src",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "3",
    "field": "src_ip",
    "numeric_count": "0"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "timeendpos",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "timestartpos",
-   "numeric_count": "30"
+   "numeric_count": "60"
   },
   {
-   "count": "30",
+   "count": "60",
    "distinct_count": "1",
    "field": "vendor_product",
    "numeric_count": "0"

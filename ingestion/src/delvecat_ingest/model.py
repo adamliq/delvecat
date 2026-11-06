@@ -86,6 +86,10 @@ class Target:
     name: str
     app: str | None = None  # preferred app scope for knowledge objects
     pattern: bool = False  # name is a Splunk wildcard pattern (e.g. "web*")
+    # Only match objects Splunk would let a search in ``app`` see (same app or shared
+    # globally; private objects only for their owner). Used for SPL references.
+    visible_only: bool = False
+    owner: str | None = None
 
 
 @dataclass(frozen=True)

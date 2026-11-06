@@ -61,7 +61,253 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/lookups/asset_owners"
    },
    "name": "asset_owners",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:18+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "fields_array": [
+     "country",
+     "region_wb",
+     "region_un",
+     "subregion",
+     "continent",
+     "iso2",
+     "iso3"
+    ],
+    "fields_list": "country,region_wb,region_un,subregion,continent,iso2,iso3",
+    "filename": "geo_attr_countries.csv",
+    "type": "file"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries/_reload",
+    "alternate": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries",
+    "disable": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries/disable",
+    "edit": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries",
+    "list": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_countries"
+   },
+   "name": "geo_attr_countries",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "fields_array": [
+     "state_name",
+     "state_fips",
+     "state_code"
+    ],
+    "fields_list": "state_name,state_fips,state_code",
+    "filename": "geo_attr_us_states.csv",
+    "type": "file"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states/_reload",
+    "alternate": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states",
+    "disable": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states/disable",
+    "edit": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states",
+    "list": "/servicesNS/nobody/search/data/transforms/lookups/geo_attr_us_states"
+   },
+   "name": "geo_attr_us_states",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "external_type": "geo",
+    "fields_array": [],
+    "fields_list": null,
+    "filename": "geo_countries.kmz",
+    "type": "geo"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/transforms/lookups/geo_countries",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/transforms/lookups/geo_countries/_reload",
+    "alternate": "/servicesNS/nobody/search/data/transforms/lookups/geo_countries",
+    "disable": "/servicesNS/nobody/search/data/transforms/lookups/geo_countries/disable",
+    "edit": "/servicesNS/nobody/search/data/transforms/lookups/geo_countries",
+    "list": "/servicesNS/nobody/search/data/transforms/lookups/geo_countries"
+   },
+   "name": "geo_countries",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "CAN_OPTIMIZE": true,
+    "CLEAN_KEYS": true,
+    "DEFAULT_VALUE": "",
+    "DEPTH_LIMIT": "1000",
+    "DEST_KEY": "",
+    "FORMAT": "",
+    "KEEP_EMPTY_VALS": false,
+    "LOOKAHEAD": "4096",
+    "MATCH_LIMIT": "100000",
+    "MV_ADD": false,
+    "REGEX": "",
+    "SOURCE_KEY": "_raw",
+    "WRITE_META": "False",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "external_type": "geo",
+    "fields_array": [],
+    "fields_list": null,
+    "filename": "geo_us_states.kmz",
+    "type": "geo"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/transforms/lookups/geo_us_states",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/transforms/lookups/geo_us_states/_reload",
+    "alternate": "/servicesNS/nobody/search/data/transforms/lookups/geo_us_states",
+    "disable": "/servicesNS/nobody/search/data/transforms/lookups/geo_us_states/disable",
+    "edit": "/servicesNS/nobody/search/data/transforms/lookups/geo_us_states",
+    "list": "/servicesNS/nobody/search/data/transforms/lookups/geo_us_states"
+   },
+   "name": "geo_us_states",
+   "updated": "1970-01-01T00:00:00+00:00"
   },
   {
    "acl": {
@@ -126,7 +372,7 @@
     "remove": "/servicesNS/nobody/acme_secops/data/transforms/lookups/threat_hosts_lookup"
    },
    "name": "threat_hosts_lookup",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:18+00:00"
   }
  ],
  "generator": {
@@ -136,7 +382,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 2
+  "total": 6
  },
- "updated": "2026-11-06T02:00:09+00:00"
+ "updated": "2026-11-06T02:42:28+00:00"
 }

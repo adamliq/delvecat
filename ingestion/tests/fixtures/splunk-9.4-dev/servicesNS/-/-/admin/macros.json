@@ -2,6 +2,269 @@
  "entry": [
   {
    "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "definition": "rex \"search='(?<search>.*?)', autojoin\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/audit_rexsearch",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/audit_rexsearch/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/audit_rexsearch",
+    "disable": "/servicesNS/nobody/search/admin/macros/audit_rexsearch/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/audit_rexsearch",
+    "list": "/servicesNS/nobody/search/admin/macros/audit_rexsearch"
+   },
+   "name": "audit_rexsearch",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "definition": "`audit_searchlocal(\"search_id!=rt_*\")`",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/audit_searchlocal",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/audit_searchlocal/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/audit_searchlocal",
+    "disable": "/servicesNS/nobody/search/admin/macros/audit_searchlocal/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/audit_searchlocal",
+    "list": "/servicesNS/nobody/search/admin/macros/audit_searchlocal"
+   },
+   "name": "audit_searchlocal",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "args": "filter",
+    "definition": "search index=_audit action=search (id=* OR search_id=*) | eval search_id = if(isnull(search_id), id, search_id) | replace '*' with * in search_id | search $filter$",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29",
+    "disable": "/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29",
+    "list": "/servicesNS/nobody/search/admin/macros/audit_searchlocal%281%29"
+   },
+   "name": "audit_searchlocal(1)",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "args": "text",
+    "definition": "\"\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "iseval": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/comment%281%29",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/comment%281%29/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/comment%281%29",
+    "disable": "/servicesNS/nobody/search/admin/macros/comment%281%29/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/comment%281%29",
+    "list": "/servicesNS/nobody/search/admin/macros/comment%281%29"
+   },
+   "name": "comment(1)",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "args": "perc, hist_rate, le",
+    "definition": "sort $le$\n| eventstats max($hist_rate$) as total_hist_rate, last($le$) as uppermost_bound, count as num_buckets\n| eval rank=exact($perc$)*total_hist_rate\n| streamstats current=f last($le$) as gr, last($hist_rate$) as last_hist_rate\n| eval gr=if(isnull(gr), 0, gr), last_hist_rate=if(isnull(last_hist_rate), 0, last_hist_rate)\n| where $hist_rate$ >= rank\n| head 1\n| eval res=case(lower(uppermost_bound) != \"+inf\" or num_buckets < 2, \"NaN\", lower($le$) == \"+inf\", gr, gr == 0 and $le$ <= 0, $le$, true(), exact(gr + ($le$-gr)*(rank - last_hist_rate) / ($hist_rate$ - last_hist_rate)))\n| fields res\n| rename res as \"histperc\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "errormsg": "1st arg \"perc\" must be a number between 0 and 1 (inclusive), 2nd arg \"hist_rate\" should be string representing a field name, and 3rd arg \"le\" must be the field name with the histogram buckets' upper boundaries.",
+    "iseval": false,
+    "validation": "isnum($perc$) and $perc$ >= 0 and $perc$ <= 1 and isstr($hist_rate$) and isstr($le$)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/histperc%283%29",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/histperc%283%29/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/histperc%283%29",
+    "disable": "/servicesNS/nobody/search/admin/macros/histperc%283%29/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/histperc%283%29",
+    "list": "/servicesNS/nobody/search/admin/macros/histperc%283%29"
+   },
+   "name": "histperc(3)",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "args": "perc, hist_rate, le, groupby",
+    "definition": "sort $groupby$, $le$\n| eventstats max($hist_rate$) as total_hist_rate, last($le$) as uppermost_bound, count as num_buckets by $groupby$\n| eval rank=exact($perc$)*total_hist_rate\n| streamstats current=f last($le$) as gr, last($hist_rate$) as last_hist_rate by $groupby$\n| eval gr=if(isnull(gr), 0, gr), last_hist_rate=if(isnull(last_hist_rate), 0, last_hist_rate)\n| where $hist_rate$ >= rank\n| dedup $groupby$\n| eval res=case(lower(uppermost_bound) != \"+inf\" or num_buckets < 2, \"NaN\", lower($le$) == \"+inf\", gr, gr == 0 and $le$ <= 0, $le$, true(), exact(gr + ($le$-gr)*(rank - last_hist_rate) / ($hist_rate$ - last_hist_rate)))\n| fields $groupby$, res\n| rename res as \"histperc\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody",
+    "errormsg": "1st arg \"perc\" must be a number between 0 and 1 (inclusive), 2nd arg \"hist_rate\" should be string representing a field name, and 3rd arg \"le\" must be the field name with the histogram buckets' upper boundaries. 4th arg \"groupby\" must be a string with one or more field names, and must be quoted if there are multiple fields.",
+    "iseval": false,
+    "validation": "isnum($perc$) and $perc$ >= 0 and $perc$ <= 1 and isstr($hist_rate$) and isstr($le$) and isstr($groupby$)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/histperc%284%29",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/histperc%284%29/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/histperc%284%29",
+    "disable": "/servicesNS/nobody/search/admin/macros/histperc%284%29/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/histperc%284%29",
+    "list": "/servicesNS/nobody/search/admin/macros/histperc%284%29"
+   },
+   "name": "histperc(4)",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
     "app": "acme_secops",
     "can_change_perms": true,
     "can_list": true,
@@ -43,7 +306,135 @@
     "remove": "/servicesNS/nobody/acme_secops/admin/macros/rare_port_threshold%281%29"
    },
    "name": "rare_port_threshold(1)",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:18+00:00"
+  },
+  {
+   "acl": {
+    "app": "acme_secops",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "definition": "index=wineventlog EventCode=4625",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_secops",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter/_reload",
+    "alternate": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter",
+    "disable": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter/disable",
+    "edit": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter",
+    "list": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter",
+    "move": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter/move",
+    "remove": "/servicesNS/nobody/acme_secops/admin/macros/secops_only_filter"
+   },
+   "name": "secops_only_filter",
+   "updated": "2026-11-06T02:42:18+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "definition": "rest splunk_server=local /services/server/info | return host",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/set_local_host",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/set_local_host/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/set_local_host",
+    "disable": "/servicesNS/nobody/search/admin/macros/set_local_host/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/set_local_host",
+    "list": "/servicesNS/nobody/search/admin/macros/set_local_host"
+   },
+   "name": "set_local_host",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "definition": "eval search=if(length(search) > 150, substr(search, 0, 150) + \"...\", search)",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/admin/macros/truncate_search",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/admin/macros/truncate_search/_reload",
+    "alternate": "/servicesNS/nobody/search/admin/macros/truncate_search",
+    "disable": "/servicesNS/nobody/search/admin/macros/truncate_search/disable",
+    "edit": "/servicesNS/nobody/search/admin/macros/truncate_search",
+    "list": "/servicesNS/nobody/search/admin/macros/truncate_search"
+   },
+   "name": "truncate_search",
+   "updated": "1970-01-01T00:00:00+00:00"
   },
   {
    "acl": {
@@ -88,7 +479,7 @@
     "remove": "/servicesNS/nobody/acme_web/admin/macros/web_status_buckets"
    },
    "name": "web_status_buckets",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:18+00:00"
   }
  ],
  "generator": {
@@ -98,7 +489,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 2
+  "total": 11
  },
- "updated": "2026-11-06T02:00:09+00:00"
+ "updated": "2026-11-06T02:42:28+00:00"
 }

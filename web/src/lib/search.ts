@@ -14,6 +14,11 @@ export const FACETS = {
   sharing: (e: Entity) => (e.sharing ? [e.sharing] : []),
   status: (e: Entity) => [e.disabled ? "disabled" : "enabled"],
   documented: (e: Entity) => [effectiveDescription(e) ? "yes" : "no"],
+  issue: (e: Entity) => [
+    ...(e.lineage?.unresolved?.length ? ["broken reference"] : []),
+    ...(e.lineage?.implicitIndex ? ["no index specified"] : []),
+    ...(e.lineage?.warnings?.some((w) => w.includes("could not parse")) ? ["unparseable"] : []),
+  ],
 } satisfies Record<string, (e: Entity) => string[]>;
 
 export type Facet = keyof typeof FACETS;
@@ -35,7 +40,8 @@ interface Doc {
 function toDoc(e: Entity): Doc {
   const p = (e.properties ?? {}) as Record<string, unknown>;
   const a = e.annotations ?? {};
-  const body = [p.search, p.definition, p.expression].filter((v) => typeof v === "string").join(" ");
+  const queries = Array.isArray(p.searches) ? (p.searches as { query?: string; ref?: string }[]).flatMap((s) => [s.query, s.ref]) : [];
+  const body = [p.search, p.definition, p.expression, ...queries].filter((v) => typeof v === "string").join(" ");
   return {
     id: e.id,
     name: e.name,

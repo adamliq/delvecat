@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from ...dashboards import parse_dashboard
 from ...model import ExtractResult
 from ...splunk_rest import as_bool, iter_entries
 from .common import (
@@ -69,15 +70,8 @@ def extract_dashboards(ctx: Ctx, out: ExtractResult) -> int:
     for e in iter_entries(ctx.transport, f"{NS}/data/ui/views"):
         c = content(e)
         source = str(c.get("eai:data") or "")
-        if 'version="2"' in source:
-            framework = "dashboardStudio"
-        elif "<form" in source[:200]:
-            framework = "simpleXmlForm"
-        elif "<dashboard" in source[:200]:
-            framework = "simpleXml"
-        else:
-            framework = "html" if "<view" in source[:200] else "other"
-        add_ko(
+        framework, searches, warnings = parse_dashboard(source)
+        ent = add_ko(
             ctx,
             out,
             "dashboard",
@@ -88,8 +82,11 @@ def extract_dashboards(ctx: Ctx, out: ExtractResult) -> int:
                 "sourceBytes": len(source.encode()),
                 "visible": as_bool(c.get("isVisible", True)),
                 "isDashboard": as_bool(c.get("isDashboard", True)),
+                "searches": [s.as_dict() for s in searches],
             },
         )
+        if warnings:
+            ent["lineage"] = {"warnings": warnings}
         n += 1
     return n
 

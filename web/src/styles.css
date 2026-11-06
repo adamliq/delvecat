@@ -190,3 +190,26 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
   .facets-mobile[open] summary { margin-bottom: 10px; }
 }
 .tile.static:hover { border-color: var(--border); }
+
+/* Phase 3: lineage */
+.lineage-controls { display: flex; gap: 12px; flex-wrap: wrap; }
+.lineage-scroll { overflow: auto; max-width: 100%; max-height: 75vh; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.lineage-canvas { position: relative; }
+.lineage-svg { position: absolute; inset: 0; }
+.lineage-edge { fill: none; stroke: var(--border); stroke-width: 1.5; }
+.lineage-edge-focus { stroke: var(--accent); stroke-opacity: 0.6; }
+.lineage-arrow { fill: var(--muted); }
+.lineage-node {
+  position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); overflow: hidden;
+}
+.lineage-node:hover { border-color: var(--accent); text-decoration: none; }
+.lineage-node-focus { border: 2px solid var(--accent); background: var(--accent-soft); }
+.lineage-node-broken { border-color: var(--danger); }
+.lineage-node-type { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); white-space: nowrap; }
+.lineage-node-name { font-size: 0.85rem; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lineage-more { position: absolute; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; border: 1px dashed var(--border); border-radius: 6px; }
+.notice { border: 1px solid var(--warn); border-radius: 8px; padding: 12px 14px; background: var(--surface); }
+.notice p { margin: 0.3rem 0; }
+.notice .chip { margin-right: 4px; }

@@ -49,6 +49,8 @@ export function Home() {
   const described = bundle.entities.filter((e) => effectiveDescription(e)).length;
   const owned = bundle.entities.filter((e) => e.annotations?.owners?.length).length;
   const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
+  const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
+  const noIndex = bundle.entities.filter((e) => e.lineage?.implicitIndex).length;
   const coverage: [string, number][] = [
     ["have a description", described],
     ["have an owner", owned],
@@ -102,6 +104,22 @@ export function Home() {
           <Link to="/glossary">Glossary ({(bundle.glossary ?? []).length} terms)</Link>
         </p>
       </section>
+
+      {(broken > 0 || noIndex > 0) && (
+        <section>
+          <h2>Search health</h2>
+          <ul className="plain-list">
+            {broken > 0 && (
+              <li><Link to={searchPath({ issue: "broken reference" })}>{broken} object{broken === 1 ? "" : "s"} with broken references</Link>{" "}
+                <span className="muted small">(macros, lookups, indexes or saved searches that are missing or not shared)</span></li>
+            )}
+            {noIndex > 0 && (
+              <li><Link to={searchPath({ issue: "no index specified" })}>{noIndex} search{noIndex === 1 ? "" : "es"} without an index</Link>{" "}
+                <span className="muted small">(results depend on the user's default indexes)</span></li>
+            )}
+          </ul>
+        </section>
+      )}
 
       <section>
         <h2>Object types</h2>

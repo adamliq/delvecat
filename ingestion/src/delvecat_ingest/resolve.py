@@ -32,6 +32,16 @@ class Resolver:
                 if splunk_wildcard_match(target.name, e["name"])
             ]
         found = self._by_name.get((target.type, target.name), [])
+        if target.visible_only and target.type not in GLOBAL_TYPES:
+
+            def visible(e: dict[str, Any]) -> bool:
+                if e.get("sharing") == "user":
+                    return e.get("app") == target.app and e.get("owner") == target.owner
+                return e.get("app") == target.app or e.get("sharing") in ("global", "system")
+
+            seen = [e for e in found if visible(e)]
+            same_app = [e for e in seen if e.get("app") == target.app]
+            return (same_app or seen)[:1]
         if target.type in GLOBAL_TYPES or len(found) <= 1:
             return found
         # Knowledge objects: Splunk prefers the current app, then globally shared objects.

@@ -20,6 +20,7 @@ const FACET_TITLES: Record<Facet, string> = {
   sharing: "Sharing",
   status: "Status",
   documented: "Has description",
+  issue: "Search issues",
 };
 
 function valueLabel(facet: Facet, value: string): string {

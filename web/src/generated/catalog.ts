@@ -164,6 +164,24 @@ export interface Entity {
    */
   contentHash?: string;
   annotations?: Annotations;
+  /**
+   * Diagnostics from SPL analysis. Derived, so it never changes the catalog version.
+   */
+  lineage?: {
+    /**
+     * A search with no index constraint: it runs against the user's default indexes.
+     */
+    implicitIndex?: boolean;
+    /**
+     * Uses $tokens$, so some references are only known at run time.
+     */
+    dynamic?: boolean;
+    /**
+     * References to objects not found (or not visible) in the catalog, as type:name.
+     */
+    unresolved?: string[];
+    warnings?: string[];
+  };
 }
 /**
  * Human-curated metadata merged from annotations/*.yaml. Never comes from Splunk.

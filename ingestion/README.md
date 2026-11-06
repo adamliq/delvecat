@@ -32,6 +32,14 @@ Useful options:
 | `--record DIR` | save every response as replayable fixtures (secrets and emails removed) |
 | `--strict` | exit 3 if any extractor failed |
 
+## Lineage
+
+Every bundle includes lineage derived from SPL in saved searches, dashboards,
+eventtypes, macros, data models and workflow actions (no extra Splunk calls).
+Objects that reference something missing or not shared get
+`entity.lineage.unresolved`; searches without an index get
+`entity.lineage.implicitIndex`.
+
 ## Safety
 
 The HTTP client refuses any request that could change Splunk: only `GET` is

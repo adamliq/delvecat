@@ -2,6 +2,1468 @@
  "entry": [
   {
    "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isVisible=\"False\" isDashboard=\"False\">\n    <label>Alert</label>\n</view>",
+    "eai:digest": "6ccce01a8f9e08b102fbdace52e4396b",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Alert",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/alert",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/alert/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/alert",
+    "edit": "/servicesNS/nobody/search/data/ui/views/alert",
+    "list": "/servicesNS/nobody/search/data/ui/views/alert"
+   },
+   "name": "alert",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Alerts</label>\n</view>",
+    "eai:digest": "21ac8e0d1f28262758bb84cb9c7551b5",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Alerts",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/alerts",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/alerts/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/alerts",
+    "edit": "/servicesNS/nobody/search/data/ui/views/alerts",
+    "list": "/servicesNS/nobody/search/data/ui/views/alerts"
+   },
+   "name": "alerts",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<view template=\"builder.html\" onunloadCancelJobs=\"False\" type=\"redirect\" target=\"search\" isVisible=\"False\" isDashboard=\"False\">\n  <label>Advanced Charting</label>\n</view>",
+    "eai:digest": "2c647fc6d886a9b88488d5639e0c377b",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Advanced Charting",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/charting",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/charting/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/charting",
+    "edit": "/servicesNS/nobody/search/data/ui/views/charting",
+    "list": "/servicesNS/nobody/search/data/ui/views/charting"
+   },
+   "name": "charting",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"dashboard.html\" stylesheet=\"dashboard2.css\" isDashboard=\"False\" type=\"redirect\" target=\"search\">\n  <label>Summary</label>\n</view>",
+    "eai:digest": "20d762676f688dc6399f50f03384d0ed",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Summary",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/dashboard_live",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/dashboard_live/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/dashboard_live",
+    "edit": "/servicesNS/nobody/search/data/ui/views/dashboard_live",
+    "list": "/servicesNS/nobody/search/data/ui/views/dashboard_live"
+   },
+   "name": "dashboard_live",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Dashboards</label>\n</view>",
+    "eai:digest": "595c66ecdfc2f517f20786c38ceb5e44",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Dashboards",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/dashboards",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/dashboards/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/dashboards",
+    "edit": "/servicesNS/nobody/search/data/ui/views/dashboards",
+    "list": "/servicesNS/nobody/search/data/ui/views/dashboards"
+   },
+   "name": "dashboards",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/system.html\" type=\"html\" isVisible=\"False\" isDashboard=\"False\">\n    <label>Data Model Editor</label>\n</view>\n",
+    "eai:digest": "c192bba067d922a7d12feba8522af497",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Data Model Editor",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/data_model_editor",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/data_model_editor/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/data_model_editor",
+    "edit": "/servicesNS/nobody/search/data/ui/views/data_model_editor",
+    "list": "/servicesNS/nobody/search/data/ui/views/data_model_editor"
+   },
+   "name": "data_model_editor",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view type=\"redirect\" target=\"pivot\" isDashboard=\"False\">\n    <label>Datasets</label>\n</view>",
+    "eai:digest": "3025aa08aca256c22ca8726cb8a42a88",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Datasets",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/data_model_explorer",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/data_model_explorer/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/data_model_explorer",
+    "edit": "/servicesNS/nobody/search/data/ui/views/data_model_explorer",
+    "list": "/servicesNS/nobody/search/data/ui/views/data_model_explorer"
+   },
+   "name": "data_model_explorer",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/system.html\" type=\"html\" isVisible=\"False\" isDashboard=\"False\">\n    <label>Data Model Manager</label>\n</view>",
+    "eai:digest": "0b0f4f2544a8d4a83093432afbd69155",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Data Model Manager",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/data_model_manager",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/data_model_manager/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/data_model_manager",
+    "edit": "/servicesNS/nobody/search/data/ui/views/data_model_manager",
+    "list": "/servicesNS/nobody/search/data/ui/views/data_model_manager"
+   },
+   "name": "data_model_manager",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view type=\"redirect\" target=\"pivot\" isDashboard=\"False\">\n    <label>Datasets</label>\n</view>",
+    "eai:digest": "3025aa08aca256c22ca8726cb8a42a88",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Datasets",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/data_models",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/data_models/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/data_models",
+    "edit": "/servicesNS/nobody/search/data/ui/views/data_models",
+    "list": "/servicesNS/nobody/search/data/ui/views/data_models"
+   },
+   "name": "data_models",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Dataset</label>\n</view>",
+    "eai:digest": "39ede0d89c6c6c71807b06e8dbcae104",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Dataset",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/dataset",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/dataset/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/dataset",
+    "edit": "/servicesNS/nobody/search/data/ui/views/dataset",
+    "list": "/servicesNS/nobody/search/data/ui/views/dataset"
+   },
+   "name": "dataset",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/page_with_flag.html\" type=\"html\" isDashboard=\"False\" packageName=\"end-user-xp\">\n    <label>Datasets</label>\n</view>",
+    "eai:digest": "a4675d6fd8d7c923c2e2ae3fc45d5e61",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Datasets",
+    "packageName": "end-user-xp",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/datasets",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/datasets/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/datasets",
+    "edit": "/servicesNS/nobody/search/data/ui/views/datasets",
+    "list": "/servicesNS/nobody/search/data/ui/views/datasets"
+   },
+   "name": "datasets",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Field Extractor</label>\n</view>",
+    "eai:digest": "874e2aeecb0e9cfb66a3028133038afd",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Field Extractor",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/field_extractor",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/field_extractor/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/field_extractor",
+    "edit": "/servicesNS/nobody/search/data/ui/views/field_extractor",
+    "list": "/servicesNS/nobody/search/data/ui/views/field_extractor"
+   },
+   "name": "field_extractor",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view onunloadCancelJobs=\"False\" autoCancelInterval=\"100\" isDashboard=\"False\" type=\"redirect\" target=\"search\">\n    <!-- autoCancelInterval is set here to 100 -->\n    <label>Search</label>\n</view>",
+    "eai:digest": "76f74adac3471ce87e96522f1bdd61b4",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Search",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/flashtimeline",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/flashtimeline/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/flashtimeline",
+    "edit": "/servicesNS/nobody/search/data/ui/views/flashtimeline",
+    "list": "/servicesNS/nobody/search/data/ui/views/flashtimeline"
+   },
+   "name": "flashtimeline",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<dashboard version=\"2\" theme=\"light\">\n    <label>Integrity Check of Installed Files</label>\n    <description></description>\n    <definition><![CDATA[\n{\n\t\"visualizations\": {\n\t\t\"viz_2CKkC9TI\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"fillColor\": \"transparent\",\n\t\t\t\t\"strokeColor\": \"transparent\"\n\t\t\t}\n\t\t},\n\t\t\"viz_91L4nLzo\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 100,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"cell\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_D8zjxoee\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.linkToSearch\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"type\": \"auto\",\n\t\t\t\t\t\t\"newTab\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Status of file integrity check\",\n\t\t\t\"description\": \"NOTE: Results for this check are available only from instances running version 6.5 or later of Splunk Enterprise or Splunk Light.\"\n\t\t},\n\t\t\"viz_vOeMR6HS\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 100,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"cell\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false,\n\t\t\t\t\"columnFormat\": {\n\t\t\t\t\t\"File path\": {\n\t\t\t\t\t\t\"width\": 455\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_ykU0J0NC\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.linkToSearch\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"type\": \"auto\",\n\t\t\t\t\t\t\"newTab\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"\"\n\t\t},\n\t\t\"viz_4ZbgpwwP\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"The file integrity check can identify when Splunk software files have been modified in a way that is not valid. This view queries the file integrity check endpoint for the selected instance (by default, the local instance). It reports on the status of this feature (is it enabled, disabled, or unavailable) and shows the results of the latest file integrity check if those are available.\\n\\n[Learn more](/help?location=learnmore.validate.files)\"\n\t\t\t}\n\t\t},\n\t\t\"viz_8yzIyg7o\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"## List of installed files presenting integrity check failures\\nThe table below shows files that were installed by the Splunk Enterprise package and have been improperly modified or are missing.\\n\\n[Learn more](https://docs.splunk.com/Documentation/Splunk/9.1.0/Admin/ChecktheintegrityofyourSplunksoftwarefiles?ref=hk#Interpret_results_of_an_integrity_check)\",\n\t\t\t\t\"backgroundColor\": \"#ffffff\"\n\t\t\t}\n\t\t},\n\t\t\"viz_D3LdmiV9\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"fillColor\": \"transparent\",\n\t\t\t\t\"strokeColor\": \"transparent\"\n\t\t\t}\n\t\t}\n\t},\n\t\"dataSources\": {\n\t\t\"ds_D8zjxoee\": {\n\t\t\t\"type\": \"ds.search\",\n\t\t\t\"options\": {\n\t\t\t\t\"query\": \"| rest splunk_server=$splunk_server$ /services/server/info\\n| fields splunk_server version\\n| join type=outer splunk_server [rest splunk_server=$splunk_server$ /services/server/status/installed-file-integrity\\n    | fields splunk_server check_ready check_failures.fail]\\n| eval check_status = case(isnull('check_failures.fail') AND isnotnull(check_ready), \\\"enabled\\\", 'check_failures.fail' == \\\"check_disabled\\\", \\\"disabled\\\", isnull(check_ready), \\\"feature unavailable\\\")\\n| eval check_ready = if(check_status == \\\"enabled\\\", check_ready, \\\"N/A\\\")\\n| fields version check_status check_ready\\n| rename version AS \\\"Splunk version\\\" check_status AS \\\"Check status\\\" check_ready AS \\\"Results ready?\\\"\",\n\t\t\t\t\"queryParameters\": {\n\t\t\t\t\t\"earliest\": \"0\",\n\t\t\t\t\t\"latest\": \"\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"name\": \"Status of file integrity check - Table search\"\n\t\t},\n\t\t\"ds_ykU0J0NC\": {\n\t\t\t\"type\": \"ds.search\",\n\t\t\t\"options\": {\n\t\t\t\t\"query\": \"| rest splunk_server=$splunk_server$ /services/server/status/installed-file-integrity\\n| fields check_failures.*\\n| untable splunk_server file_path check_result\\n| replace \\\"check_failures.*\\\" WITH \\\"*\\\" IN file_path\\n| fields file_path check_result\\n| rename file_path AS \\\"File path\\\" check_result AS \\\"Check result\\\"\",\n\t\t\t\t\"queryParameters\": {\n\t\t\t\t\t\"earliest\": \"0\",\n\t\t\t\t\t\"latest\": \"\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"name\": \"List of installed files presenting integrity check failures - Table search\"\n\t\t}\n\t},\n\t\"defaults\": {\n\t\t\"dataSources\": {\n\t\t\t\"ds.search\": {\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"queryParameters\": {}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t},\n\t\"inputs\": {\n\t\t\"input_cmA7h2yy\": {\n\t\t\t\"type\": \"input.text\",\n\t\t\t\"options\": {\n\t\t\t\t\"token\": \"splunk_server\",\n\t\t\t\t\"defaultValue\": \"local\"\n\t\t\t},\n\t\t\t\"title\": \"Instance\"\n\t\t}\n\t},\n\t\"description\": \"\",\n\t\"title\": \"Integrity Check of Installed Files\",\n\t\"layout\": {\n\t\t\"tabs\": {\n\t\t\t\"items\": [\n\t\t\t\t{\n\t\t\t\t\t\"layoutId\": \"layout_1\",\n\t\t\t\t\t\"label\": \"New tab\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"layoutDefinitions\": {\n\t\t\t\"layout_1\": {\n\t\t\t\t\"type\": \"grid\",\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"height\": 840,\n\t\t\t\t\t\"width\": 1440\n\t\t\t\t},\n\t\t\t\t\"structure\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_4ZbgpwwP\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 0,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 74\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"input_cmA7h2yy\",\n\t\t\t\t\t\t\"type\": \"input\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 74,\n\t\t\t\t\t\t\t\"w\": 407,\n\t\t\t\t\t\t\t\"h\": 90\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_91L4nLzo\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 164,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 216\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_D3LdmiV9\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 380,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_8yzIyg7o\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 444,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 89\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_vOeMR6HS\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 533,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 543\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 407,\n\t\t\t\t\t\t\t\"y\": 74,\n\t\t\t\t\t\t\t\"w\": 1033,\n\t\t\t\t\t\t\t\"h\": 90\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"item\": \"viz_2CKkC9TI\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t\"globalInputs\": []\n\t}\n}\n    ]]></definition>\n    <meta type=\"hiddenElements\"><![CDATA[\n{\n\t\"hideEdit\": true,\n\t\"hideOpenInSearch\": false,\n\t\"hideExport\": false\n}\n    ]]></meta>\n</dashboard>",
+    "eai:digest": "8d96c7f5b82da47fe51cb1cfb7ea62fc",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Integrity Check of Installed Files",
+    "rootNode": "dashboard",
+    "version": "2"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/integrity_check_of_installed_files",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/integrity_check_of_installed_files/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/integrity_check_of_installed_files",
+    "edit": "/servicesNS/nobody/search/data/ui/views/integrity_check_of_installed_files",
+    "list": "/servicesNS/nobody/search/data/ui/views/integrity_check_of_installed_files"
+   },
+   "name": "integrity_check_of_installed_files",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<dashboard version=\"2\" theme=\"light\">\n    <label>Job Details Dashboard</label>\n    <description></description>\n    <definition><![CDATA[\n{\n\t\"visualizations\": {\n\t\t\"viz_4tjuNfVM\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"fillColor\": \"transparent\",\n\t\t\t\t\"strokeColor\": \"transparent\"\n\t\t\t}\n\t\t},\n\t\t\"viz_search_duration\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 2,\n\t\t\t\t\"unit\": \"s\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_xavH8b3m\"\n\t\t\t},\n\t\t\t\"title\": \"Search Duration\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_events_scanned\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_3P9eolkf\"\n\t\t\t},\n\t\t\t\"title\": \"Total Events Scanned\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_events_matched\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_tiXhF4hf\"\n\t\t\t},\n\t\t\t\"title\": \"Total Events Matched\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_result_count\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_B0tLCgiF\"\n\t\t\t},\n\t\t\t\"title\": \"Result Count\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_events_scanned_per_sec\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 0\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_gE4CdsUI\"\n\t\t\t},\n\t\t\t\"title\": \"Events Scanned Per Second\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_search_status\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_gPBO1BES\"\n\t\t\t},\n\t\t\t\"title\": \"Search Status\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_search_user\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_qIsg157U\"\n\t\t\t},\n\t\t\t\"title\": \"Search User\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_search_mode\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_b517YriV\"\n\t\t\t},\n\t\t\t\"title\": \"Search Mode\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_server_info\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"majorColor\": \"> majorValue | rangeValue(convertedColorRange)\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_59ysbM7e\"\n\t\t\t},\n\t\t\t\"title\": \"Server Info\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_aoH6fg9Q\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 20,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"none\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_5iHsYv1k\"\n\t\t\t},\n\t\t\t\"title\": \"Search String\"\n\t\t},\n\t\t\"viz_wvNj7yEc\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 20,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"none\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_i7kX8kpW\"\n\t\t\t},\n\t\t\t\"title\": \"Optimized Search String\"\n\t\t},\n\t\t\"viz_SzryUuWB\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 20,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"none\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_tz2ZnBJT\"\n\t\t\t},\n\t\t\t\"title\": \"Map Phase Search String\"\n\t\t},\n\t\t\"viz_7FzLK9mW\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 20,\n\t\t\t\t\"dataOverlayMode\": \"none\",\n\t\t\t\t\"drilldown\": \"none\",\n\t\t\t\t\"showRowNumbers\": false,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_P4AddBVq\"\n\t\t\t},\n\t\t\t\"title\": \"Reduce Phase Search String\"\n\t\t},\n\t\t\"viz_LiP89SR7\": {\n\t\t\t\"type\": \"splunk.bar\",\n\t\t\t\"options\": {\n\t\t\t\t\"yAxisAbbreviation\": \"off\",\n\t\t\t\t\"y2AxisAbbreviation\": \"off\",\n\t\t\t\t\"showRoundedY2AxisLabels\": false,\n\t\t\t\t\"legendTruncation\": \"ellipsisMiddle\",\n\t\t\t\t\"showY2MajorGridLines\": true,\n\t\t\t\t\"xAxisTitleText\": \"Command\",\n\t\t\t\t\"yAxisTitleText\": \"Duration (s)\",\n\t\t\t\t\"dataValuesDisplay\": \"all\"\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_8k4dhVv2\"\n\t\t\t},\n\t\t\t\"title\": \"Search Costs by Command\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_map_phase_time\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 2,\n\t\t\t\t\"unit\": \"s\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_UPHGpc7J\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.setToken\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"tokens\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"token\": \"map_phase_drilldown\",\n\t\t\t\t\t\t\t\t\"value\": \"true\"\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Approximate Time Spent in Map Phase\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"description\": \"Click on the time to see a detailed breakdown of the search costs by command for the map phase.\"\n\t\t},\n\t\t\"viz_reduce_phase_time\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 2,\n\t\t\t\t\"unit\": \"s\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_N3o5NfGj\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.setToken\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"tokens\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"token\": \"reduce_phase_drilldown\",\n\t\t\t\t\t\t\t\t\"value\": \"true\"\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Approximate Time Spent in Reduce Phase\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"description\": \"Click on the time to see a detailed breakdown of the search costs by command for the reduce phase.\"\n\t\t},\n\t\t\"viz_ALswRywF\": {\n\t\t\t\"type\": \"splunk.bar\",\n\t\t\t\"options\": {\n\t\t\t\t\"yAxisAbbreviation\": \"auto\",\n\t\t\t\t\"y2AxisAbbreviation\": \"off\",\n\t\t\t\t\"showRoundedY2AxisLabels\": false,\n\t\t\t\t\"legendTruncation\": \"ellipsisMiddle\",\n\t\t\t\t\"showY2MajorGridLines\": true,\n\t\t\t\t\"xAxisTitleText\": \"Command\",\n\t\t\t\t\"yAxisTitleText\": \"Duration (s)\",\n\t\t\t\t\"yAxisScale\": \"linear\",\n\t\t\t\t\"dataValuesDisplay\": \"all\",\n\t\t\t\t\"stackMode\": \"auto\",\n\t\t\t\t\"showSplitSeries\": false,\n\t\t\t\t\"legendDisplay\": \"off\"\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_LYGRMrhG\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.setToken\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"tokens\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"token\": \"map_phase_drilldown\",\n\t\t\t\t\t\t\t\t\"value\": \"false\"\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Map Phase Search Costs by Command\",\n\t\t\t\"hideWhenNoData\": true\n\t\t},\n\t\t\"viz_mX1N0B5I\": {\n\t\t\t\"type\": \"splunk.bar\",\n\t\t\t\"options\": {\n\t\t\t\t\"yAxisAbbreviation\": \"off\",\n\t\t\t\t\"y2AxisAbbreviation\": \"off\",\n\t\t\t\t\"showRoundedY2AxisLabels\": false,\n\t\t\t\t\"legendTruncation\": \"ellipsisMiddle\",\n\t\t\t\t\"showY2MajorGridLines\": true,\n\t\t\t\t\"xAxisTitleText\": \"Command\",\n\t\t\t\t\"yAxisTitleText\": \"Duration (s)\",\n\t\t\t\t\"dataValuesDisplay\": \"all\"\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_ErxDm9Um\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.setToken\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"tokens\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"token\": \"reduce_phase_drilldown\",\n\t\t\t\t\t\t\t\t\"value\": \"false\"\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Reduce Phase Search Costs by Command\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"hideWhenNoData\": true\n\t\t},\n\t\t\"viz_startup_handoff\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 2,\n\t\t\t\t\"unit\": \"s\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_khouo4Fk\"\n\t\t\t},\n\t\t\t\"title\": \"Startup Handoff Time\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"description\": \"Time between the forking of a separate search process and the beginning of useful work of the forked search processes. This is cumulative across all involved peers. A large value could indicate I/O issues with .conf files or the dispatch directory.\"\n\t\t},\n\t\t\"viz_num_of_indexers\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_q4uWZe33\"\n\t\t\t},\n\t\t\t\"title\": \"Number of Indexers\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_avg_indexer_time\": {\n\t\t\t\"type\": \"splunk.singlevalue\",\n\t\t\t\"options\": {\n\t\t\t\t\"numberPrecision\": 2,\n\t\t\t\t\"unit\": \"s\"\n\t\t\t},\n\t\t\t\"context\": {\n\t\t\t\t\"convertedColorRange\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 100,\n\t\t\t\t\t\t\"value\": \"#dc4e41\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 70,\n\t\t\t\t\t\t\"to\": 100,\n\t\t\t\t\t\t\"value\": \"#f1813f\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 30,\n\t\t\t\t\t\t\"to\": 70,\n\t\t\t\t\t\t\"value\": \"#f8be34\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"from\": 0,\n\t\t\t\t\t\t\"to\": 30,\n\t\t\t\t\t\t\"value\": \"#0877a6\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"to\": 0,\n\t\t\t\t\t\t\"value\": \"#53a051\"\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_qRj8L4Fx\"\n\t\t\t},\n\t\t\t\"title\": \"Average Indexer Time\",\n\t\t\t\"showProgressBar\": true\n\t\t},\n\t\t\"viz_time_per_indexer\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 10,\n\t\t\t\t\"dataOverlayMode\": \"heatmap\",\n\t\t\t\t\"drilldown\": \"cell\",\n\t\t\t\t\"showRowNumbers\": true,\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_HQv3nIln\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.setToken\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"tokens\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"token\": \"indexer\",\n\t\t\t\t\t\t\t\t\"key\": \"row.Indexer.value\"\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t]\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Time Spent Running Search Per Indexer\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"description\": \"Click on an indexer name to see detailed metrics for that indexer. Note that more shaded duration values indicate slower indexers\"\n\t\t},\n\t\t\"viz_2T7sZd8d\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"count\": 10,\n\t\t\t\t\"drilldown\": \"row\",\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_sOXep8C7\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.linkToSearch\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"type\": \"auto\",\n\t\t\t\t\t\t\"newTab\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"Drilldown Details For Indexer $indexer$\",\n\t\t\t\"showProgressBar\": true,\n\t\t\t\"hideWhenNoData\": true\n\t\t},\n\t\t\"viz_zLcDjZGY\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"This dashboard displays properties of a search job. Use it to gain insight into search job performance and troubleshoot search efficiency issues. Provide a Search ID for a job that has not expired.\\n\\n[Learn more](https://docs.splunk.com/Documentation/Splunk/9.1.0/Search/ViewsearchjobpropertieswiththeJobInspector?ref=hk)\"\n\t\t\t}\n\t\t},\n\t\t\"viz_h2WFQvqy\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# Summary\",\n\t\t\t\t\"backgroundColor\": \"#ffffff\"\n\t\t\t}\n\t\t},\n\t\t\"viz_A27UCOAm\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# Search Strings\",\n\t\t\t\t\"backgroundColor\": \"#ffffff\"\n\t\t\t}\n\t\t},\n\t\t\"viz_JWCs3RfT\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# Search Costs\",\n\t\t\t\t\"backgroundColor\": \"#ffffff\"\n\t\t\t}\n\t\t},\n\t\t\"viz_n2IAWJgr\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# Indexers\",\n\t\t\t\t\"backgroundColor\": \"#ffffff\"\n\t\t\t}\n\t\t}\n\t},\n\t\"dataSources\": {\n\t\t\"ds_baseSearch\": {\n\t\t\t\"type\": \"ds.search\",\n\t\t\t\"options\": {\n\t\t\t\t\"query\": \"| rest /services/search/jobs/$sid|s$ splunk_server=local\",\n\t\t\t\t\"queryParameters\": {\n\t\t\t\t\t\"earliest\": \"-4h\"\n\t\t\t\t},\n\t\t\t\t\"refresh\": \"60s\"\n\t\t\t},\n\t\t\t\"name\": \"ds_baseSearch\"\n\t\t},\n\t\t\"ds_xavH8b3m\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields runDuration\"\n\t\t\t},\n\t\t\t\"name\": \"Search Duration - Single value search\"\n\t\t},\n\t\t\"ds_3P9eolkf\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields scanCount\"\n\t\t\t},\n\t\t\t\"name\": \"Total Events Scanned - Single value search\"\n\t\t},\n\t\t\"ds_tiXhF4hf\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields eventCount\"\n\t\t\t},\n\t\t\t\"name\": \"Total Events Matched - Single value search\"\n\t\t},\n\t\t\"ds_B0tLCgiF\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields resultCount\"\n\t\t\t},\n\t\t\t\"name\": \"Result Count - Single value search\"\n\t\t},\n\t\t\"ds_gE4CdsUI\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"eval eventsScannedPerSec=scanCount / exact(runDuration) | fields eventsScannedPerSec\"\n\t\t\t},\n\t\t\t\"name\": \"Events Scanned Per Second - Single value search\"\n\t\t},\n\t\t\"ds_gPBO1BES\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields dispatchState | eval dispatchState=lower(dispatchState)\"\n\t\t\t},\n\t\t\t\"name\": \"Search Status - Single value search\"\n\t\t},\n\t\t\"ds_qIsg157U\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields author\"\n\t\t\t},\n\t\t\t\"name\": \"Search User - Single value search\"\n\t\t},\n\t\t\"ds_b517YriV\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"eval searchMode=if (isnull('custom.display.page.search.mode'), \\\"smart\\\", 'custom.display.page.search.mode') | fields searchMode\"\n\t\t\t},\n\t\t\t\"name\": \"Search Mode - Single value search\"\n\t\t},\n\t\t\"ds_59ysbM7e\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields splunk_server\"\n\t\t\t},\n\t\t\t\"name\": \"Server Info - Single value search\"\n\t\t},\n\t\t\"ds_5iHsYv1k\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields search\"\n\t\t\t},\n\t\t\t\"name\": \"Search String - Table search\"\n\t\t},\n\t\t\"ds_i7kX8kpW\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields optimizedSearch\"\n\t\t\t},\n\t\t\t\"name\": \"Optimized Search String - Table search\"\n\t\t},\n\t\t\"ds_tz2ZnBJT\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields remoteSearch\"\n\t\t\t},\n\t\t\t\"name\": \"Map Phase Search String - Table search\"\n\t\t},\n\t\t\"ds_P4AddBVq\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields reduceSearch | eval reduceSearch=if (isnull(reduceSearch), \\\"N/A\\\", reduceSearch)\"\n\t\t\t},\n\t\t\t\"name\": \"Reduce Phase Search String - Table search\"\n\t\t},\n\t\t\"ds_8k4dhVv2\": {\n\t\t\t\"type\": \"ds.search\",\n\t\t\t\"options\": {\n\t\t\t\t\"query\": \"index=\\\"_introspection\\\" sourcetype=search_telemetry search_id=*$sid|s$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval fields=mvzip(command, duration, \\\",\\\") | mvexpand fields | rex field=fields \\\"(?<Command>[^,]+),(?<Duration>.+)$\\\"\\n                        | table Command, Duration\",\n\t\t\t\t\"queryParameters\": {\n\t\t\t\t\t\"earliest\": \"-4h\"\n\t\t\t\t},\n\t\t\t\t\"refresh\": \"60s\"\n\t\t\t},\n\t\t\t\"name\": \"Search Costs by Command - Bar chart search\"\n\t\t},\n\t\t\"ds_UPHGpc7J\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance*dispatch.stream.remote.*.duration_secs, performance*dispatch.stream.local.duration_secs | transpose | rename column as Indexer \\\"row 1\\\" as Duration | stats max(Duration)\"\n\t\t\t},\n\t\t\t\"name\": \"Approximate Time Spent in Map Phase - Click on the time to see a detailed breakdown of the search costs by command for the map phase. search\"\n\t\t},\n\t\t\"ds_N3o5NfGj\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields reduceSearch | rex field=reduceSearch max_match=0 \\\"(^(?<first>\\\\w+){1})|((\\\\| (?<command>\\\\w+)))\\\" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | eval Command=if(like(Command, \\\"%stats%\\\"), \\\"stats\\\", Command) | eval Command=if(like(Command, \\\"%bin%\\\"), \\\"prebin\\\", Command) | join Command [| search index=\\\"_introspection\\\" sourcetype=search_telemetry search_id=*$sid|s$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,\\\",\\\"),0), Duration= mvindex(split(tempField,\\\",\\\"),1) | fields Command, Duration] | stats sum(Duration)\"\n\t\t\t},\n\t\t\t\"name\": \"Approximate Time Spent in Reduce Phase - Click on the time to see a detailed breakdown of the search costs by command for the reduce phase. search\"\n\t\t},\n\t\t\"ds_LYGRMrhG\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields remoteSearch | rex field=remoteSearch max_match=0 \\\"(^(?<first>\\\\w+){1})|((\\\\| (?<command>\\\\w+)))\\\" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | join Command [| search index=\\\"_introspection\\\" sourcetype=search_telemetry search_id=*$sid|s$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,\\\",\\\"),0), Duration= mvindex(split(tempField,\\\",\\\"),1) | fields Command, Duration] | table Command, Duration\\n| head limit=100 ($map_phase_drilldown|s$ = \\\"true\\\")\"\n\t\t\t},\n\t\t\t\"name\": \"Map Phase Search Costs by Command - Bar chart search\"\n\t\t},\n\t\t\"ds_ErxDm9Um\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields reduceSearch | rex field=reduceSearch max_match=0 \\\"(^(?<first>\\\\w+){1})|((\\\\| (?<command>\\\\w+)))\\\" | eval Command = mvappend(first, command) | mvexpand Command | fields Command | eval Command=if(like(Command, \\\"%stats%\\\"), \\\"stats\\\", Command) | eval Command=if(like(Command, \\\"%bin%\\\"), \\\"prebin\\\", Command) | join Command [| search index=\\\"_introspection\\\" sourcetype=search_telemetry source=*$sid|s$* | spath path=search_commands{}.name output=command | spath path=search_commands{}.duration output=duration | eval tempField= mvzip(command, duration) | stats count by tempField | eval Command = mvindex(split(tempField,\\\",\\\"),0), Duration= mvindex(split(tempField,\\\",\\\"),1) | fields Command, Duration] | table Command, Duration\\n| head limit=100 ($reduce_phase_drilldown|s$ = \\\"true\\\")\"\n\t\t\t},\n\t\t\t\"name\": \"Reduce Phase Search Costs by Command - Bar chart search\"\n\t\t},\n\t\t\"ds_khouo4Fk\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance.startup.handoff.duration_secs\"\n\t\t\t},\n\t\t\t\"name\": \"Startup Handoff Time - Time between the forking of a separate search process and the beginning of useful work of the forked search processes. This is cumulative across all involved peers. A large value could indicate I_O issues with .conf files or the dispatch directory. search\"\n\t\t},\n\t\t\"ds_q4uWZe33\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance*dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer \\\"row 1\\\" as Duration | stats count(Indexer)\"\n\t\t\t},\n\t\t\t\"name\": \"Number of Indexers - Single value search\"\n\t\t},\n\t\t\"ds_qRj8L4Fx\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance*dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer \\\"row 1\\\" as Duration | stats avg(Duration)\"\n\t\t\t},\n\t\t\t\"name\": \"Average Indexer Time - Single value search\"\n\t\t},\n\t\t\"ds_HQv3nIln\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance*dispatch.stream.remote.*.duration_secs | transpose | rename column as Indexer \\\"row 1\\\" as \\\"Duration (seconds)\\\" | rex field=Indexer \\\"performance\\\\.dispatch\\\\.stream\\\\.remote\\\\.(?<Indexer>.*)\\\\.duration_secs\\\"\"\n\t\t\t},\n\t\t\t\"name\": \"Time Spent Running Search Per Indexer - Click on an indexer name to see detailed metrics for that indexer. Note that more shaded duration values indicate slower indexers. search\"\n\t\t},\n\t\t\"ds_sOXep8C7\": {\n\t\t\t\"type\": \"ds.chain\",\n\t\t\t\"options\": {\n\t\t\t\t\"extend\": \"ds_baseSearch\",\n\t\t\t\t\"query\": \"fields performance*dispatch.stream.remote.* | transpose | rename column as Field \\\"row 1\\\" as Value | rex field=Field \\\"performance\\\\.dispatch\\\\.stream\\\\.remote\\\\.(?<remoteDetail>.*)$\\\" | eval selectedIndexer=$indexer|s$ | where substr(remoteDetail, 1, len(selectedIndexer) + 1) = selectedIndexer . \\\".\\\" | eval Field=substr(remoteDetail, len(selectedIndexer) + 2) | fields Field Value\"\n\t\t\t},\n\t\t\t\"name\": \"Drilldown Details For Indexer _indexer_ - Table search\"\n\t\t}\n\t},\n\t\"defaults\": {\n\t\t\"dataSources\": {\n\t\t\t\"ds.search\": {\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"queryParameters\": {}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t},\n\t\"inputs\": {\n\t\t\"input_xXrMZj04\": {\n\t\t\t\"type\": \"input.text\",\n\t\t\t\"options\": {\n\t\t\t\t\"token\": \"sid\"\n\t\t\t},\n\t\t\t\"title\": \"Search ID (SID)\"\n\t\t}\n\t},\n\t\"description\": \"\",\n\t\"title\": \"Job Details Dashboard\",\n\t\"layout\": {\n\t\t\"tabs\": {\n\t\t\t\"items\": [\n\t\t\t\t{\n\t\t\t\t\t\"layoutId\": \"layout_1\",\n\t\t\t\t\t\"label\": \"New tab\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"layoutDefinitions\": {\n\t\t\t\"layout_1\": {\n\t\t\t\t\"type\": \"grid\",\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"height\": 4840,\n\t\t\t\t\t\"width\": 1440\n\t\t\t\t},\n\t\t\t\t\"structure\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_LiP89SR7\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2096,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_map_phase_time\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2346,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_ALswRywF\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2596,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 125\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_mX1N0B5I\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2721,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_startup_handoff\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2971,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_n2IAWJgr\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 3221,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_num_of_indexers\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 3285,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_time_per_indexer\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 3535,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_reduce_phase_time\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 720,\n\t\t\t\t\t\t\t\"y\": 2346,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_avg_indexer_time\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 720,\n\t\t\t\t\t\t\t\"y\": 3285,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_2T7sZd8d\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 720,\n\t\t\t\t\t\t\t\"y\": 3535,\n\t\t\t\t\t\t\t\"w\": 720,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_zLcDjZGY\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 0,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"input_xXrMZj04\",\n\t\t\t\t\t\t\"type\": \"input\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 64,\n\t\t\t\t\t\t\t\"w\": 480,\n\t\t\t\t\t\t\t\"h\": 90\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_h2WFQvqy\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 154,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_search_duration\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 218,\n\t\t\t\t\t\t\t\"w\": 288,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_search_status\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 468,\n\t\t\t\t\t\t\t\"w\": 480,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_server_info\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 718,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_A27UCOAm\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 968,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_aoH6fg9Q\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 1032,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_wvNj7yEc\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 1282,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_SzryUuWB\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 1532,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_7FzLK9mW\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 1782,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_JWCs3RfT\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 2032,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 64\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_events_scanned\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 288,\n\t\t\t\t\t\t\t\"y\": 218,\n\t\t\t\t\t\t\t\"w\": 288,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 480,\n\t\t\t\t\t\t\t\"y\": 64,\n\t\t\t\t\t\t\t\"w\": 960,\n\t\t\t\t\t\t\t\"h\": 90\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"item\": \"viz_4tjuNfVM\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_search_user\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 480,\n\t\t\t\t\t\t\t\"y\": 468,\n\t\t\t\t\t\t\t\"w\": 480,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_events_matched\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 576,\n\t\t\t\t\t\t\t\"y\": 218,\n\t\t\t\t\t\t\t\"w\": 288,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_result_count\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 864,\n\t\t\t\t\t\t\t\"y\": 218,\n\t\t\t\t\t\t\t\"w\": 288,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_search_mode\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 960,\n\t\t\t\t\t\t\t\"y\": 468,\n\t\t\t\t\t\t\t\"w\": 480,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_events_scanned_per_sec\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 1152,\n\t\t\t\t\t\t\t\"y\": 218,\n\t\t\t\t\t\t\t\"w\": 288,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t\"globalInputs\": []\n\t}\n}\n    ]]></definition>\n    <meta type=\"hiddenElements\"><![CDATA[\n{\n\t\"hideEdit\": true,\n\t\"hideOpenInSearch\": false,\n\t\"hideExport\": false\n}\n    ]]></meta>\n</dashboard>",
+    "eai:digest": "af2a7f34efe9bae2e7c832d57faacfca",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Job Details Dashboard",
+    "rootNode": "dashboard",
+    "version": "2"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/job_details_dashboard",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/job_details_dashboard/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/job_details_dashboard",
+    "edit": "/servicesNS/nobody/search/data/ui/views/job_details_dashboard",
+    "list": "/servicesNS/nobody/search/data/ui/views/job_details_dashboard"
+   },
+   "name": "job_details_dashboard",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Job Manager</label>\n</view>",
+    "eai:digest": "273d813645a0bf65079074521b8e265d",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Job Manager",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/job_manager",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/job_manager/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/job_manager",
+    "edit": "/servicesNS/nobody/search/data/ui/views/job_manager",
+    "list": "/servicesNS/nobody/search/data/ui/views/job_manager"
+   },
+   "name": "job_manager",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "description": "The following list of dashboards might be affected by a security update that requires jQuery 3.5 or higher. Version 1.0 Simple XML dashboards use jQuery 2.1 and need to be upgraded to jQuery 3.5 by using version 1.1 of Simple XML dashboards. HTML dashboards also depend on jQuery 2.1, but they cannot be upgraded. Instead, recreate them with Dashboard Studio.\n\nVersion 1.0 Simple XML dashboards and HTML dashboards will soon no longer be available in future versions of Splunk software.",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<form version=\"1.1\" script=\"get_html_dashboard_count.js\" hideEdit=\"true\">\n  <label>jQuery Upgrade</label>\n  <description>The following list of dashboards might be affected by a security update that requires jQuery 3.5 or higher. Version 1.0 Simple XML dashboards use jQuery 2.1 and need to be upgraded to jQuery 3.5 by using version 1.1 of Simple XML dashboards. HTML dashboards also depend on jQuery 2.1, but they cannot be upgraded. Instead, recreate them with Dashboard Studio.\n\nVersion 1.0 Simple XML dashboards and HTML dashboards will soon no longer be available in future versions of Splunk software.</description>\n  <fieldset submitButton=\"false\">\n    <input type=\"time\" token=\"field1\">\n      <label>Select Time Range</label>\n      <default>\n        <earliest>-24h@h</earliest>\n        <latest>now</latest>\n      </default>\n    </input>\n    <input type=\"dropdown\" token=\"field2\">\n      <label>Owner</label>\n      <fieldForLabel>owner</fieldForLabel>\n      <fieldForValue>owner</fieldForValue>\n      <default>*</default>\n      <search>\n        <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) | table owner\n| append [\n\t| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"eai:type=html\" count=0 timeout=240\n\t| rename eai:acl.owner as owner\n\t| table owner]\n| append [\n    | rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"rootNode=form OR rootNode=dashboard\" count=0 timeout=240\n\t| rename eai:data as xml eai:acl.owner as owner\n    ``` include only dashboards with customjs ```\n    | regex xml=\"^&lt;(dashboard|form)(.|\\n)*script[ ]*=[ ]*(?:\\'|\\\").*\\.js(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n    ``` filter out dashboards with version=\"1.1\" explicitly set ```\n    | regex xml!=\"^&lt;(dashboard|form)(.|\\n)*version[ ]*=[ ]*(?:\\'|\\\")1.1(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n\t| table owner]\n| dedup owner</query>\n        <earliest>$field1.earliest$</earliest>\n        <latest>$field1.latest$</latest>\n      </search>\n    </input>\n    <input type=\"dropdown\" token=\"field3\">\n      <label>App</label>\n      <fieldForLabel>app_dropdown</fieldForLabel>\n      <fieldForValue>app</fieldForValue>\n      <default>*</default>\n      <search>\n        <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load)\n| fields app\n| append [\n\t| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"eai:type=html\" count=0 timeout=240\n\t| rename eai:acl.app as app\n\t| table app]\n| append [\n\t| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"rootNode=form OR rootNode=dashboard\" count=0 timeout=240\n\t| rename eai:data as xml eai:acl.app as app\n    ``` include only dashboards with customjs ```\n    | regex xml=\"^&lt;(dashboard|form)(.|\\n)*script[ ]*=[ ]*(?:\\'|\\\").*\\.js(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n    ``` filter out dashboards with version=\"1.1\" explicitly set ```\n    | regex xml!=\"^&lt;(dashboard|form)(.|\\n)*version[ ]*=[ ]*(?:\\'|\\\")1.1(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n\t| table app]\n| dedup app\n| join type=inner app\n\t[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0\n\t| rename title as app label as app_label\n\t| table app app_label]\n| strcat app_label \" (\" app \")\" app_dropdown</query>\n        <earliest>$field1.earliest$</earliest>\n        <latest>$field1.latest$</latest>\n      </search>\n    </input>\n  </fieldset>\n  <row>\n    <panel>\n      <title>Number of v1.0 dashboard views</title>\n      <single>\n        <title>Trend of v1.0 dashboard views over time</title>\n        <search>\n          <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) owner=$field2|s$ app=$field3|s$ | timechart count</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"colorBy\">trend</option>\n        <option name=\"colorMode\">none</option>\n        <option name=\"drilldown\">none</option>\n        <option name=\"numberPrecision\">0</option>\n        <option name=\"rangeColors\">[\"0x53a051\",\"0x0877a6\",\"0xf8be34\",\"0xf1813f\",\"0xdc4e41\"]</option>\n        <option name=\"rangeValues\">[0,30,70,100]</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"showSparkline\">1</option>\n        <option name=\"showTrendIndicator\">1</option>\n        <option name=\"trellis.enabled\">0</option>\n        <option name=\"trellis.scales.shared\">1</option>\n        <option name=\"trellis.size\">medium</option>\n        <option name=\"trendColorInterpretation\">inverse</option>\n        <option name=\"trendDisplayMode\">absolute</option>\n        <option name=\"unitPosition\">after</option>\n        <option name=\"useColors\">1</option>\n        <option name=\"useThousandSeparators\">1</option>\n      </single>\n    </panel>\n    <panel>\n      <title>List of v1.0 dashboards viewed</title>\n      <table>\n        <title>Version 1.0 Simple XML dashboards will no longer be available in future versions of Splunk software</title>\n        <search>\n          <query>index=_internal sourcetype=splunk_web_service TERM(dashboard_migrate_type=v1.0_load) owner=$field2|s$ app=$field3|s$\n| join type=inner app\n\t[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0\n\t| rename title as app label as app_label\n\t| table app app_label]\n| stats count by view_name, owner, app, app_label\n| sort - count</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"count\">20</option>\n        <option name=\"dataOverlayMode\">none</option>\n        <option name=\"drilldown\">cell</option>\n        <option name=\"percentagesRow\">false</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"rowNumbers\">false</option>\n        <option name=\"totalsRow\">false</option>\n        <option name=\"wrap\">true</option>\n        <drilldown>\n          <link target=\"_blank\">/app/$row.app$/$row.view_name$</link>\n        </drilldown>\n      </table>\n    </panel>\n  </row>\n  <row>\n    <panel>\n      <title>Number of Simple XML dashboards with CustomJS</title>\n      <single>\n        <search>\n          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"rootNode=form OR rootNode=dashboard\" count=0 timeout=240\n| rename eai:data as xml\n  title as view_name\n  eai:acl.app as app\n  eai:acl.owner as owner\n| search owner=$field2|s$ app=$field3|s$\n``` include only dashboards with customjs ```\n| regex xml=\"^&lt;(dashboard|form)(.|\\n)*script[ ]*=[ ]*(?:\\'|\\\").*\\.js(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n``` filter out dashboards with version=\"1.1\" explicitly set ```\n| regex xml!=\"^&lt;(dashboard|form)(.|\\n)*version[ ]*=[ ]*(?:\\'|\\\")1.1(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n| stats count</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"colorBy\">trend</option>\n        <option name=\"colorMode\">none</option>\n        <option name=\"drilldown\">none</option>\n        <option name=\"numberPrecision\">0</option>\n        <option name=\"rangeColors\">[\"0x53a051\",\"0x0877a6\",\"0xf8be34\",\"0xf1813f\",\"0xdc4e41\"]</option>\n        <option name=\"rangeValues\">[0,30,70,100]</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"showSparkline\">1</option>\n        <option name=\"showTrendIndicator\">1</option>\n        <option name=\"trellis.enabled\">0</option>\n        <option name=\"trellis.scales.shared\">1</option>\n        <option name=\"trellis.size\">medium</option>\n        <option name=\"trendColorInterpretation\">inverse</option>\n        <option name=\"trendDisplayMode\">absolute</option>\n        <option name=\"unitPosition\">after</option>\n        <option name=\"useColors\">0</option>\n        <option name=\"useThousandSeparators\">1</option>\n      </single>\n    </panel>\n    <panel>\n      <title>List of Simple XML dashboards with Custom JS</title>\n      <table>\n        <title>Dashboards with CustomJS depend on jQuery and require a manual update to jQuery version 3.5</title>\n        <search>\n          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"rootNode=form OR rootNode=dashboard\" count=0 timeout=240\n| rename eai:data as xml\n  title as view_name\n  eai:acl.app as app\n  eai:acl.owner as owner\n| search owner=$field2|s$ app=$field3|s$\n``` include only dashboards with customjs ```\n| regex xml=\"^&lt;(dashboard|form)(.|\\n)*script[ ]*=[ ]*(?:\\'|\\\").*\\.js(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n``` filter out dashboards with version=\"1.1\" explicitly set ```\n| regex xml!=\"^&lt;(dashboard|form)(.|\\n)*version[ ]*=[ ]*(?:\\'|\\\")1.1(?:\\'|\\\")(.|\\n)*&gt;(.|\\n)*\"\n| table view_name, owner, app\n| join type=inner app\n\t[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0\n\t| rename title as app label as app_label\n\t| table app app_label]</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"count\">20</option>\n        <option name=\"dataOverlayMode\">none</option>\n        <option name=\"drilldown\">cell</option>\n        <option name=\"percentagesRow\">false</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"rowNumbers\">false</option>\n        <option name=\"totalsRow\">false</option>\n        <option name=\"wrap\">true</option>\n        <drilldown>\n          <link target=\"_blank\">/app/$row.app$/$row.view_name$</link>\n        </drilldown>\n      </table>\n    </panel>\n  </row>\n  <row>\n    <panel id=\"num_html\">\n      <title>Number of HTML dashboards</title>\n      <single>\n        <search>\n          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"eai:type=html\" count=0 timeout=240\n          | rename eai:acl.app as app eai:acl.owner as owner\n          | search owner=$field2|s$ app=$field3|s$\n          | stats count</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"colorBy\">trend</option>\n        <option name=\"colorMode\">none</option>\n        <option name=\"drilldown\">none</option>\n        <option name=\"numberPrecision\">0</option>\n        <option name=\"rangeColors\">[\"0x53a051\",\"0x0877a6\",\"0xf8be34\",\"0xf1813f\",\"0xdc4e41\"]</option>\n        <option name=\"rangeValues\">[0,30,70,100]</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"showSparkline\">1</option>\n        <option name=\"showTrendIndicator\">1</option>\n        <option name=\"trellis.enabled\">0</option>\n        <option name=\"trellis.scales.shared\">1</option>\n        <option name=\"trellis.size\">medium</option>\n        <option name=\"trendColorInterpretation\">inverse</option>\n        <option name=\"trendDisplayMode\">absolute</option>\n        <option name=\"unitPosition\">after</option>\n        <option name=\"useColors\">0</option>\n        <option name=\"useThousandSeparators\">1</option>\n      </single>\n    </panel>\n    <panel>\n      <title>List of HTML dashboards</title>\n      <table>\n        <title>HTML files in the data/ui/html directory will no longer be available in future versions of Splunk software</title>\n        <search>\n          <query>| rest splunk_server=local /servicesNS/-/-/data/ui/views search=\"eai:type=html\" count=0 timeout=240\n| rename title as view_name eai:acl.app as app eai:acl.owner as owner\n| search owner=$field2|s$ app=$field3|s$\n| table view_name, owner, app\n| join type=inner app\n\t[ | rest splunk_server=local /servicesNS/-/-/apps/local count=0\n\t| rename title as app label as app_label\n\t| table app app_label]</query>\n          <earliest>$field1.earliest$</earliest>\n          <latest>$field1.latest$</latest>\n          <sampleRatio>1</sampleRatio>\n        </search>\n        <option name=\"count\">20</option>\n        <option name=\"dataOverlayMode\">none</option>\n        <option name=\"drilldown\">cell</option>\n        <option name=\"percentagesRow\">false</option>\n        <option name=\"refresh.display\">progressbar</option>\n        <option name=\"rowNumbers\">false</option>\n        <option name=\"totalsRow\">false</option>\n        <option name=\"wrap\">true</option>\n        <drilldown>\n          <link target=\"_blank\">/app/$row.app$/$row.view_name$</link>\n        </drilldown>\n      </table>\n    </panel>\n  </row>\n</form>",
+    "eai:digest": "4c3dbbecd74e8f79d7aaaf156b90642e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "jQuery Upgrade",
+    "rootNode": "form"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/jquery_upgrade",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/jquery_upgrade/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/jquery_upgrade",
+    "edit": "/servicesNS/nobody/search/data/ui/views/jquery_upgrade",
+    "list": "/servicesNS/nobody/search/data/ui/views/jquery_upgrade"
+   },
+   "name": "jquery_upgrade",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"licensing/usage.html\" type=\"html\" isVisible=\"False\" isDashboard=\"False\">\n    <label>License Usage</label>\n</view>",
+    "eai:digest": "fc62475944ae815c90cd81a06d3aa3ff",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "License Usage",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/licenseusage",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/licenseusage/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/licenseusage",
+    "edit": "/servicesNS/nobody/search/data/ui/views/licenseusage",
+    "list": "/servicesNS/nobody/search/data/ui/views/licenseusage"
+   },
+   "name": "licenseusage",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/blank.html\" type=\"html\" isDashboard=\"False\">\n    <label>Live Tail</label>\n</view>",
+    "eai:digest": "c063fcee84dcbb76f003449f481bf08b",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Live Tail",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/live_tail",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/live_tail/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/live_tail",
+    "edit": "/servicesNS/nobody/search/data/ui/views/live_tail",
+    "list": "/servicesNS/nobody/search/data/ui/views/live_tail"
+   },
+   "name": "live_tail",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Mod Setup</label>\n</view>",
+    "eai:digest": "2c6fbc69090dfa7327d99c4dcdc72c8e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Mod Setup",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/mod_setup",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/mod_setup/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/mod_setup",
+    "edit": "/servicesNS/nobody/search/data/ui/views/mod_setup",
+    "list": "/servicesNS/nobody/search/data/ui/views/mod_setup"
+   },
+   "name": "mod_setup",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<dashboard version=\"2\" theme=\"light\">\n    <label>Orphaned Scheduled Searches, Reports, and Alerts</label>\n    <description></description>\n    <definition><![CDATA[\n{\n\t\"visualizations\": {\n\t\t\"viz_swfoybdv\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_7lsaccFn\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.linkToSearch\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"type\": \"auto\",\n\t\t\t\t\t\t\"newTab\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"title\": \"List of Orphaned Scheduled Searches, Reports, and Alerts\"\n\t\t},\n\t\t\"viz_VTavh1em\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"These are saved scheduled searches, reports, and alerts with deactivated owners.\\n\\nThe scheduler cannot run orphaned scheduled searches. Review these items and disable, delete, or reassign them to a new owner.\\n\\n[Learn more](/help?location=learnmore.orphaned_searches)\"\n\t\t\t}\n\t\t}\n\t},\n\t\"dataSources\": {\n\t\t\"ds_7lsaccFn\": {\n\t\t\t\"type\": \"ds.savedSearch\",\n\t\t\t\"options\": {\n\t\t\t\t\"ref\": \"Orphaned scheduled searches\"\n\t\t\t},\n\t\t\t\"name\": \"List of Orphaned Scheduled Searches_ Reports_ and Alerts - Table search\"\n\t\t}\n\t},\n\t\"defaults\": {\n\t\t\"dataSources\": {\n\t\t\t\"ds.search\": {\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"queryParameters\": {}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t},\n\t\"inputs\": {},\n\t\"description\": \"\",\n\t\"title\": \"Orphaned Scheduled Searches, Reports, and Alerts\",\n\t\"layout\": {\n\t\t\"tabs\": {\n\t\t\t\"items\": [\n\t\t\t\t{\n\t\t\t\t\t\"layoutId\": \"layout_1\",\n\t\t\t\t\t\"label\": \"New tab\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"layoutDefinitions\": {\n\t\t\t\"layout_1\": {\n\t\t\t\t\"type\": \"grid\",\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"height\": 500,\n\t\t\t\t\t\"width\": 1440\n\t\t\t\t},\n\t\t\t\t\"structure\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_VTavh1em\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 0,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 82\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_swfoybdv\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 0,\n\t\t\t\t\t\t\t\"y\": 82,\n\t\t\t\t\t\t\t\"w\": 1440,\n\t\t\t\t\t\t\t\"h\": 250\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t\"globalInputs\": []\n\t}\n}\n    ]]></definition>\n    <meta type=\"hiddenElements\"><![CDATA[\n{\n\t\"hideEdit\": true,\n\t\"hideOpenInSearch\": false,\n\t\"hideExport\": false\n}\n    ]]></meta>\n</dashboard>",
+    "eai:digest": "42ee75066f1120ddd856d0752d5a541e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Orphaned Scheduled Searches, Reports, and Alerts",
+    "rootNode": "dashboard",
+    "version": "2"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/orphaned_scheduled_searches",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/orphaned_scheduled_searches/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/orphaned_scheduled_searches",
+    "edit": "/servicesNS/nobody/search/data/ui/views/orphaned_scheduled_searches",
+    "list": "/servicesNS/nobody/search/data/ui/views/orphaned_scheduled_searches"
+   },
+   "name": "orphaned_scheduled_searches",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Datasets</label>\n</view>",
+    "eai:digest": "00a5e6feac767938d2bea1cfc0d90f4c",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Datasets",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/pivot",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/pivot/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/pivot",
+    "edit": "/servicesNS/nobody/search/data/ui/views/pivot",
+    "list": "/servicesNS/nobody/search/data/ui/views/pivot"
+   },
+   "name": "pivot",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isVisible=\"False\"  isDashboard=\"False\">\n    <label>Report</label>\n</view>",
+    "eai:digest": "fe167ed03210447c56248af78bd1bba9",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Report",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/report",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/report/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/report",
+    "edit": "/servicesNS/nobody/search/data/ui/views/report",
+    "list": "/servicesNS/nobody/search/data/ui/views/report"
+   },
+   "name": "report",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<view isVisible=\"false\" template=\"builder.html\" displayView=\"report_builder_display\" decomposeIntentions=\"true\" isDashboard=\"False\" type=\"redirect\" target=\"search\"> \n  <label>Report Builder</label>\n</view>",
+    "eai:digest": "fd343b826e5ede59751ff3ba51daa6b1",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Report Builder",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/report_builder_define_data",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/report_builder_define_data/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/report_builder_define_data",
+    "edit": "/servicesNS/nobody/search/data/ui/views/report_builder_define_data",
+    "list": "/servicesNS/nobody/search/data/ui/views/report_builder_define_data"
+   },
+   "name": "report_builder_define_data",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<view isVisible=\"false\" template=\"builder.html\" isDashboard=\"False\" type=\"redirect\" target=\"report\">\n  <label>Display Report</label>\n</view>",
+    "eai:digest": "886c59b13e581bad5b5da6c1da6bc436",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Display Report",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/report_builder_display",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/report_builder_display/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/report_builder_display",
+    "edit": "/servicesNS/nobody/search/data/ui/views/report_builder_display",
+    "list": "/servicesNS/nobody/search/data/ui/views/report_builder_display"
+   },
+   "name": "report_builder_display",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<view isVisible=\"false\" template=\"builder.html\" displayView=\"report_builder_display\" onunloadCancelJobs=\"False\" decomposeIntentions=\"true\" isDashboard=\"False\" type=\"redirect\" target=\"search\">\n  <label>Report Builder</label>\n</view>",
+    "eai:digest": "c0b654b455be44c7010f074e8dea910e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Report Builder",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/report_builder_format_report",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/report_builder_format_report/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/report_builder_format_report",
+    "edit": "/servicesNS/nobody/search/data/ui/views/report_builder_format_report",
+    "list": "/servicesNS/nobody/search/data/ui/views/report_builder_format_report"
+   },
+   "name": "report_builder_format_report",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<view isVisible=\"false\" template=\"builder.html\" isDashboard=\"False\" type=\"redirect\" target=\"report\">\n    <label>Display Report</label>\n</view>",
+    "eai:digest": "ac2003dc5150e012c466e0faf7eda07f",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": false,
+    "label": "Display Report",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/report_builder_print",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/report_builder_print/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/report_builder_print",
+    "edit": "/servicesNS/nobody/search/data/ui/views/report_builder_print",
+    "list": "/servicesNS/nobody/search/data/ui/views/report_builder_print"
+   },
+   "name": "report_builder_print",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/page_with_flag.html\" type=\"html\" isDashboard=\"False\">\n    <label>Reports</label>\n</view>",
+    "eai:digest": "b7999050610d985f566d86c732f2ef15",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Reports",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/reports",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/reports/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/reports",
+    "edit": "/servicesNS/nobody/search/data/ui/views/reports",
+    "list": "/servicesNS/nobody/search/data/ui/views/reports"
+   },
+   "name": "reports",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "description": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<dashboard version=\"2\" theme=\"light\">\n    <label>Scheduled export is now available for Dashboard Studio</label>\n    <description></description>\n    <definition><![CDATA[\n{\n\t\"visualizations\": {\n\t\t\"viz_PEnzuC6O\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# **Classic dashboards with schedules that you may want to convert to Dashboard Studio**\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\",\n\t\t\t\t\"fontSize\": \"large\"\n\t\t\t}\n\t\t},\n\t\t\"viz_xahk2LxS\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"You can convert from Classic to Dashboard Studio with the **Clone in Dashboard Studio** action.\\n\\nThe conversion process makes a clone of your Classic dashboard and converts the clone, leaving your original dashboard untouched.\",\n\t\t\t\t\"fontSize\": \"large\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_bM8KCb0y\": {\n\t\t\t\"type\": \"splunk.table\",\n\t\t\t\"options\": {\n\t\t\t\t\"backgroundColor\": \"transparent\",\n\t\t\t\t\"tableFormat\": {\n\t\t\t\t\t\"rowBackgroundColors\": \"> table | seriesByIndex(0) | pick(tableAltRowBackgroundColorsByBackgroundColor)\",\n\t\t\t\t\t\"headerBackgroundColor\": \"> backgroundColor | setColorChannel(tableHeaderBackgroundColorConfig)\",\n\t\t\t\t\t\"rowColors\": \"> rowBackgroundColors | maxContrast(tableRowColorMaxContrast)\",\n\t\t\t\t\t\"headerColor\": \"> headerBackgroundColor | maxContrast(tableRowColorMaxContrast)\"\n\t\t\t\t},\n\t\t\t\t\"showInternalFields\": false\n\t\t\t},\n\t\t\t\"dataSources\": {\n\t\t\t\t\"primary\": \"ds_YwMNtT5r\"\n\t\t\t},\n\t\t\t\"eventHandlers\": [\n\t\t\t\t{\n\t\t\t\t\t\"type\": \"drilldown.customUrl\",\n\t\t\t\t\t\"options\": {\n\t\t\t\t\t\t\"url\": \"/app/$row.App.value$/$row.Title.value$\",\n\t\t\t\t\t\t\"newTab\": true\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"viz_AJ3zmcH5\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"Upon conversion, you can see a summary of how many configurations were successfully converted. \\n\\nThen, you can select **View conversion report** for  more details about what did not convert.\",\n\t\t\t\t\"fontSize\": \"large\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_2EzncWf1\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"The conversion report gives you specific details about the configurations that did not convert. In this example, the \\\"min value\\\" for horseshoe meter and the Calendar heat map visualization did not convert. \",\n\t\t\t\t\"fontSize\": \"large\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_8F1OzLSQ\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"To reopen the conversion report later, select the conversion report icon in the toolbar. \",\n\t\t\t\t\"fontSize\": \"large\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_MJsFPrKe\": {\n\t\t\t\"type\": \"splunk.image\",\n\t\t\t\"options\": {\n\t\t\t\t\"preserveAspectRatio\": true,\n\t\t\t\t\"src\": \"/static/app/search/ootb_dashboard_images/scheduled_export_dashboard/img_step1_clone.png\"\n\t\t\t}\n\t\t},\n\t\t\"viz_RSvTUOja\": {\n\t\t\t\"type\": \"splunk.image\",\n\t\t\t\"options\": {\n\t\t\t\t\"preserveAspectRatio\": true,\n\t\t\t\t\"src\": \"/static/app/search/ootb_dashboard_images/scheduled_export_dashboard/img_step2_conversion.png\"\n\t\t\t}\n\t\t},\n\t\t\"viz_WbJd8SDE\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# **How to clone a Classic dashboard in Dashboard Studio**\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 16\n\t\t\t}\n\t\t},\n\t\t\"viz_iaOSkDcp\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# **Additional resources**\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 18\n\t\t\t}\n\t\t},\n\t\t\"viz_oJRe4b3S\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"* [Convert a Simple XML dashboard to a Dashboard Studio dashboard](https://docs.splunk.com/Documentation/Splunk/9.1.2/DashStudio/Convert)\\n* [Splunk Dashboard Studio Example Hub](https://docs.splunk.com/Documentation/Splunk/9.1.2/DashStudio/ExHub)\",\n\t\t\t\t\"fontSize\": \"extraLarge\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_PDaQOM1v\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"As we've added new capabilities to Dashboard Studio, we've also been working hard to ensure we can convert as much as possible from Classic dashboards to Dashboard Studio.\",\n\t\t\t\t\"fontSize\": \"extraLarge\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_hxZuIDZx\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"strokeColor\": \"transparent\",\n\t\t\t\t\"fillColor\": \"#ED0080\",\n\t\t\t\t\"rx\": 28\n\t\t\t}\n\t\t},\n\t\t\"viz_frOE0GWy\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"strokeColor\": \"transparent\",\n\t\t\t\t\"fillColor\": \"#ED0080\",\n\t\t\t\t\"rx\": 28\n\t\t\t}\n\t\t},\n\t\t\"viz_v1NQ2Lzx\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"strokeColor\": \"transparent\",\n\t\t\t\t\"fillColor\": \"#ED0080\",\n\t\t\t\t\"rx\": 28\n\t\t\t}\n\t\t},\n\t\t\"viz_DrWZo5rt\": {\n\t\t\t\"type\": \"splunk.rectangle\",\n\t\t\t\"options\": {\n\t\t\t\t\"strokeColor\": \"transparent\",\n\t\t\t\t\"fillColor\": \"#ED0080\",\n\t\t\t\t\"rx\": 28\n\t\t\t}\n\t\t},\n\t\t\"viz_c3aTfPcq\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"**2**\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 32,\n\t\t\t\t\"fontColor\": \"#ffffff\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_7NYiaDEI\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"**3**\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 32,\n\t\t\t\t\"fontColor\": \"#ffffff\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_NBNx6H5U\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"**4**\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 32,\n\t\t\t\t\"fontColor\": \"#ffffff\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t},\n\t\t\"viz_nr5gCBaH\": {\n\t\t\t\"type\": \"splunk.image\",\n\t\t\t\"options\": {\n\t\t\t\t\"preserveAspectRatio\": true,\n\t\t\t\t\"src\": \"/static/app/search/ootb_dashboard_images/scheduled_export_dashboard/img_step3_conversion_report.png\"\n\t\t\t}\n\t\t},\n\t\t\"viz_8K0zIsKu\": {\n\t\t\t\"type\": \"splunk.image\",\n\t\t\t\"options\": {\n\t\t\t\t\"preserveAspectRatio\": true,\n\t\t\t\t\"src\": \"/static/app/search/ootb_dashboard_images/scheduled_export_dashboard/img_step4_conversion_report_details.png\"\n\t\t\t}\n\t\t},\n\t\t\"viz_x0CYX8dr\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"# **Scheduled export is now available for Dashboard Studio**\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 24\n\t\t\t}\n\t\t},\n\t\t\"viz_v7GaWc3B\": {\n\t\t\t\"type\": \"splunk.singlevalueicon\",\n\t\t\t\"options\": {\n\t\t\t\t\"showValue\": false,\n\t\t\t\t\"icon\": \"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTcyIiBoZWlnaHQ9IjE1NiIgdmlld0JveD0iMCAwIDE3MiAxNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xNV8xODMzKSI+CjxwYXRoIGQ9Ik0xMS44MTI1IDI4LjY4NzVDMTEuODEyNSAyNC45NTk2IDE0LjgzNDYgMjEuOTM3NSAxOC41NjI1IDIxLjkzNzVIODkuNDM3NUM5My4xNjU0IDIxLjkzNzUgOTYuMTg3NSAyNC45NTk2IDk2LjE4NzUgMjguNjg3NVY0Mi4xODc1SDExLjgxMjVWMjguNjg3NVoiIGZpbGw9IiNENURDRTUiLz4KPHBhdGggZD0iTTcwLjAzMTIgODYuMDYyNUgxOC41NjI1QzE0LjgzNDYgODYuMDYyNSAxMS44MTI1IDgzLjA0MDQgMTEuODEyNSA3OS4zMTI1VjQyLjE4NzVNOTYuMTg3NSA2Mi40Mzc1VjQyLjE4NzVNMTEuODEyNSA0Mi4xODc1VjI4LjY4NzVDMTEuODEyNSAyNC45NTk2IDE0LjgzNDYgMjEuOTM3NSAxOC41NjI1IDIxLjkzNzVIODkuNDM3NUM5My4xNjU0IDIxLjkzNzUgOTYuMTg3NSAyNC45NTk2IDk2LjE4NzUgMjguNjg3NVY0Mi4xODc1TTExLjgxMjUgNDIuMTg3NUg5Ni4xODc1IiBzdHJva2U9IiMzNjNDNDQiIHN0cm9rZS13aWR0aD0iMy4zNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNOTYuMTg3NSA0Mi4xODc1SDExLjgxMjUiIHN0cm9rZT0iIzM2M0M0NCIgc3Ryb2tlLXdpZHRoPSIzLjM3NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0yMS45Mzc1IDI5LjUzMTJDMjEuOTM3NSAzMC40NjMyIDIxLjE4MiAzMS4yMTg4IDIwLjI1IDMxLjIxODhDMTkuMzE4IDMxLjIxODggMTguNTYyNSAzMC40NjMyIDE4LjU2MjUgMjkuNTMxMkMxOC41NjI1IDI4LjU5OTMgMTkuMzE4IDI3Ljg0MzggMjAuMjUgMjcuODQzOEMyMS4xODIgMjcuODQzOCAyMS45Mzc1IDI4LjU5OTMgMjEuOTM3NSAyOS41MzEyWiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNMjguNjg3NSAyOS41MzEyQzI4LjY4NzUgMzAuNDYzMiAyNy45MzIgMzEuMjE4OCAyNyAzMS4yMTg4QzI2LjA2OCAzMS4yMTg4IDI1LjMxMjUgMzAuNDYzMiAyNS4zMTI1IDI5LjUzMTJDMjUuMzEyNSAyOC41OTkzIDI2LjA2OCAyNy44NDM4IDI3IDI3Ljg0MzhDMjcuOTMyIDI3Ljg0MzggMjguNjg3NSAyOC41OTkzIDI4LjY4NzUgMjkuNTMxMloiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTM1LjQzNzUgMjkuNTMxMkMzNS40Mzc1IDMwLjQ2MzIgMzQuNjgyIDMxLjIxODggMzMuNzUgMzEuMjE4OEMzMi44MTggMzEuMjE4OCAzMi4wNjI1IDMwLjQ2MzIgMzIuMDYyNSAyOS41MzEyQzMyLjA2MjUgMjguNTk5MyAzMi44MTggMjcuODQzOCAzMy43NSAyNy44NDM4QzM0LjY4MiAyNy44NDM4IDM1LjQzNzUgMjguNTk5MyAzNS40Mzc1IDI5LjUzMTJaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik00Mi4xODc1IDI5LjUzMTJDNDIuMTg3NSAzMC40NjMyIDQxLjQzMiAzMS4yMTg4IDQwLjUgMzEuMjE4OEMzOS41NjggMzEuMjE4OCAzOC44MTI1IDMwLjQ2MzIgMzguODEyNSAyOS41MzEyQzM4LjgxMjUgMjguNTk5MyAzOS41NjggMjcuODQzOCA0MC41IDI3Ljg0MzhDNDEuNDMyIDI3Ljg0MzggNDIuMTg3NSAyOC41OTkzIDQyLjE4NzUgMjkuNTMxMloiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTQ4LjkzNzUgMjkuNTMxMkM0OC45Mzc1IDMwLjQ2MzIgNDguMTgyIDMxLjIxODggNDcuMjUgMzEuMjE4OEM0Ni4zMTggMzEuMjE4OCA0NS41NjI1IDMwLjQ2MzIgNDUuNTYyNSAyOS41MzEyQzQ1LjU2MjUgMjguNTk5MyA0Ni4zMTggMjcuODQzOCA0Ny4yNSAyNy44NDM4QzQ4LjE4MiAyNy44NDM4IDQ4LjkzNzUgMjguNTk5MyA0OC45Mzc1IDI5LjUzMTJaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik01NS42ODc1IDI5LjUzMTJDNTUuNjg3NSAzMC40NjMyIDU0LjkzMiAzMS4yMTg4IDU0IDMxLjIxODhDNTMuMDY4IDMxLjIxODggNTIuMzEyNSAzMC40NjMyIDUyLjMxMjUgMjkuNTMxMkM1Mi4zMTI1IDI4LjU5OTMgNTMuMDY4IDI3Ljg0MzggNTQgMjcuODQzOEM1NC45MzIgMjcuODQzOCA1NS42ODc1IDI4LjU5OTMgNTUuNjg3NSAyOS41MzEyWiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNNjIuNDM3NSAyOS41MzEyQzYyLjQzNzUgMzAuNDYzMiA2MS42ODIgMzEuMjE4OCA2MC43NSAzMS4yMTg4QzU5LjgxOCAzMS4yMTg4IDU5LjA2MjUgMzAuNDYzMiA1OS4wNjI1IDI5LjUzMTJDNTkuMDYyNSAyOC41OTkzIDU5LjgxOCAyNy44NDM4IDYwLjc1IDI3Ljg0MzhDNjEuNjgyIDI3Ljg0MzggNjIuNDM3NSAyOC41OTkzIDYyLjQzNzUgMjkuNTMxMloiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTY5LjE4NzUgMjkuNTMxMkM2OS4xODc1IDMwLjQ2MzIgNjguNDMyIDMxLjIxODggNjcuNSAzMS4yMTg4QzY2LjU2OCAzMS4yMTg4IDY1LjgxMjUgMzAuNDYzMiA2NS44MTI1IDI5LjUzMTJDNjUuODEyNSAyOC41OTkzIDY2LjU2OCAyNy44NDM4IDY3LjUgMjcuODQzOEM2OC40MzIgMjcuODQzOCA2OS4xODc1IDI4LjU5OTMgNjkuMTg3NSAyOS41MzEyWiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNNzUuOTM3NSAyOS41MzEyQzc1LjkzNzUgMzAuNDYzMiA3NS4xODIgMzEuMjE4OCA3NC4yNSAzMS4yMTg4QzczLjMxOCAzMS4yMTg4IDcyLjU2MjUgMzAuNDYzMiA3Mi41NjI1IDI5LjUzMTJDNzIuNTYyNSAyOC41OTkzIDczLjMxOCAyNy44NDM4IDc0LjI1IDI3Ljg0MzhDNzUuMTgyIDI3Ljg0MzggNzUuOTM3NSAyOC41OTkzIDc1LjkzNzUgMjkuNTMxMloiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTIxLjkzNzUgMzQuNTkzOEMyMS45Mzc1IDM1LjUyNTcgMjEuMTgyIDM2LjI4MTIgMjAuMjUgMzYuMjgxMkMxOS4zMTggMzYuMjgxMiAxOC41NjI1IDM1LjUyNTcgMTguNTYyNSAzNC41OTM4QzE4LjU2MjUgMzMuNjYxOCAxOS4zMTggMzIuOTA2MiAyMC4yNSAzMi45MDYyQzIxLjE4MiAzMi45MDYyIDIxLjkzNzUgMzMuNjYxOCAyMS45Mzc1IDM0LjU5MzhaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik0yOC42ODc1IDM0LjU5MzhDMjguNjg3NSAzNS41MjU3IDI3LjkzMiAzNi4yODEyIDI3IDM2LjI4MTJDMjYuMDY4IDM2LjI4MTIgMjUuMzEyNSAzNS41MjU3IDI1LjMxMjUgMzQuNTkzOEMyNS4zMTI1IDMzLjY2MTggMjYuMDY4IDMyLjkwNjIgMjcgMzIuOTA2MkMyNy45MzIgMzIuOTA2MiAyOC42ODc1IDMzLjY2MTggMjguNjg3NSAzNC41OTM4WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNMzUuNDM3NSAzNC41OTM4QzM1LjQzNzUgMzUuNTI1NyAzNC42ODIgMzYuMjgxMiAzMy43NSAzNi4yODEyQzMyLjgxOCAzNi4yODEyIDMyLjA2MjUgMzUuNTI1NyAzMi4wNjI1IDM0LjU5MzhDMzIuMDYyNSAzMy42NjE4IDMyLjgxOCAzMi45MDYyIDMzLjc1IDMyLjkwNjJDMzQuNjgyIDMyLjkwNjIgMzUuNDM3NSAzMy42NjE4IDM1LjQzNzUgMzQuNTkzOFoiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTQyLjE4NzUgMzQuNTkzOEM0Mi4xODc1IDM1LjUyNTcgNDEuNDMyIDM2LjI4MTIgNDAuNSAzNi4yODEyQzM5LjU2OCAzNi4yODEyIDM4LjgxMjUgMzUuNTI1NyAzOC44MTI1IDM0LjU5MzhDMzguODEyNSAzMy42NjE4IDM5LjU2OCAzMi45MDYyIDQwLjUgMzIuOTA2MkM0MS40MzIgMzIuOTA2MiA0Mi4xODc1IDMzLjY2MTggNDIuMTg3NSAzNC41OTM4WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNNDguOTM3NSAzNC41OTM4QzQ4LjkzNzUgMzUuNTI1NyA0OC4xODIgMzYuMjgxMiA0Ny4yNSAzNi4yODEyQzQ2LjMxOCAzNi4yODEyIDQ1LjU2MjUgMzUuNTI1NyA0NS41NjI1IDM0LjU5MzhDNDUuNTYyNSAzMy42NjE4IDQ2LjMxOCAzMi45MDYyIDQ3LjI1IDMyLjkwNjJDNDguMTgyIDMyLjkwNjIgNDguOTM3NSAzMy42NjE4IDQ4LjkzNzUgMzQuNTkzOFoiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTU1LjY4NzUgMzQuNTkzOEM1NS42ODc1IDM1LjUyNTcgNTQuOTMyIDM2LjI4MTIgNTQgMzYuMjgxMkM1My4wNjggMzYuMjgxMiA1Mi4zMTI1IDM1LjUyNTcgNTIuMzEyNSAzNC41OTM4QzUyLjMxMjUgMzMuNjYxOCA1My4wNjggMzIuOTA2MiA1NCAzMi45MDYyQzU0LjkzMiAzMi45MDYyIDU1LjY4NzUgMzMuNjYxOCA1NS42ODc1IDM0LjU5MzhaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik02Mi40Mzc1IDM0LjU5MzhDNjIuNDM3NSAzNS41MjU3IDYxLjY4MiAzNi4yODEyIDYwLjc1IDM2LjI4MTJDNTkuODE4IDM2LjI4MTIgNTkuMDYyNSAzNS41MjU3IDU5LjA2MjUgMzQuNTkzOEM1OS4wNjI1IDMzLjY2MTggNTkuODE4IDMyLjkwNjIgNjAuNzUgMzIuOTA2MkM2MS42ODIgMzIuOTA2MiA2Mi40Mzc1IDMzLjY2MTggNjIuNDM3NSAzNC41OTM4WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNNjkuMTg3NSAzNC41OTM4QzY5LjE4NzUgMzUuNTI1NyA2OC40MzIgMzYuMjgxMiA2Ny41IDM2LjI4MTJDNjYuNTY4IDM2LjI4MTIgNjUuODEyNSAzNS41MjU3IDY1LjgxMjUgMzQuNTkzOEM2NS44MTI1IDMzLjY2MTggNjYuNTY4IDMyLjkwNjIgNjcuNSAzMi45MDYyQzY4LjQzMiAzMi45MDYyIDY5LjE4NzUgMzMuNjYxOCA2OS4xODc1IDM0LjU5MzhaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik03NS45Mzc1IDM0LjU5MzhDNzUuOTM3NSAzNS41MjU3IDc1LjE4MiAzNi4yODEyIDc0LjI1IDM2LjI4MTJDNzMuMzE4IDM2LjI4MTIgNzIuNTYyNSAzNS41MjU3IDcyLjU2MjUgMzQuNTkzOEM3Mi41NjI1IDMzLjY2MTggNzMuMzE4IDMyLjkwNjIgNzQuMjUgMzIuOTA2MkM3NS4xODIgMzIuOTA2MiA3NS45Mzc1IDMzLjY2MTggNzUuOTM3NSAzNC41OTM4WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNODEuODQzOCAyOC42ODc1TDg4LjU5MzggMzUuNDM3NU04OC41OTM4IDI4LjY4NzVMODEuODQzOCAzNS40Mzc1IiBzdHJva2U9IiMzNjNDNDQiIHN0cm9rZS13aWR0aD0iMy4zNzUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNNTQgNTEuNTg5M1Y2NC4xMjVMNjQuNjA3MSA1Ni40MTA3TTY3LjUgNjQuMTI1QzY3LjUgNzEuNTgwOCA2MS40NTU4IDc3LjYyNSA1NCA3Ny42MjVDNDYuNTQ0MiA3Ny42MjUgNDAuNSA3MS41ODA4IDQwLjUgNjQuMTI1QzQwLjUgNTYuNjY5MiA0Ni41NDQyIDUwLjYyNSA1NCA1MC42MjVDNjEuNDU1OCA1MC42MjUgNjcuNSA1Ni42NjkyIDY3LjUgNjQuMTI1WiIgc3Ryb2tlPSIjMzYzQzQ0IiBzdHJva2Utd2lkdGg9IjMuMzc1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxyZWN0IHg9Ijc3LjYyNSIgeT0iNjkuMTg3NSIgd2lkdGg9Ijg0LjM3NSIgaGVpZ2h0PSI2NC4xMjUiIHJ4PSI2Ljc1IiBzdHJva2U9IiMzNjNDNDQiIHN0cm9rZS13aWR0aD0iMy4zNzUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTExNi40MzggMTEzLjA2Mkg4OS40Mzc1TTExOS44MTIgMTIxLjVIODkuNDM3NSIgc3Ryb2tlPSIjMzYzQzQ0IiBzdHJva2Utd2lkdGg9IjMuMzc1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTE1MS44NzUgODFIMTI4LjI1TTE1MS44NzUgODkuNDM3NUgxMjguMjUiIHN0cm9rZT0iIzM2M0M0NCIgc3Ryb2tlLXdpZHRoPSIzLjM3NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTAyLjkzOCA4OC41OTM4QzEwMi45MzggODUuNzk3OCAxMDUuMjA0IDgzLjUzMTIgMTA4IDgzLjUzMTJDMTEwLjc5NiA4My41MzEyIDExMy4wNjIgODUuNzk3OCAxMTMuMDYyIDg4LjU5MzhDMTEzLjA2MiA5MS4zODk3IDExMC43OTYgOTMuNjU2MiAxMDggOTMuNjU2MkMxMDUuMjA0IDkzLjY1NjIgMTAyLjkzOCA5MS4zODk3IDEwMi45MzggODguNTkzOFpNMTA4IDg2LjkwNjJDMTA3LjA2OCA4Ni45MDYyIDEwNi4zMTIgODcuNjYxOCAxMDYuMzEyIDg4LjU5MzhDMTA2LjMxMiA4OS41MjU3IDEwNy4wNjggOTAuMjgxMiAxMDggOTAuMjgxMkMxMDguOTMyIDkwLjI4MTIgMTA5LjY4OCA4OS41MjU3IDEwOS42ODggODguNTkzOEMxMDkuNjg4IDg3LjY2MTggMTA4LjkzMiA4Ni45MDYyIDEwOCA4Ni45MDYyWiIgZmlsbD0iI0Q1RENFNSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg2LjA2MjUgOTYuMTg3OFYxMDIuMDk0Qzg2LjA2MjUgMTAzLjQ5MiA4Ny4xOTU4IDEwNC42MjUgODguNTkzOCAxMDQuNjI1SDEwNy45OUMxMDcuOTk3IDEwNC42MjUgMTA4LjAwMyAxMDQuNjI1IDEwOC4wMSAxMDQuNjI1SDExNy4yODFDMTE4LjY3OSAxMDQuNjI1IDExOS44MTIgMTAzLjQ5MiAxMTkuODEyIDEwMi4wOTRWODAuMTU2MkMxMTkuODEyIDc4Ljc1ODMgMTE4LjY3OSA3Ny42MjUgMTE3LjI4MSA3Ny42MjVIODguNTkzOEM4Ny4xOTU4IDc3LjYyNSA4Ni4wNjI1IDc4Ljc1ODMgODYuMDYyNSA4MC4xNTYyVjk2LjE4NzhaTTg5LjQzNzUgOTYuODg2NVYxMDEuMjVIMTAzLjkyNkw5NS4wOTY2IDkyLjQyMDZDOTQuNzY3MSA5Mi4wOTExIDk0LjIzMjkgOTIuMDkxMSA5My45MDM0IDkyLjQyMDZMODkuNDM3NSA5Ni44ODY1Wk04OS40Mzc1IDkyLjExMzVMOTEuNTE2OSA5MC4wMzQyQzkzLjE2NDQgODguMzg2NiA5NS44MzU2IDg4LjM4NjYgOTcuNDgzMSA5MC4wMzQyTDEwOC42OTkgMTAxLjI1SDExNi40MzhWODFIODkuNDM3NVY5Mi4xMTM1WiIgZmlsbD0iI0Q1RENFNSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTg5LjQzNzUgOTIuMTEzNUw5MS41MTY5IDkwLjAzNDJDOTMuMTY0NCA4OC4zODY2IDk1LjgzNTYgODguMzg2NiA5Ny40ODMxIDkwLjAzNDJMMTA4LjY5OSAxMDEuMjVIMTE2LjQzOFY4MUg4OS40Mzc1VjkyLjExMzVaTTEwMi45MzggODguNTkzOEMxMDIuOTM4IDg1Ljc5NzggMTA1LjIwNCA4My41MzEyIDEwOCA4My41MzEyQzExMC43OTYgODMuNTMxMiAxMTMuMDYyIDg1Ljc5NzggMTEzLjA2MiA4OC41OTM4QzExMy4wNjIgOTEuMzg5NyAxMTAuNzk2IDkzLjY1NjIgMTA4IDkzLjY1NjJDMTA1LjIwNCA5My42NTYyIDEwMi45MzggOTEuMzg5NyAxMDIuOTM4IDg4LjU5MzhaIiBmaWxsPSIjRDVEQ0U1Ii8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTA4IDgzLjUzMTJDMTA1LjIwNCA4My41MzEyIDEwMi45MzggODUuNzk3OCAxMDIuOTM4IDg4LjU5MzhDMTAyLjkzOCA5MS4zODk3IDEwNS4yMDQgOTMuNjU2MiAxMDggOTMuNjU2MkMxMTAuNzk2IDkzLjY1NjIgMTEzLjA2MiA5MS4zODk3IDExMy4wNjIgODguNTkzOEMxMTMuMDYyIDg1Ljc5NzggMTEwLjc5NiA4My41MzEyIDEwOCA4My41MzEyWk0xMDggODYuOTA2MkMxMDcuMDY4IDg2LjkwNjIgMTA2LjMxMiA4Ny42NjE4IDEwNi4zMTIgODguNTkzOEMxMDYuMzEyIDg5LjUyNTcgMTA3LjA2OCA5MC4yODEyIDEwOCA5MC4yODEyQzEwOC45MzIgOTAuMjgxMiAxMDkuNjg4IDg5LjUyNTcgMTA5LjY4OCA4OC41OTM4QzEwOS42ODggODcuNjYxOCAxMDguOTMyIDg2LjkwNjIgMTA4IDg2LjkwNjJaIiBmaWxsPSIjRUQwMDgwIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNODYuMDYyNSA5Ni4xODc4VjEwMi4wOTRDODYuMDYyNSAxMDMuNDkyIDg3LjE5NTggMTA0LjYyNSA4OC41OTM4IDEwNC42MjVIMTA3Ljk5QzEwNy45OTcgMTA0LjYyNSAxMDguMDAzIDEwNC42MjUgMTA4LjAxIDEwNC42MjVIMTE3LjI4MUMxMTguNjc5IDEwNC42MjUgMTE5LjgxMiAxMDMuNDkyIDExOS44MTIgMTAyLjA5NFY4MC4xNTYyQzExOS44MTIgNzguNzU4MyAxMTguNjc5IDc3LjYyNSAxMTcuMjgxIDc3LjYyNUg4OC41OTM4Qzg3LjE5NTggNzcuNjI1IDg2LjA2MjUgNzguNzU4MyA4Ni4wNjI1IDgwLjE1NjJWOTYuMTg3OFpNODkuNDM3NSA5Ni44ODY1VjEwMS4yNUgxMDMuOTI2TDk1LjA5NjYgOTIuNDIwNkM5NC43NjcxIDkyLjA5MTEgOTQuMjMyOSA5Mi4wOTExIDkzLjkwMzQgOTIuNDIwNkw4OS40Mzc1IDk2Ljg4NjVaTTg5LjQzNzUgOTIuMTEzNUw5MS41MTY5IDkwLjAzNDJDOTMuMTY0NCA4OC4zODY2IDk1LjgzNTYgODguMzg2NiA5Ny40ODMxIDkwLjAzNDJMMTA4LjY5OSAxMDEuMjVIMTE2LjQzOFY4MUg4OS40Mzc1VjkyLjExMzVaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik0xNDAuMDYyIDEwMC40MDZWMTExLjM3NUwxNDkuMzQ0IDEwNC42MjVNMTUxLjg3NSAxMTEuMzc1QzE1MS44NzUgMTE3Ljg5OSAxNDYuNTg2IDEyMy4xODggMTQwLjA2MiAxMjMuMTg4QzEzMy41MzkgMTIzLjE4OCAxMjguMjUgMTE3Ljg5OSAxMjguMjUgMTExLjM3NUMxMjguMjUgMTA0Ljg1MSAxMzMuNTM5IDk5LjU2MjUgMTQwLjA2MiA5OS41NjI1QzE0Ni41ODYgOTkuNTYyNSAxNTEuODc1IDEwNC44NTEgMTUxLjg3NSAxMTEuMzc1WiIgc3Ryb2tlPSIjRUQwMDgwIiBzdHJva2Utd2lkdGg9IjMuMzc1IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik01Ny40Nzk0IDEwMy41MzhDNTcuNDc5NCAxMDIuNjA2IDU4LjIzNDkgMTAxLjg1IDU5LjE2NjkgMTAxLjg1QzYwLjA5ODkgMTAxLjg1IDYwLjg1NDQgMTAyLjYwNiA2MC44NTQ0IDEwMy41MzhMNjAuODU0NCAxMTcuMzg1QzYwLjg1NDQgMTE4Ljc4MyA1OS43MjEyIDExOS45MTYgNTguMzIzMiAxMTkuOTE2TDQ0LjQ3NTggMTE5LjkxNkM0My41NDM4IDExOS45MTYgNDIuNzg4MyAxMTkuMTYxIDQyLjc4ODMgMTE4LjIyOUM0Mi43ODgzIDExNy4yOTcgNDMuNTQzOCAxMTYuNTQxIDQ0LjQ3NTggMTE2LjU0MUw1NS4xNzc3IDExNi41NDFMNDEuMDczOCAxMDIuNDM4QzQwLjQxNDggMTAxLjc3OSA0MC40MTQ4IDEwMC43MSA0MS4wNzM4IDEwMC4wNTFDNDEuNzMyOSA5OS4zOTIxIDQyLjgwMTMgOTkuMzkyMSA0My40NjAzIDEwMC4wNTFMNTcuNDc5NCAxMTQuMDdMNTcuNDc5NCAxMDMuNTM4WiIgZmlsbD0iI0VEMDA4MCIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzE1XzE4MzMiPgo8cmVjdCB3aWR0aD0iMTcyIiBoZWlnaHQ9IjE1NiIgZmlsbD0id2hpdGUiLz4KPC9jbGlwUGF0aD4KPC9kZWZzPgo8L3N2Zz4K\"\n\t\t\t}\n\t\t},\n\t\t\"viz_BxLGZQrA\": {\n\t\t\t\"type\": \"splunk.singlevalueicon\",\n\t\t\t\"options\": {\n\t\t\t\t\"showValue\": false,\n\t\t\t\t\"icon\": \"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHg9IjU5LjI1IiB5PSI0Mi43NSIgd2lkdGg9IjIwLjI1IiBoZWlnaHQ9IjE1IiBmaWxsPSIjRDVEQ0U1Ii8+CjxwYXRoIGQ9Ik05Mi4wMjUgMTMxLjI1SDI5Ljc3NUMyNS44IDEzMS4yNSAyMi41IDEyOC4wMjUgMjIuNSAxMjMuOTc1VjQzLjg3NUMyMi41IDM5LjkgMjUuNzI1IDM2LjYgMjkuNzc1IDM2LjZIMzUuODVDMzcuMTI1IDM2LjYgMzguMSAzNy41NzUgMzguMSAzOC44NUMzOC4xIDQwLjEyNSAzNy4xMjUgNDEuMSAzNS44NSA0MS4xSDI5Ljc3NUMyOC4yNzUgNDEuMSAyNyA0Mi4zIDI3IDQzLjg3NVYxMjQuMDVDMjcgMTI1LjU1IDI4LjIgMTI2LjgyNSAyOS43NzUgMTI2LjgyNUg5Mi4xQzkzLjYgMTI2LjgyNSA5NC44NzUgMTI1LjYyNSA5NC44NzUgMTI0LjA1VjExNy4xNUM5NC44NzUgMTE1Ljg3NSA5NS44NSAxMTQuOSA5Ny4xMjUgMTE0LjlDOTguNCAxMTQuOSA5OS4zNzUgMTE1Ljg3NSA5OS4zNzUgMTE3LjE1VjEyNC4wNUM5OS4zIDEyOC4wMjUgOTYuMDc1IDEzMS4yNSA5Mi4wMjUgMTMxLjI1WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNMTAzLjEyNSAxMTkuMzI1SDQwLjc5OTlDMzYuODI0OSAxMTkuMzI1IDMzLjUyNDkgMTE2LjEgMzMuNTI0OSAxMTIuMDVWMzEuOTQ5OUMzMy41MjQ5IDI3Ljk3NDkgMzYuNzQ5OSAyNC42NzQ5IDQwLjc5OTkgMjQuNjc0OUg0Ni44NzQ5QzQ4LjE0OTkgMjQuNjc0OSA0OS4xMjQ5IDI1LjY0OTkgNDkuMTI0OSAyNi45MjQ5QzQ5LjEyNDkgMjguMTk5OSA0OC4xNDk5IDI5LjE3NDkgNDYuODc0OSAyOS4xNzQ5SDQwLjc5OTlDMzkuMjk5OSAyOS4xNzQ5IDM4LjAyNDkgMzAuMzc0OSAzOC4wMjQ5IDMxLjk0OTlWMTEyLjEyNUMzOC4wMjQ5IDExMy42MjUgMzkuMjI0OSAxMTQuOSA0MC43OTk5IDExNC45SDEwMy4xMjVDMTA0LjYyNSAxMTQuOSAxMDUuOSAxMTMuNyAxMDUuOSAxMTIuMTI1VjEwNS4yMjVDMTA1LjkgMTAzLjk1IDEwNi44NzUgMTAyLjk3NSAxMDguMTUgMTAyLjk3NUMxMDkuNDI1IDEwMi45NzUgMTEwLjQgMTAzLjk1IDExMC40IDEwNS4yMjVWMTEyLjEyNUMxMTAuMzI1IDExNi4xIDEwNy4xIDExOS4zMjUgMTAzLjEyNSAxMTkuMzI1WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNMTE0LjE1IDEwNy40SDUxLjgyNDhDNDcuODQ5OCAxMDcuNCA0NC41NDk4IDEwNC4xNzUgNDQuNTQ5OCAxMDAuMTI1VjIwLjAyNUM0NC41NDk4IDE2LjA1IDQ3Ljc3NDggMTIuNzUgNTEuODI0OCAxMi43NUg5OC41NDk4Qzk5LjE0OTggMTIuNzUgOTkuNzQ5OCAxMi45NzUgMTAwLjEyNSAxMy40MjVMMTIwLjc1IDMzLjk3NUMxMjEuMiAzNC40MjUgMTIxLjQyNSAzNC45NSAxMjEuNDI1IDM1LjU1VjEwMC4xMjVDMTIxLjQyNSAxMDQuMTc1IDExOC4xMjUgMTA3LjQgMTE0LjE1IDEwNy40Wk01MS44MjQ4IDE3LjI1QzUwLjMyNDggMTcuMjUgNDkuMDQ5OCAxOC40NSA0OS4wNDk4IDIwLjAyNVYxMDAuMkM0OS4wNDk4IDEwMS43IDUwLjI0OTggMTAyLjk3NSA1MS44MjQ4IDEwMi45NzVIMTE0LjE1QzExNS42NSAxMDIuOTc1IDExNi45MjUgMTAxLjc3NSAxMTYuOTI1IDEwMC4yVjM2LjUyNUw5Ny42NDk4IDE3LjI1SDUxLjgyNDhaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik0xMTkuMTc1IDM3LjhIMTAzLjY1Qzk5LjY3NSAzNy44IDk2LjM3NSAzNC41NzUgOTYuMzc1IDMwLjUyNVYxNUM5Ni4zNzUgMTMuNzI1IDk3LjM1IDEyLjc1IDk4LjYyNSAxMi43NUM5OS45IDEyLjc1IDEwMC44NzUgMTMuNzI1IDEwMC44NzUgMTVWMzAuNTI1QzEwMC44NzUgMzIuMDI1IDEwMi4wNzUgMzMuMyAxMDMuNjUgMzMuM0gxMTkuMTc1QzEyMC40NSAzMy4zIDEyMS40MjUgMzQuMjc1IDEyMS40MjUgMzUuNTVDMTIxLjQyNSAzNi44MjUgMTIwLjM3NSAzNy44IDExOS4xNzUgMzcuOFoiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTEwNi43MjUgNzEuMDI1SDU5LjI1QzU3Ljk3NSA3MS4wMjUgNTcgNzAuMDUgNTcgNjguNzc1QzU3IDY3LjUgNTcuOTc1IDY2LjUyNSA1OS4yNSA2Ni41MjVIMTA2LjcyNUMxMDggNjYuNTI1IDEwOC45NzUgNjcuNSAxMDguOTc1IDY4Ljc3NUMxMDguOTc1IDcwLjA1IDEwOCA3MS4wMjUgMTA2LjcyNSA3MS4wMjVaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik0xMDYuNzI1IDgzLjYyNUg1OS4yNUM1Ny45NzUgODMuNjI1IDU3IDgyLjY1IDU3IDgxLjM3NUM1NyA4MC4xIDU3Ljk3NSA3OS4xMjUgNTkuMjUgNzkuMTI1SDEwNi43MjVDMTA4IDc5LjEyNSAxMDguOTc1IDgwLjEgMTA4Ljk3NSA4MS4zNzVDMTA4Ljk3NSA4Mi42NSAxMDggODMuNjI1IDEwNi43MjUgODMuNjI1WiIgZmlsbD0iIzM2M0M0NCIvPgo8cGF0aCBkPSJNMTA2LjggNDUuODI1SDg4Ljc5OThDODcuNTI0OCA0NS44MjUgODYuNTQ5OCA0NC44NSA4Ni41NDk4IDQzLjU3NUM4Ni41NDk4IDQyLjMgODcuNTI0OCA0MS4zMjUgODguNzk5OCA0MS4zMjVIMTA2LjhDMTA4LjA3NSA0MS4zMjUgMTA5LjA1IDQyLjMgMTA5LjA1IDQzLjU3NUMxMDkuMDUgNDQuODUgMTA4IDQ1LjgyNSAxMDYuOCA0NS44MjVaIiBmaWxsPSIjMzYzQzQ0Ii8+CjxwYXRoIGQ9Ik0xMDYuOCA1OC40MjVIODguNzk5OEM4Ny41MjQ4IDU4LjQyNSA4Ni41NDk4IDU3LjQ1IDg2LjU0OTggNTYuMTc1Qzg2LjU0OTggNTQuOSA4Ny41MjQ4IDUzLjkyNSA4OC43OTk4IDUzLjkyNUgxMDYuOEMxMDguMDc1IDUzLjkyNSAxMDkuMDUgNTQuOSAxMDkuMDUgNTYuMTc1QzEwOS4wNSA1Ny40NSAxMDggNTguNDI1IDEwNi44IDU4LjQyNVoiIGZpbGw9IiMzNjNDNDQiLz4KPHBhdGggZD0iTTc5LjI3NSA2MC4wNzVINTkuMjVDNTcuOTc1IDYwLjA3NSA1NyA1OS4xIDU3IDU3LjgyNVY0Mi40NUM1NyA0MS4xNzUgNTcuOTc1IDQwLjIgNTkuMjUgNDAuMkg3OS4yQzgwLjQ3NSA0MC4yIDgxLjQ1IDQxLjE3NSA4MS40NSA0Mi40NVY1Ny44MjVDODEuNTI1IDU5LjEgODAuNDc1IDYwLjA3NSA3OS4yNzUgNjAuMDc1Wk02MS41IDU1LjU3NUg3Ni45NVY0NC43SDYxLjVWNTUuNTc1WiIgZmlsbD0iI0VEMDA4MCIvPgo8L3N2Zz4K\"\n\t\t\t}\n\t\t},\n\t\t\"viz_bWKIR3as\": {\n\t\t\t\"type\": \"splunk.singlevalueicon\",\n\t\t\t\"options\": {\n\t\t\t\t\"showValue\": false,\n\t\t\t\t\"icon\": \"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CgogICAgPGcgaWQ9ImltZ19lbWFpbC1zY2hlZHVsZWQiPgogICAgICAgIDxnIGlkPSJ2ZWN0b3JzIj4KICAgICAgICAgICAgPHBhdGggaWQ9ImVudmVsb3BlLWJvZHkiIGQ9Ik0xMDcuMTc2IDE2OUgzNEMyNy4zNzI2IDE2OSAyMiAxNjMuNjI3IDIyIDE1N1Y3OUMyMiA3Mi4zNzI2IDI3LjM3MjYgNjcgMzQgNjdIMTU0QzE2MC42MjcgNjcgMTY2IDcyLjM3MjYgMTY2IDc5VjEwOC45NzIiIHN0cm9rZT0iIzM2M0M0NCIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgICAgICAgICAgPHBhdGggaWQ9ImVudmVsb3BlLWluc2lkZSIgZD0iTTE1Ny44NzQgNzMuNDA5NUwxMDEuODc4IDEyMi4xNDRDOTcuMzYxNSAxMjYuMDc0IDkwLjYzODUgMTI2LjA3NCA4Ni4xMjIgMTIyLjE0NEwzMC4xMjY1IDczLjQwOTVDMjguMTYxOCA3MS42OTk3IDI4LjU2NjEgNjguNTQyIDMwLjg5ODEgNjcuMzgyMkMzMS40MDM2IDY3LjEzMDggMzEuOTYwNSA2NyAzMi41MjUgNjdIMTU1LjQ3NUMxNTYuMDQgNjcgMTU2LjU5NiA2Ny4xMzA4IDE1Ny4xMDIgNjcuMzgyMkMxNTkuNDM0IDY4LjU0MiAxNTkuODM4IDcxLjY5OTcgMTU3Ljg3NCA3My40MDk1WiIgZmlsbD0iI0Q1RENFNSIgc3Ryb2tlPSIjMzYzQzQ0IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgoKICAgICAgICAgICAgPGcgdHJhbnNmb3JtLW9yaWdpbj0iOTQgNjciIHZpc2liaWxpdHk9ImhpZGRlbiI+CiAgICAgICAgICAgICAgICA8cGF0aCBpZD0iZW52ZWxvcGUtbGlkLW9wZW4iIGQ9Ik0xNTcuODc0IDYwLjU5MDVMMTAxLjg3OCAxMS44NTY0Qzk3LjM2MTUgNy45MjU1OSA5MC42Mzg1IDcuOTI1NiA4Ni4xMjIgMTEuODU2NEwzMC4xMjY1IDYwLjU5MDVDMjguMTYxOCA2Mi4zMDAzIDI4LjU2NjEgNjUuNDU4IDMwLjg5ODEgNjYuNjE3OEMzMS40MDM2IDY2Ljg2OTIgMzEuOTYwNSA2NyAzMi41MjUgNjdIOTRIMTU1LjQ3NUMxNTYuMDQgNjcgMTU2LjU5NiA2Ni44NjkyIDE1Ny4xMDIgNjYuNjE3OEMxNTkuNDM0IDY1LjQ1OCAxNTkuODM4IDYyLjMwMDMgMTU3Ljg3NCA2MC41OTA1WiIgZmlsbD0iI0Q1RENFNSIgc3Ryb2tlPSIjMzYzQzQ0IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgoKICAgICAgICAgICAgICAgIDwhLS0gQW5pbWF0aW9uOiBCb3VjaW5nIFNjYWxpbmcgLS0+CiAgICAgICAgICAgICAgICA8IS0tIFNldCB0aGUgb3JpZ2luIHRvIHRoZSBwYXRoIGxpa2U6IHRyYW5zZm9ybS1vcmlnaW49IjE2MCAxNjAiIC0tPgogICAgICAgICAgICAgICAgPGFuaW1hdGVUcmFuc2Zvcm0gCiAgICAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiAKICAgICAgICAgICAgICAgICAgICBkdXI9IjEuNXMiIAogICAgICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIgogICAgICAgICAgICAgICAgICAgIGZpbGw9ImZyZWV6ZSIgCiAgICAgICAgICAgICAgICAgICAgYXR0cmlidXRlTmFtZT0idHJhbnNmb3JtIiAKICAgICAgICAgICAgICAgICAgICB2YWx1ZXM9IjEgMTsgMSAxOyAxIDEiCiAgICAgICAgICAgICAgICAgICAgdHlwZT0ic2NhbGUiIAogICAgICAgICAgICAgICAgICAgIGFkZGl0aXZlPSJzdW0iIAogICAgICAgICAgICAgICAgICAgIGtleVRpbWVzPSIwOzAuNTsxIgogICAgICAgICAgICAgICAgICAgIGNhbGNNb2RlPSJzcGxpbmUiCiAgICAgICAgICAgICAgICAgICAga2V5U3BsaW5lcz0iLjMgMCAuNyAxOyAuMyAwIC43IDEiCiAgICAgICAgICAgICAgICAvPgogICAgICAgICAgICA8L2c+CgogICAgICAgICAgICA8ZyBpZD0iY2xvY2siPgogICAgICAgICAgICAgICAgPGNpcmNsZSBpZD0iY2xvY2stZnJhbWUiIGN4PSIxNTMiIGN5PSIxNTMiIHI9IjMzIiBzdHJva2U9IiMzNjNDNDQiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgICAgICAgICAgICAgPHBhdGggaWQ9InNob3J0LWhhbmQiIGQ9Ik0xNTMgMTM0VjE1MyIgc3Ryb2tlPSIjRUQwMDgwIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgdmlzaWJpbGl0eT0iaGlkZGVuIi8+CiAgICAgICAgICAgICAgICA8ZyB0cmFuc2Zvcm0tb3JpZ2luPSIxNTMgMTUzIj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBpZD0ic2hvcnQtaGFuZC1hbmdsZWQiIGQ9Ik0xNjguNSAxNjEuNUwxNTMgMTUzIiBzdHJva2U9IiNFRDAwODAiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgICAgICAgICAgICAgICAgPCEtLSBBbmltYXRpb246IEJvdWNpbmcgUm90YXRpb24gLS0+CiAgICAgICAgICAgICAgICAgICAgPCEtLSBTZXQgdGhlIG9yaWdpbiB0byB0aGUgcGF0aCBsaWtlOiB0cmFuc2Zvcm0tb3JpZ2luPSIxNjAgMTYwIiAtLT4KICAgICAgICAgICAgICAgICAgICA8YW5pbWF0ZVRyYW5zZm9ybSAKICAgICAgICAgICAgICAgICAgICAgICAgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIAogICAgICAgICAgICAgICAgICAgICAgICBkdXI9IjZzIiAKICAgICAgICAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiAKICAgICAgICAgICAgICAgICAgICAgICAgZmlsbD0iZnJlZXplIiAKICAgICAgICAgICAgICAgICAgICAgICAgYXR0cmlidXRlTmFtZT0idHJhbnNmb3JtIiAKICAgICAgICAgICAgICAgICAgICAgICAgZnJvbT0iMCIgCiAgICAgICAgICAgICAgICAgICAgICAgIHRvPSIwIiAKICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT0icm90YXRlIiAKICAgICAgICAgICAgICAgICAgICAgICAgYWRkaXRpdmU9InN1bSIgCiAgICAgICAgICAgICAgICAgICAgICAgIGtleVRpbWVzPSIwOzAuNTswLjUwMDE7MSIgCiAgICAgICAgICAgICAgICAgICAgICAgIHZhbHVlcz0iMDszNjA7MDswIiAKICAgICAgICAgICAgICAgICAgICAgICAga2V5U3BsaW5lcz0iMC45IDAgMC4xIDE7MC41IDAgMC41IDE7MC41IDAgMC41IDEiIAogICAgICAgICAgICAgICAgICAgICAgICBjYWxjTW9kZT0ic3BsaW5lIgogICAgICAgICAgICAgICAgICAgIC8+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8ZyB0cmFuc2Zvcm0tb3JpZ2luPSIxNTMgMTUzIj4KICAgICAgICAgICAgICAgICAgICA8cGF0aCBpZD0ibG9uZy1oYW5kIiBkPSJNMTUzIDEzMFYxNTMiIHN0cm9rZT0iI0VEMDA4MCIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgICAgICAgICAgICAgICAgICA8IS0tIEFuaW1hdGlvbjogQm91Y2luZyBSb3RhdGlvbiAtLT4KICAgICAgICAgICAgICAgICAgICA8IS0tIFNldCB0aGUgb3JpZ2luIHRvIHRoZSBwYXRoIGxpa2U6IHRyYW5zZm9ybS1vcmlnaW49IjE2MCAxNjAiIC0tPgogICAgICAgICAgICAgICAgICAgIDxhbmltYXRlVHJhbnNmb3JtIAogICAgICAgICAgICAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgCiAgICAgICAgICAgICAgICAgICAgICAgIGR1cj0iNnMiIAogICAgICAgICAgICAgICAgICAgICAgICBiZWdpbj0iMHMiIAogICAgICAgICAgICAgICAgICAgICAgICBmaWxsPSJmcmVlemUiIAogICAgICAgICAgICAgICAgICAgICAgICBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIAogICAgICAgICAgICAgICAgICAgICAgICBmcm9tPSIwIiAKICAgICAgICAgICAgICAgICAgICAgICAgdG89IjAiIAogICAgICAgICAgICAgICAgICAgICAgICB0eXBlPSJyb3RhdGUiIAogICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGl2ZT0ic3VtIiAKICAgICAgICAgICAgICAgICAgICAgICAga2V5VGltZXM9IjA7MC41OzAuNTAwMTsxIiAKICAgICAgICAgICAgICAgICAgICAgICAgdmFsdWVzPSIwOzM2MDA7MDswIiAKICAgICAgICAgICAgICAgICAgICAgICAga2V5U3BsaW5lcz0iMC45IDAgMC4xIDE7MC41IDAgMC41IDE7MC41IDAgMC41IDEiIAogICAgICAgICAgICAgICAgICAgICAgICBjYWxjTW9kZT0ic3BsaW5lIgogICAgICAgICAgICAgICAgICAgIC8+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KCiAgICAgICAgICAgIDxnIGlkPSJyZXBvcnQiPgogICAgICAgICAgICAgICAgPG1hc2sgaWQ9Im1hc2swXzE1XzE4MTQiIHN0eWxlPSJtYXNrLXR5cGU6YWxwaGEiIG1hc2tVbml0cz0idXNlclNwYWNlT25Vc2UiIHg9IjI2IiB5PSIxNyIgd2lkdGg9IjEzNiIgaGVpZ2h0PSIxMDkiPgogICAgICAgICAgICAgICAgICAgIDxwYXRoIGlkPSJtYXNrIiBkPSJNODYuMTU0IDEyMi43MkwzMC4zODkyIDc0LjUzMDhDMjcuNzUxNSA3Mi4yNTEzIDI2LjIzNTQgNjguOTM3NCAyNi4yMzU0IDY1LjQ1MTJWMjkuNDcwNkMyNi4yMzU0IDIyLjg0MzIgMzEuNjA3OSAxNy40NzA2IDM4LjIzNTQgMTcuNDcwNkgxNDkuNzY1QzE1Ni4zOTIgMTcuNDcwNiAxNjEuNzY1IDIyLjg0MzIgMTYxLjc2NSAyOS40NzA2VjY1LjQ1MTJDMTYxLjc2NSA2OC45Mzc0IDE2MC4yNDkgNzIuMjUxMyAxNTcuNjExIDc0LjUzMDhMMTAxLjg0NiAxMjIuNzJDOTcuMzQwMSAxMjYuNjE0IDkwLjY2IDEyNi42MTQgODYuMTU0IDEyMi43MloiIGZpbGw9IiNEOUQ5RDkiLz4KICAgICAgICAgICAgICAgIDwvbWFzaz4KICAgICAgICAgICAgICAgIDxnIG1hc2s9InVybCgjbWFzazBfMTVfMTgxNCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJyZXBvcnQtcGFwZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsNDgpIj4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZD0iTTQ1IDgwSDE0M1YyMDVINDVWODBaIiBmaWxsPSIjRjJGNEY1Ii8+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMjEuMjIyIDEwNi45ODlINjYuNzc3OE0xMjEuMjIyIDEyOS43MTZINjYuNzc3OE0xMjEuMjIyIDE1MS4wMjNINjYuNzc3OE00NSA4MEgxNDNWMjA1SDQ1VjgwWiIgc3Ryb2tlPSIjMzYzQzQ0IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgICAgICAgICAgICAgICA8IS0tIEFuaW1hdGlvbjogQm91Y2luZyBUcmFuc2xhdGUgKFggWSkgdmFsdWVzIC0tPgogICAgICAgICAgICAgICAgICAgICAgICA8YW5pbWF0ZVRyYW5zZm9ybSAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJlZ2luPSIzcyIgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkdXI9IjZzIiAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGw9ImZyZWV6ZSIgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgdHlwZT0idHJhbnNsYXRlIiAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aXZlPSJzdW0iIAogICAgICAgICAgICAgICAgICAgICAgICAgICAga2V5VGltZXM9IjA7MC4xNTswLjQ7MC40MjswLjQ0OzAuNDY7MSIgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB2YWx1ZXM9IjAgMDswIC0xMDg7MCAtMTA4OzAgMDswIC0yMDswIDA7MCAwIiAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGtleVNwbGluZXM9IjAuOCAwIDAuMiAxOzAuOCAwIDAuMiAxOzAuMzMzIDAgMC42NjcgMTswLjMzMyAwIDAuNjY3IDE7MC4zMzMgMCAwLjY2NyAxOzAgMCAwIDAiIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FsY01vZGU9InNwbGluZSIKICAgICAgICAgICAgICAgICAgICAgICAgLz4KICAgICAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KCiAgICAgICAgICAgIDxnPgogICAgICAgICAgICAgICAgPHBhdGggaWQ9ImVudmVsb3BlLXJpZCIgZD0iTTI2IDcwTDg2LjEzNTggMTIyLjE3N0M5MC42NDc4IDEyNi4wOTEgOTcuMzUyMiAxMjYuMDkxIDEwMS44NjQgMTIyLjE3N0wxNjIgNzAiIHN0cm9rZT0iIzM2M0M0NCIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg==\"\n\t\t\t}\n\t\t},\n\t\t\"viz_dT8e5Wkn\": {\n\t\t\t\"type\": \"splunk.markdown\",\n\t\t\t\"options\": {\n\t\t\t\t\"markdown\": \"**1**\",\n\t\t\t\t\"fontSize\": \"custom\",\n\t\t\t\t\"customFontSize\": 32,\n\t\t\t\t\"fontColor\": \"#ffffff\",\n\t\t\t\t\"fontFamily\": \"Splunk Data Sans\"\n\t\t\t}\n\t\t}\n\t},\n\t\"dataSources\": {\n\t\t\"ds_YwMNtT5r\": {\n\t\t\t\"type\": \"ds.search\",\n\t\t\t\"options\": {\n\t\t\t\t\"queryParameters\": {\n\t\t\t\t\t\"earliest\": \"-24h@h\",\n\t\t\t\t\t\"latest\": \"now\"\n\t\t\t\t},\n\t\t\t\t\"query\": \"| rest /servicesNS/-/-/data/ui/views search=\\\"rootNode=\\\"dashboard\\\" AND version!=2\\\"\\n| rename eai:acl.app as App title as Title author as Author\\n| search Author=$dash_owner$ App=$app$\\n| table App, Title, Author\\n| strcat App \\\"/\\\" Title appAndTitle \\n| join appAndTitle \\n  [| rest /servicesNS/-/-/scheduled/views search=\\\"is_scheduled=1\\\"\\n  | rename action.email.pdfview as Title eai:acl.app as App \\n  | strcat App \\\"/\\\" Title appAndTitle \\n  | fields Title, is_scheduled, App, appAndTitle, is_scheduled] \\n| dedup appAndTitle\\n| fields App Title Author\"\n\t\t\t},\n\t\t\t\"name\": \"Search_1\"\n\t\t}\n\t},\n\t\"inputs\": {\n\t\t\"input_o9ktWgk8\": {\n\t\t\t\"options\": {\n\t\t\t\t\"items\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"label\": \"Me\",\n\t\t\t\t\t\t\"value\": \"$env:user$\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"label\": \"All\",\n\t\t\t\t\t\t\"value\": \"*\"\n\t\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"defaultValue\": \"*\",\n\t\t\t\t\"token\": \"dash_owner\"\n\t\t\t},\n\t\t\t\"title\": \"Dashboard owner\",\n\t\t\t\"type\": \"input.dropdown\"\n\t\t},\n\t\t\"input_RFqxOOTP\": {\n\t\t\t\"options\": {\n\t\t\t\t\"items\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"label\": \"Current app\",\n\t\t\t\t\t\t\"value\": \"$env:app$\"\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"label\": \"All apps\",\n\t\t\t\t\t\t\"value\": \"*\"\n\t\t\t\t\t}\n\t\t\t\t],\n\t\t\t\t\"defaultValue\": \"*\",\n\t\t\t\t\"token\": \"app\"\n\t\t\t},\n\t\t\t\"title\": \"App\",\n\t\t\t\"type\": \"input.dropdown\"\n\t\t}\n\t},\n\t\"title\": \"Scheduled export is now available for Dashboard Studio\",\n\t\"layout\": {\n\t\t\"tabs\": {\n\t\t\t\"items\": [\n\t\t\t\t{\n\t\t\t\t\t\"layoutId\": \"layout_1\",\n\t\t\t\t\t\"label\": \"New tab\"\n\t\t\t\t}\n\t\t\t]\n\t\t},\n\t\t\"layoutDefinitions\": {\n\t\t\t\"layout_1\": {\n\t\t\t\t\"type\": \"absolute\",\n\t\t\t\t\"options\": {\n\t\t\t\t\t\"width\": 1400,\n\t\t\t\t\t\"height\": 1400\n\t\t\t\t},\n\t\t\t\t\"structure\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_PEnzuC6O\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 50,\n\t\t\t\t\t\t\t\"y\": 240,\n\t\t\t\t\t\t\t\"w\": 1320,\n\t\t\t\t\t\t\t\"h\": 40\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_AJ3zmcH5\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 420,\n\t\t\t\t\t\t\t\"y\": 1000,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 130\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_2EzncWf1\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 750,\n\t\t\t\t\t\t\t\"y\": 1000,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 100\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_8F1OzLSQ\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 1080,\n\t\t\t\t\t\t\t\"y\": 1000,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 100\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_xahk2LxS\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 90,\n\t\t\t\t\t\t\t\"y\": 1000,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 160\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_MJsFPrKe\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 90,\n\t\t\t\t\t\t\t\"y\": 820,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 160\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_RSvTUOja\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 420,\n\t\t\t\t\t\t\t\"y\": 820,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 160\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_WbJd8SDE\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 320,\n\t\t\t\t\t\t\t\"y\": 660,\n\t\t\t\t\t\t\t\"w\": 970,\n\t\t\t\t\t\t\t\"h\": 80\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_iaOSkDcp\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 240,\n\t\t\t\t\t\t\t\"y\": 1180,\n\t\t\t\t\t\t\t\"w\": 800,\n\t\t\t\t\t\t\t\"h\": 50\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_oJRe4b3S\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 230,\n\t\t\t\t\t\t\t\"y\": 1230,\n\t\t\t\t\t\t\t\"w\": 1060,\n\t\t\t\t\t\t\t\"h\": 100\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_PDaQOM1v\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 80,\n\t\t\t\t\t\t\t\"y\": 160,\n\t\t\t\t\t\t\t\"w\": 1170,\n\t\t\t\t\t\t\t\"h\": 70\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_hxZuIDZx\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 70,\n\t\t\t\t\t\t\t\"y\": 800,\n\t\t\t\t\t\t\t\"w\": 56,\n\t\t\t\t\t\t\t\"h\": 56\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_frOE0GWy\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 400,\n\t\t\t\t\t\t\t\"y\": 800,\n\t\t\t\t\t\t\t\"w\": 56,\n\t\t\t\t\t\t\t\"h\": 56\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_nr5gCBaH\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 750,\n\t\t\t\t\t\t\t\"y\": 820,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 160\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_v1NQ2Lzx\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 730,\n\t\t\t\t\t\t\t\"y\": 800,\n\t\t\t\t\t\t\t\"w\": 56,\n\t\t\t\t\t\t\t\"h\": 56\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_8K0zIsKu\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 1080,\n\t\t\t\t\t\t\t\"y\": 820,\n\t\t\t\t\t\t\t\"w\": 300,\n\t\t\t\t\t\t\t\"h\": 160\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_DrWZo5rt\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 1060,\n\t\t\t\t\t\t\t\"y\": 800,\n\t\t\t\t\t\t\t\"w\": 56,\n\t\t\t\t\t\t\t\"h\": 56\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_c3aTfPcq\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 413,\n\t\t\t\t\t\t\t\"y\": 806,\n\t\t\t\t\t\t\t\"w\": 31,\n\t\t\t\t\t\t\t\"h\": 40\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_7NYiaDEI\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 743,\n\t\t\t\t\t\t\t\"y\": 806,\n\t\t\t\t\t\t\t\"w\": 31,\n\t\t\t\t\t\t\t\"h\": 40\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_NBNx6H5U\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 1072,\n\t\t\t\t\t\t\t\"y\": 806,\n\t\t\t\t\t\t\t\"w\": 31,\n\t\t\t\t\t\t\t\"h\": 40\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_bM8KCb0y\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 60,\n\t\t\t\t\t\t\t\"y\": 350,\n\t\t\t\t\t\t\t\"w\": 1310,\n\t\t\t\t\t\t\t\"h\": 280\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_x0CYX8dr\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 250,\n\t\t\t\t\t\t\t\"y\": 40,\n\t\t\t\t\t\t\t\"w\": 950,\n\t\t\t\t\t\t\t\"h\": 110\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_v7GaWc3B\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 80,\n\t\t\t\t\t\t\t\"y\": 620,\n\t\t\t\t\t\t\t\"w\": 180,\n\t\t\t\t\t\t\t\"h\": 170\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_BxLGZQrA\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 70,\n\t\t\t\t\t\t\t\"y\": 1180,\n\t\t\t\t\t\t\t\"w\": 140,\n\t\t\t\t\t\t\t\"h\": 140\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_bWKIR3as\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 80,\n\t\t\t\t\t\t\t\"y\": 0,\n\t\t\t\t\t\t\t\"w\": 160,\n\t\t\t\t\t\t\t\"h\": 150\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"viz_dT8e5Wkn\",\n\t\t\t\t\t\t\"type\": \"block\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 83,\n\t\t\t\t\t\t\t\"y\": 806,\n\t\t\t\t\t\t\t\"w\": 31,\n\t\t\t\t\t\t\t\"h\": 40\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"input_o9ktWgk8\",\n\t\t\t\t\t\t\"type\": \"input\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 60,\n\t\t\t\t\t\t\t\"y\": 270,\n\t\t\t\t\t\t\t\"w\": 390,\n\t\t\t\t\t\t\t\"h\": 82\n\t\t\t\t\t\t}\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"item\": \"input_RFqxOOTP\",\n\t\t\t\t\t\t\"type\": \"input\",\n\t\t\t\t\t\t\"position\": {\n\t\t\t\t\t\t\t\"x\": 450,\n\t\t\t\t\t\t\t\"y\": 270,\n\t\t\t\t\t\t\t\"w\": 390,\n\t\t\t\t\t\t\t\"h\": 82\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t\"globalInputs\": [],\n\t\t\"options\": {\n\t\t\t\"showTitleAndDescription\": false\n\t\t}\n\t}\n}\n    ]]></definition>\n    <meta type=\"hiddenElements\"><![CDATA[\n{\n\t\"hideEdit\": true,\n\t\"hideOpenInSearch\": false,\n\t\"hideExport\": false\n}\n    ]]></meta>\n</dashboard>",
+    "eai:digest": "8bbeb767b3af16dce31cd3a3e2fca89e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Scheduled export is now available for Dashboard Studio",
+    "rootNode": "dashboard",
+    "version": "2"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/scheduled_export_dashboard",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/scheduled_export_dashboard/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/scheduled_export_dashboard",
+    "edit": "/servicesNS/nobody/search/data/ui/views/scheduled_export_dashboard",
+    "list": "/servicesNS/nobody/search/data/ui/views/scheduled_export_dashboard"
+   },
+   "name": "scheduled_export_dashboard",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/search.html\" type=\"html\" isDashboard=\"False\">\n    <label>Search</label>\n</view>",
+    "eai:digest": "111312893578c3fec234cec341cf5f22",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Search",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/search",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/search/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/search",
+    "edit": "/servicesNS/nobody/search/data/ui/views/search",
+    "list": "/servicesNS/nobody/search/data/ui/views/search"
+   },
+   "name": "search",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Show Source</label>\n</view>",
+    "eai:digest": "a746de9c3478a30123b4761216e170cc",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Show Source",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/show_source",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/show_source/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/show_source",
+    "edit": "/servicesNS/nobody/search/data/ui/views/show_source",
+    "list": "/servicesNS/nobody/search/data/ui/views/show_source"
+   },
+   "name": "show_source",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
     "app": "acme_secops",
     "can_change_perms": true,
     "can_list": true,
@@ -100,6 +1562,149 @@
    },
    "name": "storefront_health",
    "updated": "2026-11-06T01:54:21+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/app.html\" type=\"html\" isDashboard=\"False\">\n    <label>Table</label>\n</view>",
+    "eai:digest": "038723a00b25d59456109981c7a6d49e",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Table",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/table",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/table/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/table",
+    "edit": "/servicesNS/nobody/search/data/ui/views/table",
+    "list": "/servicesNS/nobody/search/data/ui/views/table"
+   },
+   "name": "table",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<?xml version=\"1.0\"?>\n<view template=\"pages/individual_page.html\" type=\"html\" isDashboard=\"False\">\n    <label>Trigger Action View</label>\n</view>",
+    "eai:digest": "22d12801950b66b8505b841bcbfd28ff",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": false,
+    "isVisible": true,
+    "label": "Trigger Action View",
+    "rootNode": "view"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/views/trigger_action_view",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/ui/views/trigger_action_view/_reload",
+    "alternate": "/servicesNS/nobody/search/data/ui/views/trigger_action_view",
+    "edit": "/servicesNS/nobody/search/data/ui/views/trigger_action_view",
+    "list": "/servicesNS/nobody/search/data/ui/views/trigger_action_view"
+   },
+   "name": "trigger_action_view",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:data": "<form version=\"1.1\"><label>Web Explorer</label><search id=\"base\"><query>index=web sourcetype=access_combined | fields status uri host</query></search><fieldset><input type=\"dropdown\" token=\"host_tok\"><label>Host</label><search><query>| tstats count where index=web by host</query></search><fieldForLabel>host</fieldForLabel><fieldForValue>host</fieldForValue></input><input type=\"text\" token=\"idx\"><label>Index</label><default>web</default></input></fieldset><row><panel><title>Status codes</title><chart><search base=\"base\"><query>| stats count by status</query></search></chart></panel><panel><title>Any index</title><chart><search><query>index=$idx$ | timechart count</query></search></chart></panel><panel><title>Owners</title><table><search ref=\"Web - Error Owners\"/></table></panel></row></form>",
+    "eai:digest": "f7f41b29cae37e7a7bd5b9b8eae3cdf7",
+    "eai:type": "views",
+    "eai:userName": "nobody",
+    "isDashboard": true,
+    "isVisible": true,
+    "label": "Web Explorer",
+    "rootNode": "form"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/ui/views/web_explorer",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer/_reload",
+    "alternate": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer",
+    "edit": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer",
+    "list": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer",
+    "move": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer/move",
+    "remove": "/servicesNS/nobody/acme_web/data/ui/views/web_explorer"
+   },
+   "name": "web_explorer",
+   "updated": "2026-11-06T02:42:18+00:00"
   }
  ],
  "generator": {
@@ -109,7 +1714,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 2
+  "total": 36
  },
- "updated": "2026-11-06T02:00:09+00:00"
+ "updated": "2026-11-06T02:42:28+00:00"
 }

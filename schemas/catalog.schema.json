@@ -298,6 +298,34 @@
         },
         "annotations": {
           "$ref": "#/$defs/Annotations"
+        },
+        "lineage": {
+          "description": "Diagnostics from SPL analysis. Derived, so it never changes the catalog version.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "implicitIndex": {
+              "description": "A search with no index constraint: it runs against the user's default indexes.",
+              "type": "boolean"
+            },
+            "dynamic": {
+              "description": "Uses $tokens$, so some references are only known at run time.",
+              "type": "boolean"
+            },
+            "unresolved": {
+              "description": "References to objects not found (or not visible) in the catalog, as type:name.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },

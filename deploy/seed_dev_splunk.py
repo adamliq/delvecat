@@ -248,6 +248,64 @@ def main() -> None:
         "name": "5514", "index": "firewall", "sourcetype": "acme:fw", "connection_host": "ip"})
     record("input", "udp://5514", "TA-acme-firewall")
 
+    # --- Lineage cases (Phase 3): one saved search per SPL pattern -------------------
+    def search(app: str, name: str, spl: str, desc: str, owner: str = "nobody") -> None:
+        post(f"{ns(app, owner)}/saved/searches", {"name": name, "search": spl,
+                                                  "description": desc,
+                                                  "dispatch.earliest_time": "-24h"})
+        record("savedSearch", name, app, owner if owner != "nobody" else None)
+
+    search("acme_web", "Web - Error Owners",
+           "index=web status>=500 | lookup asset_owners ip AS clientip OUTPUT owner "
+           "| stats count by owner | outputlookup web_error_owners.csv",
+           "Uses a globally shared lookup from the firewall add-on; writes a CSV.")
+    search("acme_secops", "Auth - Failures by Tag",
+           "tag=authentication tag=failure | stats count by user",
+           "Finds data through tags rather than indexes.")
+    search("acme_web", "Web - Requests by Status (Data Model)",
+           "| tstats count from datamodel=Acme_Web.Requests by Requests.status",
+           "Reads the Acme_Web data model.")
+    search("acme_secops", "SOC - Blocked Threat Hosts",
+           "index=firewall action=blocked [| inputlookup threat_hosts_lookup | rename ip AS src_ip "
+           "| fields src_ip] | stats count by src_ip | outputlookup threat_hosts_lookup",
+           "Subsearch over a KV store lookup; writes back to it.")
+    # Broken references happen when objects are deleted or unshared after a search was
+    # saved (Splunk validates macros on save), so recreate that sequence.
+    conf("search", "macros", "proxy_filter", definition="search category!=internal")
+    search("search", "Legacy - Proxy Categories",
+           "index=legacy_proxy | lookup proxy_categories url OUTPUT category | `proxy_filter`",
+           "Broken on purpose: the lookup never existed and the macro was deleted.")
+    client.delete(f"{ns('search')}/configs/conf-macros/proxy_filter")
+    search("acme_web", "Errors Anywhere", "error OR failed | stats count by host",
+           "No index: runs against each user's default indexes.")
+    conf("acme_secops", "macros", "secops_only_filter", definition="index=wineventlog EventCode=4625")
+    macro_acl = f"{ns('acme_secops')}/admin/macros/secops_only_filter/acl"
+    post(macro_acl, {"sharing": "global", "owner": "nobody"})
+    search("acme_web", "Web - Uses SOC Macro", "`secops_only_filter` | stats count",
+           "Broken on purpose: the macro was later restricted to the acme_secops app.")
+    post(macro_acl, {"sharing": "app", "owner": "nobody"})
+    record("macro", "secops_only_filter", "acme_secops")
+
+    post(f"{ns('acme_web')}/data/ui/views", {
+        "name": "web_explorer",
+        "eai:data": (
+            '<form version="1.1"><label>Web Explorer</label>'
+            '<search id="base"><query>index=web sourcetype=access_combined | fields status uri host'
+            "</query></search>"
+            '<fieldset><input type="dropdown" token="host_tok"><label>Host</label>'
+            "<search><query>| tstats count where index=web by host</query></search>"
+            '<fieldForLabel>host</fieldForLabel><fieldForValue>host</fieldForValue></input>'
+            '<input type="text" token="idx"><label>Index</label><default>web</default></input>'
+            "</fieldset>"
+            '<row><panel><title>Status codes</title><chart><search base="base">'
+            "<query>| stats count by status</query></search></chart></panel>"
+            "<panel><title>Any index</title><chart><search>"
+            "<query>index=$idx$ | timechart count</query></search></chart></panel>"
+            '<panel><title>Owners</title><table><search ref="Web - Error Owners"/></table></panel>'
+            "</row></form>"
+        )})
+    record("dashboard", "web_explorer", "acme_web")
+
     # Data so that the tstats inventory has something to find
     now = int(time.time())
     batches = [
@@ -262,6 +320,9 @@ def main() -> None:
           f"user=svc{i % 4} src=10.1.0.{i}" for i in range(20)]),
     ]
     for index, st, host, events in batches:
+        info = client.get(f"/services/data/indexes/{index}", params={"output_mode": "json"})
+        if int(info.json()["entry"][0]["content"].get("totalEventCount", 0) or 0) > 0:
+            continue  # already seeded: keep counts stable across re-runs
         r = client.post("/services/receivers/simple",
                         params={"index": index, "sourcetype": st, "host": host},
                         content="\n".join(events).encode())

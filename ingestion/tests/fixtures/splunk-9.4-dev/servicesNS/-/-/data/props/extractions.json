@@ -41,7 +41,7 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20EXTRACT-action"
    },
    "name": "acme:fw : EXTRACT-action",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:17+00:00"
   },
   {
    "acl": {
@@ -84,7 +84,130 @@
     "remove": "/servicesNS/nobody/TA-acme-firewall/data/props/extractions/acme%3Afw%20%3A%20REPORT-fw_kv"
    },
    "name": "acme:fw : REPORT-fw_kv",
-   "updated": "2026-11-06T01:54:28+00:00"
+   "updated": "2026-11-06T02:42:17+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "attribute": "EXTRACT-fields",
+    "eai:acl": null,
+    "stanza": "scheduler",
+    "type": "Inline",
+    "value": "(?i)^(?:[^ ]* ){2}(?:[+\\-]\\d+ )?(?P<log_level>[^ ]*)\\s+(?P<component>[^ ]+) - (?P<event_message>.+)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/props/extractions/scheduler%20%3A%20EXTRACT-fields",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/props/extractions/scheduler%20%3A%20EXTRACT-fields/_reload",
+    "alternate": "/servicesNS/nobody/search/data/props/extractions/scheduler%20%3A%20EXTRACT-fields",
+    "edit": "/servicesNS/nobody/search/data/props/extractions/scheduler%20%3A%20EXTRACT-fields",
+    "list": "/servicesNS/nobody/search/data/props/extractions/scheduler%20%3A%20EXTRACT-fields"
+   },
+   "name": "scheduler : EXTRACT-fields",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "attribute": "EXTRACT-useragent",
+    "eai:acl": null,
+    "stanza": "splunk_web_service",
+    "type": "Inline",
+    "value": "userAgent=(?P<browser>[^ (]+)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/props/extractions/splunk_web_service%20%3A%20EXTRACT-useragent",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/props/extractions/splunk_web_service%20%3A%20EXTRACT-useragent/_reload",
+    "alternate": "/servicesNS/nobody/search/data/props/extractions/splunk_web_service%20%3A%20EXTRACT-useragent",
+    "edit": "/servicesNS/nobody/search/data/props/extractions/splunk_web_service%20%3A%20EXTRACT-useragent",
+    "list": "/servicesNS/nobody/search/data/props/extractions/splunk_web_service%20%3A%20EXTRACT-useragent"
+   },
+   "name": "splunk_web_service : EXTRACT-useragent",
+   "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "attribute": "EXTRACT-fields",
+    "eai:acl": null,
+    "stanza": "splunkd",
+    "type": "Inline",
+    "value": "(?i)^(?:[^ ]* ){2}(?:[+\\-]\\d+ )?(?P<log_level>[^ ]*)\\s+(?P<component>[^ ]+) (?:\\[(?P<thread_id>\\d+)\\s)?(?:(?P<thread_name>[^\\]]+)\\]\\s)?- (?P<event_message>.+)"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/props/extractions/splunkd%20%3A%20EXTRACT-fields",
+   "links": {
+    "_reload": "/servicesNS/nobody/search/data/props/extractions/splunkd%20%3A%20EXTRACT-fields/_reload",
+    "alternate": "/servicesNS/nobody/search/data/props/extractions/splunkd%20%3A%20EXTRACT-fields",
+    "edit": "/servicesNS/nobody/search/data/props/extractions/splunkd%20%3A%20EXTRACT-fields",
+    "list": "/servicesNS/nobody/search/data/props/extractions/splunkd%20%3A%20EXTRACT-fields"
+   },
+   "name": "splunkd : EXTRACT-fields",
+   "updated": "1970-01-01T00:00:00+00:00"
   }
  ],
  "generator": {
@@ -94,7 +217,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 2
+  "total": 5
  },
- "updated": "2026-11-06T02:00:09+00:00"
+ "updated": "2026-11-06T02:42:28+00:00"
 }

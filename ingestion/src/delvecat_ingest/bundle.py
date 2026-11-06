@@ -11,11 +11,12 @@ from typing import Any
 from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
+from .lineage import derive, record_unresolved
 from .model import ExtractResult
 from .resolve import Resolver
 
 # Bookkeeping and human annotations never count as a change to the Splunk object.
-_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash", "annotations")
+_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash", "annotations", "lineage")
 
 
 def find_schema(start: Path | None = None, name: str = "catalog.schema.json") -> Path:
@@ -114,7 +115,9 @@ def assemble(
     ts = (generated_at or datetime.now(UTC)).astimezone(UTC).replace(microsecond=0)
     generated = ts.isoformat().replace("+00:00", "Z")
     entities = merge_entities(result.entities)
-    resolved, unresolved = Resolver(entities).resolve(result.refs)
+    spl_refs = derive(entities)
+    resolved, unresolved = Resolver(entities).resolve([*result.refs, *spl_refs])
+    broken = record_unresolved({e["id"]: e for e in entities}, unresolved)
 
     # Drop dangling edges (e.g. to an app that was not extracted) and duplicates.
     ids = {e["id"] for e in entities}
@@ -129,8 +132,23 @@ def assemble(
             edges.append(edge)
 
     reports = list(result.reports)
+    if spl_refs:
+        with_issues = sum(1 for e in entities if e.get("lineage"))
+        broken = sum(len((e.get("lineage") or {}).get("unresolved", [])) for e in entities)
+        reports.append(
+            {
+                "connector": "lineage",
+                "status": "ok",
+                "counts": {
+                    "splReferences": len(spl_refs),
+                    "brokenReferences": broken,
+                    "objectsWithIssues": with_issues,
+                },
+            }
+        )
     if result.refs:
-        examples = sorted({f"{r.target.type}:{r.target.name}" for r in unresolved})[:10]
+        config_unresolved = [r for r in unresolved if r.origin != "spl"]
+        examples = sorted({f"{r.target.type}:{r.target.name}" for r in config_unresolved})[:10]
         reports.append(
             {
                 "connector": "resolver",
