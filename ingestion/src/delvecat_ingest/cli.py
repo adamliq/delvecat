@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from . import __version__
+from .annotations import AnnotationError, apply_annotations, load_annotations
 from .bundle import assemble, load_bundle, validate, write_bundle
 from .connectors import splunk, splunk_cloud_acs
 from .connectors.splunk import Options
@@ -93,6 +94,8 @@ def _build(args: argparse.Namespace) -> int:
 
     generated_at = datetime.fromisoformat(args.generated_at) if args.generated_at else None
     bundle = assemble([instance], result, generated_at, previous)
+    if args.annotations and (code := _annotate_into(bundle, args)) is not None:
+        return code
 
     problems = validate(bundle)
     if problems:
@@ -114,6 +117,67 @@ def _build(args: argparse.Namespace) -> int:
     )
     failed = [r for r in bundle["ingestionReport"] if r["status"] == "failed"]
     return 3 if failed and args.strict else 0
+
+
+def _annotation_source(args: argparse.Namespace) -> dict[str, str] | None:
+    if not args.annotation_repo:
+        return None
+    return {
+        "repoUrl": args.annotation_repo.rstrip("/"),
+        "branch": args.annotation_branch,
+        "path": Path(args.annotations).name if args.annotations else "annotations",
+    }
+
+
+def _annotate_into(bundle: dict[str, Any], args: argparse.Namespace) -> int | None:
+    """Apply annotations; return an exit code on failure, None on success."""
+    try:
+        annotations = load_annotations(Path(args.annotations))
+    except AnnotationError as exc:
+        print("invalid annotations:", *exc.problems, sep="\n  ", file=sys.stderr)
+        return 4
+    report = apply_annotations(bundle, annotations, _annotation_source(args))
+    if report["status"] != "ok" and args.strict:
+        print(f"annotations: {report.get('message')}", file=sys.stderr)
+        return 3
+    return None
+
+
+def _annotate(args: argparse.Namespace) -> int:
+    if not args.annotations:
+        print("error: annotate requires --annotations DIR", file=sys.stderr)
+        return 2
+    bundle = load_bundle(Path(args.bundle))
+    if (code := _annotate_into(bundle, args)) is not None:
+        return code
+    problems = validate(bundle)
+    if problems:
+        print("bundle failed validation:", *problems[:50], sep="\n  ", file=sys.stderr)
+        return 1
+    files = write_bundle(bundle, Path(args.out), shard=args.shard, pretty=args.pretty)
+    r = bundle["ingestionReport"][-1]
+    print(f"  annotations {r['status']} {r['counts']} {r.get('message', '')}".rstrip())
+    print(f"wrote {files[0]}")
+    return 0
+
+
+def _lint_annotations(args: argparse.Namespace) -> int:
+    try:
+        annotations = load_annotations(Path(args.annotations))
+    except AnnotationError as exc:
+        print(*exc.problems, sep="\n", file=sys.stderr)
+        return 4
+    print(
+        f"{args.annotations}: {annotations.files} file(s), {len(annotations.entries)} "
+        f"entries, {len(annotations.glossary)} glossary terms"
+    )
+    if args.bundle:
+        report = apply_annotations(load_bundle(Path(args.bundle)), annotations)
+        print(f"against {args.bundle}: {report['counts']}")
+        if report.get("message"):
+            print(report["message"], file=sys.stderr)
+            return 3
+    return 0
 
 
 def _validate(args: argparse.Namespace) -> int:
@@ -169,6 +233,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     inv.add_argument("--max-field-sourcetypes", type=int, default=100)
 
+    def annotation_args(p: argparse.ArgumentParser) -> None:
+        g = p.add_argument_group("annotations")
+        g.add_argument("--annotations", help="directory of annotation YAML files to merge")
+        g.add_argument(
+            "--annotation-repo",
+            help="repository URL holding the annotations, for 'suggest an edit' links",
+        )
+        g.add_argument("--annotation-branch", default="main")
+
+    annotation_args(b)
     b.add_argument("--only", help="comma-separated extractor names to run")
     b.add_argument("--record", help="save every response under this directory as fixtures")
     b.add_argument("--previous", help="previous bundle (file or directory) for versioning")
@@ -186,6 +260,24 @@ def main(argv: list[str] | None = None) -> int:
     v = sub.add_parser("validate", help="validate a bundle (file, manifest or directory)")
     v.add_argument("bundle")
     v.set_defaults(func=_validate)
+
+    a = sub.add_parser("annotate", help="merge annotations into an existing bundle")
+    a.add_argument("bundle", help="bundle file, manifest or directory")
+    annotation_args(a)
+    a.add_argument("--out", required=True)
+    a.add_argument("--shard", action="store_true")
+    a.add_argument("--pretty", action="store_true")
+    a.add_argument(
+        "--strict",
+        action="store_true",
+        help="exit 3 if an entry matches nothing or a term is undefined",
+    )
+    a.set_defaults(func=_annotate)
+
+    la = sub.add_parser("lint-annotations", help="validate annotation files")
+    la.add_argument("annotations", help="annotations directory")
+    la.add_argument("--bundle", help="also check that every entry matches an entity")
+    la.set_defaults(func=_lint_annotations)
 
     lst = sub.add_parser("extractors", help="list available extractors")
     lst.set_defaults(func=lambda _: print("\n".join(splunk.EXTRACTORS)) or 0)

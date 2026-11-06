@@ -186,7 +186,7 @@ are confirmed against a live instance before their connector ships.
 |---|---|---|
 | **0. Skeleton** ✅ | Monorepo, JSON Schemas, read-only client + fixture transport, ingest CLI producing a validated bundle from fixtures, web shell (search + entity page), CI, Pages deploy, docker-compose Splunk for dev | `make demo` builds a bundle and the site renders it; CI green; Pages workflow deploys the demo |
 | **1. Core inventory** ✅ | All Splunk platform extractors (Enterprise + Cloud/ACS), versioned bundles, sharding | Every knowledge object in a test instance is in the bundle |
-| **2. UI MVP + annotations** | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
+| **2. UI MVP + annotations** ✅ | Faceted search, entity tabs, `annotations/*.yaml` merge, "suggest edit" links, local bundle loading | Every type browsable and annotatable |
 | **3. SPL lineage** | Parser integration, edge resolution, lineage graph (React Flow), impact analysis | index → search → lookup → dashboard chain traced |
 | **4. Ingestion products** | Deployment Server, DB Connect, Stream connectors + lineage | "Which forwarders/DBs/streams feed index X" answered |
 | **5. Security suite** | ES, SOAR, UEBA, ARI connectors; ATT&CK & CIM coverage views | Detection → SOAR playbook chain shown; coverage gaps listed |
@@ -229,6 +229,28 @@ are confirmed against a live instance before their connector ships.
 - Deferred: SPL-derived lineage (Phase 3), dashboard panel parsing (Phase 3),
   data model acceleration status and `_audit` usage (Phase 6).
 
+### Phase 2 notes (done)
+
+- `annotations/**/*.yaml` (schema: `schemas/annotations.schema.json`) holds
+  descriptions, owners, tags, classifications, glossary terms, links and the
+  glossary itself. Entries target one entity by `id` or many by `match`
+  (type/product/instance/app/name/owner, wildcards for app/name/owner).
+  Selectors apply first, then ids; lists union; the last description wins.
+- Merged by `delvecat-ingest build --annotations` or, without Splunk access,
+  `delvecat-ingest annotate <bundle>`. `lint-annotations` validates files
+  (errors carry `file:line`) and, with `--bundle`, flags entries that match
+  nothing and glossary terms used but not defined. CI runs it, so pull
+  requests from "suggest an edit" are checked automatically.
+- Annotations sit in `entity.annotations` (with `sources` and
+  `primarySource`), separate from Splunk's own description, and never change
+  an entity's catalog version.
+- Web: faceted search (type, product, app, owner, tag, classification,
+  glossary term, sharing, status, has description; multi-select with counts),
+  sorting and paging; entity tabs (Overview, Fields, Relationships,
+  Annotations, Raw); glossary pages with synonyms; documentation coverage on
+  the home page; "suggest an edit" links to the entity's own entry, or a
+  pre-filled new file on GitHub, plus a copyable YAML entry.
+
 ## 8. Repository layout
 
 ```
@@ -237,7 +259,7 @@ delvecat/
   ingestion/          Python package `delvecat_ingest` (CLI, connectors, transports)
     tests/fixtures/   recorded REST responses per scenario
   web/                React + TypeScript + Vite static app
-  annotations/        human-curated metadata (Phase 2)
+  annotations/        human-curated metadata (descriptions, owners, glossary)
   deploy/             docker-compose for a local dev Splunk
   docs/               plan and design notes
   .github/workflows/  ci.yml, pages.yml

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { searchPath } from "../lib/routes";
 
@@ -31,6 +31,10 @@ export function Layout({ children }: { children: ReactNode }) {
         <Link to="/" className="brand">
           <span className="logo" aria-hidden>DC</span> DelveCat
         </Link>
+        <nav className="nav">
+          <NavLink to="/search">Browse</NavLink>
+          <NavLink to="/glossary">Glossary</NavLink>
+        </nav>
         <form className="search-box" onSubmit={submit} role="search">
           <input
             type="search"

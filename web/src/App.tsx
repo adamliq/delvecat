@@ -2,6 +2,7 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { useCatalogState } from "./lib/CatalogContext";
 import { EntityPage } from "./pages/EntityPage";
+import { GlossaryPage } from "./pages/GlossaryPage";
 import { Home } from "./pages/Home";
 import { SearchPage } from "./pages/SearchPage";
 
@@ -25,6 +26,8 @@ function Body() {
       <Route path="/" element={<Home />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="/entity/:id" element={<EntityPage />} />
+      <Route path="/glossary" element={<GlossaryPage />} />
+      <Route path="/glossary/:term" element={<GlossaryPage />} />
       <Route path="*" element={<Home />} />
     </Routes>
   );

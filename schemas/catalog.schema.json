@@ -71,6 +71,15 @@
       "items": {
         "$ref": "#/$defs/Shard"
       }
+    },
+    "glossary": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/GlossaryTerm"
+      }
+    },
+    "annotationSource": {
+      "$ref": "#/$defs/AnnotationSource"
     }
   },
   "$defs": {
@@ -193,7 +202,8 @@
         },
         "webUrl": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "pattern": "^https?://"
         },
         "roles": {
           "type": "array",
@@ -258,37 +268,14 @@
         "description": {
           "type": "string"
         },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "owners": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "classifications": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "glossaryTerms": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
         "updatedAt": {
           "type": "string",
           "format": "date-time"
         },
         "sourceUrl": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "pattern": "^https?://"
         },
         "properties": {
           "description": "Type-specific attributes. Never contains credentials.",
@@ -308,6 +295,9 @@
         "contentHash": {
           "description": "Hash of the entity's extracted content, used to detect changes.",
           "type": "string"
+        },
+        "annotations": {
+          "$ref": "#/$defs/Annotations"
         }
       }
     },
@@ -474,6 +464,129 @@
         "sha256": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "Link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        }
+      }
+    },
+    "Annotations": {
+      "description": "Human-curated metadata merged from annotations/*.yaml. Never comes from Splunk.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "classifications": {
+          "description": "e.g. PII.Email, Confidential, MITRE.T1078",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "glossaryTerms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Link"
+          }
+        },
+        "sources": {
+          "description": "Annotation files (and entry numbers) that contributed, e.g. annotations/web.yaml#2",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "primarySource": {
+          "description": "The entry that targets this entity by id (the one to edit), if any.",
+          "type": "string"
+        }
+      }
+    },
+    "GlossaryTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "term"
+      ],
+      "properties": {
+        "term": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "AnnotationSource": {
+      "description": "Where annotations live, so the web app can link to 'suggest an edit'.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repoUrl",
+        "branch",
+        "path"
+      ],
+      "properties": {
+        "repoUrl": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
         }
       }
     }

@@ -1,0 +1,17 @@
+glossary:
+  - term: Storefront
+    description: The public e-commerce site customers buy from. Its web servers send access logs to the web index.
+    synonyms: [shop, web store]
+    related: [Summary index]
+  - term: Perimeter firewall
+    description: The edge firewalls between the corporate network and the internet. They log every allowed and blocked connection.
+    synonyms: [edge firewall]
+    related: [SOC]
+  - term: SOC
+    description: Security Operations Center. Owns detection content and responds to security alerts.
+    synonyms: [security operations]
+  - term: Summary index
+    description: An index holding pre-aggregated results written by scheduled searches, so dashboards stay fast.
+  - term: Failed logon
+    description: A Windows authentication failure (EventCode 4625). Spikes can indicate password spraying.
+    related: [SOC]

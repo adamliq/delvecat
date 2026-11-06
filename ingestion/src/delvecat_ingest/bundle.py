@@ -14,18 +14,19 @@ from . import SCHEMA_VERSION, __version__
 from .model import ExtractResult
 from .resolve import Resolver
 
-SCHEMA_RELATIVE = Path("schemas") / "catalog.schema.json"
-_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash")
+# Bookkeeping and human annotations never count as a change to the Splunk object.
+_VERSION_FIELDS = ("version", "firstSeenAt", "contentHash", "annotations")
 
 
-def find_schema(start: Path | None = None) -> Path:
-    """Locate ``schemas/catalog.schema.json`` by walking up from cwd and this file."""
+def find_schema(start: Path | None = None, name: str = "catalog.schema.json") -> Path:
+    """Locate ``schemas/<name>`` by walking up from cwd and this file."""
+    relative = Path("schemas") / name
     for base in (start or Path.cwd(), Path(__file__).resolve()):
         for parent in (base, *base.parents):
-            candidate = parent / SCHEMA_RELATIVE
+            candidate = parent / relative
             if candidate.is_file():
                 return candidate
-    raise FileNotFoundError(f"could not find {SCHEMA_RELATIVE}")
+    raise FileNotFoundError(f"could not find {relative}")
 
 
 # --- merging --------------------------------------------------------------------------

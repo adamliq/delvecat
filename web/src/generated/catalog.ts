@@ -110,6 +110,8 @@ export interface CatalogBundle {
    * When present, entities and edges live in these files (paths relative to this manifest) and the entities/edges arrays here are empty.
    */
   shards?: Shard[];
+  glossary?: GlossaryTerm[];
+  annotationSource?: AnnotationSource;
 }
 export interface Instance {
   id: string;
@@ -141,10 +143,6 @@ export interface Entity {
   sharing?: Sharing;
   disabled?: boolean;
   description?: string;
-  tags?: string[];
-  owners?: string[];
-  classifications?: string[];
-  glossaryTerms?: string[];
   updatedAt?: string;
   sourceUrl?: string;
   /**
@@ -165,6 +163,33 @@ export interface Entity {
    * Hash of the entity's extracted content, used to detect changes.
    */
   contentHash?: string;
+  annotations?: Annotations;
+}
+/**
+ * Human-curated metadata merged from annotations/*.yaml. Never comes from Splunk.
+ */
+export interface Annotations {
+  description?: string;
+  owners?: string[];
+  tags?: string[];
+  /**
+   * e.g. PII.Email, Confidential, MITRE.T1078
+   */
+  classifications?: string[];
+  glossaryTerms?: string[];
+  links?: Link[];
+  /**
+   * Annotation files (and entry numbers) that contributed, e.g. annotations/web.yaml#2
+   */
+  sources?: string[];
+  /**
+   * The entry that targets this entity by id (the one to edit), if any.
+   */
+  primarySource?: string;
+}
+export interface Link {
+  title?: string;
+  url: string;
 }
 export interface Edge {
   from: string;
@@ -200,4 +225,19 @@ export interface Shard {
   entityType?: EntityType;
   count: number;
   sha256: string;
+}
+export interface GlossaryTerm {
+  term: string;
+  description?: string;
+  synonyms?: string[];
+  related?: string[];
+  source?: string;
+}
+/**
+ * Where annotations live, so the web app can link to 'suggest an edit'.
+ */
+export interface AnnotationSource {
+  repoUrl: string;
+  branch: string;
+  path: string;
 }

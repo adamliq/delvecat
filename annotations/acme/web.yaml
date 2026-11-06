@@ -1,0 +1,31 @@
+annotations:
+  # Everything in the storefront app belongs to the web team.
+  - match: {app: acme_web}
+    owners: [web-platform]
+    glossaryTerms: [Storefront]
+
+  - id: acme:index:web
+    description: >-
+      Raw HTTP access logs from the storefront web servers, one event per
+      request. Retained 90 days.
+    owners: [web-platform]
+    tags: [tier-1]
+    classifications: [PII.IPAddress]
+    glossaryTerms: [Storefront]
+    links:
+      - title: Storefront logging runbook
+        url: https://wiki.example.com/runbooks/storefront-logging
+
+  - id: acme:index:summary_web
+    description: Hourly HTTP status roll-ups written by "Web - Hourly Status Summary".
+    glossaryTerms: [Summary index]
+
+  - id: acme:sourcetype:access_combined
+    description: Apache/NGINX combined log format.
+    classifications: [PII.IPAddress]
+
+  - id: acme:dashboard:acme_web/storefront_health
+    tags: [exec-reporting]
+    links:
+      - title: Storefront SLOs
+        url: https://wiki.example.com/storefront/slo

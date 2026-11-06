@@ -17,6 +17,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    the browser. **Open file** / **Open folder** load a local bundle without
    uploading it; `?bundle=<url>` loads a bundle from elsewhere.
 
+3. Descriptions, owners, tags, classifications and the glossary live in
+   [`annotations/`](annotations/README.md) as YAML and change through pull
+   requests. Each entity page links to "suggest an edit" on GitHub.
+
 ## Quick start
 
 Requires [uv](https://docs.astral.sh/uv/) and Node 22+.

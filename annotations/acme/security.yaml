@@ -1,0 +1,45 @@
+annotations:
+  - match: {app: acme_secops}
+    owners: [soc]
+    glossaryTerms: [SOC]
+
+  - match: {app: TA-acme-firewall}
+    owners: [network-engineering]
+
+  # Access review: every custom role is reviewed quarterly.
+  - match: {type: role, name: "acme_*"}
+    tags: [quarterly-access-review]
+
+  - id: acme:index:firewall
+    description: Connection logs from the perimeter firewalls (allowed and blocked). Retained one year for investigations.
+    owners: [network-engineering, soc]
+    tags: [tier-1]
+    classifications: [PII.IPAddress]
+    glossaryTerms: [Perimeter firewall]
+
+  - id: acme:sourcetype:acme:fw
+    glossaryTerms: [Perimeter firewall]
+
+  - id: acme:field:acme:fw/src_ip
+    description: Internal address that opened the connection.
+    classifications: [PII.IPAddress]
+
+  - id: acme:field:acme:fw/dest_ip
+    classifications: [PII.IPAddress]
+
+  - id: acme:index:wineventlog
+    description: Windows Security event logs from domain controllers.
+    owners: [soc]
+    classifications: [PII.Username]
+
+  - id: acme:eventtype:acme_secops/acme_failed_login
+    glossaryTerms: [Failed logon]
+
+  - id: acme:savedSearch:acme_secops/Firewall - Denied Outbound to Rare Ports
+    description: >-
+      Fires when an internal host is blocked repeatedly on uncommon
+      destination ports, an early sign of malware calling home.
+    tags: [detection]
+    links:
+      - title: Response playbook
+        url: https://wiki.example.com/soc/playbooks/rare-ports

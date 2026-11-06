@@ -1,15 +1,22 @@
-.PHONY: install demo dev test lint build types
+.PHONY: install demo dev test lint build types annotations
+
+# Repository that holds annotations/, used for "suggest an edit" links in the demo.
+ANNOTATION_REPO ?= https://github.com/adamliq/delvecat
 
 install:
 	cd ingestion && uv sync
 	cd web && npm install
 
 demo:  ## build the demo catalog bundle from fixtures
-	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard \
+	cd ingestion && uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance acme --fields --max-field-sourcetypes 3 --shard --strict \
+		--annotations ../annotations --annotation-repo $(ANNOTATION_REPO) \
 		--instance-name "Acme (demo)" --out ../web/public/catalog
 
 dev: demo
 	cd web && npm run dev
+
+annotations:  ## validate annotations/ against the demo bundle
+	cd ingestion && uv run delvecat-ingest lint-annotations ../annotations --bundle ../web/public/catalog
 
 types:
 	cd web && npm run gen:types

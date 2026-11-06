@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { EntityType } from "../generated/catalog";
 import { PropValue } from "../components/PropValue";
+import { effectiveDescription } from "../lib/annotate";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
@@ -44,6 +45,15 @@ export function Home() {
   const report = bundle.ingestionReport ?? [];
   const notOk = report.filter((r) => r.status !== "ok");
   const changes = bundle.changes;
+  const total = bundle.entities.length || 1;
+  const described = bundle.entities.filter((e) => effectiveDescription(e)).length;
+  const owned = bundle.entities.filter((e) => e.annotations?.owners?.length).length;
+  const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
+  const coverage: [string, number][] = [
+    ["have a description", described],
+    ["have an owner", owned],
+    ["are classified", classified],
+  ];
 
   return (
     <div className="stack">
@@ -75,6 +85,22 @@ export function Home() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section>
+        <h2>Documentation</h2>
+        <div className="tiles">
+          {coverage.map(([label, n]) => (
+            <div key={label} className="tile static">
+              <span className="tile-num">{Math.round((n / total) * 100)}%</span>
+              <span className="tile-label">{label} ({n.toLocaleString()})</span>
+            </div>
+          ))}
+        </div>
+        <p className="small">
+          <Link to={searchPath({ documented: "no" })}>Find objects without a description</Link> ·{" "}
+          <Link to="/glossary">Glossary ({(bundle.glossary ?? []).length} terms)</Link>
+        </p>
       </section>
 
       <section>
