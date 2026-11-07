@@ -5,6 +5,7 @@ import { Sparkline } from "../components/Sparkline";
 import { useCatalog } from "../lib/CatalogContext";
 import { dailySeries, downloadText, healthStatus, isBuiltin, isUnused, toCsv } from "../lib/health";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
+import { riskMap } from "../lib/risk";
 import { entityPath, searchPath } from "../lib/routes";
 
 const ICON = { critical: "✕", warning: "!", ok: "✓" } as const;
@@ -46,6 +47,57 @@ function IssueTable({ title, entities, empty, spark = false }: {
                   </tr>
                 );
               })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function AtRisk() {
+  const { catalog } = useCatalog();
+  const rows = [...riskMap(catalog)].map(([id, risk]) => ({ entity: catalog.byId.get(id)!, risk }))
+    .filter((r) => r.entity)
+    .sort((a, b) => (a.risk.severity === b.risk.severity ? 0 : a.risk.severity === "critical" ? -1 : 1)
+      || a.entity.type.localeCompare(b.entity.type) || a.entity.name.localeCompare(b.entity.name));
+  const exportCsv = () => downloadText("delvecat-at-risk.csv", toCsv([
+    ["type", "name", "app", "risk", "caused by", "problem", "hops", "via", "partly affected", "id"],
+    ...rows.flatMap(({ entity: e, risk }) => risk.causes.map((c) => [
+      e.type, e.name, e.app, risk.severity, c.root.id, c.problems.map((p) => p.summary).join("; "), c.depth, c.via?.id,
+      c.partial ? "yes" : "no", e.id,
+    ])),
+  ]));
+  return (
+    <section>
+      <div className="results-bar">
+        <h2>At risk from upstream problems <span className="muted">({rows.length})</span></h2>
+        <button type="button" className="btn btn-small" onClick={exportCsv} disabled={!rows.length}>Download CSV</button>
+      </div>
+      <p className="muted small">
+        Objects that depend, directly or through other objects, on something with a health finding, a broken reference or
+        a disabled object. When something has several sources, one bad source only partly affects it.
+      </p>
+      {rows.length === 0 ? <p className="muted">Nothing depends on an object with a problem.</p> : (
+        <div className="table-wrap">
+          <table className="mini-table">
+            <thead><tr><th>Object</th><th>Risk</th><th>Caused by</th></tr></thead>
+            <tbody>
+              {rows.slice(0, 500).map(({ entity: e, risk }) => (
+                <tr key={e.id}>
+                  <td><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
+                    {e.app && <div className="muted small">{e.app}</div>}</td>
+                  <td><StatusLabel status={risk.severity} /></td>
+                  <td>
+                    {risk.causes.map((c) => (
+                      <div key={c.root.id}>
+                        <Link to={entityPath(c.root.id)}>{c.root.displayName ?? c.root.name}</Link>: {c.problems.map((p) => p.summary).join("; ")}
+                        <span className="muted small"> · {c.depth === 1 ? "direct" : `${c.depth} hops`}{c.partial ? " · partly" : ""}</span>
+                      </div>
+                    ))}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -100,6 +152,8 @@ export function HealthPage() {
       <IssueTable title="Data sources" entities={data} empty="Every index and sourcetype looks healthy." spark />
       <IssueTable title="Scheduled searches and detections" entities={searches} empty="No skipped, failing or missing scheduled runs." />
       <IssueTable title="Forwarders and deployment clients" entities={machines} empty="Every forwarder and client reported recently." />
+
+      <AtRisk />
 
       <section>
         <div className="results-bar">

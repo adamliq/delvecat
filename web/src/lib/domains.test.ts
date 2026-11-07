@@ -33,7 +33,7 @@ describe("domains", () => {
   });
 
   it("rolls up health, documentation and cleanup", () => {
-    expect(rollup(domainAssets(c, "Web"))).toEqual({ total: 3, critical: 0, warning: 1, sensitive: 0, unused: 1, undocumented: 2 });
+    expect(rollup(domainAssets(c, "Web"))).toEqual({ total: 3, critical: 0, warning: 1, sensitive: 0, unused: 1, undocumented: 2, atRisk: 0 });
   });
 
   it("finds a data product's boundary", () => {

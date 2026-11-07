@@ -292,3 +292,10 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .sql-schema summary { cursor: pointer; }
 .sql-schema ul { margin: 6px 0; }
 @media (max-width: 800px) { .sql-layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* Downstream risk */
+.risk-banner { border: 1px solid var(--border); border-left: 4px solid var(--status-warning); border-radius: 6px; padding: 10px 14px; background: var(--surface); }
+.risk-banner.risk-critical { border-left-color: var(--status-critical); }
+.risk-banner p { margin: 0 0 6px; }
+.risk-banner ul { margin: 0; }
+.risk-banner li + li { margin-top: 4px; }

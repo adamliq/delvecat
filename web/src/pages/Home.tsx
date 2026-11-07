@@ -3,6 +3,7 @@ import type { EntityType } from "../generated/catalog";
 import { PropValue } from "../components/PropValue";
 import { effectiveDescription } from "../lib/annotate";
 import { detectionStatus, isDetection } from "../lib/coverage";
+import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
@@ -52,6 +53,7 @@ export function Home() {
   const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
   const detections = bundle.entities.filter(isDetection).map((e) => detectionStatus(catalog, e));
   const firing = detections.filter((d) => d.state === "ready").length;
+  const atRisk = riskMap(catalog).size;
   const missingRequired = bundle.entities.filter((e) => e.annotations?.missingProperties?.length).length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
   const healthReport = bundle.ingestionReport?.find((r) => r.connector === "health");
@@ -163,7 +165,9 @@ export function Home() {
           <p>
             {unhealthy.filter((e) => e.health!.status === "critical").length} critical and{" "}
             {unhealthy.filter((e) => e.health!.status === "warning").length} warning findings,{" "}
-            {unusedCustom} unused objects in custom apps. <Link to="/health">Open the health report</Link>
+            {unusedCustom} unused objects in custom apps
+            {atRisk > 0 && <>, <Link to={searchPath({ risk: ["critical", "warning"] })}>{atRisk} at risk from upstream problems</Link></>}.{" "}
+            <Link to="/health">Open the health report</Link>
           </p>
         </section>
       )}

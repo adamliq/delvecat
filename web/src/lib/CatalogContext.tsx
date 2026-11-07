@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CatalogBundle } from "../generated/catalog";
 import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
+import { riskMap, type Risk } from "./risk";
 import { EntitySearch } from "./search";
 import { propertyDefs, propertyFacets } from "./structured";
 
@@ -17,8 +18,16 @@ interface Ctx {
 export const CatalogCtx = createContext<Ctx | null>(null);
 
 function ready(bundle: CatalogBundle, origin: string): State {
-  const search = new EntitySearch(bundle.entities, propertyFacets(propertyDefs(bundle)));
-  return { status: "ready", catalog: new Catalog(bundle), search, origin };
+  const catalog = new Catalog(bundle);
+  const risk = riskMap(catalog);
+  const search = new EntitySearch(bundle.entities, {
+    ...propertyFacets(propertyDefs(bundle)),
+    risk: (e) => {
+      const r = risk.get(e.id);
+      return r ? [r.severity] : [];
+    },
+  });
+  return { status: "ready", catalog, search, origin };
 }
 
 export function CatalogProvider({ children }: { children: ReactNode }) {
@@ -62,4 +71,10 @@ export function useCatalog() {
 export function usePropertyDefs() {
   const ctx = useContext(CatalogCtx);
   return ctx?.state.status === "ready" ? propertyDefs(ctx.state.catalog.bundle) : [];
+}
+
+/** What puts an object at risk, or undefined (also when no catalog is loaded). */
+export function useRisk(id: string): Risk | undefined {
+  const ctx = useContext(CatalogCtx);
+  return ctx?.state.status === "ready" ? riskMap(ctx.state.catalog).get(id) : undefined;
 }

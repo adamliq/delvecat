@@ -5,6 +5,7 @@ import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 import { useCatalog } from "../lib/CatalogContext";
 import { downloadText, toCsv } from "../lib/health";
 import { entityPath } from "../lib/routes";
+import { riskMap } from "../lib/risk";
 import { catalogTables, EXAMPLES, fillDatabase, runQuery, type QueryResult, type Table } from "../lib/sql";
 
 const SHOWN = 1000;
@@ -36,7 +37,7 @@ export default function SqlPage() {
       .then((SQL) => {
         if (cancelled) return;
         db = new SQL.Database();
-        const tables = catalogTables(catalog.bundle);
+        const tables = catalogTables(catalog.bundle, riskMap(catalog));
         fillDatabase(db, tables);
         setDb({ status: "ready", db, tables });
       })

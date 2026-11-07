@@ -2,6 +2,7 @@ import type { Database, SqlValue } from "sql.js";
 import type { CatalogBundle, Entity } from "../generated/catalog";
 import { effectiveDescription } from "./annotate";
 import { access, effectiveClassifications, isSensitive } from "./governance";
+import type { Risk } from "./risk";
 
 /** Tables the SQL console exposes. Built from the loaded (possibly redacted) bundle. */
 export interface Column {
@@ -29,7 +30,7 @@ function cell(v: Cell): SqlValue {
 
 const col = (name: string, type: Column["type"] = "TEXT", doc?: string): Column => ({ name, type, doc });
 
-export function catalogTables(bundle: CatalogBundle): Table[] {
+export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = new Map()): Table[] {
   const E = bundle.entities;
   const per = <T,>(fn: (e: Entity) => T[]) => E.flatMap((e) => fn(e));
 
@@ -162,8 +163,21 @@ export function catalogTables(bundle: CatalogBundle): Table[] {
     rows: (bundle.dataProducts ?? []).flatMap((p) => p.assets.map((a) => [p.name, p.domain, a].map(cell))),
   };
 
+  const riskTable: Table = {
+    name: "risk",
+    doc: "Objects at risk from upstream problems: one row per cause (the object with the problem).",
+    columns: [
+      col("entity_id"), col("severity", "TEXT", "warning or critical"), col("cause_id", "TEXT", "The object with the problem"),
+      col("problem"), col("hops", "INTEGER", "1 = direct dependency"), col("via_id"),
+      col("partial", "INTEGER", "1 if the cause is one of several sources"),
+    ],
+    rows: [...risk].flatMap(([id, r]) => r.causes.map((c) => [
+      id, r.severity, c.root.id, c.problems.map((p) => p.summary).join("; "), c.depth, c.via?.id, c.partial ?? false,
+    ].map(cell))),
+  };
+
   return [entities, edges, labels, classifications, properties, settings, healthChecks, lineageIssues,
-    accessTable, instances, domains, dataProducts];
+    riskTable, accessTable, instances, domains, dataProducts];
 }
 
 /** Create and fill an in-memory database. It is read-only once loaded. */
@@ -177,7 +191,7 @@ export function fillDatabase(db: Database, tables: Table[]) {
   }
   db.run("CREATE INDEX edges_from ON edges(from_id)");
   db.run("CREATE INDEX edges_to ON edges(to_id)");
-  for (const t of ["labels", "classifications", "properties", "settings", "health_checks", "lineage_issues", "access"]) {
+  for (const t of ["labels", "classifications", "properties", "settings", "health_checks", "lineage_issues", "risk", "access"]) {
     db.run(`CREATE INDEX ${t}_entity ON ${t}(entity_id)`);
   }
   db.run("COMMIT");
@@ -239,6 +253,13 @@ ORDER BY name;`,
 FROM entities e JOIN classifications c ON c.entity_id = e.id AND c.sensitive = 1
 WHERE e.readable_by_everyone = 1
 GROUP BY e.id;`,
+  },
+  {
+    title: "Problems that put the most objects at risk",
+    sql: `SELECT c.id, c.type, c.name, min(r.problem) AS problem, count(DISTINCT r.entity_id) AS at_risk
+FROM risk r JOIN entities c ON c.id = r.cause_id
+GROUP BY c.id
+ORDER BY at_risk DESC;`,
   },
   {
     title: "Unused objects by app",

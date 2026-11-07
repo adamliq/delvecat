@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import type { Entity, EntityType } from "../generated/catalog";
 import { EntityRow } from "../components/EntityBits";
 import { RollupTiles } from "../components/Rollup";
+import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
 import { boundary, dataProducts, productAssets, rollup } from "../lib/domains";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
@@ -47,7 +48,7 @@ export function DataProductPage() {
           <ul className="plain-list small">{product.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noreferrer">{l.title ?? l.url}</a></li>)}</ul>
         ) : null}
       </div>
-      <RollupTiles r={rollup(assets)} browse={searchPath({ dataProduct: product.name })} />
+      <RollupTiles r={rollup(assets, riskMap(catalog))} browse={searchPath({ dataProduct: product.name })} />
       <section className="rel-grid">
         <Boundary title="Depends on (outside the product)" items={inputs} empty="Nothing outside the product feeds it." />
         <Boundary title="Used by (outside the product)" items={consumers} empty="Nothing outside the product uses it." />

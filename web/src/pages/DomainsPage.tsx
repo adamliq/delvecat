@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { EntityRow } from "../components/EntityBits";
 import { RollupTiles } from "../components/Rollup";
+import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
 import { dataProducts, domainAssets, domains, rollup, subtree, type Domain } from "../lib/domains";
 import { domainPath, productPath, searchPath } from "../lib/routes";
@@ -14,7 +15,7 @@ function DomainTree({ items, parent, depth = 0 }: { items: Domain[]; parent?: st
   return (
     <ul className={depth ? "domain-tree nested" : "domain-tree"}>
       {level.sort((a, b) => a.name.localeCompare(b.name)).map((d) => {
-        const r = rollup(domainAssets(catalog, d.name));
+        const r = rollup(domainAssets(catalog, d.name), riskMap(catalog));
         const products = dataProducts(catalog).filter((p) => subtree(catalog, d.name).has(p.domain ?? "")).length;
         return (
           <li key={d.name}>
@@ -89,7 +90,7 @@ export function DomainsPage() {
         {domain?.owners?.length ? <p className="small">Owners: {domain.owners.join(", ")}</p> : null}
         {domain?.links?.length ? <p className="small">{domain.links.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noreferrer">{l.title ?? l.url} </a>)}</p> : null}
       </div>
-      <RollupTiles r={rollup(assets)} browse={searchPath({ domain: [...subtree(catalog, name)] })} />
+      <RollupTiles r={rollup(assets, riskMap(catalog))} browse={searchPath({ domain: [...subtree(catalog, name)] })} />
       {children.length > 0 && (
         <section>
           <h2>Sub-domains</h2>

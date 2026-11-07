@@ -30,6 +30,9 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    Upstream and impact lists can be filtered and exported to CSV.
    **Structured properties** add typed, validated fields (retention tier,
    compliance scope, review date...) with search filters and coverage.
+   **At-risk alerts** flag objects that depend, directly or through other
+   objects, on something unhealthy, broken or disabled, and show what each
+   problem puts at risk.
    An in-browser **SQL console** (SQLite, read-only) queries the whole catalog:
    objects, relationships, settings, access, health and annotations.
 7. Descriptions, owners, tags, classifications, domains and the glossary live in

@@ -450,6 +450,24 @@ are confirmed against a live instance before their connector ships.
   a link to the objects missing a required value. "Suggest an edit" snippets
   include the properties with empty placeholders for missing required ones.
 
+### Downstream at-risk alerts (done)
+
+- From OpenDataDiscovery's alert propagation. Computed in the web app from
+  the loaded bundle, so it works for merged and redacted bundles. Causes are
+  health findings, broken references and disabled objects.
+- Risk follows dependency: mostly data flow, except that a detection depends
+  on the alert action it triggers (a broken action puts its detections at
+  risk; a disabled detection does not put a shared action at risk). Disabled
+  objects are causes, never paths.
+- A target with several producers of the same kind (an index fed by many
+  sourcetypes or written by many searches) is only partly affected by one bad
+  producer: it is flagged as a warning and the risk stops there; a disabled
+  producer among several is ignored. A sole producer spreads fully.
+- Web: an "At risk" banner on the object with each cause, hops and path; "Puts
+  N objects at risk" on the cause; an At risk label and search facet; an At
+  risk section with CSV export on the Health page; counts on Home and in
+  domain and data product roll-ups; a `risk` table in the SQL console.
+
 ### SQL console (done)
 
 - From Magda's in-browser SQL console. `/#/sql` loads SQLite (sql.js,

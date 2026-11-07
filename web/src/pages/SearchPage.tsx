@@ -26,6 +26,7 @@ const FACET_TITLES: Record<string, string> = {
   documented: "Has description",
   issue: "Search issues",
   missing: "Missing required property",
+  risk: "At risk from upstream problems",
   health: "Health",
   sensitivity: "Sensitivity",
   usage: "Usage",
@@ -38,6 +39,7 @@ const facetTitle = (f: Facet): string => FACET_TITLES[f] ?? propertyNames[f.repl
 function valueLabel(facet: Facet, value: string): string {
   if (facet === "instance") return instanceNames[value] ?? value;
   if (facet === "missing") return propertyNames[value] ?? value;
+  if (facet === "risk") return value === "critical" ? "Critical" : "Warning";
   if (facet === "type") return pluralTypeLabel(value as EntityType);
   if (facet === "product") return PRODUCT_LABELS[value as Product] ?? value;
   return value;

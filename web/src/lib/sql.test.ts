@@ -2,6 +2,8 @@ import initSqlJs from "sql.js";
 import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 import type { CatalogBundle, Entity, EntityType } from "../generated/catalog";
+import { Catalog } from "./catalog";
+import { riskMap } from "./risk";
 import { catalogTables, EXAMPLES, fillDatabase, runQuery } from "./sql";
 
 const require = createRequire(import.meta.url);
@@ -58,5 +60,13 @@ describe("SQL console", () => {
     const db = await open();
     for (const x of EXAMPLES) expect(() => runQuery(db, x.sql), x.title).not.toThrow();
     expect(runQuery(db, EXAMPLES[0].sql).rows.map((r) => r[1])).toEqual(["busy"]);
+  });
+
+  it("has a risk table", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    fillDatabase(db, catalogTables(bundle, riskMap(new Catalog(bundle))));
+    expect(runQuery(db, "SELECT entity_id, severity, cause_id, hops FROM risk").rows).toEqual([[search.id, "warning", idx.id, 1]]);
+    expect(runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Problems"))!.sql).rows[0][4]).toBe(1);
   });
 });

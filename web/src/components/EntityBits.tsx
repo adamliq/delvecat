@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription, owners } from "../lib/annotate";
-import { usePropertyDefs } from "../lib/CatalogContext";
+import { usePropertyDefs, useRisk } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
 import { summaryChips } from "../lib/structured";
 import { domainPath, entityPath, glossaryPath, productPath, searchPath } from "../lib/routes";
@@ -37,6 +37,7 @@ export function AnnotationChips({ entity, compact = false }: { entity: Entity; c
 export function EntityRow({ entity }: { entity: Entity }) {
   const description = effectiveDescription(entity);
   const summary = summaryChips(usePropertyDefs(), entity);
+  const risk = useRisk(entity.id);
   return (
     <li className="entity-row">
       <div className="entity-row-head">
@@ -45,6 +46,11 @@ export function EntityRow({ entity }: { entity: Entity }) {
           {entity.displayName ?? entity.name}
         </Link>
         {entity.disabled && <span className="muted-tag">disabled</span>}
+        {risk && (
+          <span className={`status-label status-${risk.severity}`} title={`Depends on: ${risk.causes.map((c) => c.root.name).join(", ")}`}>
+            At risk
+          </span>
+        )}
       </div>
       <div className="entity-row-meta">
         {PRODUCT_LABELS[entity.product]}

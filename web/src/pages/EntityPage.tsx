@@ -5,6 +5,7 @@ import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
 import { GovernancePanel } from "../components/GovernancePanel";
 import { PropertiesPanel } from "../components/PropertiesPanel";
+import { BlastRadius, RiskBanner } from "../components/RiskPanel";
 import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
@@ -128,6 +129,8 @@ export function EntityPage() {
         <AnnotationChips entity={entity} />
       </div>
 
+      <RiskBanner catalog={catalog} entity={entity} />
+
       <div className="tabs" role="tablist">
         {tabs.map(([t, label]) => (
           <button key={t} type="button" role="tab" aria-selected={tab === t}
@@ -168,6 +171,8 @@ export function EntityPage() {
           <GovernancePanel catalog={catalog} entity={entity} />
 
           <UsagePanel entity={entity} />
+
+          <BlastRadius catalog={catalog} entity={entity} />
 
           {(entity.type === "index" || entity.type === "sourcetype") && (
             <DataSources catalog={catalog} entity={entity} />
