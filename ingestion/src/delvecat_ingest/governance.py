@@ -125,6 +125,13 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
                     add(nxt, cls, origin, True, "lineage")
                 queue.append((nxt, depth + 1))
 
+    # field lineage: a search that reads a classified field reads that classification
+    for edge in edges:
+        if edge["type"] == "readsField" and edge["from"] in by_id:
+            for c in found.get(edge["to"], {}):
+                if by_id[edge["from"]]["type"] in CONSUMER_TYPES:
+                    consumers[edge["from"]].add(c)
+
     # role closure (role -> itself + imported roles, transitively)
     imports: dict[str, set[str]] = defaultdict(set)
     for edge in edges:

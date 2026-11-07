@@ -21,6 +21,8 @@ const DEPENDS: Partial<Record<EdgeType, "fromNeedsTo" | "toNeedsFrom">> = {
   uses: "fromNeedsTo",
   mapsTo: "fromNeedsTo",
   triggers: "fromNeedsTo",
+  readsField: "fromNeedsTo",
+  definesField: "toNeedsFrom",
   feeds: "toNeedsFrom",
   writes: "toNeedsFrom",
   accelerates: "toNeedsFrom",

@@ -14,8 +14,12 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from .sql import tables as _sql_tables
+
+if TYPE_CHECKING:
+    from .spl_fields import FieldAnalysis
 
 MAX_MACRO_DEPTH = 10
 
@@ -31,8 +35,16 @@ class SplAnalysis:
     implicit_index: bool = False  # a base search without an index constraint
     dynamic: bool = False  # contains $tokens$
     warnings: list[str] = field(default_factory=list)
+    fields: FieldAnalysis | None = None  # field-level lineage
 
     def merge(self, other: SplAnalysis) -> None:
+        if other.fields is not None:
+            if self.fields is None:
+                self.fields = other.fields
+            else:
+                if self.fields.source != other.fields.source and other.fields.source == "events":
+                    self.fields.source = "events"
+                self.fields.merge(other.fields)
         self.refs |= other.refs
         for m in other.unresolved_macros:
             if m not in self.unresolved_macros:
@@ -457,6 +469,9 @@ def analyze(
         out.dynamic = True
         expanded = expanded.replace("$dynamic$", " ")
     _analyze_pipeline(expanded, out, fragment=fragment)
+    from .spl_fields import analyze_fields  # imports helpers from this module
+
+    out.fields = analyze_fields(expanded)
     return out
 
 

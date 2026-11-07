@@ -29,8 +29,19 @@ def spl_edges(bundle, frm):
     return sorted(
         (e["type"], e["to"])
         for e in bundle["edges"]
-        if e["from"] == frm and e.get("origin") == "spl"
+        if e["from"] == frm and e.get("origin") == "spl" and e["type"] != "readsField"
     )
+
+
+def field_edges(bundle, frm):
+    return sorted(
+        e["to"] for e in bundle["edges"] if e["from"] == frm and e["type"] == "readsField"
+    )
+
+
+def problems(entity):
+    """Lineage diagnostics, without field-level lineage (which every search has)."""
+    return {k: v for k, v in (entity.get("lineage") or {}).items() if k != "fields"}
 
 
 def test_bundle_valid(bundle):
@@ -60,9 +71,8 @@ def test_globally_shared_lookup_from_another_app(bundle):
     edges = spl_edges(bundle, SS + "acme_web/Web - Error Owners")
     assert ("uses", "dev:lookup:TA-acme-firewall/asset_owners") in edges
     # the CSV it writes does not exist until the search runs: not reported as broken
-    assert (
-        "lineage"
-        not in {e["id"]: e for e in bundle["entities"]}[SS + "acme_web/Web - Error Owners"]
+    assert not problems(
+        {e["id"]: e for e in bundle["entities"]}[SS + "acme_web/Web - Error Owners"]
     )
 
 
@@ -107,7 +117,7 @@ def test_dashboards(bundle, by_id):
         ("reads", SS + "acme_web/Web - Error Owners"),
         ("reads", "dev:sourcetype:access_combined"),
     ]
-    assert explorer["lineage"] == {"dynamic": True}
+    assert problems(explorer) == {"dynamic": True}
     kinds = sorted(s["kind"] for s in explorer["properties"]["searches"])
     assert kinds == ["inline", "inline", "inline", "postProcess", "savedSearch"]
 
@@ -175,3 +185,17 @@ def test_unparseable_dashboard_xml_keeps_its_warning():
     d["lineage"] = {"warnings": ["could not parse dashboard XML: ParseError"]}
     derive([d])
     assert d["lineage"]["warnings"] == ["could not parse dashboard XML: ParseError"]
+
+
+def test_field_lineage(bundle, by_id):
+    det = SS + "acme_secops/Firewall - Denied Outbound to Rare Ports"
+    assert field_edges(bundle, det) == ["dev:field:acme:fw/action", "dev:field:acme:fw/src_ip"]
+    assert by_id[det]["lineage"]["fields"]["source"] == "events"
+    # props.conf definitions become fields of the sourcetype
+    alias = "dev:fieldAlias:TA-acme-firewall/acme:fw : FIELDALIAS-src"
+    defined = sorted(
+        e["to"] for e in bundle["edges"] if e["from"] == alias and e["type"] == "definesField"
+    )
+    assert defined == ["dev:field:acme:fw/dest", "dev:field:acme:fw/src"]
+    assert field_edges(bundle, alias) == ["dev:field:acme:fw/dest_ip", "dev:field:acme:fw/src_ip"]
+    assert by_id["dev:field:acme:fw/action"]["properties"]["definedIn"] == "configuration"

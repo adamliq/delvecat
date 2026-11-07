@@ -9,6 +9,7 @@ import { BlastRadius, RiskBanner } from "../components/RiskPanel";
 import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
+import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
@@ -57,7 +58,7 @@ function Group({ group }: { group: RelationGroup }) {
   );
 }
 
-type Tab = "overview" | "fields" | "lineage" | "relationships" | "annotations" | "raw";
+type Tab = "overview" | "fields" | "fieldsUsed" | "lineage" | "relationships" | "annotations" | "raw";
 
 export function EntityPage() {
   const { id = "" } = useParams();
@@ -88,6 +89,9 @@ export function EntityPage() {
   const tabs: [Tab, string][] = [
     ["overview", "Overview"],
     ...(fields ? [["fields", `Fields (${fields.rows.length})`] as [Tab, string]] : []),
+    ...(entity.lineage?.fields && entity.type !== "field"
+      ? [["fieldsUsed", `Fields used (${entity.lineage.fields.used.length})`] as [Tab, string]]
+      : []),
     ...(hasLineage(catalog, entity.id) || entity.lineage
       ? [["lineage", entity.lineage?.unresolved?.length ? "Lineage ⚠" : "Lineage"] as [Tab, string]]
       : []),
@@ -166,6 +170,8 @@ export function EntityPage() {
 
           {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
 
+          <FieldPanel catalog={catalog} entity={entity} />
+
           <PropertiesPanel catalog={catalog} entity={entity} />
 
           <GovernancePanel catalog={catalog} entity={entity} />
@@ -219,6 +225,8 @@ export function EntityPage() {
       )}
 
       {tab === "fields" && fields && <FieldsTab table={fields} />}
+
+      {tab === "fieldsUsed" && <SearchFieldsTab catalog={catalog} entity={entity} />}
 
       {tab === "lineage" && <LineageTab catalog={catalog} entity={entity} />}
 

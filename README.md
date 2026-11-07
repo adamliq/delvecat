@@ -30,6 +30,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    Upstream and impact lists, and any search result set, can be exported to CSV.
    **Structured properties** add typed, validated fields (retention tier,
    compliance scope, review date...) with search filters and coverage.
+   **Field-level lineage** shows which fields each search reads and how
+   (filter, group by, aggregate, eval, lookup...), where each result column
+   comes from, which configuration defines a field, and what breaks if a
+   field changes or disappears.
    **At-risk alerts** flag objects that depend, directly or through other
    objects, on something unhealthy, broken or disabled, and show what each
    problem puts at risk.

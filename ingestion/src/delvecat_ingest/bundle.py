@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
+from .fields import define_fields, link_fields
 from .health import apply_usage, evaluate_health, mark_unused
 from .lineage import derive, record_unresolved
 from .link import link_hosts
@@ -177,6 +178,7 @@ def assemble(
     attribute_products(entities)
     spl_refs = derive(entities)
     result.edges.extend(link_hosts(entities))
+    result.edges.extend(define_fields(entities))
     all_refs = [*result.refs, *spl_refs]
     resolved, unresolved = Resolver(entities).resolve(all_refs)
     broken = record_unresolved({e["id"]: e for e in entities}, unresolved)
@@ -193,10 +195,20 @@ def assemble(
         elif key not in seen:
             seen.add(key)
             edges.append(edge)
+    field_edges = 0
+    for edge in link_fields(entities, edges):
+        key = (edge["from"], edge["to"], edge["type"])
+        if key not in seen:
+            seen.add(key)
+            edges.append(edge)
+            field_edges += 1
 
     reports = list(result.reports)
     if spl_refs:
-        with_issues = sum(1 for e in entities if e.get("lineage"))
+        issue_keys = ("unresolved", "warnings", "implicitIndex", "dynamic")
+        with_issues = sum(
+            1 for e in entities if any(k in (e.get("lineage") or {}) for k in issue_keys)
+        )
         broken = sum(len((e.get("lineage") or {}).get("unresolved", [])) for e in entities)
         reports.append(
             {
@@ -206,6 +218,7 @@ def assemble(
                     "splReferences": len(spl_refs),
                     "brokenReferences": broken,
                     "objectsWithIssues": with_issues,
+                    "fieldReferences": field_edges,
                 },
             }
         )

@@ -14,6 +14,8 @@ const OUTGOING: Record<EdgeType, string> = {
   grantsAccess: "Can search (incl. inherited)",
   memberOf: "Member of",
   inherits: "Inherits from",
+  readsField: "Reads fields",
+  definesField: "Defines fields",
 };
 
 const INCOMING: Record<EdgeType, string> = {
@@ -29,6 +31,8 @@ const INCOMING: Record<EdgeType, string> = {
   grantsAccess: "Searchable by roles",
   memberOf: "Members",
   inherits: "Inherited by",
+  readsField: "Fields read by",
+  definesField: "Defined by",
 };
 
 export interface RelationGroup {

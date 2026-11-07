@@ -75,7 +75,7 @@ export type Product =
   | "dbConnect";
 export type Sharing = "user" | "app" | "global" | "system";
 /**
- * Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...).
+ * Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...); search (or field alias, calculated field, automatic lookup) readsField field; field extraction, alias, calculated field or automatic lookup definesField field.
  */
 export type EdgeType =
   | "reads"
@@ -89,7 +89,9 @@ export type EdgeType =
   | "mapsTo"
   | "grantsAccess"
   | "memberOf"
-  | "inherits";
+  | "inherits"
+  | "readsField"
+  | "definesField";
 
 /**
  * A DelveCat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.
@@ -208,6 +210,7 @@ export interface Entity {
      */
     unresolved?: string[];
     warnings?: string[];
+    fields?: FieldLineage;
   };
   /**
    * How people and the scheduler use the object, from _audit and _internal. Derived; never changes the catalog version.
@@ -292,6 +295,40 @@ export interface Annotations {
 export interface Link {
   title?: string;
   url: string;
+}
+/**
+ * Field-level lineage from SPL: the fields a search reads from its data and how, and the source fields behind each output column (when the result shape is known).
+ */
+export interface FieldLineage {
+  /**
+   * What the fields belong to: events (sourcetype fields), a data model, a lookup, another search's results, a database, metrics or other.
+   */
+  source: "events" | "datamodel" | "lookup" | "search" | "database" | "metrics" | "other";
+  used: {
+    name: string;
+    how: (
+      | "filter"
+      | "groupBy"
+      | "aggregate"
+      | "eval"
+      | "rename"
+      | "lookup"
+      | "extract"
+      | "enrich"
+      | "join"
+      | "dedup"
+      | "sort"
+      | "select"
+      | "output"
+    )[];
+  }[];
+  /**
+   * Result columns, in order, each with the source fields it is computed from (empty for counts and constants).
+   */
+  outputs?: {
+    name: string;
+    from: string[];
+  }[];
 }
 export interface Edge {
   from: string;

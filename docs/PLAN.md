@@ -450,6 +450,36 @@ are confirmed against a live instance before their connector ships.
   a link to the objects missing a required value. "Suggest an edit" snippets
   include the properties with empty placeholders for missing required ones.
 
+### Field-level lineage (done)
+
+- From Marquez's column-level lineage. `spl_fields.py` walks the macro-expanded
+  pipeline (subsearches included) and records, per search, the source fields
+  it reads and how (filter, groupBy, aggregate, eval, rename, lookup, extract,
+  enrich, join, dedup, sort, select, output), and when the result shape is
+  known (stats / table / fields...) each output column with the source fields
+  it is computed from. Fields the pipeline creates (eval, rename, stats
+  outputs, lookup outputs, rex groups, iplocation) are traced back to their
+  sources. Commands whose output shape is not modelled (xyseries, foreach,
+  map...) make outputs unknown rather than wrong. Stored as derived
+  `lineage.fields`, so it never changes catalog versions.
+- `fields.py` adds `field` entities for fields props.conf defines (inline and
+  transform extractions, aliases, calculated fields, automatic lookup outputs)
+  with `definesField` edges, plus `readsField` edges from those definitions to
+  their inputs; and `readsField` edges from searches to the fields of the
+  sourcetypes they read (`sourcetype=` narrows it; otherwise every sourcetype
+  feeding the indexes read). Merge re-links across instances.
+- Governance: reading a classified field counts as reading that
+  classification. Risk: a field whose only definition is disabled puts its
+  readers at risk.
+- Web: "Fields used" tab on searches (fields, how, matched sourcetype fields,
+  result columns and their sources); on a field, where it comes from, who uses
+  it and how, and what a change could break (readers, fields derived through
+  aliases and lookups, and everything downstream); "Used by" on sourcetype
+  fields; `field_usage` and `column_lineage` tables in the SQL console.
+- Limits: data model, lookup and other-search fields are recorded but not
+  linked (no entities for them yet); wildcards and `$token$` field names are
+  skipped; `spath` and automatic key-value fields are taken by name.
+
 ### Search results export (done)
 
 - "Download CSV" on Browse exports every result of the current search and

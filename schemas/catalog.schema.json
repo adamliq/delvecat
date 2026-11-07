@@ -400,6 +400,9 @@
               "items": {
                 "type": "string"
               }
+            },
+            "fields": {
+              "$ref": "#/$defs/FieldLineage"
             }
           }
         },
@@ -540,9 +543,95 @@
         "mapsTo",
         "grantsAccess",
         "memberOf",
-        "inherits"
+        "inherits",
+        "readsField",
+        "definesField"
       ],
-      "description": "Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...)."
+      "description": "Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...); search (or field alias, calculated field, automatic lookup) readsField field; field extraction, alias, calculated field or automatic lookup definesField field."
+    },
+    "FieldLineage": {
+      "description": "Field-level lineage from SPL: the fields a search reads from its data and how, and the source fields behind each output column (when the result shape is known).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "used"
+      ],
+      "properties": {
+        "source": {
+          "description": "What the fields belong to: events (sourcetype fields), a data model, a lookup, another search's results, a database, metrics or other.",
+          "type": "string",
+          "enum": [
+            "events",
+            "datamodel",
+            "lookup",
+            "search",
+            "database",
+            "metrics",
+            "other"
+          ]
+        },
+        "used": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "how"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "how": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "filter",
+                    "groupBy",
+                    "aggregate",
+                    "eval",
+                    "rename",
+                    "lookup",
+                    "extract",
+                    "enrich",
+                    "join",
+                    "dedup",
+                    "sort",
+                    "select",
+                    "output"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "outputs": {
+          "description": "Result columns, in order, each with the source fields it is computed from (empty for counts and constants).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "from"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "from": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "Edge": {
       "type": "object",

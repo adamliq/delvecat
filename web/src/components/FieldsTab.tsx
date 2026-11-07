@@ -31,17 +31,19 @@ export function fieldsTable(catalog: Catalog, e: Entity): Table | null {
         .map((x) => catalog.byId.get(x.to))
         .filter((f): f is Entity => f?.type === "field")
         .sort((a, b) => Number(observed(b).coverage ?? 0) - Number(observed(a).coverage ?? 0));
+      const readers = (f: Entity) => catalog.edgesTo(f.id).filter((x) => x.type === "readsField").length;
       if (!fields.length) return null;
       return {
-        caption: "Fields seen in sampled events (search-time extractions, aliases, lookups included)",
-        columns: ["Field", "Coverage", "Distinct values", "Numeric", "Annotations"],
+        caption: "Fields seen in sampled events (search-time extractions, aliases, lookups included) and fields defined in props.conf. Used by counts the searches, dashboards and configuration that read each field.",
+        columns: ["Field", "Coverage", "Distinct values", "Numeric", "Used by", "Annotations"],
         rows: fields.map((f) => ({
           key: f.id,
           cells: [
             <>{link(f)}{effectiveDescription(f) && <div className="muted small">{effectiveDescription(f)}</div>}</>,
             pct(observed(f).coverage),
             num(observed(f).distinctCount),
-            props(f).numeric ? "Yes" : "No",
+            props(f).numeric === undefined ? "—" : props(f).numeric ? "Yes" : "No",
+            readers(f) ? <Link to={entityPath(f.id)}>{readers(f)}</Link> : <span className="muted">0</span>,
             <AnnotationChips entity={f} compact />,
           ],
         })),

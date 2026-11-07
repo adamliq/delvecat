@@ -26,6 +26,7 @@ from typing import Any
 
 from . import SCHEMA_VERSION, __version__
 from .bundle import apply_versions, ref_from_json, ref_to_json
+from .fields import link_fields
 from .governance import apply_governance
 from .health import CONSUMER_EDGES, SEVERITY
 from .health import _merge_usage as merge_usage
@@ -208,9 +209,13 @@ def merge_bundles(
     for edge in link_hosts(entities):
         add(edge)
 
+    # 3. searches to fields of sourcetypes they now reach on another instance
+    for edge in link_fields(entities, [*edges, *new_edges]):
+        add(edge)
+
     edges.extend(new_edges)
 
-    # 3. objects that gained consumers or producers elsewhere are no longer unused
+    # 4. objects that gained consumers or producers elsewhere are no longer unused
     gained = {e["to"] for e in new_edges if e["type"] in (*CONSUMER_EDGES, "writes", "feeds")}
     revived = 0
     for eid in gained:

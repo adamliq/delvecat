@@ -163,6 +163,38 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
     rows: (bundle.dataProducts ?? []).flatMap((p) => p.assets.map((a) => [p.name, p.domain, a].map(cell))),
   };
 
+  const fieldIds = new Map<string, string[]>(); // "entity|field name" -> matched field ids
+  for (const x of bundle.edges) {
+    if (x.type !== "readsField") continue;
+    const name = x.to.slice(x.to.lastIndexOf("/") + 1);
+    const key = `${x.from}|${name}`;
+    fieldIds.set(key, [...(fieldIds.get(key) ?? []), x.to]);
+  }
+  const fieldUsage: Table = {
+    name: "field_usage",
+    doc: "Fields each search reads, from its SPL: one row per field and matched sourcetype field (field_id is NULL when none matched).",
+    columns: [
+      col("entity_id"), col("field"), col("how", "TEXT", "Comma-separated: filter, groupBy, aggregate, eval, rename, lookup, extract, enrich, join, dedup, sort, select, output"),
+      col("source", "TEXT", "events, datamodel, lookup, search, database, metrics or other"), col("field_id"),
+    ],
+    rows: per((e) => {
+      const fl = e.lineage?.fields;
+      if (!fl) return [];
+      return fl.used.flatMap((u) => {
+        const ids = fieldIds.get(`${e.id}|${u.name}`) ?? [undefined];
+        return ids.map((fid) => [e.id, u.name, u.how.join(","), fl.source, fid].map(cell));
+      });
+    }),
+  };
+
+  const columnLineage: Table = {
+    name: "column_lineage",
+    doc: "Result columns of searches whose output shape is known, one row per source field they are computed from (source_field NULL for counts and constants).",
+    columns: [col("entity_id"), col("column_name"), col("source_field")],
+    rows: per((e) => (e.lineage?.fields?.outputs ?? []).flatMap((o) =>
+      (o.from.length ? o.from : [undefined]).map((f) => [e.id, o.name, f].map(cell)))),
+  };
+
   const riskTable: Table = {
     name: "risk",
     doc: "Objects at risk from upstream problems: one row per cause (the object with the problem).",
@@ -177,7 +209,7 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
   };
 
   return [entities, edges, labels, classifications, properties, settings, healthChecks, lineageIssues,
-    riskTable, accessTable, instances, domains, dataProducts];
+    fieldUsage, columnLineage, riskTable, accessTable, instances, domains, dataProducts];
 }
 
 /** Create and fill an in-memory database. It is read-only once loaded. */
@@ -191,7 +223,7 @@ export function fillDatabase(db: Database, tables: Table[]) {
   }
   db.run("CREATE INDEX edges_from ON edges(from_id)");
   db.run("CREATE INDEX edges_to ON edges(to_id)");
-  for (const t of ["labels", "classifications", "properties", "settings", "health_checks", "lineage_issues", "risk", "access"]) {
+  for (const t of ["labels", "classifications", "properties", "settings", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]) {
     db.run(`CREATE INDEX ${t}_entity ON ${t}(entity_id)`);
   }
   db.run("COMMIT");
@@ -260,6 +292,22 @@ GROUP BY e.id;`,
 FROM risk r JOIN entities c ON c.id = r.cause_id
 GROUP BY c.id
 ORDER BY at_risk DESC;`,
+  },
+  {
+    title: "Detections that break if a field disappears",
+    sql: `SELECT u.field, count(DISTINCT u.entity_id) AS searches, group_concat(DISTINCT e.name) AS detections
+FROM field_usage u JOIN entities e ON e.id = u.entity_id
+WHERE e.type = 'correlationSearch'
+GROUP BY u.field
+ORDER BY searches DESC;`,
+  },
+  {
+    title: "Sourcetype fields nobody uses",
+    sql: `SELECT f.id, f.name
+FROM entities f
+WHERE f.type = 'field'
+  AND NOT EXISTS (SELECT 1 FROM edges x WHERE x.to_id = f.id AND x.type = 'readsField')
+ORDER BY f.name;`,
   },
   {
     title: "Unused objects by app",

@@ -170,7 +170,7 @@ def test_dbxquery_in_spl_reaches_tables(bundle, by_id):
         ("reads", "dev:index:web"),
         ("uses", "dev:dbConnection:orders_mysql"),
     ]
-    assert "lineage" not in by_id[s]
+    assert set(by_id[s].get("lineage", {})) <= {"fields"}
 
 
 # --- Stream ------------------------------------------------------------------------

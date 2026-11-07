@@ -7,7 +7,8 @@ turns into ``reads`` / ``writes`` / ``uses`` edges with origin ``spl``.
 
 Diagnostics go to ``entity["lineage"]`` (not part of the content hash):
 ``implicitIndex``, ``dynamic``, ``unresolved`` (filled in after resolution)
-and ``warnings``.
+and ``warnings``, plus field-level lineage in ``fields`` (see
+:mod:`spl_fields`), which :mod:`fields` turns into ``readsField`` edges.
 """
 
 from __future__ import annotations
@@ -162,6 +163,8 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         ]
         if warnings:
             lineage["warnings"] = warnings
+        if combined.fields is not None and (combined.fields.used or combined.fields.outputs):
+            lineage["fields"] = combined.fields.to_json()
         if lineage:
             e["lineage"] = lineage
         else:
