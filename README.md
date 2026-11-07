@@ -30,6 +30,8 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    Upstream and impact lists can be filtered and exported to CSV.
    **Structured properties** add typed, validated fields (retention tier,
    compliance scope, review date...) with search filters and coverage.
+   An in-browser **SQL console** (SQLite, read-only) queries the whole catalog:
+   objects, relationships, settings, access, health and annotations.
 7. Descriptions, owners, tags, classifications, domains and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { useCatalogState } from "./lib/CatalogContext";
@@ -11,6 +12,9 @@ import { HealthPage } from "./pages/HealthPage";
 import { PropertiesPage } from "./pages/PropertiesPage";
 import { Home } from "./pages/Home";
 import { SearchPage } from "./pages/SearchPage";
+
+// SQLite (about 1 MB) loads only when the console is opened.
+const SqlPage = lazy(() => import("./pages/SqlPage"));
 
 function Body() {
   const { state } = useCatalogState();
@@ -37,6 +41,7 @@ function Body() {
       <Route path="/domains/:name" element={<DomainsPage />} />
       <Route path="/products/:name" element={<DataProductPage />} />
       <Route path="/properties" element={<PropertiesPage />} />
+      <Route path="/sql" element={<Suspense fallback={<p className="muted">Loading SQL console…</p>}><SqlPage /></Suspense>} />
       <Route path="/coverage" element={<CoveragePage />} />
       <Route path="/health" element={<HealthPage />} />
       <Route path="/governance" element={<GovernancePage />} />

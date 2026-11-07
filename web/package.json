@@ -15,11 +15,13 @@
     "minisearch": "^7.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^7.18.5",
+    "sql.js": "1.15.1"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@types/sql.js": "1.4.11",
     "@vitejs/plugin-react": "^6.2.1",
     "json-schema-to-typescript": "^16.0.0",
     "typescript": "^7.0.2",

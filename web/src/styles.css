@@ -272,3 +272,23 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .chip-domain { border-color: var(--accent); }
 .chip-product { border-style: dotted; border-color: var(--accent); }
 .reach-controls { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 6px; }
+
+/* SQL console */
+.sql-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 24px; align-items: start; }
+.sql-main > * + * { margin-top: 12px; }
+.sql-examples { display: grid; gap: 4px; max-width: 420px; }
+.sql-editor {
+  width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface); color: var(--text); resize: vertical; tab-size: 2; white-space: pre; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9rem; line-height: 1.45;
+}
+.sql-editor:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.sql-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.sql-actions .btn-primary:disabled { opacity: 0.5; cursor: wait; }
+.sql-results td { white-space: pre-wrap; overflow-wrap: anywhere; }
+.sql-results th { white-space: nowrap; }
+.sql-schema h2 { margin-top: 0; }
+.sql-schema details { border-bottom: 1px solid var(--border); padding: 6px 0; }
+.sql-schema summary { cursor: pointer; }
+.sql-schema ul { margin: 6px 0; }
+@media (max-width: 800px) { .sql-layout { grid-template-columns: minmax(0, 1fr); } }

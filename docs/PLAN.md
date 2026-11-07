@@ -450,6 +450,20 @@ are confirmed against a live instance before their connector ships.
   a link to the objects missing a required value. "Suggest an edit" snippets
   include the properties with empty placeholders for missing required ones.
 
+### SQL console (done)
+
+- From Magda's in-browser SQL console. `/#/sql` loads SQLite (sql.js,
+  WebAssembly) only when opened, so the main bundle stays the same size, and
+  fills an in-memory database from the loaded bundle. Redacted bundles stay
+  redacted. The database is set `query_only`, so nothing can change.
+- Tables: `entities` (with `settings` and `props` as JSON for
+  `json_extract`), `edges`, `labels` (owners, tags, terms, data products,
+  missing properties), `classifications`, `properties`, `settings` (one row
+  per Splunk setting), `health_checks`, `lineage_issues`, `access`,
+  `instances`, `domains`, `data_products`.
+- Example queries, a table browser with column notes, ids linked to entity
+  pages, CSV download, and the query kept in the URL for sharing.
+
 ## 8. Repository layout
 
 ```
