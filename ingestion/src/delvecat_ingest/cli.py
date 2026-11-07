@@ -336,8 +336,11 @@ def _lint_annotations(args: argparse.Namespace) -> int:
     if args.bundle:
         report = apply_annotations(load_bundle(Path(args.bundle)), annotations)
         print(f"against {args.bundle}: {report['counts']}")
-        if report.get("message"):
-            print(report["message"], file=sys.stderr)
+        notes = [n for n in (report.get("message") or "").split(" | ") if n]
+        if notes:
+            print(*notes, sep="\n", file=sys.stderr)
+        # Missing required properties are a coverage gap, not a broken annotation.
+        if any(not n.startswith("objects missing required") for n in notes):
             return 3
     return 0
 

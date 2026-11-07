@@ -150,6 +150,12 @@
       "items": {
         "$ref": "#/$defs/DataProduct"
       }
+    },
+    "structuredProperties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StructuredProperty"
+      }
     }
   },
   "$defs": {
@@ -765,6 +771,25 @@
           "items": {
             "type": "string"
           }
+        },
+        "properties": {
+          "description": "Structured property values by id.",
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "array"
+            ]
+          }
+        },
+        "missingProperties": {
+          "description": "Required structured properties this object has no value for.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -969,6 +994,67 @@
         },
         "source": {
           "type": "string"
+        }
+      }
+    },
+    "StructuredProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "date",
+            "url"
+          ]
+        },
+        "allowedValues": {
+          "type": "array"
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": [
+            "single",
+            "multiple"
+          ]
+        },
+        "appliesTo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Object types; omit for all."
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "showInFilters": {
+          "type": "boolean"
+        },
+        "showInSummary": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string"
+        },
+        "requiredWhere": {
+          "type": "object"
         }
       }
     }

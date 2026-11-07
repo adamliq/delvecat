@@ -24,6 +24,7 @@ export const FACETS = {
     return [cs.some((c) => !c.derived) ? "sensitive" : "sensitive (derived)"];
   },
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
+  missing: (e: Entity) => e.annotations?.missingProperties ?? [],
   issue: (e: Entity) => [
     ...(e.lineage?.unresolved?.length ? ["broken reference"] : []),
     ...(e.lineage?.implicitIndex ? ["no index specified"] : []),
@@ -31,9 +32,11 @@ export const FACETS = {
   ],
 } satisfies Record<string, (e: Entity) => string[]>;
 
-export type Facet = keyof typeof FACETS;
+/** Built-in facets plus any added per bundle (structured properties use "p.<id>"). */
+export type Facet = string;
 export const FACET_NAMES = Object.keys(FACETS) as Facet[];
 export type Filters = Partial<Record<Facet, string[]>>;
+export type FacetFn = (e: Entity) => string[];
 export type Sort = "relevance" | "name" | "type" | "updated";
 
 interface Doc {
@@ -74,7 +77,12 @@ export class EntitySearch {
   private readonly index: MiniSearch<Doc>;
   private readonly byId: Map<string, Entity>;
 
-  constructor(private readonly entities: Entity[]) {
+  readonly facets: Record<Facet, FacetFn>;
+  readonly facetNames: Facet[];
+
+  constructor(private readonly entities: Entity[], extraFacets: Record<Facet, FacetFn> = {}) {
+    this.facets = { ...FACETS, ...extraFacets };
+    this.facetNames = Object.keys(this.facets);
     this.byId = new Map(entities.map((e) => [e.id, e]));
     this.index = new MiniSearch<Doc>({
       fields: ["name", "displayName", "description", "app", "owner", "tags", "body"],
@@ -99,16 +107,16 @@ export class EntitySearch {
 
   query(query: string, filters: Filters = {}, sort: Sort = "relevance"): SearchResult {
     const base = this.matching(query);
-    const active = FACET_NAMES.filter((f) => filters[f]?.length);
+    const active = this.facetNames.filter((f) => filters[f]?.length);
     const passes = (e: Entity, skip?: Facet) =>
-      active.every((f) => f === skip || FACETS[f](e).some((v) => filters[f]!.includes(v)));
+      active.every((f) => f === skip || this.facets[f](e).some((v) => filters[f]!.includes(v)));
 
     const facets = {} as Record<Facet, Map<string, number>>;
-    for (const f of FACET_NAMES) {
+    for (const f of this.facetNames) {
       const counts = new Map<string, number>();
       for (const e of base) {
         if (!passes(e, f)) continue;
-        for (const v of new Set(FACETS[f](e))) counts.set(v, (counts.get(v) ?? 0) + 1);
+        for (const v of new Set(this.facets[f](e))) counts.set(v, (counts.get(v) ?? 0) + 1);
       }
       facets[f] = new Map([...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
     }

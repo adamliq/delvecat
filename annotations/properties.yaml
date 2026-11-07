@@ -1,0 +1,55 @@
+# Structured properties: typed custom fields, defined once and set on any entry
+# with `properties:`. Values are validated by `delvecat-ingest lint-annotations`.
+structuredProperties:
+  - id: retentionTier
+    displayName: Retention tier
+    description: Storage tier agreed with the data owner.
+    type: string
+    allowedValues:
+      - {value: hot, description: Searchable on fast storage}
+      - {value: warm, description: "Searchable, slower storage"}
+      - {value: cold, description: Rarely searched}
+      - {value: archive, description: Frozen; restore before searching}
+    appliesTo: [index]
+    required: true
+    showInFilters: true
+    showInSummary: true
+  - id: costCenter
+    displayName: Cost centre
+    type: string
+    appliesTo: [index, dataModel]
+    showInFilters: true
+  - id: complianceScope
+    displayName: Compliance scope
+    type: string
+    cardinality: multiple
+    allowedValues: [PCI-DSS, SOX, GDPR, ISO27001]
+    showInFilters: true
+    showInSummary: true
+  - id: lastReviewed
+    displayName: Last reviewed
+    description: When the owner last confirmed the logic is still right.
+    type: date
+    appliesTo: [correlationSearch, savedSearch]
+  - id: runbook
+    displayName: Runbook
+    type: url
+    appliesTo: [correlationSearch, savedSearch, dashboard]
+
+annotations:
+  - match: {type: index, app: acme_web}
+    properties: {retentionTier: hot, costCenter: CC-WEB-120}
+  - id: acme:index:firewall
+    properties: {retentionTier: warm, costCenter: CC-SEC-300, complianceScope: [PCI-DSS, ISO27001]}
+  - id: acme:index:wineventlog
+    properties: {retentionTier: warm, costCenter: CC-SEC-300, complianceScope: [SOX, ISO27001]}
+  - id: acme:index:db_orders
+    properties: {retentionTier: hot, costCenter: CC-DATA-410, complianceScope: [PCI-DSS, GDPR]}
+  - id: acme:index:web
+    properties: {complianceScope: [GDPR]}
+  - id: acme:correlationSearch:DA-ESS-ContentUpdate/ESCU - Brute Force Access Behavior Detected
+    properties:
+      lastReviewed: 2026-09-15
+      runbook: https://wiki.example.com/soc/playbooks/brute-force
+  - id: acme:savedSearch:acme_secops/Firewall - Denied Outbound to Rare Ports
+    properties: {lastReviewed: 2026-05-02}

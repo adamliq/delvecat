@@ -23,6 +23,7 @@ from __future__ import annotations
 import fnmatch
 import json
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +31,7 @@ import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
 from .bundle import find_schema
+from .structured import apply_values, check_definitions, check_values, missing_required
 
 LIST_FIELDS = ("owners", "tags", "classifications", "glossaryTerms")
 MATCH_KEYS = ("type", "product", "instance", "app", "name", "owner")
@@ -55,6 +57,7 @@ class AnnotationSet:
     glossary: list[dict[str, Any]] = field(default_factory=list)
     classifications: list[dict[str, Any]] = field(default_factory=list)
     domains: list[dict[str, Any]] = field(default_factory=list)
+    structured: list[dict[str, Any]] = field(default_factory=list)
     data_products: list[dict[str, Any]] = field(default_factory=list)
     files: int = 0
 
@@ -70,6 +73,17 @@ def _entry_lines(text: str) -> tuple[list[int], list[int]]:
     return lines["annotations"], lines["glossary"]
 
 
+def _iso_dates(value: Any) -> Any:
+    """YAML reads 2026-09-15 as a date; annotations store ISO strings."""
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if isinstance(value, dict):
+        return {k: _iso_dates(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_iso_dates(v) for v in value]
+    return value
+
+
 def load_annotations(directory: Path) -> AnnotationSet:
     """Load and validate every ``*.yaml`` / ``*.yml`` file under ``directory``."""
     schema = json.loads(find_schema(name="annotations.schema.json").read_text(encoding="utf-8"))
@@ -81,7 +95,7 @@ def load_annotations(directory: Path) -> AnnotationSet:
         rel = (Path(directory.name) / file.relative_to(directory)).as_posix()
         text = file.read_text(encoding="utf-8")
         try:
-            data = yaml.safe_load(text) or {}
+            data = _iso_dates(yaml.safe_load(text) or {})
             ann_lines, term_lines = _entry_lines(text)
         except yaml.YAMLError as exc:
             problems.append(f"{rel}: invalid YAML: {exc}")
@@ -108,6 +122,8 @@ def load_annotations(directory: Path) -> AnnotationSet:
             result.glossary.append({**term, "source": f"{rel}:{line}"})
         for c in data.get("classifications", []):
             result.classifications.append({**c, "source": rel})
+        for sp in data.get("structuredProperties", []):
+            result.structured.append({**sp, "source": rel})
         for d in data.get("domains", []):
             result.domains.append({**d, "source": rel})
         for p in data.get("dataProducts", []):
@@ -130,6 +146,8 @@ def load_annotations(directory: Path) -> AnnotationSet:
                 f"defined at {seen[key]}"
             )
         seen[key] = term["source"]
+    problems.extend(check_definitions(result.structured))
+    problems.extend(check_values(result.entries, {d["id"]: d for d in result.structured}))
     if problems:
         raise AnnotationError(problems)
     return result
@@ -150,11 +168,18 @@ def _matches(selector: dict[str, str], entity: dict[str, Any]) -> bool:
     return True
 
 
-def _apply(entity: dict[str, Any], entry: Entry) -> None:
+def _apply(
+    entity: dict[str, Any],
+    entry: Entry,
+    defs: dict[str, dict[str, Any]] | None = None,
+    misapplied: set[str] | None = None,
+) -> None:
     ann = entity.setdefault("annotations", {})
     data = entry.data
     if (data.get("description") or "").strip():  # an empty template field changes nothing
         ann["description"] = data["description"].strip()
+    if defs is not None and data.get("properties"):
+        apply_values(entity, entry, defs, misapplied if misapplied is not None else set())
     if (data.get("domain") or "").strip():  # one domain per object; the last applied wins
         ann["domain"] = data["domain"].strip()
     for key in LIST_FIELDS:
@@ -227,18 +252,20 @@ def apply_annotations(
     unmatched: list[str] = []
     selectors = [e for e in annotations.entries if "match" in e.data]
     exact = [e for e in annotations.entries if "id" in e.data]
+    defs = {d["id"]: d for d in annotations.structured}
+    misapplied: set[str] = set()
     for entry in selectors:
         hits = [e for e in entities if _matches(entry.data["match"], e)]
         if not hits:
             unmatched.append(f"{entry.source} (match {entry.data['match']})")
         for e in hits:
-            _apply(e, entry)
+            _apply(e, entry, defs, misapplied)
     for entry in exact:
         target = by_id.get(entry.data["id"])
         if target is None:
             unmatched.append(f"{entry.source} ({entry.data['id']})")
         else:
-            _apply(target, entry)
+            _apply(target, entry, defs, misapplied)
             target["annotations"]["primarySource"] = entry.source
 
     if annotations.glossary:
@@ -252,6 +279,22 @@ def apply_annotations(
     else:
         bundle.pop("classifications", None)
     domain_notes = _apply_domains_and_products(bundle, annotations, unmatched)
+    if annotations.structured:
+        bundle["structuredProperties"] = sorted(annotations.structured, key=lambda d: d["id"])
+    else:
+        bundle.pop("structuredProperties", None)
+    missing = missing_required(entities, annotations.structured)
+    gaps = {k: v for k, v in missing.items() if v}
+    if gaps:
+        domain_notes.append(
+            "objects missing required structured properties: "
+            + ", ".join(f"{k} ({v})" for k, v in sorted(gaps.items()))
+        )
+    if misapplied:
+        domain_notes.append(
+            "structured properties set on types they do not apply to "
+            "(skipped): " + ", ".join(sorted(misapplied)[:10])
+        )
     from .governance import apply_governance  # classifications drive governance
 
     apply_governance(bundle)
@@ -269,10 +312,10 @@ def apply_annotations(
         }
     )
 
-    annotated = sum(1 for e in entities if "annotations" in e)
+    annotated = sum(1 for e in entities if (e.get("annotations") or {}).get("sources"))
     report: dict[str, Any] = {
         "connector": "annotations",
-        "status": "partial" if unmatched else "ok",
+        "status": "partial" if unmatched or misapplied else "ok",
         "counts": {
             "files": annotations.files,
             "entries": len(annotations.entries),
@@ -281,6 +324,8 @@ def apply_annotations(
             "glossaryTerms": len(annotations.glossary),
             "domains": len(annotations.domains),
             "dataProducts": len(annotations.data_products),
+            "structuredProperties": len(annotations.structured),
+            "missingRequiredValues": sum(missing.values()),
         },
     }
     notes = []

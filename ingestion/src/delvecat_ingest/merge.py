@@ -109,6 +109,7 @@ def merge_bundles(
     glossary: dict[str, dict[str, Any]] = {}
     taxonomy: dict[str, dict[str, Any]] = {}
     domains: dict[str, dict[str, Any]] = {}
+    structured: dict[str, dict[str, Any]] = {}
     products: dict[str, dict[str, Any]] = {}
     source = None
     for label, b in bundles:
@@ -131,6 +132,8 @@ def merge_bundles(
             glossary.setdefault(t["term"].lower(), t)
         for c in b.get("classifications", []):
             taxonomy.setdefault(c["name"], c)
+        for sp in b.get("structuredProperties", []):
+            structured.setdefault(sp["id"], sp)
         for dom in b.get("domains", []):
             domains.setdefault(dom["name"], dom)
         for prod in b.get("dataProducts", []):
@@ -241,6 +244,8 @@ def merge_bundles(
         merged["glossary"] = sorted(glossary.values(), key=lambda t: t["term"].lower())
     if taxonomy:
         merged["classifications"] = sorted(taxonomy.values(), key=lambda c: c["name"])
+    if structured:
+        merged["structuredProperties"] = sorted(structured.values(), key=lambda d: d["id"])
     if domains:
         merged["domains"] = sorted(domains.values(), key=lambda d: d["name"].lower())
     if products:

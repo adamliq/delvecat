@@ -4,12 +4,13 @@ import type { EntityType, Product } from "../generated/catalog";
 import { EntityRow } from "../components/EntityBits";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel } from "../lib/labels";
-import { FACET_NAMES, type Facet, type Filters, type Sort } from "../lib/search";
+import { type Facet, type Filters, type Sort } from "../lib/search";
+import { label, propertyDefs } from "../lib/structured";
 
 const PAGE = 50;
 const FACET_PREVIEW = 8;
 
-const FACET_TITLES: Record<Facet, string> = {
+const FACET_TITLES: Record<string, string> = {
   type: "Type",
   product: "Product",
   instance: "Instance",
@@ -24,15 +25,19 @@ const FACET_TITLES: Record<Facet, string> = {
   status: "Status",
   documented: "Has description",
   issue: "Search issues",
+  missing: "Missing required property",
   health: "Health",
   sensitivity: "Sensitivity",
   usage: "Usage",
 };
 
 let instanceNames: Record<string, string> = {};
+let propertyNames: Record<string, string> = {};
+const facetTitle = (f: Facet): string => FACET_TITLES[f] ?? propertyNames[f.replace(/^p\./, "")] ?? f;
 
 function valueLabel(facet: Facet, value: string): string {
   if (facet === "instance") return instanceNames[value] ?? value;
+  if (facet === "missing") return propertyNames[value] ?? value;
   if (facet === "type") return pluralTypeLabel(value as EntityType);
   if (facet === "product") return PRODUCT_LABELS[value as Product] ?? value;
   return value;
@@ -52,7 +57,7 @@ function FacetBox({ facet, counts, selected, onToggle }: {
   const shown = open ? entries : entries.slice(0, FACET_PREVIEW);
   return (
     <fieldset className="facet">
-      <legend>{FACET_TITLES[facet]}</legend>
+      <legend>{facetTitle(facet)}</legend>
       {shown.map(([value, n]) => (
         <label key={value} className="facet-option">
           <input type="checkbox" checked={selected.includes(value)} onChange={() => onToggle(value)} />
@@ -72,6 +77,8 @@ function FacetBox({ facet, counts, selected, onToggle }: {
 export function SearchPage() {
   const { search, catalog } = useCatalog();
   instanceNames = Object.fromEntries(catalog.bundle.instances.map((i) => [i.id, i.name]));
+  propertyNames = Object.fromEntries(propertyDefs(catalog.bundle).map((d) => [d.id, label(d)]));
+  const FACET_NAMES = search.facetNames;
   const [params, setParams] = useSearchParams();
   const [limit, setLimit] = useState(PAGE);
   const q = params.get("q") ?? "";
@@ -127,8 +134,8 @@ export function SearchPage() {
             {FACET_NAMES.flatMap((f) =>
               (filters[f] ?? []).map((v) => (
                 <button key={`${f}:${v}`} type="button" className="chip chip-remove" onClick={() => toggle(f, v)}
-                  aria-label={`Remove filter ${FACET_TITLES[f]}: ${valueLabel(f, v)}`}>
-                  {FACET_TITLES[f]}: {valueLabel(f, v)} ×
+                  aria-label={`Remove filter ${facetTitle(f)}: ${valueLabel(f, v)}`}>
+                  {facetTitle(f)}: {valueLabel(f, v)} ×
                 </button>
               )),
             )}

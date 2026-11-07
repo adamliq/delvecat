@@ -66,6 +66,42 @@ dataProducts:
       - match: {type: correlationSearch, name: "ESCU - *"}
 ```
 
+## Structured properties
+
+Typed fields your team defines, validated at build time (see
+`properties.yaml`):
+
+```yaml
+structuredProperties:
+  - id: retentionTier
+    displayName: Retention tier
+    type: string                 # string | number | boolean | date | url
+    appliesTo: [index]           # omit for every type
+    required: true               # optional: requiredWhere: {app: acme_*}
+    allowedValues:
+      - {value: hot, description: Searchable on fast storage}
+      - cold
+    showInFilters: true          # a search facet
+    showInSummary: true          # a chip on search results
+  - id: complianceScope
+    type: string
+    cardinality: multiple        # values from several entries are combined
+
+annotations:
+  - id: acme:index:web
+    properties:
+      retentionTier: hot
+      complianceScope: [PCI-DSS, GDPR]
+```
+
+Unknown properties, wrong types, values outside `allowedValues` and lists for
+single-value properties fail the build with the file and line. A single value
+set by several entries keeps the last one applied. Objects missing a required
+value are listed on the Properties page and with the "Missing required
+property" search filter; this is reported but does not fail `--strict`.
+Internal indexes, system objects and names starting with `_` are never
+required to have values.
+
 Classifications can be defined once in a taxonomy (see `classifications.yaml`):
 
 ```yaml

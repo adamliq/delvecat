@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { CatalogBundle } from "../generated/catalog";
 import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
 import { EntitySearch } from "./search";
+import { propertyDefs, propertyFacets } from "./structured";
 
 type State =
   | { status: "loading" }
@@ -13,10 +14,11 @@ interface Ctx {
   openFiles: (files: File[]) => Promise<void>;
 }
 
-const CatalogCtx = createContext<Ctx | null>(null);
+export const CatalogCtx = createContext<Ctx | null>(null);
 
 function ready(bundle: CatalogBundle, origin: string): State {
-  return { status: "ready", catalog: new Catalog(bundle), search: new EntitySearch(bundle.entities), origin };
+  const search = new EntitySearch(bundle.entities, propertyFacets(propertyDefs(bundle)));
+  return { status: "ready", catalog: new Catalog(bundle), search, origin };
 }
 
 export function CatalogProvider({ children }: { children: ReactNode }) {
@@ -54,4 +56,10 @@ export function useCatalog() {
   const { state } = useCatalogState();
   if (state.status !== "ready") throw new Error("catalog not ready");
   return state;
+}
+
+/** Structured property definitions, or none when no catalog is loaded. */
+export function usePropertyDefs() {
+  const ctx = useContext(CatalogCtx);
+  return ctx?.state.status === "ready" ? propertyDefs(ctx.state.catalog.bundle) : [];
 }

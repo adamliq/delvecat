@@ -27,6 +27,11 @@ export function annotationSnippet(e: Entity): string {
     `    tags: ${list(a.tags)}`,
     `    classifications: ${list(a.classifications)}`,
     `    glossaryTerms: ${list(a.glossaryTerms)}`,
+    // JSON objects are valid YAML flow mappings; missing required values start empty.
+    `    properties: ${JSON.stringify({
+      ...Object.fromEntries((a.missingProperties ?? []).map((p) => [p, ""])),
+      ...(a.properties ?? {}),
+    }).replace(/","/g, '", "').replace(/,"/g, ', "').replace(/":/g, '": ')}`,
     "",
   ].join("\n");
 }

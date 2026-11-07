@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription, owners } from "../lib/annotate";
+import { usePropertyDefs } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
+import { summaryChips } from "../lib/structured";
 import { domainPath, entityPath, glossaryPath, productPath, searchPath } from "../lib/routes";
 
 export function TypeBadge({ entity }: { entity: Pick<Entity, "type"> }) {
@@ -34,6 +36,7 @@ export function AnnotationChips({ entity, compact = false }: { entity: Entity; c
 
 export function EntityRow({ entity }: { entity: Entity }) {
   const description = effectiveDescription(entity);
+  const summary = summaryChips(usePropertyDefs(), entity);
   return (
     <li className="entity-row">
       <div className="entity-row-head">
@@ -51,6 +54,11 @@ export function EntityRow({ entity }: { entity: Entity }) {
       </div>
       {description && <p className="entity-row-desc">{description}</p>}
       <AnnotationChips entity={entity} compact />
+      {summary.length > 0 && (
+        <span className="chips">
+          {summary.map((c) => <span key={c.id} className="chip chip-property">{c.text}</span>)}
+        </span>
+      )}
     </li>
   );
 }

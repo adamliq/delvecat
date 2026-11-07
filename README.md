@@ -28,6 +28,8 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
 6. **Domains** and **data products** group objects by business area, with
    roll-ups of health, sensitivity and documentation per domain and product.
    Upstream and impact lists can be filtered and exported to CSV.
+   **Structured properties** add typed, validated fields (retention tier,
+   compliance scope, review date...) with search filters and coverage.
 7. Descriptions, owners, tags, classifications, domains and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.

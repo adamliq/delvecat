@@ -35,6 +35,12 @@
       "items": {
         "$ref": "#/$defs/DataProduct"
       }
+    },
+    "structuredProperties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StructuredProperty"
+      }
     }
   },
   "$defs": {
@@ -132,6 +138,32 @@
           "description": "The business domain this object belongs to (one per object).",
           "type": "string",
           "minLength": 1
+        },
+        "properties": {
+          "description": "Structured property values by id (see structuredProperties).",
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                },
+                "minItems": 1
+              }
+            ]
+          }
         }
       }
     },
@@ -318,6 +350,117 @@
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/AssetSpec"
+          }
+        }
+      }
+    },
+    "StructuredProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "date",
+            "url"
+          ]
+        },
+        "allowedValues": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "value"
+                ],
+                "properties": {
+                  "value": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean"
+                    ]
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": [
+            "single",
+            "multiple"
+          ]
+        },
+        "appliesTo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Object types; omit for all."
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "showInFilters": {
+          "type": "boolean"
+        },
+        "showInSummary": {
+          "type": "boolean"
+        },
+        "requiredWhere": {
+          "description": "Only objects matching this selector must have a value.",
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "product": {
+              "type": "string"
+            },
+            "instance": {
+              "type": "string"
+            },
+            "app": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "owner": {
+              "type": "string"
+            }
           }
         }
       }

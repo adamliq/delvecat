@@ -432,6 +432,24 @@ are confirmed against a live instance before their connector ships.
 - Impact analysis: the Lineage tab's upstream and downstream lists show hops
   and the path ("via"), filter by type and distance, and export to CSV.
 
+### Structured properties (done)
+
+- Also from DataHub. `structuredProperties` definitions in `annotations/`
+  give an id, display name, type (string, number, boolean, date, url),
+  optional allowed values (with meanings), single or multiple values, the
+  object types they apply to and whether they are required (optionally only
+  where a selector matches). Entries set values under `properties:`.
+- Ingestion checks values against definitions (unknown property, wrong type,
+  value not allowed, list for a single value) with file:line errors, skips
+  values on types the property does not apply to, and records which required
+  properties each object lacks. Internal, system and `_` objects are not
+  required to have values. Merge unions definitions by id.
+- Web: a Structured properties panel on the entity overview, summary chips on
+  search results, one search facet per filterable property plus "Missing
+  required property", and a Properties page with fill rate, value counts and
+  a link to the objects missing a required value. "Suggest an edit" snippets
+  include the properties with empty placeholders for missing required ones.
+
 ## 8. Repository layout
 
 ```

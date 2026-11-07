@@ -52,6 +52,7 @@ export function Home() {
   const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
   const detections = bundle.entities.filter(isDetection).map((e) => detectionStatus(catalog, e));
   const firing = detections.filter((d) => d.state === "ready").length;
+  const missingRequired = bundle.entities.filter((e) => e.annotations?.missingProperties?.length).length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
   const healthReport = bundle.ingestionReport?.find((r) => r.connector === "health");
   const gov = bundle.ingestionReport?.find((r) => r.connector === "governance")?.counts;
@@ -130,6 +131,17 @@ export function Home() {
             {bundle.domains!.length} domains and {bundle.dataProducts?.length ?? 0} data products;{" "}
             {bundle.entities.filter((e) => e.annotations?.domain).length.toLocaleString()} objects assigned to a domain.{" "}
             <Link to="/domains">Explore domains</Link>
+          </p>
+        </section>
+      )}
+
+      {(bundle.structuredProperties?.length ?? 0) > 0 && (
+        <section>
+          <h2>Properties</h2>
+          <p>
+            {bundle.structuredProperties!.length} structured properties defined
+            {missingRequired > 0 && <>; <strong>{missingRequired}</strong> objects are missing a required value</>}.{" "}
+            <Link to="/properties">Review properties</Link>
           </p>
         </section>
       )}

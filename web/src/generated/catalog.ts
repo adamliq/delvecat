@@ -138,6 +138,7 @@ export interface CatalogBundle {
   }[];
   domains?: Domain[];
   dataProducts?: DataProduct[];
+  structuredProperties?: StructuredProperty[];
 }
 export interface Instance {
   id: string;
@@ -277,6 +278,16 @@ export interface Annotations {
   primarySource?: string;
   domain?: string;
   dataProducts?: string[];
+  /**
+   * Structured property values by id.
+   */
+  properties?: {
+    [k: string]: string | number | boolean | unknown[];
+  };
+  /**
+   * Required structured properties this object has no value for.
+   */
+  missingProperties?: string[];
 }
 export interface Link {
   title?: string;
@@ -377,4 +388,21 @@ export interface DataProduct {
    */
   assets: string[];
   source?: string;
+}
+export interface StructuredProperty {
+  id: string;
+  displayName?: string;
+  description?: string;
+  type?: "string" | "number" | "boolean" | "date" | "url";
+  allowedValues?: unknown[];
+  cardinality?: "single" | "multiple";
+  /**
+   * Object types; omit for all.
+   */
+  appliesTo?: string[];
+  required?: boolean;
+  showInFilters?: boolean;
+  showInSummary?: boolean;
+  source?: string;
+  requiredWhere?: {};
 }
