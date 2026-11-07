@@ -133,6 +133,39 @@ export function impact(catalog: Catalog, id: string, maxDepth = 20): Entity[] {
   return [...down.keys()].map((n) => catalog.byId.get(n)!).filter(Boolean);
 }
 
+export interface Reached {
+  entity: Entity;
+  depth: number;
+  via?: Entity; // the object it was reached through (undefined at depth 1)
+}
+
+/** Everything reachable downstream ("impact") or upstream, with hop count and path. */
+export function reach(catalog: Catalog, id: string, direction: "down" | "up", maxDepth = 20): Reached[] {
+  const f = flow(catalog);
+  const map = direction === "down" ? f.down : f.up;
+  const next = (e: FlowEdge) => (direction === "down" ? e.to : e.from);
+  const seen = new Map<string, { depth: number; via?: string }>([[id, { depth: 0 }]]);
+  let frontier = [id];
+  for (let d = 1; d <= maxDepth && frontier.length; d++) {
+    const nextFrontier: string[] = [];
+    for (const n of frontier) {
+      for (const e of map.get(n) ?? []) {
+        const m = next(e);
+        if (!seen.has(m)) {
+          seen.set(m, { depth: d, via: n === id ? undefined : n });
+          nextFrontier.push(m);
+        }
+      }
+    }
+    frontier = nextFrontier;
+  }
+  seen.delete(id);
+  return [...seen.entries()]
+    .map(([n, s]) => ({ entity: catalog.byId.get(n)!, depth: s.depth, via: s.via ? catalog.byId.get(s.via) : undefined }))
+    .filter((r) => r.entity)
+    .sort((a, b) => a.depth - b.depth || a.entity.type.localeCompare(b.entity.type) || a.entity.name.localeCompare(b.entity.name));
+}
+
 export function upstreamOf(catalog: Catalog, id: string, maxDepth = 20): Entity[] {
   const up = walk(flow(catalog).up, id, maxDepth, (e) => e.from);
   return [...up.keys()].map((n) => catalog.byId.get(n)!).filter(Boolean);

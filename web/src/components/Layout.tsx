@@ -33,6 +33,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </Link>
         <nav className="nav">
           <NavLink to="/search">Browse</NavLink>
+          <NavLink to="/domains">Domains</NavLink>
           <NavLink to="/glossary">Glossary</NavLink>
           <NavLink to="/coverage">Coverage</NavLink>
           <NavLink to="/health">Health</NavLink>

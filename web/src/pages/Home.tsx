@@ -123,6 +123,17 @@ export function Home() {
         </section>
       )}
 
+      {(bundle.domains?.length ?? 0) > 0 && (
+        <section>
+          <h2>Domains</h2>
+          <p>
+            {bundle.domains!.length} domains and {bundle.dataProducts?.length ?? 0} data products;{" "}
+            {bundle.entities.filter((e) => e.annotations?.domain).length.toLocaleString()} objects assigned to a domain.{" "}
+            <Link to="/domains">Explore domains</Link>
+          </p>
+        </section>
+      )}
+
       {gov && gov.sensitiveStores > 0 && (
         <section>
           <h2>Governance</h2>

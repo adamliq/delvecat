@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription, owners } from "../lib/annotate";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
-import { entityPath, glossaryPath, searchPath } from "../lib/routes";
+import { domainPath, entityPath, glossaryPath, productPath, searchPath } from "../lib/routes";
 
 export function TypeBadge({ entity }: { entity: Pick<Entity, "type"> }) {
   return <span className={`badge badge-${entity.type}`}>{typeLabel(entity.type)}</span>;
@@ -13,6 +13,8 @@ export function AnnotationChips({ entity, compact = false }: { entity: Entity; c
   const a = entity.annotations;
   if (!a) return null;
   const groups: [string, string, string[] | undefined, (v: string) => string][] = [
+    ["domain", "Domain", a.domain ? [a.domain] : undefined, (v) => domainPath(v)],
+    ["product", "Data product", a.dataProducts, (v) => productPath(v)],
     ["owner", "Owner", a.owners, (v) => searchPath({ owner: v })],
     ["classification", "Classification", a.classifications, (v) => searchPath({ classification: v })],
     ["tag", "Tag", a.tags, (v) => searchPath({ tag: v })],

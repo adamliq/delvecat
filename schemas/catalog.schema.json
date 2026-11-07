@@ -138,6 +138,18 @@
           }
         }
       }
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Domain"
+      }
+    },
+    "dataProducts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DataProduct"
+      }
     }
   },
   "$defs": {
@@ -744,6 +756,15 @@
         "primarySource": {
           "description": "The entry that targets this entity by id (the one to edit), if any.",
           "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "dataProducts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -874,6 +895,80 @@
             "connector",
             "annotation"
           ]
+        }
+      }
+    },
+    "Domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Link"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "DataProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "assets"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Link"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Entity ids."
+        },
+        "source": {
+          "type": "string"
         }
       }
     }

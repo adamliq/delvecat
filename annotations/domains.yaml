@@ -1,0 +1,81 @@
+# Business domains and data products (DataHub-style). One domain per object;
+# an object's own entry wins over a broad rule. Data products bundle assets that
+# are delivered and owned together.
+domains:
+  - name: Security
+    description: Security monitoring, detection and response.
+    owners: [soc]
+  - name: Detection Engineering
+    parent: Security
+    description: Enterprise Security detections, risk and notable events.
+    owners: [soc]
+  - name: Web
+    description: The public storefront and its telemetry.
+    owners: [web-platform]
+  - name: Data Platform
+    description: Business data brought into Splunk from databases.
+    owners: [data-platform]
+  - name: Platform Operations
+    description: Running Splunk itself and the forwarder estate.
+    owners: [splunk-admins]
+
+annotations:
+  - match: {app: acme_web}
+    domain: Web
+  - match: {app: acme_secops}
+    domain: Security
+  - match: {app: TA-acme-firewall}
+    domain: Security
+  - match: {product: soar}
+    domain: Security
+  - match: {type: correlationSearch}
+    domain: Detection Engineering
+  - match: {product: dbConnect}
+    domain: Data Platform
+  - match: {product: deploymentServer}
+    domain: Platform Operations
+  - id: acme:index:db_orders
+    domain: Data Platform
+  - id: acme:index:os
+    domain: Platform Operations
+  - id: acme:index:notable
+    domain: Detection Engineering
+  - id: acme:index:risk
+    domain: Detection Engineering
+
+dataProducts:
+  - name: Storefront Analytics
+    domain: Web
+    description: Request logs, hourly roll-ups and the dashboards the web team runs the storefront on.
+    owners: [web-platform]
+    links:
+      - title: Storefront SLOs
+        url: https://wiki.example.com/storefront/slo
+    assets:
+      - id: acme:index:web
+      - id: acme:index:summary_web
+      - id: acme:dataModel:acme_web/Acme_Web
+      - match: {type: savedSearch, app: acme_web, name: "Web - *"}
+      - match: {type: dashboard, app: acme_web}
+
+  - name: Perimeter Threat Detection
+    domain: Detection Engineering
+    description: Firewall telemetry and the detections, alerts and dashboards built on it.
+    owners: [soc, network-engineering]
+    assets:
+      - id: acme:index:firewall
+      - id: acme:sourcetype:acme:fw
+      - id: acme:lookup:TA-acme-firewall/asset_owners
+      - id: acme:correlationSearch:DA-ESS-ContentUpdate/ESCU - Rare Outbound Port Traffic
+      - id: acme:savedSearch:acme_secops/Firewall - Denied Outbound to Rare Ports
+      - id: acme:dashboard:acme_secops/soc_overview
+
+  - name: Order Data
+    domain: Data Platform
+    description: Storefront orders replicated from MySQL, and the fraud flags written back.
+    owners: [data-platform]
+    assets:
+      - id: acme:dbInput:orders_rising
+      - id: acme:index:db_orders
+      - id: acme:externalTable:orders_mysql/shop.orders
+      - id: acme:dbOutput:fraud_flags_out

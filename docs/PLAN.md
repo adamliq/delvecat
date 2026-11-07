@@ -418,6 +418,20 @@ are confirmed against a live instance before their connector ships.
   instance, so annotate objects under the instance that owns them.
 - The demo is now four instances merged (`make demo`), used by CI and Pages.
 
+### Domains, data products and impact export (done)
+
+- Inspired by DataHub. Domains (nested with `parent`) and data products are
+  defined in `annotations/`; objects get one domain each (`domain:` on any
+  entry), data products list assets by id or selector. `lint-annotations`
+  reports undefined domains, duplicate names and assets that match nothing.
+  Merge combines them across bundles.
+- Web: Domains page (tree with asset counts and health findings), domain and
+  data product pages with health / sensitivity / documentation / cleanup
+  roll-ups, a data product's boundary (what it depends on and what uses it
+  outside the product), Domain and Data product facets and chips.
+- Impact analysis: the Lineage tab's upstream and downstream lists show hops
+  and the path ("via"), filter by type and distance, and export to CSV.
+
 ## 8. Repository layout
 
 ```

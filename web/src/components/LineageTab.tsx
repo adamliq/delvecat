@@ -1,41 +1,80 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Entity, EntityType } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
-import { impact, upstreamOf } from "../lib/lineage";
+import { downloadText, toCsv } from "../lib/health";
+import { reach } from "../lib/lineage";
 import { entityPath } from "../lib/routes";
 import { LineageGraph } from "./LineageGraph";
 
 const SUMMARY_LIMIT = 12;
 
-function TypeSummary({ title, entities, empty }: { title: string; entities: Entity[]; empty: string }) {
+const MAX_DEPTH_OPTIONS = [1, 2, 3, 5, 20];
+
+/** Upstream or downstream objects with type and depth filters and a CSV export. */
+function ReachList({ title, entity, direction, catalog, empty }: {
+  title: string; entity: Entity; direction: "up" | "down"; catalog: Catalog; empty: string;
+}) {
   const [open, setOpen] = useState(false);
+  const [type, setType] = useState("");
+  const [depth, setDepth] = useState(20);
+  const all = useMemo(() => reach(catalog, entity.id, direction), [catalog, entity.id, direction]);
+  const shown = all.filter((r) => (!type || r.entity.type === type) && r.depth <= depth);
   const counts = new Map<EntityType, number>();
-  entities.forEach((e) => counts.set(e.type, (counts.get(e.type) ?? 0) + 1));
-  const sorted = [...entities].sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
+  shown.forEach((r) => counts.set(r.entity.type, (counts.get(r.entity.type) ?? 0) + 1));
+  const types = [...new Set(all.map((r) => r.entity.type))].sort();
+
+  const exportCsv = () => {
+    const rows = shown.map((r) => [
+      r.depth, typeLabel(r.entity.type), r.entity.displayName ?? r.entity.name, r.entity.app,
+      r.entity.instance, r.entity.annotations?.domain, (r.entity.annotations?.owners ?? []).join("; "),
+      r.entity.health?.status ?? "ok", r.via ? r.via.displayName ?? r.via.name : entity.displayName ?? entity.name,
+      r.entity.id,
+    ]);
+    const header = ["hops", "type", "name", "app", "instance", "domain", "owners", "health", "reached via", "id"];
+    const safe = (entity.displayName ?? entity.name).replace(/[^A-Za-z0-9_-]+/g, "-").slice(0, 60);
+    downloadText(`${direction === "down" ? "impact" : "upstream"}-${safe}.csv`, toCsv([header, ...rows]));
+  };
+
   return (
     <div className="rel-group">
-      <h3>{title} <span className="muted">({entities.length})</span></h3>
-      {entities.length === 0 ? (
+      <h3>{title} <span className="muted">({shown.length}{shown.length !== all.length ? ` of ${all.length}` : ""})</span></h3>
+      {all.length === 0 ? (
         <p className="muted small">{empty}</p>
       ) : (
         <>
+          <div className="reach-controls">
+            <label className="sort">
+              Type
+              <select value={type} onChange={(e) => setType(e.target.value)}>
+                <option value="">All</option>
+                {types.map((t) => <option key={t} value={t}>{pluralTypeLabel(t)}</option>)}
+              </select>
+            </label>
+            <label className="sort">
+              Within
+              <select value={depth} onChange={(e) => setDepth(Number(e.target.value))}>
+                {MAX_DEPTH_OPTIONS.map((d) => <option key={d} value={d}>{d === 20 ? "any distance" : `${d} hop${d > 1 ? "s" : ""}`}</option>)}
+              </select>
+            </label>
+            <button type="button" className="btn btn-small" onClick={exportCsv} disabled={!shown.length}>Download CSV</button>
+          </div>
           <p className="small">
             {[...counts.entries()].map(([t, n]) => `${n} ${n === 1 ? typeLabel(t) : pluralTypeLabel(t)}`).join(", ")}
           </p>
           <ul className="plain-list">
-            {(open ? sorted : sorted.slice(0, SUMMARY_LIMIT)).map((e) => (
-              <li key={e.id}>
-                <span className="muted rel-type">{typeLabel(e.type)}</span>{" "}
-                <Link to={`${entityPath(e.id)}?tab=lineage`}>{e.displayName ?? e.name}</Link>
-                {e.app && <span className="muted"> · {e.app}</span>}
+            {(open ? shown : shown.slice(0, SUMMARY_LIMIT)).map((r) => (
+              <li key={r.entity.id}>
+                <span className="muted rel-type">{typeLabel(r.entity.type)}</span>{" "}
+                <Link to={`${entityPath(r.entity.id)}?tab=lineage`}>{r.entity.displayName ?? r.entity.name}</Link>
+                <span className="muted small"> · {r.depth} hop{r.depth > 1 ? "s" : ""}{r.via ? ` via ${r.via.displayName ?? r.via.name}` : ""}</span>
               </li>
             ))}
           </ul>
-          {entities.length > SUMMARY_LIMIT && (
+          {shown.length > SUMMARY_LIMIT && (
             <button type="button" className="link-btn" onClick={() => setOpen(!open)}>
-              {open ? "Show fewer" : `Show all ${entities.length}`}
+              {open ? "Show fewer" : `Show all ${shown.length}`}
             </button>
           )}
         </>
@@ -59,8 +98,6 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
   const [up, setUp] = useState(2);
   const [down, setDown] = useState(2);
   const l = entity.lineage;
-  const downstream = impact(catalog, entity.id);
-  const upstream = upstreamOf(catalog, entity.id);
 
   return (
     <div className="stack">
@@ -105,8 +142,9 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
       </section>
 
       <section className="rel-grid">
-        <TypeSummary title="Depends on (all upstream)" entities={upstream} empty="Nothing upstream." />
-        <TypeSummary title="Impact (all downstream)" entities={downstream}
+        <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}
+          empty="Nothing upstream." />
+        <ReachList title="Impact (downstream)" entity={entity} direction="down" catalog={catalog}
           empty="Nothing in the catalog depends on this object." />
       </section>
     </div>

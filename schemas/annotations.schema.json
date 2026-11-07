@@ -23,6 +23,18 @@
       "items": {
         "$ref": "#/$defs/ClassificationDef"
       }
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Domain"
+      }
+    },
+    "dataProducts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DataProduct"
+      }
     }
   },
   "$defs": {
@@ -115,6 +127,11 @@
               }
             }
           }
+        },
+        "domain": {
+          "description": "The business domain this object belongs to (one per object).",
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -162,6 +179,146 @@
         "propagate": {
           "type": "boolean",
           "description": "Carry to data derived from it (default true)."
+        }
+      }
+    },
+    "Domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "owners": {
+          "$ref": "#/$defs/StringList"
+        },
+        "parent": {
+          "type": "string",
+          "description": "Parent domain, for sub-domains."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https?://"
+              }
+            }
+          }
+        }
+      }
+    },
+    "AssetSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "id"
+          ]
+        },
+        {
+          "required": [
+            "match"
+          ]
+        }
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "All given keys must match. name and app accept * and ? wildcards.",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "product": {
+              "type": "string"
+            },
+            "instance": {
+              "type": "string"
+            },
+            "app": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "owner": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "DataProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "assets"
+      ],
+      "description": "A named, owned set of assets delivered together (e.g. 'Storefront Analytics').",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "domain": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "owners": {
+          "$ref": "#/$defs/StringList"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https?://"
+              }
+            }
+          }
+        },
+        "assets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/AssetSpec"
+          }
         }
       }
     }

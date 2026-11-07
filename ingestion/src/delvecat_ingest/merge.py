@@ -108,6 +108,8 @@ def merge_bundles(
     open_refs: list[dict[str, Any]] = []
     glossary: dict[str, dict[str, Any]] = {}
     taxonomy: dict[str, dict[str, Any]] = {}
+    domains: dict[str, dict[str, Any]] = {}
+    products: dict[str, dict[str, Any]] = {}
     source = None
     for label, b in bundles:
         main = b["instances"][0]["id"] if b["instances"] else label
@@ -129,6 +131,14 @@ def merge_bundles(
             glossary.setdefault(t["term"].lower(), t)
         for c in b.get("classifications", []):
             taxonomy.setdefault(c["name"], c)
+        for dom in b.get("domains", []):
+            domains.setdefault(dom["name"], dom)
+        for prod in b.get("dataProducts", []):
+            if prod["name"] in products:  # the same product annotated in several bundles
+                merged_assets = set(products[prod["name"]]["assets"]) | set(prod["assets"])
+                products[prod["name"]]["assets"] = sorted(merged_assets)
+            else:
+                products[prod["name"]] = {**prod, "assets": list(prod["assets"])}
         source = source or b.get("annotationSource")
 
     # 0. fold observation-only index stubs into the configured index on another instance
@@ -231,6 +241,12 @@ def merge_bundles(
         merged["glossary"] = sorted(glossary.values(), key=lambda t: t["term"].lower())
     if taxonomy:
         merged["classifications"] = sorted(taxonomy.values(), key=lambda c: c["name"])
+    if domains:
+        merged["domains"] = sorted(domains.values(), key=lambda d: d["name"].lower())
+    if products:
+        for prod in products.values():  # assets may have been folded into other ids
+            prod["assets"] = sorted({id_map.get(a, a) for a in prod["assets"]})
+        merged["dataProducts"] = sorted(products.values(), key=lambda p: p["name"].lower())
     if source:
         merged["annotationSource"] = source
     if still_open:

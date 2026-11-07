@@ -25,7 +25,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    through lineage to derived data, and roles and users are traced to the
    sensitive data they can search or read. Bundles can be redacted
    (`--redact-profile public`) before publishing.
-6. Descriptions, owners, tags, classifications and the glossary live in
+6. **Domains** and **data products** group objects by business area, with
+   roll-ups of health, sensitivity and documentation per domain and product.
+   Upstream and impact lists can be filtered and exported to CSV.
+7. Descriptions, owners, tags, classifications, domains and the glossary live in
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.
 

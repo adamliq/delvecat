@@ -22,6 +22,7 @@ export function annotationSnippet(e: Entity): string {
     "annotations:",
     `  - id: ${yamlString(e.id)}`,
     `    description: ${yamlString(a.description ?? "")}`,
+    `    domain: ${yamlString(a.domain ?? "")}`,
     `    owners: ${list(a.owners)}`,
     `    tags: ${list(a.tags)}`,
     `    classifications: ${list(a.classifications)}`,

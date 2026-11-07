@@ -54,6 +54,8 @@ class AnnotationSet:
     entries: list[Entry] = field(default_factory=list)
     glossary: list[dict[str, Any]] = field(default_factory=list)
     classifications: list[dict[str, Any]] = field(default_factory=list)
+    domains: list[dict[str, Any]] = field(default_factory=list)
+    data_products: list[dict[str, Any]] = field(default_factory=list)
     files: int = 0
 
 
@@ -106,6 +108,19 @@ def load_annotations(directory: Path) -> AnnotationSet:
             result.glossary.append({**term, "source": f"{rel}:{line}"})
         for c in data.get("classifications", []):
             result.classifications.append({**c, "source": rel})
+        for d in data.get("domains", []):
+            result.domains.append({**d, "source": rel})
+        for p in data.get("dataProducts", []):
+            result.data_products.append({**p, "source": rel})
+    for kind, items in (("domain", result.domains), ("data product", result.data_products)):
+        names: dict[str, str] = {}
+        for item in items:
+            key = item["name"].lower()
+            if key in names:
+                problems.append(
+                    f"{item['source']}: {kind} {item['name']!r} is already defined in {names[key]}"
+                )
+            names[key] = item["source"]
     seen: dict[str, str] = {}
     for term in result.glossary:
         key = term["term"].lower()
@@ -140,6 +155,8 @@ def _apply(entity: dict[str, Any], entry: Entry) -> None:
     data = entry.data
     if (data.get("description") or "").strip():  # an empty template field changes nothing
         ann["description"] = data["description"].strip()
+    if (data.get("domain") or "").strip():  # one domain per object; the last applied wins
+        ann["domain"] = data["domain"].strip()
     for key in LIST_FIELDS:
         for item in data.get(key, []):
             ann.setdefault(key, [])
@@ -150,6 +167,48 @@ def _apply(entity: dict[str, Any], entry: Entry) -> None:
         if all(existing["url"] != link["url"] for existing in links):
             links.append(link)
     ann.setdefault("sources", []).append(entry.source)
+
+
+def _apply_domains_and_products(
+    bundle: dict[str, Any], annotations: AnnotationSet, unmatched: list[str]
+) -> list[str]:
+    """Publish domain and data product definitions; resolve each product's assets.
+    Returns notes about references to domains that are not defined."""
+    entities = bundle["entities"]
+    by_id = {e["id"]: e for e in entities}
+    keep = ("name", "description", "owners", "parent", "links", "source")
+    domains = [{k: d[k] for k in keep if d.get(k)} for d in annotations.domains]
+    products = []
+    for p in annotations.data_products:
+        assets: list[str] = []
+        for i, spec in enumerate(p.get("assets", [])):
+            if "id" in spec:
+                hits = [by_id[spec["id"]]] if spec["id"] in by_id else []
+            else:
+                hits = [e for e in entities if _matches(spec["match"], e)]
+            if not hits:
+                unmatched.append(f"{p['source']} (data product {p['name']!r} asset {i + 1})")
+            for e in hits:
+                if e["id"] not in assets:
+                    assets.append(e["id"])
+                listed = e.setdefault("annotations", {}).setdefault("dataProducts", [])
+                if p["name"] not in listed:
+                    listed.append(p["name"])
+        products.append(
+            {**{k: p[k] for k in (*keep, "domain") if p.get(k)}, "assets": sorted(assets)}
+        )
+    for key, items in (("domains", domains), ("dataProducts", products)):
+        if items:
+            bundle[key] = sorted(items, key=lambda x: x["name"].lower())
+        else:
+            bundle.pop(key, None)
+
+    defined = {d["name"] for d in domains}
+    used = {(e.get("annotations") or {}).get("domain") for e in entities} - {None}
+    used |= {p["domain"] for p in products if p.get("domain")}
+    used |= {d["parent"] for d in domains if d.get("parent")}
+    missing = sorted(used - defined)
+    return [f"domains used but not defined: {', '.join(missing[:10])}"] if missing else []
 
 
 def apply_annotations(
@@ -192,6 +251,7 @@ def apply_annotations(
         bundle["classifications"] = sorted(annotations.classifications, key=lambda c: c["name"])
     else:
         bundle.pop("classifications", None)
+    domain_notes = _apply_domains_and_products(bundle, annotations, unmatched)
     from .governance import apply_governance  # classifications drive governance
 
     apply_governance(bundle)
@@ -219,6 +279,8 @@ def apply_annotations(
             "annotatedEntities": annotated,
             "unmatchedEntries": len(unmatched),
             "glossaryTerms": len(annotations.glossary),
+            "domains": len(annotations.domains),
+            "dataProducts": len(annotations.data_products),
         },
     }
     notes = []
@@ -226,6 +288,7 @@ def apply_annotations(
         notes.append("entries that matched nothing: " + "; ".join(unmatched[:10]))
     if undefined:
         notes.append("glossary terms used but not defined: " + ", ".join(undefined[:10]))
+    notes.extend(domain_notes)
     if notes:
         report["message"] = " | ".join(notes)
     reports = [r for r in bundle.get("ingestionReport", []) if r["connector"] != "annotations"]

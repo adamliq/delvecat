@@ -38,6 +38,34 @@ glossary:
     synonyms: [shop]
 ```
 
+## Domains and data products
+
+`domains.yaml` defines business domains (optionally nested with `parent`) and
+data products: named, owned sets of assets delivered together. Assign an
+object to a domain with `domain:` on any entry (one domain per object; an
+object's own entry wins over a broad rule). A data product lists its assets by
+`id` or `match`:
+
+```yaml
+domains:
+  - name: Security
+    owners: [soc]
+  - name: Detection Engineering
+    parent: Security
+
+annotations:
+  - match: {app: acme_secops}
+    domain: Security
+
+dataProducts:
+  - name: Perimeter Threat Detection
+    domain: Detection Engineering
+    owners: [soc]
+    assets:
+      - id: acme:index:firewall
+      - match: {type: correlationSearch, name: "ESCU - *"}
+```
+
 Classifications can be defined once in a taxonomy (see `classifications.yaml`):
 
 ```yaml

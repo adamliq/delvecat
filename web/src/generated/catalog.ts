@@ -136,6 +136,8 @@ export interface CatalogBundle {
     generatedAt: string;
     source?: string;
   }[];
+  domains?: Domain[];
+  dataProducts?: DataProduct[];
 }
 export interface Instance {
   id: string;
@@ -273,6 +275,8 @@ export interface Annotations {
    * The entry that targets this entity by id (the one to edit), if any.
    */
   primarySource?: string;
+  domain?: string;
+  dataProducts?: string[];
 }
 export interface Link {
   title?: string;
@@ -353,4 +357,24 @@ export interface OpenReference {
   };
   knownIsFrom?: boolean;
   origin?: "config" | "spl" | "connector" | "annotation";
+}
+export interface Domain {
+  name: string;
+  description?: string;
+  owners?: string[];
+  parent?: string;
+  links?: Link[];
+  source?: string;
+}
+export interface DataProduct {
+  name: string;
+  domain?: string;
+  description?: string;
+  owners?: string[];
+  links?: Link[];
+  /**
+   * Entity ids.
+   */
+  assets: string[];
+  source?: string;
 }

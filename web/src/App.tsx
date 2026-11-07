@@ -2,6 +2,8 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { useCatalogState } from "./lib/CatalogContext";
 import { CoveragePage } from "./pages/CoveragePage";
+import { DataProductPage } from "./pages/DataProductPage";
+import { DomainsPage } from "./pages/DomainsPage";
 import { EntityPage } from "./pages/EntityPage";
 import { GlossaryPage } from "./pages/GlossaryPage";
 import { GovernancePage } from "./pages/GovernancePage";
@@ -30,6 +32,9 @@ function Body() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/entity/:id" element={<EntityPage />} />
       <Route path="/glossary" element={<GlossaryPage />} />
+      <Route path="/domains" element={<DomainsPage />} />
+      <Route path="/domains/:name" element={<DomainsPage />} />
+      <Route path="/products/:name" element={<DataProductPage />} />
       <Route path="/coverage" element={<CoveragePage />} />
       <Route path="/health" element={<HealthPage />} />
       <Route path="/governance" element={<GovernancePage />} />

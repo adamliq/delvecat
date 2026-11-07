@@ -14,6 +14,8 @@ const FACET_TITLES: Record<Facet, string> = {
   product: "Product",
   instance: "Instance",
   app: "App",
+  domain: "Domain",
+  dataProduct: "Data product",
   owner: "Owner",
   tag: "Tag",
   classification: "Classification",
