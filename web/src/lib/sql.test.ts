@@ -13,7 +13,7 @@ const ent = (type: EntityType, name: string, extra: Partial<Entity> = {}): Entit
 const idx = ent("index", "web", {
   properties: { datatype: "event", observed: { currentDBSizeMB: 12 } },
   annotations: { owners: ["web-team"], properties: { scope: ["PCI-DSS", "SOX"] }, missingProperties: ["tier"] },
-  governance: { classifications: [{ name: "PII", sensitive: true, how: "annotated", derived: false }], access: { roles: ["*"], filteredRoles: [], users: ["bob"], everyone: true } },
+  governance: { classifications: [{ name: "PII", sensitive: true, how: "annotated", derived: false }, { name: "PII.Email", sensitive: true, how: "lineage", derived: true, via: "i:savedSearch:x", columns: ["email", "user"] }], access: { roles: ["*"], filteredRoles: [], users: ["bob"], everyone: true } },
   health: { status: "warning", checks: [{ check: "freshness", status: "warning", message: "stale" }] },
 });
 const search = ent("savedSearch", "busy", { properties: { cronSchedule: "*/5 * * * *", isScheduled: true }, usage: { unused: true } });
@@ -48,6 +48,7 @@ describe("SQL console", () => {
     expect(r.columns).toEqual(["name", "cron"]);
     expect(r.rows).toEqual([["busy", "*/5 * * * *"]]);
     expect(runQuery(db, "SELECT sensitive, readable_by_everyone, health FROM entities WHERE type='index'").rows).toEqual([[1, 1, "warning"]]);
+    expect(runQuery(db, "SELECT name, columns FROM classifications ORDER BY name").rows).toEqual([["PII", null], ["PII.Email", "email,user"]]);
   });
 
   it("is read-only", async () => {

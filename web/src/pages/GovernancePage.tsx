@@ -101,7 +101,7 @@ export function GovernancePage() {
                   <tr key={s.id}>
                     <td><span className="muted rel-type">{typeLabel(s.type)}</span> <Name e={s} /></td>
                     <td>{effectiveClassifications(s).filter((c) => c.sensitive && matchesClass(c.name, filter)).map((c) => (
-                      <div key={c.name}>{c.name} <span className="muted small">{HOW_LABEL[c.how]}{c.via && byId.get(c.via) ? <> (<Name e={byId.get(c.via)} />)</> : null}</span></div>
+                      <div key={c.name}>{c.name} <span className="muted small">{HOW_LABEL[c.how]}{c.via && byId.get(c.via) ? <> (<Name e={byId.get(c.via)} />)</> : null}{c.columns?.length ? <> · in <code>{c.columns.join(", ")}</code></> : null}</span></div>
                     ))}</td>
                     <td>{a ? a.roles.map((r, i) => <span key={r}>{i > 0 && ", "}<Name e={byId.get(r)} />{a.filteredRoles.includes(r) && <span className="muted small"> (filtered)</span>}</span>) : <span className="muted">no role (sourcetype or table)</span>}</td>
                     <td>{a ? (a.users.length ? a.users.map((u, i) => <span key={u}>{i > 0 && ", "}<Name e={byId.get(u)} /></span>) : <span className="muted">none</span>) : "—"}</td>

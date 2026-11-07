@@ -1,11 +1,14 @@
 """Governance: where sensitive data lives and who can reach it.
 
 1. **Effective classifications.** A classification annotated on a field also
-   applies to its sourcetype; on a sourcetype, to the indexes it feeds. From any
-   classified data store it is carried along lineage to the data stores derived
-   from it (summary indexes, lookups written by searches, indexes fed by DB
-   Connect from a classified table), marked ``derived``. Searches and dashboards
-   that read classified data directly are marked as consumers.
+   applies to fields derived from it (aliases, calculated fields, lookups), to
+   its sourcetype and to the indexes it feeds, in that column. From there it
+   is carried along lineage column by column (see :mod:`classify`): a search
+   passes it on only through result columns computed from a classified column,
+   counts and hashes pass nothing on, and ``stopsClassifications`` stops it.
+   Derived classifications record the columns that hold them and the object
+   they came through. Searches and dashboards that use a classified column
+   are marked as reading it.
 2. **Access.** A role reaches an index through its effective search access
    (``grantsAccess``, inherited roles included) and a lookup / KV collection
    through the object's read permission (``*`` = every role). Users inherit
@@ -18,8 +21,10 @@ Approximations: app-level visibility of objects and capabilities such as
 
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import defaultdict
 from typing import Any
+
+from .classify import ALL, derived_fields, propagate
 
 STORE_TYPES = frozenset(
     {"index", "sourcetype", "lookup", "kvCollection", "externalTable", "dataModel", "field"}
@@ -34,9 +39,6 @@ CONSUMER_TYPES = frozenset(
         "workflowAction",
     }
 )
-FLOW_FORWARD = {"feeds", "writes", "triggers", "accelerates", "deploys"}
-FLOW_REVERSE = {"reads", "uses", "mapsTo"}
-MAX_DEPTH = 6
 DEFAULT_ROLES = frozenset({"user"})  # granted to new users by default
 
 
@@ -80,6 +82,23 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         for c in (e.get("annotations") or {}).get("classifications", []):
             add(e["id"], c, None, False, "annotated")
 
+    # fields derived from classified fields (aliases, calculated fields, lookups)
+    sources = derived_fields(by_id, edges)
+    changed = True
+    while changed:
+        changed = False
+        for fid, srcs in sources.items():
+            for src in sorted(srcs):
+                for c in list(found.get(src, {})):
+                    changed |= add(fid, c, src, True, "derivedField")
+
+    # columns each classification is in: node -> class -> names (ALL = every column)
+    seed_cols: dict[str, dict[str, frozenset[str] | None]] = defaultdict(dict)
+    for eid, cs in found.items():
+        if by_id[eid]["type"] != "field":
+            for c in cs:
+                seed_cols[eid][c] = ALL
+
     # structural: field -> sourcetype -> index
     out_edges: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for edge in edges:
@@ -89,41 +108,44 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         for edge in edges
         if edge["type"] == "contains" and edge["to"].split(":")[1] == "field"
     }
+
+    def field_name(fid: str) -> str:
+        p = by_id[fid].get("properties") or {}
+        return str(p.get("field") or by_id[fid].get("displayName") or fid.rsplit("/", 1)[-1])
+
     for fid, st in contains_field.items():
         for c in list(found.get(fid, {})):
             add(st, c, fid, False, "field")
+            cur = seed_cols[st].get(c, frozenset())
+            if cur is not ALL:
+                seed_cols[st][c] = cur | {field_name(fid)}
     for e in [x for x in entities if x["type"] == "sourcetype"]:
         for c in list(found.get(e["id"], {})):
             for edge in out_edges[e["id"]]:
                 if edge["type"] == "feeds" and edge["to"].split(":")[1] == "index":
                     add(edge["to"], c, e["id"], False, "sourcetype")
+                    cur = seed_cols[edge["to"]].get(c, frozenset())
+                    st_cols = seed_cols[e["id"]].get(c, ALL)
+                    seed_cols[edge["to"]][c] = (
+                        ALL if cur is ALL or st_cols is ALL else cur | st_cols
+                    )
 
-    # lineage: carry to derived data stores; mark direct consumers
-    down: dict[str, list[str]] = defaultdict(list)
-    for edge in edges:
-        if edge["type"] in FLOW_FORWARD:
-            down[edge["from"]].append(edge["to"])
-        elif edge["type"] in FLOW_REVERSE:
-            down[edge["to"]].append(edge["from"])
+    # lineage: carry classifications to derived data through the columns that hold them
+    carried = {c for cs in found.values() for c in cs if propagates(c)}
+    derived, readers, stopped = propagate(by_id, edges, seed_cols, carried)
+    for node, per in derived.items():
+        if by_id[node]["type"] in STORE_TYPES and by_id[node]["type"] != "field":
+            for c, d in sorted(per.items()):
+                if add(node, c, d["via"], True, "lineage") and d["columns"] is not ALL:
+                    found[node][c]["columns"] = sorted(d["columns"])
+    for node, per in seed_cols.items():
+        for c, cols in per.items():
+            if cols is not ALL and c in found.get(node, {}):
+                found[node][c].setdefault("columns", sorted(cols))
     consumers: dict[str, set[str]] = defaultdict(set)
-    seeds = [(eid, c) for eid, cs in list(found.items()) for c in cs if propagates(c)]
-    for origin, cls in seeds:
-        queue: deque[tuple[str, int]] = deque([(origin, 0)])
-        seen = {origin}
-        while queue:
-            node, depth = queue.popleft()
-            if depth >= MAX_DEPTH:
-                continue
-            for nxt in down.get(node, []):
-                if nxt in seen or nxt not in by_id:
-                    continue
-                seen.add(nxt)
-                t = by_id[nxt]["type"]
-                if t in CONSUMER_TYPES and depth == 0:
-                    consumers[nxt].add(cls)
-                if t in STORE_TYPES and t != "field":
-                    add(nxt, cls, origin, True, "lineage")
-                queue.append((nxt, depth + 1))
+    for node, cls in readers.items():
+        if by_id[node]["type"] in CONSUMER_TYPES:
+            consumers[node] |= cls
 
     # field lineage: a search that reads a classified field reads that classification
     for edge in edges:
@@ -202,6 +224,8 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         ]
     for eid, cls in consumers.items():
         by_id[eid].setdefault("governance", {})["readsClassified"] = sorted(cls)
+    for eid, cls in stopped.items():
+        by_id[eid].setdefault("governance", {})["stops"] = sorted(cls)
     for eid, access in store_access.items():
         role_ids = {a["role"] for a in access}
         everyone = "*" in set((by_id[eid].get("permissions") or {}).get("read", [])) or any(

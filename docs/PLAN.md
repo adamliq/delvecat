@@ -480,6 +480,29 @@ are confirmed against a live instance before their connector ships.
   linked (no entities for them yet); wildcards and `$token$` field names are
   skipped; `spath` and automatic key-value fields are taken by name.
 
+### Column-level classification propagation (done)
+
+- From Apache Atlas's classification propagation, made precise with field
+  lineage (`classify.py`). Each classification travels with the columns that
+  hold it: a classified field classifies fields derived from it (aliases and
+  calculated fields; automatic lookup outputs take the lookup's
+  classification, not their key's), then its sourcetype and indexes in that
+  column. A search passes it on only through result columns computed from a
+  classified column; `count` / `dc` / `estdc` and `md5` / `sha*` columns are
+  `masked` and pass nothing on. Objects without field lineage pass classified
+  columns on by name; data models, and inputs a search cannot match by name,
+  count as classified in every column (the old behaviour).
+- Searches read a classification only when they use a classified column (or
+  read data classified as a whole). `stopsClassifications` annotations stop a
+  classification (and its children; `*` for all) at an object; it is still
+  shown as reading it, with a "Stops ... here" note.
+- Derived classifications record the columns that hold them and the object
+  they came through; shown on entity and Governance pages and in the SQL
+  console's `classifications.columns`.
+- Demo annotations now classify fields (clientip, user, src) instead of whole
+  indexes. Result: `summary_web` (status counts) is no longer PII, and the
+  search writing it no longer reads PII.
+
 ### Search results export (done)
 
 - "Download CSV" on Browse exports every result of the current search and

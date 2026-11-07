@@ -111,6 +111,10 @@
         "classifications": {
           "$ref": "#/$defs/StringList"
         },
+        "stopsClassifications": {
+          "description": "Classifications this object does not pass on to the data derived from it (for example a search that masks or hashes them). A parent stops its children (PII stops PII.Email); \"*\" stops all.",
+          "$ref": "#/$defs/StringList"
+        },
         "glossaryTerms": {
           "$ref": "#/$defs/StringList"
         },

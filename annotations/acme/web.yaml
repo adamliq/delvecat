@@ -10,7 +10,6 @@ annotations:
       request. Retained 90 days.
     owners: [web-platform]
     tags: [tier-1]
-    classifications: [PII.IPAddress]
     glossaryTerms: [Storefront]
     links:
       - title: Storefront logging runbook
@@ -22,7 +21,15 @@ annotations:
 
   - id: acme:sourcetype:access_combined
     description: Apache/NGINX combined log format.
+
+  # Classify the fields that hold personal data, not the whole index: the
+  # catalog then follows them column by column into summaries and lookups.
+  - id: acme:field:access_combined/clientip
+    description: Address of the visitor's browser.
     classifications: [PII.IPAddress]
+
+  - id: acme:field:access_combined/user
+    classifications: [PII.Username]
 
   - id: acme:dashboard:acme_web/storefront_health
     tags: [exec-reporting]

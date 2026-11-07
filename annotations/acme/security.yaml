@@ -14,7 +14,6 @@ annotations:
     description: Connection logs from the perimeter firewalls (allowed and blocked). Retained one year for investigations.
     owners: [network-engineering, soc]
     tags: [tier-1]
-    classifications: [PII.IPAddress]
     glossaryTerms: [Perimeter firewall]
 
   - id: acme:sourcetype:acme:fw
@@ -30,7 +29,12 @@ annotations:
   - id: acme:index:wineventlog
     description: Windows Security event logs from domain controllers.
     owners: [soc]
+
+  - id: acme:field:WinEventLog:Security/user
     classifications: [PII.Username]
+
+  - id: acme:field:WinEventLog:Security/src
+    classifications: [PII.IPAddress]
 
   - id: acme:eventtype:acme_secops/acme_failed_login
     glossaryTerms: [Failed logon]

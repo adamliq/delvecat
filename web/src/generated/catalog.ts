@@ -269,6 +269,10 @@ export interface Annotations {
    * e.g. PII.Email, Confidential, MITRE.T1078
    */
   classifications?: string[];
+  /**
+   * Classifications this object does not pass on to data derived from it; "*" stops all.
+   */
+  stopsClassifications?: string[];
   glossaryTerms?: string[];
   links?: Link[];
   /**
@@ -328,6 +332,10 @@ export interface FieldLineage {
   outputs?: {
     name: string;
     from: string[];
+    /**
+     * The column does not reveal the values it is computed from (a count, a distinct count or a hash), so classifications of its source fields do not carry over.
+     */
+    masked?: boolean;
   }[];
 }
 export interface Edge {

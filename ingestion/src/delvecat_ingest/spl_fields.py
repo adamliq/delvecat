@@ -144,6 +144,10 @@ _NAMED_GROUP = re.compile(r"\(\?P?<([A-Za-z_]\w*)>")
 _AS_PAIR = re.compile(r"(\"[^\"]+\"|'[^']+'|[^\s,]+)\s+as\s+(\"[^\"]+\"|'[^']+'|[^\s,]+)", re.I)
 _COMPARE = ("<", ">", "<=", ">=", "==")
 _TERM_FIELD = re.compile(r"^([A-Za-z_][\w.:]*?)(::|!=|<=|>=|==|=|<|>)(.*)$", re.S)
+# Aggregations whose result does not reveal the values they were computed from.
+COUNT_LIKE = frozenset({"count", "c", "dc", "distinct_count", "estdc", "estdc_error"})
+# An eval that only hashes: the result does not reveal the values either.
+_HASHED = re.compile(r"(?i)^\s*(md5|sha1|sha256|sha512)\s*\(.*\)\s*$", re.S)
 _BY = re.compile(r"(?i)\s+(?:by|over)\s+")
 
 
@@ -152,6 +156,7 @@ class FieldAnalysis:
     source: str = "events"  # events | datamodel | lookup | search | database | metrics | other
     used: dict[str, set[str]] = field(default_factory=dict)  # source field -> hows
     outputs: dict[str, set[str]] | None = None  # output column -> source fields
+    masked: set[str] = field(default_factory=set)  # output columns that hide source values
 
     def merge(self, other: FieldAnalysis) -> None:
         for name, hows in other.used.items():
@@ -168,7 +173,12 @@ class FieldAnalysis:
         }
         if self.outputs is not None:
             out["outputs"] = [
-                {"name": n, "from": sorted(srcs, key=str.lower)} for n, srcs in self.outputs.items()
+                {
+                    "name": n,
+                    "from": sorted(srcs, key=str.lower),
+                    **({"masked": True} if n in self.masked and srcs else {}),
+                }
+                for n, srcs in self.outputs.items()
             ]
         return out
 
@@ -197,6 +207,8 @@ class _Pipeline:
         self.closed = False  # only fields in env exist (after a transforming command)
         self.projected = False  # env is exactly the set of result columns
         self.opaque = False  # result shape unknown from here on
+        # Fields whose values do not carry their source values (counts, hashes).
+        self.masked: set[str] = set()
 
     # -- references --------------------------------------------------------------------
     def ref(self, raw: str, how: str) -> set[str]:
@@ -228,17 +240,23 @@ class _Pipeline:
                 srcs |= self.ref(name, how)
         return srcs
 
-    def set(self, name: str, srcs: set[str]) -> None:
+    def set(self, name: str, srcs: set[str], masked: bool = False) -> None:
         name = _clean(name)
         if name and "*" not in name:
             self.env[name] = set(srcs)
+            if masked:
+                self.masked.add(name)
+            else:
+                self.masked.discard(name)
 
-    def reset(self, columns: dict[str, set[str]]) -> None:
+    def reset(self, columns: dict[str, set[str]], masked: set[str] | None = None) -> None:
         self.env = columns
+        self.masked = {m for m in (masked or set()) if m in columns}
         self.closed = True
         self.projected = True
 
     def make_opaque(self) -> None:
+        self.masked = set()
         self.opaque = True
         self.projected = False
         self.closed = True
@@ -269,6 +287,7 @@ def _stats(p: _Pipeline, name: str, args: str) -> None:
     parts = _BY.split(args, maxsplit=2)
     aggs, by = parts[0], " ".join(parts[1:])
     columns: dict[str, set[str]] = {}
+    masked: set[str] = set()
     transforming = name in TRANSFORMING
     if name in ("top", "rare"):
         fields = _names(aggs)
@@ -280,19 +299,24 @@ def _stats(p: _Pipeline, name: str, args: str) -> None:
             if m.group(1):
                 func, inner, alias = m.group(1), m.group(2), m.group(3)
                 srcs = p.expression(inner, "aggregate")
-                columns[_clean(alias) if alias else f"{func}({inner.strip()})"] = srcs
+                col = _clean(alias) if alias else f"{func}({inner.strip()})"
+                columns[col] = srcs
+                if func.lower() in COUNT_LIKE:
+                    masked.add(col)
             else:
                 alias = m.group(5)
                 columns[_clean(alias) if alias else m.group(4)] = set()
     for f in _names(by):
+        if f in p.masked:
+            masked.add(f)
         columns[f] = p.ref(f, "groupBy")
     if name == "timechart":
         columns.setdefault("_time", set())
     if transforming:
-        p.reset(columns)
+        p.reset(columns, masked)
     else:  # eventstats / streamstats add columns to every event
         for k, v in columns.items():
-            p.set(k, v)
+            p.set(k, v, masked=k in masked)
 
 
 def _lookup(p: _Pipeline, args: str) -> None:
@@ -340,13 +364,15 @@ def _command(p: _Pipeline, name: str, args: str, sub_outputs: list[set[str]]) ->
                 continue
             srcs = p.expression(m.group(2), "eval")
             if name == "eval":
-                p.set(m.group(1), srcs)
+                p.set(m.group(1), srcs, masked=bool(_HASHED.match(m.group(2))))
     elif name == "rename":
         for m in _AS_PAIR.finditer(args):
             old, new = _clean(m.group(1)), m.group(2)
+            was_masked = old in p.masked
             srcs = p.ref(old, "rename")
-            p.set(new, srcs)
+            p.set(new, srcs, masked=was_masked)
             p.env.pop(old, None)
+            p.masked.discard(old)
     elif name in ("table", "fields"):
         body = args.strip()
         if name == "fields" and body.startswith("-"):
@@ -361,7 +387,7 @@ def _command(p: _Pipeline, name: str, args: str, sub_outputs: list[set[str]]) ->
             p.projected = False
             return
         columns = {f: p.ref(f, "select") for f in _names(body)}
-        p.reset(columns)
+        p.reset(columns, {f for f in columns if f in p.masked})
     elif name == "lookup":
         _lookup(p, args)
     elif name == "rex":
@@ -429,7 +455,7 @@ def analyze_fields(spl: str) -> FieldAnalysis:
     """Analyze macro-expanded SPL (subsearches included)."""
     out = _analyze(spl)
     for col, srcs in (out.outputs or {}).items():
-        if srcs == {col}:  # a source field passed through to the results
+        if srcs == {col} and col not in out.masked:  # a source field passed through
             out.used[col].add("output")
     return out
 
@@ -486,3 +512,4 @@ def _pipeline(spl: str, out: FieldAnalysis) -> None:
         _command(p, name, rest, sub_outputs)
     if p.projected and not p.opaque:
         out.outputs = {k: v for k, v in p.env.items()}
+        out.masked = set(p.masked)

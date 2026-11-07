@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
-import { access, effectiveClassifications, HOW_LABEL, readsClassified, sensitiveAccess } from "../lib/governance";
+import { access, effectiveClassifications, HOW_LABEL, readsClassified, sensitiveAccess, stoppedClassifications } from "../lib/governance";
 import { typeLabel } from "../lib/labels";
 import { entityPath } from "../lib/routes";
 
@@ -10,7 +10,8 @@ export function GovernancePanel({ catalog, entity }: { catalog: Catalog; entity:
   const a = access(entity);
   const reach = sensitiveAccess(entity);
   const reads = readsClassified(entity);
-  if (!classes.length && !a && !reach.length && !reads.length) return null;
+  const stops = stoppedClassifications(entity);
+  if (!classes.length && !a && !reach.length && !reads.length && !stops.length) return null;
   const link = (id: string) => {
     const e = catalog.byId.get(id);
     return e ? <Link to={entityPath(id)}>{e.displayName ?? e.name}</Link> : id;
@@ -23,12 +24,23 @@ export function GovernancePanel({ catalog, entity }: { catalog: Catalog; entity:
           {classes.map((c) => (
             <li key={c.name}>
               <span className={`chip${c.sensitive ? " chip-classification" : ""}`}>{c.name}</span>{" "}
-              <span className="muted small">{HOW_LABEL[c.how]}{c.via ? <> · {link(c.via)}</> : null}{c.sensitive ? "" : " · not sensitive"}</span>
+              <span className="muted small">
+                {HOW_LABEL[c.how]}{c.via ? <> · {link(c.via)}</> : null}
+                {c.columns?.length ? <> · in {c.columns.map((col, i) => <span key={col}>{i > 0 && ", "}<code>{col}</code></span>)}</>
+                  : c.how === "lineage" ? " · every column (no column-level evidence)" : null}
+                {c.sensitive ? "" : " · not sensitive"}
+              </span>
             </li>
           ))}
         </ul>
       )}
       {reads.length > 0 && <p className="small">Reads sensitive data: {reads.join(", ")}</p>}
+      {stops.length > 0 && (
+        <p className="small">
+          Stops {stops.join(", ")} here: data derived from this object is not classified with {stops.length === 1 ? "it" : "them"}{" "}
+          <span className="muted">(stopsClassifications annotation)</span>
+        </p>
+      )}
       {a && (
         <dl className="facts">
           <dt>Roles with access</dt>

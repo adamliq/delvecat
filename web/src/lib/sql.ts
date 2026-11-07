@@ -87,8 +87,12 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
   const classifications: Table = {
     name: "classifications",
     doc: "Classifications on each object, annotated or derived (how / via say where they came from).",
-    columns: [col("entity_id"), col("name"), col("sensitive", "INTEGER"), col("how", "TEXT", "annotated, field, sourcetype or lineage"), col("via")],
-    rows: per((e) => effectiveClassifications(e).map((c) => [e.id, c.name, c.sensitive, c.how, c.via].map(cell))),
+    columns: [
+      col("entity_id"), col("name"), col("sensitive", "INTEGER"),
+      col("how", "TEXT", "annotated, field, derivedField, sourcetype or lineage"), col("via", "TEXT", "The object it came from or through"),
+      col("columns", "TEXT", "Comma-separated columns that hold it; NULL when the whole object is classified"),
+    ],
+    rows: per((e) => effectiveClassifications(e).map((c) => [e.id, c.name, c.sensitive, c.how, c.via, c.columns?.join(",")].map(cell))),
   };
 
   const properties: Table = {

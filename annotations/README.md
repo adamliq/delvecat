@@ -113,6 +113,27 @@ classifications:
 
 Undefined classifications count as sensitive and propagate.
 
+Classify **fields** rather than whole indexes where you can
+(`id: acme:field:access_combined/clientip`). The catalog then follows the
+classification column by column: into fields derived from it (aliases,
+calculated fields), up to its sourcetype and indexes, and through searches
+only via the result columns computed from it. A search that just counts
+(`count`, `dc`) or hashes (`md5`, `sha256`...) a classified field passes
+nothing on, and a summary of `stats count by status` is not PII. Searches
+count as reading a classification only when they use a classified column.
+An index classified as a whole stays classified in every column.
+
+To stop a classification at an object, for example a search that masks it
+before writing a summary, use `stopsClassifications` (a parent stops its
+children; `"*"` stops all). The object still reads the data; what is derived
+from it is not classified:
+
+```yaml
+annotations:
+  - id: "acme:savedSearch:acme_web/Web - Masked Visitors"
+    stopsClassifications: [PII]
+```
+
 Rules:
 
 - Selector (`match`) entries are applied first, in file order, then `id`

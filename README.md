@@ -34,6 +34,9 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    (filter, group by, aggregate, eval, lookup...), where each result column
    comes from, which configuration defines a field, and what breaks if a
    field changes or disappears.
+   Classifications follow the data **column by column**: a summary built from
+   counts is not PII, and a search only reads PII when it uses a PII field.
+   `stopsClassifications` stops a classification at a masking search.
    **At-risk alerts** flag objects that depend, directly or through other
    objects, on something unhealthy, broken or disabled, and show what each
    problem puts at risk.

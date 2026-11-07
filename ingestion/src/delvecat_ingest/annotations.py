@@ -33,7 +33,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from .bundle import find_schema
 from .structured import apply_values, check_definitions, check_values, missing_required
 
-LIST_FIELDS = ("owners", "tags", "classifications", "glossaryTerms")
+LIST_FIELDS = ("owners", "tags", "classifications", "stopsClassifications", "glossaryTerms")
 MATCH_KEYS = ("type", "product", "instance", "app", "name", "owner")
 
 

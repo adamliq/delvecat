@@ -238,8 +238,11 @@ def test_cli_annotate_and_lint(tmp_path, capsys):
         == 0
     )
     annotated = json.loads(out.read_text())
+    ip = next(e for e in annotated["entities"] if e["id"] == "acme:field:access_combined/clientip")
+    assert "PII.IPAddress" in ip["annotations"]["classifications"]
     web = next(e for e in annotated["entities"] if e["id"] == "acme:index:web")
-    assert "PII.IPAddress" in web["annotations"]["classifications"]
+    pii = {c["name"]: c for c in web["governance"]["classifications"]}["PII.IPAddress"]
+    assert pii["columns"] == ["clientip"]
     assert main(["lint-annotations", str(REPO_ANNOTATIONS), "--bundle", str(out)]) == 0
 
     bad = tmp_path / "bad"

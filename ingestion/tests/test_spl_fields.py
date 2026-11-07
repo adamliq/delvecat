@@ -130,3 +130,25 @@ def test_tokens_and_wildcards_are_skipped():
     assert used("index=web user=$user$ | table src* | stats count by $field$") == {
         "user": ["filter"]
     }
+
+
+def masked(spl):
+    o = analyze_fields(spl).to_json().get("outputs") or []
+    return {x["name"]: x.get("masked", False) for x in o}
+
+
+def test_counts_and_hashes_hide_values():
+    spl = (
+        "index=fw | eval h=sha256(src_ip), u=lower(user) "
+        "| stats count dc(dest_ip) as dests values(dest_port) as ports by h, u "
+        "| rename h as host_hash | table host_hash u dests ports count"
+    )
+    assert masked(spl) == {
+        "host_hash": True,
+        "u": False,
+        "dests": True,
+        "ports": False,
+        "count": False,  # no source fields at all
+    }
+    # A hashed field passed through is not reported as output.
+    assert used("index=fw | eval src_ip=md5(src_ip) | table src_ip") == {"src_ip": ["eval"]}
