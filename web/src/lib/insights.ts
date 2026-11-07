@@ -137,3 +137,34 @@ export function usagePercentile(catalog: Catalog, e: Entity): number | undefined
   }
   return cache.get(e.id);
 }
+
+export interface Kpi {
+  key: string;
+  label: string;
+  value: number | undefined; // percent
+  ok: number;
+  of: number;
+  target: number;
+  sub: string;
+}
+
+/** Headline coverage numbers with targets, as in data catalog "insights" views. */
+export function kpis(catalog: Catalog, includeVendor: boolean, extra: {
+  fieldsInCim: [number, number]; fieldsWithTerm: [number, number];
+}): Kpi[] {
+  const { overall } = coverageBy(catalog, "type", includeVendor);
+  const quality = catalog.entities.reduce((acc, e) => {
+    if (e.quality) { acc[0] += e.quality.passed; acc[1] += e.quality.passed + e.quality.failed; }
+    return acc;
+  }, [0, 0] as [number, number]);
+  const pct = ([ok, of]: [number, number]) => (of ? Math.round((100 * ok) / of) : undefined);
+  const k = (key: string, label: string, pair: [number, number], target: number, sub: string): Kpi =>
+    ({ key, label, value: pct(pair), ok: pair[0], of: pair[1], target, sub });
+  return [
+    k("owned", "Ownership", overall.counts.owned, 100, "objects with an owning team"),
+    k("described", "Descriptions", overall.counts.described, 80, "objects with a description"),
+    k("cim", "CIM coverage", extra.fieldsInCim, 85, "fields of mapped sourcetypes that are data model fields"),
+    k("terms", "Glossary linkage", extra.fieldsWithTerm, 60, "sampled fields linked to a business term"),
+    k("quality", "Checks passing", quality, 95, "data quality checks that passed"),
+  ];
+}

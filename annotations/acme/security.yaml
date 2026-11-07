@@ -47,3 +47,15 @@ annotations:
     links:
       - title: Response playbook
         url: https://wiki.example.com/soc/playbooks/rare-ports
+
+  # Data quality checks on top of the built-in ones (freshness, volume, and
+  # "not null" for every field a detection reads).
+  - id: acme:sourcetype:acme:fw
+    qualityChecks:
+      - test: notNull
+        field: dest_ip
+        min: 0.99
+      - test: distinctBetween
+        field: action
+        min: 2
+        max: 5

@@ -36,3 +36,15 @@ annotations:
     links:
       - title: Storefront SLOs
         url: https://wiki.example.com/storefront/slo
+
+  - id: acme:sourcetype:access_combined
+    qualityChecks:
+      - test: notNull
+        field: clientip
+        min: 0.99
+      - test: notNull
+        field: status
+      - test: distinctBetween
+        field: status
+        min: 1
+        max: 60

@@ -15,3 +15,26 @@ glossary:
   - term: Failed logon
     description: A Windows authentication failure (EventCode 4625). Spikes can indicate password spraying.
     related: [SOC]
+
+  # Field-level terms: the fields listed carry the term in every sourcetype,
+  # so the same meaning is findable across vendors' names and types.
+  - term: Source address
+    description: The network address that started the activity. CIM calls it src or src_ip; web servers log it as clientip.
+    owner: network-engineering
+    fields: [src_ip, src, clientip]
+  - term: Destination address
+    description: The network address or host that received the activity.
+    owner: network-engineering
+    fields: [dest_ip, dest]
+  - term: Identity
+    description: The human or service account responsible for the activity. Formats differ by source (bare name, DOMAIN\user, email).
+    owner: soc
+    fields: [user, src_user]
+  - term: Outcome
+    description: Whether the activity was allowed or blocked, succeeded or failed. HTTP status codes count as an outcome.
+    owner: soc
+    fields: [action, status, reply_code]
+  - term: Web request
+    description: Attributes of an HTTP request.
+    owner: web-platform
+    fields: [uri, uri_path, method, http_method, useragent, http_user_agent]

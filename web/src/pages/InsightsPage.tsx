@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { FieldClassification, KpiTiles, OwnersChart, PropertyDistributions } from "../components/InsightsExtras";
 import { Meter } from "../components/Meter";
 import { useCatalog } from "../lib/CatalogContext";
 import { coverageBy, METRICS, mostUsed, USAGE_GROUPS, type Coverage, type GroupBy } from "../lib/insights";
@@ -48,6 +49,25 @@ export function InsightsPage() {
         </label>
         <label className="sort"><input type="checkbox" checked={vendor} onChange={(e) => setVendor(e.target.checked)} /> Include Splunk and product apps</label>
       </div>
+
+      <section>
+        <h2>Targets</h2>
+        <KpiTiles catalog={catalog} includeVendor={vendor} />
+      </section>
+
+      <section>
+        <h2>Fields by classification</h2>
+        <p className="muted small">Every sampled or configured sourcetype field, by its sensitive classification.</p>
+        <FieldClassification catalog={catalog} />
+      </section>
+
+      <section>
+        <h2>Distribution</h2>
+        <div className="usage-grid">
+          <PropertyDistributions catalog={catalog} />
+          <OwnersChart catalog={catalog} includeVendor={vendor} />
+        </div>
+      </section>
 
       <section>
         <h2>Catalog coverage</h2>

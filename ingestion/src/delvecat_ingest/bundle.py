@@ -28,6 +28,7 @@ _VERSION_FIELDS = (
     "lineage",
     "usage",
     "health",
+    "quality",
 )
 
 
@@ -284,6 +285,9 @@ def assemble(
     }
     if changes is not None:
         bundle["changes"] = changes
+    from .quality import apply_quality  # built-in checks; annotations add more later
+
+    apply_quality(bundle)
     return bundle
 
 

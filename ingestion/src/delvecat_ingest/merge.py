@@ -31,6 +31,7 @@ from .governance import apply_governance
 from .health import CONSUMER_EDGES, SEVERITY
 from .health import _merge_usage as merge_usage
 from .link import link_hosts
+from .quality import apply_quality
 from .resolve import Resolver
 
 
@@ -265,6 +266,7 @@ def merge_bundles(
         merged["changes"] = apply_versions(entities, generated, previous)
 
     apply_governance(merged)
+    apply_quality(merged)
     merged["ingestionReport"].append(
         {
             "connector": "merge",

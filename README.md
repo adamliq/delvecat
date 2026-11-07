@@ -37,6 +37,12 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    Classifications follow the data **column by column**: a summary built from
    counts is not PII, and a search only reads PII when it uses a PII field.
    `stopsClassifications` stops a classification at a masking search.
+   **Schemas** (from a sourcetype schema catalog prototype): typed field
+   schemas with null rates, CIM data model mapping and coverage, most similar
+   schemas, a side-by-side compare view, a shared-field network, field
+   lineage from sourcetype through data model to the searches that read it,
+   glossary terms linked to field names with inconsistent-type warnings, and
+   data quality checks (built in and as code).
    **Visualizations**: lineage graphs badge health, risk and sensitive data;
    a column lineage diagram traces result columns to source fields; a
    relationship graph shows every link one hop out; an Insights page charts

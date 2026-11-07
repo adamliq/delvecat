@@ -30,6 +30,7 @@ const FACET_TITLES: Record<string, string> = {
   issue: "Search issues",
   missing: "Missing required property",
   risk: "At risk from upstream problems",
+  quality: "Data quality",
   health: "Health",
   sensitivity: "Sensitivity",
   usage: "Usage",

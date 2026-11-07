@@ -187,6 +187,12 @@ def _apply(
             ann.setdefault(key, [])
             if item not in ann[key]:
                 ann[key].append(item)
+    for check in data.get("qualityChecks", []):
+        checks = ann.setdefault("qualityChecks", [])
+        checks[:] = [
+            c for c in checks if (c["test"], c.get("field")) != (check["test"], check.get("field"))
+        ]
+        checks.append({**check, "source": entry.source})
     for link in data.get("links", []):
         links = ann.setdefault("links", [])
         if all(existing["url"] != link["url"] for existing in links):
@@ -298,6 +304,9 @@ def apply_annotations(
     from .governance import apply_governance  # classifications drive governance
 
     apply_governance(bundle)
+    from .quality import apply_quality
+
+    quality = apply_quality(bundle)
 
     # Terms used on entities but not defined anywhere are worth flagging too.
     defined = {t["term"].lower() for t in annotations.glossary}
@@ -326,6 +335,8 @@ def apply_annotations(
             "dataProducts": len(annotations.data_products),
             "structuredProperties": len(annotations.structured),
             "missingRequiredValues": sum(missing.values()),
+            "qualityChecksPassed": quality["passed"],
+            "qualityChecksFailed": quality["failed"],
         },
     }
     notes = []

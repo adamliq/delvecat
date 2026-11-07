@@ -44,6 +44,55 @@
     }
   },
   "$defs": {
+    "QualityCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "test"
+      ],
+      "properties": {
+        "test": {
+          "type": "string",
+          "enum": [
+            "fresh",
+            "volume",
+            "notNull",
+            "distinctBetween"
+          ]
+        },
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "min": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "test": {
+                "enum": [
+                  "notNull",
+                  "distinctBetween"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "field"
+            ]
+          }
+        }
+      ]
+    },
     "StringList": {
       "type": "array",
       "items": {
@@ -110,6 +159,13 @@
         },
         "classifications": {
           "$ref": "#/$defs/StringList"
+        },
+        "qualityChecks": {
+          "description": "Data quality checks evaluated against the sampled field profile and health measurements at build time.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/QualityCheck"
+          }
         },
         "stopsClassifications": {
           "description": "Classifications this object does not pass on to the data derived from it (for example a search that masks or hashes them). A parent stops its children (PII stops PII.Email); \"*\" stops all.",
@@ -190,6 +246,18 @@
         },
         "related": {
           "$ref": "#/$defs/StringList"
+        },
+        "fields": {
+          "description": "Field names that carry this term in any sourcetype (for example src_ip, src, clientip). Fields get the term without annotating each one.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "owner": {
+          "description": "Team that owns the definition.",
+          "type": "string"
         }
       }
     },

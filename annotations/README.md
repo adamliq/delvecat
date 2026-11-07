@@ -66,6 +66,43 @@ dataProducts:
       - match: {type: correlationSearch, name: "ESCU - *"}
 ```
 
+## Glossary terms for fields
+
+A glossary term can list the field names that carry it in any sourcetype, so
+"Source address" finds `src_ip`, `src` and `clientip` everywhere without
+annotating each field. The term page lists those fields per sourcetype and
+warns when the same field name is a number in one sourcetype and text in
+another:
+
+```yaml
+glossary:
+  - term: Source address
+    description: The network address that started the activity.
+    owner: network-engineering
+    fields: [src_ip, src, clientip]
+```
+
+## Data quality checks
+
+Checks run when the catalog is built, against the sampled field profile and
+the health measurements (no extra searches). Built in: "not null" for every
+sourcetype field a detection reads, plus freshness and volume where they can
+be judged. Add more on any entry:
+
+```yaml
+annotations:
+  - id: acme:sourcetype:acme:fw
+    qualityChecks:
+      - {test: notNull, field: dest_ip, min: 0.99}       # present in 99% of events
+      - {test: distinctBetween, field: action, min: 2, max: 5}
+      - {test: fresh}                                    # health freshness passes
+      - {test: volume}                                   # health volume passes
+```
+
+A check that cannot be judged (field not sampled) shows as "not measured".
+Failing checks other than freshness and volume put what depends on the data
+at risk.
+
 ## Structured properties
 
 Typed fields your team defines, validated at build time (see

@@ -1,3 +1,4 @@
+import { SourcetypeFieldLineage } from "./SourcetypeFieldLineage";
 import { ColumnLineage } from "./ColumnLineage";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -143,6 +144,8 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
       </section>
 
       <ColumnLineage catalog={catalog} entity={entity} />
+
+      {entity.type === "sourcetype" && <SourcetypeFieldLineage catalog={catalog} entity={entity} />}
 
       <section className="rel-grid">
         <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}

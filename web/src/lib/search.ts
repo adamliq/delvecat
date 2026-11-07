@@ -25,6 +25,7 @@ export const FACETS = {
   },
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   missing: (e: Entity) => e.annotations?.missingProperties ?? [],
+  quality: (e: Entity) => (!e.quality ? [] : e.quality.failed ? ["failing checks"] : ["all checks passing"]),
   issue: (e: Entity) => [
     ...(e.lineage?.unresolved?.length ? ["broken reference"] : []),
     ...(e.lineage?.implicitIndex ? ["no index specified"] : []),

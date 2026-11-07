@@ -32,7 +32,7 @@ const DEPENDS: Partial<Record<EdgeType, "fromNeedsTo" | "toNeedsFrom">> = {
 export type Severity = "warning" | "critical";
 
 export interface Problem {
-  kind: "health" | "brokenReference" | "disabled";
+  kind: "health" | "brokenReference" | "disabled" | "quality";
   severity: Severity;
   summary: string;
 }
@@ -63,6 +63,12 @@ export function problems(e: Entity): Problem[] {
     out.push({ kind: "brokenReference", severity: "warning", summary: `missing ${missing.join(", ")}` });
   }
   if (e.disabled) out.push({ kind: "disabled", severity: "warning", summary: "disabled" });
+  for (const t of e.quality?.tests ?? []) {
+    // Freshness and volume failures are already health findings.
+    if (t.status === "fail" && t.test !== "fresh" && t.test !== "volume") {
+      out.push({ kind: "quality", severity: "warning", summary: `data quality: ${t.field ?? ""} ${t.result}`.replace(/\s+/g, " ") });
+    }
+  }
   return out;
 }
 

@@ -3,7 +3,24 @@ import type { Entity, GlossaryTerm } from "../generated/catalog";
 import { EntityRow } from "../components/EntityBits";
 import { parseSource } from "../lib/annotate";
 import { useCatalog } from "../lib/CatalogContext";
-import { glossaryPath } from "../lib/routes";
+import type { Catalog } from "../lib/catalog";
+import { fieldName } from "../lib/fieldLineage";
+import { fieldsOfTerm } from "../lib/glossaryFields";
+import { effectiveClassifications } from "../lib/governance";
+import { entityPath, glossaryPath } from "../lib/routes";
+import { fieldType, nullRate } from "../lib/schema";
+
+/** Fields that carry a term, with the field names typed differently across sourcetypes. */
+function termFields(catalog: Catalog, def: GlossaryTerm) {
+  const fields = fieldsOfTerm(catalog, def).sort((a, b) => fieldName(a).localeCompare(fieldName(b)) || a.name.localeCompare(b.name));
+  const types = new Map<string, Set<string>>();
+  for (const f of fields) {
+    const t = fieldType(f);
+    if (t !== "unknown") types.set(fieldName(f), (types.get(fieldName(f)) ?? new Set()).add(t));
+  }
+  const inconsistent = [...types.entries()].filter(([, t]) => t.size > 1).map(([n]) => n);
+  return { fields, inconsistent, sourcetypes: new Set(fields.map((f) => String((f.properties as { sourcetype?: string })?.sourcetype))) };
+}
 
 function usage(entities: Entity[]): Map<string, Entity[]> {
   const map = new Map<string, Entity[]>();
@@ -43,6 +60,7 @@ export function GlossaryPage() {
             <p className="muted">This term is used on objects but not defined in the glossary yet.</p>
           )}
           {def?.synonyms?.length ? <p className="small">Also called: {def.synonyms.join(", ")}</p> : null}
+          {def?.owner ? <p className="small">Owned by {def.owner}</p> : null}
           {def?.related?.length ? (
             <p className="small">Related: {def.related.map((r, i) => (
               <span key={r}>{i > 0 && ", "}<Link to={glossaryPath(r)}>{r}</Link></span>
@@ -56,6 +74,7 @@ export function GlossaryPage() {
             </p>
           )}
         </div>
+        {def && <TermFields catalog={catalog} def={def} />}
         <section>
           <h2>Objects using this term ({entities.length})</h2>
           <ul className="entity-list">{entities.map((e) => <EntityRow key={e.id} entity={e} />)}</ul>
@@ -80,7 +99,10 @@ export function GlossaryPage() {
       <dl className="glossary">
         {glossary.map((t) => (
           <div key={t.term} className="glossary-item">
-            <dt><Link to={glossaryPath(t.term)}>{t.term}</Link> <span className="muted small">{count(t)} objects</span></dt>
+            <dt>
+              <Link to={glossaryPath(t.term)}>{t.term}</Link> <span className="muted small">{count(t)} objects{t.fields?.length ? `, ${termFields(catalog, t).fields.length} fields` : ""}{t.owner ? `, owned by ${t.owner}` : ""}</span>
+              {termFields(catalog, t).inconsistent.length > 0 && <> <span className="status-label status-warning">! Inconsistent type: {termFields(catalog, t).inconsistent.join(", ")}</span></>}
+            </dt>
             <dd>{t.description ?? <span className="muted">No definition.</span>}</dd>
           </div>
         ))}
@@ -97,5 +119,43 @@ export function GlossaryPage() {
         </section>
       )}
     </div>
+  );
+}
+
+function TermFields({ catalog, def }: { catalog: Catalog; def: GlossaryTerm }) {
+  const { fields, inconsistent, sourcetypes } = termFields(catalog, def);
+  if (!fields.length && !def.fields?.length) return null;
+  return (
+    <section>
+      <h2>Fields ({fields.length} in {sourcetypes.size} sourcetypes)</h2>
+      {def.fields?.length ? <p className="muted small">Field names that carry this term: {def.fields.map((n, i) => <span key={n}>{i > 0 && ", "}<code>{n}</code></span>)}</p> : null}
+      {inconsistent.length > 0 && (
+        <p><span className="status-label status-warning">! Inconsistent type</span> {inconsistent.map((n, i) => <span key={n}>{i > 0 && ", "}<code>{n}</code></span>)}{" "}
+          {inconsistent.length === 1 ? "is" : "are"} a number in some sourcetypes and text in others, so searches comparing values may miss events.</p>
+      )}
+      {fields.length === 0 ? <p className="muted">No sampled sourcetype has these fields.</p> : (
+        <div className="table-wrap">
+          <table className="mini-table">
+            <thead><tr><th>Sourcetype</th><th>Field</th><th>Type</th><th>Null rate</th><th>Sensitive</th></tr></thead>
+            <tbody>
+              {fields.map((f) => {
+                const st = String((f.properties as { sourcetype?: string })?.sourcetype ?? "");
+                const nr = nullRate(f);
+                const t = fieldType(f);
+                return (
+                  <tr key={f.id}>
+                    <td><Link to={`${entityPath(`${f.instance}:sourcetype:${st}`)}?tab=fields`}>{st}</Link></td>
+                    <td><Link to={entityPath(f.id)}><code>{fieldName(f)}</code></Link></td>
+                    <td>{t === "unknown" ? "config" : t}{inconsistent.includes(fieldName(f)) && <span className="status-label status-warning small"> ! differs</span>}</td>
+                    <td className="num">{nr === undefined ? "—" : `${Math.round(nr * 1000) / 10}%`}</td>
+                    <td>{effectiveClassifications(f).filter((c) => c.sensitive).map((c) => c.name).join(", ") || <span className="muted">—</span>}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }

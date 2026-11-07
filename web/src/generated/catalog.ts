@@ -213,6 +213,25 @@ export interface Entity {
     fields?: FieldLineage;
   };
   /**
+   * Data quality check results (derived; never changes the catalog version).
+   */
+  quality?: {
+    passed: number;
+    failed: number;
+    tests: {
+      test: string;
+      field?: string;
+      expectation: string;
+      result: string;
+      status: "pass" | "fail" | "unknown";
+      /**
+       * default, or the annotation file:line that defined it
+       */
+      source: string;
+      why?: string;
+    }[];
+  };
+  /**
    * How people and the scheduler use the object, from _audit and _internal. Derived; never changes the catalog version.
    */
   usage?: {
@@ -269,6 +288,13 @@ export interface Annotations {
    * e.g. PII.Email, Confidential, MITRE.T1078
    */
   classifications?: string[];
+  qualityChecks?: {
+    test: string;
+    field?: string;
+    min?: number;
+    max?: number;
+    source?: string;
+  }[];
   /**
    * Classifications this object does not pass on to data derived from it; "*" stops all.
    */
@@ -382,6 +408,11 @@ export interface GlossaryTerm {
   description?: string;
   synonyms?: string[];
   related?: string[];
+  /**
+   * Field names that carry this term in any sourcetype.
+   */
+  fields?: string[];
+  owner?: string;
   source?: string;
 }
 /**

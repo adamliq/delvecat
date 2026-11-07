@@ -5,7 +5,9 @@ import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
 import { GovernancePanel } from "../components/GovernancePanel";
 import { PropertiesPanel } from "../components/PropertiesPanel";
+import { QualityTab } from "../components/QualityTab";
 import { RelationGraph } from "../components/RelationGraph";
+import { SchemaTab } from "../components/SchemaTab";
 import { BlastRadius, RiskBanner } from "../components/RiskPanel";
 import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
@@ -59,7 +61,7 @@ function Group({ group }: { group: RelationGroup }) {
   );
 }
 
-type Tab = "overview" | "fields" | "fieldsUsed" | "lineage" | "relationships" | "annotations" | "raw";
+type Tab = "overview" | "fields" | "fieldsUsed" | "quality" | "lineage" | "relationships" | "annotations" | "raw";
 
 export function EntityPage() {
   const { id = "" } = useParams();
@@ -90,6 +92,9 @@ export function EntityPage() {
   const tabs: [Tab, string][] = [
     ["overview", "Overview"],
     ...(fields ? [["fields", `Fields (${fields.rows.length})`] as [Tab, string]] : []),
+    ...(entity.quality
+      ? [["quality", entity.quality.failed ? `Data quality ✕ ${entity.quality.failed}` : "Data quality"] as [Tab, string]]
+      : []),
     ...(entity.lineage?.fields && entity.type !== "field"
       ? [["fieldsUsed", `Fields used (${entity.lineage.fields.used.length})`] as [Tab, string]]
       : []),
@@ -226,9 +231,11 @@ export function EntityPage() {
         </div>
       )}
 
-      {tab === "fields" && fields && <FieldsTab table={fields} />}
+      {tab === "fields" && (entity.type === "sourcetype" ? <SchemaTab catalog={catalog} entity={entity} /> : fields && <FieldsTab table={fields} />)}
 
       {tab === "fieldsUsed" && <SearchFieldsTab catalog={catalog} entity={entity} />}
+
+      {tab === "quality" && <QualityTab entity={entity} />}
 
       {tab === "lineage" && <LineageTab catalog={catalog} entity={entity} />}
 

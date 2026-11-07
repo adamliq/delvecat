@@ -12,6 +12,7 @@
     "gen:types": "json2ts -i ../schemas/catalog.schema.json -o src/generated/catalog.ts --bannerComment \"/* Generated from schemas/catalog.schema.json by npm run gen:types. Do not edit. */\" --additionalProperties false"
   },
   "dependencies": {
+    "d3-force": "3.0.0",
     "minisearch": "^7.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -19,6 +20,7 @@
     "sql.js": "1.15.1"
   },
   "devDependencies": {
+    "@types/d3-force": "3.0.10",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/sql.js": "1.4.11",

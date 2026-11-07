@@ -480,6 +480,41 @@ are confirmed against a live instance before their connector ships.
   linked (no entities for them yet); wildcards and `$token$` field names are
   skipped; `spath` and automatic key-value fields are taken by name.
 
+### Schema catalog features (done)
+
+From a standalone "Sourcetype schema catalog" prototype (mock data), rebuilt
+on real catalog data:
+
+- Schema model (`web/src/lib/schema.ts`): field type from sampling (number /
+  text, or config for props.conf-only fields), null rate (1 - fill rate),
+  sourcetype -> data model through CIM tags or direct reads, CIM coverage
+  using the data model's own field list or, when it has none, a labelled CIM
+  5.x reference subset (`cimReference.ts`), Jaccard similarity, comparison.
+- Sourcetype Fields tab: summary strip (fields, data models, CIM coverage,
+  sensitive fields), type / CIM / sensitive filters, null-rate and distinct
+  meters, classification and CIM tags, glossary terms, used by; most similar
+  schemas with Compare links.
+- Compare page (`/compare`): same type / type differs / only A / only B,
+  tall segmented overlap bar, field-by-field table.
+- Schemas page (`/schemas`): filters (search over sourcetypes, fields and
+  terms; data model; owner; minimum CIM coverage), sourcetype table, and a
+  d3-force network of sourcetypes and shared fields (or sourcetype overlap)
+  with inconsistent types flagged and a detail panel.
+- Sourcetype field lineage on the Lineage tab: fields -> data model fields ->
+  readers, with "stops here" fields.
+- Glossary terms list `fields`; term pages show them per sourcetype with an
+  inconsistent-type warning; terms can have an `owner`.
+- Data quality checks (`quality.py`): notNull, distinctBetween, fresh,
+  volume; built in for detection fields, and as code via `qualityChecks`;
+  results in `entity.quality` (derived), a Data quality tab, a search facet,
+  and failing checks count as risk causes.
+- Insights: KPI tiles with targets, fields by classification (segmented bar),
+  distribution per fixed-value structured property (tier), assets by owner
+  with health.
+- Not taken: version timelines and 30-day trends (need build history), sample
+  events, top values and histograms (need new searches and redaction rules),
+  vendor facet.
+
 ### Visualizations (done)
 
 Ideas from the other catalogs (Marquez and ODD run-state nodes, Atlas

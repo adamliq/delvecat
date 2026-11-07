@@ -406,6 +406,33 @@
             }
           }
         },
+        "quality": {
+          "description": "Data quality check results (derived; never changes the catalog version).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tests", "passed", "failed"],
+          "properties": {
+            "passed": {"type": "integer"},
+            "failed": {"type": "integer"},
+            "tests": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["test", "expectation", "result", "status", "source"],
+                "properties": {
+                  "test": {"type": "string"},
+                  "field": {"type": "string"},
+                  "expectation": {"type": "string"},
+                  "result": {"type": "string"},
+                  "status": {"type": "string", "enum": ["pass", "fail", "unknown"]},
+                  "source": {"description": "default, or the annotation file:line that defined it", "type": "string"},
+                  "why": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
         "usage": {
           "description": "How people and the scheduler use the object, from _audit and _internal. Derived; never changes the catalog version.",
           "type": "object",
@@ -833,6 +860,21 @@
             "type": "string"
           }
         },
+        "qualityChecks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test"],
+            "properties": {
+              "test": {"type": "string"},
+              "field": {"type": "string"},
+              "min": {"type": "number"},
+              "max": {"type": "number"},
+              "source": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
         "stopsClassifications": {
           "description": "Classifications this object does not pass on to data derived from it; \"*\" stops all.",
           "type": "array",
@@ -918,6 +960,16 @@
           "items": {
             "type": "string"
           }
+        },
+        "fields": {
+          "description": "Field names that carry this term in any sourcetype.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "owner": {
+          "type": "string"
         },
         "source": {
           "type": "string"
