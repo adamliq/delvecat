@@ -5,6 +5,9 @@ import { EntityRow } from "../components/EntityBits";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel } from "../lib/labels";
 import { type Facet, type Filters, type Sort } from "../lib/search";
+import { exportFileName, resultRows } from "../lib/exportResults";
+import { downloadText, toCsv } from "../lib/health";
+import { riskMap } from "../lib/risk";
 import { label, propertyDefs } from "../lib/structured";
 
 const PAGE = 50;
@@ -110,6 +113,9 @@ export function SearchPage() {
       const updated = values.includes(value) ? values.filter((v) => v !== value) : [...values, value];
       updated.forEach((v) => next.append(facet, v));
     });
+  const exportCsv = () => downloadText(exportFileName(q), toCsv(resultRows(results, {
+    instanceNames, defs: propertyDefs(catalog.bundle), risk: riskMap(catalog), baseUrl: window.location.href.split("#")[0],
+  })));
   const clearAll = () => update((next) => FACET_NAMES.forEach((f) => next.delete(f)));
 
   const facetPanel = (
@@ -148,15 +154,21 @@ export function SearchPage() {
           <span className="muted">
             {results.length.toLocaleString()} result{results.length === 1 ? "" : "s"}
           </span>
-          <label className="sort">
-            Sort
-            <select value={sort} onChange={(e) => update((next) => next.set("sort", e.target.value))}>
-              <option value="relevance">{q ? "Relevance" : "Name"}</option>
-              <option value="name">Name</option>
-              <option value="type">Type</option>
-              <option value="updated">Recently updated in Splunk</option>
-            </select>
-          </label>
+          <div className="results-actions">
+            <button type="button" className="btn btn-small" onClick={exportCsv} disabled={!results.length}
+              title="Every result, with annotations, health and structured properties">
+              Download CSV
+            </button>
+            <label className="sort">
+              Sort
+              <select value={sort} onChange={(e) => update((next) => next.set("sort", e.target.value))}>
+                <option value="relevance">{q ? "Relevance" : "Name"}</option>
+                <option value="name">Name</option>
+                <option value="type">Type</option>
+                <option value="updated">Recently updated in Splunk</option>
+              </select>
+            </label>
+          </div>
         </div>
         <ul className="entity-list">
           {results.slice(0, limit).map((e) => <EntityRow key={e.id} entity={e} />)}

@@ -299,3 +299,5 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .risk-banner p { margin: 0 0 6px; }
 .risk-banner ul { margin: 0; }
 .risk-banner li + li { margin-top: 4px; }
+.results-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.results-actions .btn-small { margin-top: 0; }

@@ -450,6 +450,16 @@ are confirmed against a live instance before their connector ships.
   a link to the objects missing a required value. "Suggest an edit" snippets
   include the properties with empty placeholders for missing required ones.
 
+### Search results export (done)
+
+- "Download CSV" on Browse exports every result of the current search and
+  filters, in the current sort: identity, product, app, sharing, status,
+  description, domain, data products, owners, tags, classifications, glossary
+  terms, health and findings, at-risk severity and causes, usage, Splunk and
+  catalog links, and one column per structured property.
+- All CSV exports defuse spreadsheet formulas (text starting with = + - @ gets
+  a leading apostrophe) and start with a byte-order mark so Excel reads UTF-8.
+
 ### Downstream at-risk alerts (done)
 
 - From OpenDataDiscovery's alert propagation. Computed in the web app from

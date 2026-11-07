@@ -9,6 +9,10 @@ describe("health helpers", () => {
   it("quotes CSV values", () => {
     expect(toCsv([["a", 'b "c"', undefined], [1, "x,y", "z"]])).toBe('"a","b ""c""",""\n"1","x,y","z"\n');
   });
+  it("defuses spreadsheet formulas in text but keeps negative numbers", () => {
+    expect(toCsv([["=HYPERLINK(\"x\")", "@SUM(1)", "+1", "-cmd", "\tx", -5, "a=b"]]))
+      .toBe(`"'=HYPERLINK(""x"")","'@SUM(1)","'+1","'-cmd","'\tx","-5","a=b"\n`);
+  });
   it("labels days from a start date across month ends", () => {
     expect(dayLabel("2026-10-30", 0)).toBe("2026-10-30");
     expect(dayLabel("2026-10-30", 3)).toBe("2026-11-02");

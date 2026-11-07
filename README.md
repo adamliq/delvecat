@@ -27,7 +27,7 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    (`--redact-profile public`) before publishing.
 6. **Domains** and **data products** group objects by business area, with
    roll-ups of health, sensitivity and documentation per domain and product.
-   Upstream and impact lists can be filtered and exported to CSV.
+   Upstream and impact lists, and any search result set, can be exported to CSV.
    **Structured properties** add typed, validated fields (retention tier,
    compliance scope, review date...) with search filters and coverage.
    **At-risk alerts** flag objects that depend, directly or through other
