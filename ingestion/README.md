@@ -91,6 +91,14 @@ of global objects (indexes, sourcetypes, hosts, SOAR labels) are matched
 across instances; an index name configured on several indexer clusters links
 to all of them. Merge unredacted bundles and redact the result.
 
+### From PowerShell
+
+`../scripts/Build-Catalog.ps1 -Config catalog.psd1` builds every instance in a
+config file ([example](../scripts/catalog.example.psd1)) and merges them as
+above, with annotations, redaction, `--previous` and `--shard` applied to the
+merge. Tokens are read from environment variables (or asked for without
+echoing) and passed to `delvecat-ingest` only through its environment.
+
 ## Publishing safely
 
 Bundles can be redacted before they go anywhere public:

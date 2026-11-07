@@ -84,6 +84,18 @@ Several instances (search heads, indexers, Deployment Server, SOAR, ...): build
 each with its own `--instance` and combine them with `delvecat-ingest merge`.
 See [ingestion/README.md](ingestion/README.md) for all options.
 
+On Windows, `scripts/Build-Catalog.ps1` does the same from PowerShell (5.1 or
+7): one instance from parameters, or several from a config file
+([example](scripts/catalog.example.psd1)), merged, with the previous catalog
+reused and replaced only when the build succeeds:
+
+```powershell
+$env:DELVECAT_SPLUNK_TOKEN = '...'   # or leave unset to be asked
+.\scripts\Build-Catalog.ps1 -Url https://splunk.example.com:8089 -Instance prod -Fields
+.\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -Strict
+Get-Help .\scripts\Build-Catalog.ps1 -Full
+```
+
 ### Local Splunk for development
 
 ```bash
