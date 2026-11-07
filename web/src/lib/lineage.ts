@@ -175,3 +175,28 @@ export function hasLineage(catalog: Catalog, id: string): boolean {
   const f = flow(catalog);
   return Boolean(f.up.get(id)?.length || f.down.get(id)?.length);
 }
+
+/**
+ * Is there an upstream object (within ``maxDepth`` hops) that satisfies ``test``?
+ * Breadth-first and stops at the first match, so it does not build the whole
+ * upstream set (which on large catalogs reaches much of the graph).
+ */
+export function anyUpstream(catalog: Catalog, id: string, maxDepth: number, test: (e: Entity) => boolean): boolean {
+  const up = flow(catalog).up;
+  const seen = new Set([id]);
+  let frontier = [id];
+  for (let d = 1; d <= maxDepth && frontier.length; d++) {
+    const next: string[] = [];
+    for (const n of frontier) {
+      for (const e of up.get(n) ?? []) {
+        if (seen.has(e.from)) continue;
+        seen.add(e.from);
+        const ent = catalog.byId.get(e.from);
+        if (ent && test(ent)) return true;
+        next.push(e.from);
+      }
+    }
+    frontier = next;
+  }
+  return false;
+}

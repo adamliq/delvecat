@@ -128,9 +128,12 @@ export function usagePercentile(catalog: Catalog, e: Entity): number | undefined
     }
     for (const list of byType.values()) {
       if (list.length < 5) continue;
-      for (const item of list) {
-        const below = list.filter((o) => o.score < item.score).length;
-        cache.set(item.id, Math.round((100 * below) / list.length));
+      // Sorted once: everything before the first equal score is "below" (O(n log n)).
+      list.sort((a, b) => a.score - b.score);
+      let below = 0;
+      for (let i = 0; i < list.length; i++) {
+        if (i > 0 && list[i].score !== list[i - 1].score) below = i;
+        cache.set(list[i].id, Math.round((100 * below) / list.length));
       }
     }
     pctCache.set(catalog, cache);

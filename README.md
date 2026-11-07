@@ -56,6 +56,11 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    [`annotations/`](annotations/README.md) as YAML and change through pull
    requests. Each entity page links to "suggest an edit" on GitHub.
 
+
+Tested at the size of a large estate (88,000 objects, 292,000 relationships):
+first load in about 3 seconds, every page under a second except the SQL
+console. See [docs/PERFORMANCE.md](docs/PERFORMANCE.md) and `make perf`.
+
 ## Quick start
 
 Requires [uv](https://docs.astral.sh/uv/) and Node 22+.

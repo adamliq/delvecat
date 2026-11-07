@@ -8,7 +8,7 @@ import { entityPath } from "../lib/routes";
 export function GovernancePanel({ catalog, entity }: { catalog: Catalog; entity: Entity }) {
   const classes = effectiveClassifications(entity);
   const a = access(entity);
-  const reach = sensitiveAccess(entity);
+  const reach = sensitiveAccess(entity, catalog);
   const reads = readsClassified(entity);
   const stops = stoppedClassifications(entity);
   if (!classes.length && !a && !reach.length && !reads.length && !stops.length) return null;

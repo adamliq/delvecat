@@ -52,11 +52,18 @@ def _taxonomy(bundle: dict[str, Any]):
                 return d
         return {}
 
+    cache: dict[str, dict[str, Any]] = {}
+
+    def cached(name: str) -> dict[str, Any]:
+        if name not in cache:
+            cache[name] = lookup(name)
+        return cache[name]
+
     def sensitive(name: str) -> bool:
-        return lookup(name).get("sensitive", True)
+        return cached(name).get("sensitive", True)
 
     def propagates(name: str) -> bool:
-        return lookup(name).get("propagate", True)
+        return cached(name).get("propagate", True)
 
     return sensitive, propagates
 
@@ -177,8 +184,19 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         if edge["type"] == "grantsAccess":
             grants[edge["from"]].add(edge["to"])
 
+    sensitive_cache: dict[str, list[str]] = {}
+
     def sensitive_classes(eid: str) -> list[str]:
-        return sorted(c for c in found.get(eid, {}) if sensitive(c))
+        if eid not in sensitive_cache:
+            sensitive_cache[eid] = sorted(c for c in found.get(eid, {}) if sensitive(c))
+        return sensitive_cache[eid]
+
+    # Classified lookups and KV collections with their readers, found once (not per role).
+    readable_stores = [
+        (e["id"], cls, set((e.get("permissions") or {}).get("read", [])))
+        for e in entities
+        if e["type"] in ("lookup", "kvCollection") and (cls := sensitive_classes(e["id"]))
+    ]
 
     # access to sensitive stores
     store_access: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -193,15 +211,10 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
                 entry = {"id": idx, "classifications": cls, "how": "search", "filtered": filtered}
                 role_access[rid].append(entry)
                 store_access[idx].append({"role": rid, "filtered": filtered})
-        for e in entities:
-            if e["type"] not in ("lookup", "kvCollection") or not (
-                cls := sensitive_classes(e["id"])
-            ):
-                continue
-            readers = set((e.get("permissions") or {}).get("read", []))
+        for sid, cls, readers in readable_stores:
             if "*" in readers or readers & names:
-                role_access[rid].append({"id": e["id"], "classifications": cls, "how": "read"})
-                store_access[e["id"]].append({"role": rid, "filtered": False})
+                role_access[rid].append({"id": sid, "classifications": cls, "how": "read"})
+                store_access[sid].append({"role": rid, "filtered": False})
 
     members: dict[str, set[str]] = defaultdict(set)  # role id -> user ids
     for edge in edges:
@@ -239,17 +252,15 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         }
     for rid, access in role_access.items():
         by_id[rid].setdefault("governance", {})["sensitiveAccess"] = access
+    # A user's reach is the union of their roles' (which already include inherited
+    # roles). It is not copied onto every user: on large estates that duplicated most
+    # of the bundle. The web app derives it from the roles.
     for u in [e for e in entities if e["type"] == "user"]:
-        held = {edge["to"] for edge in out_edges[u["id"]] if edge["type"] == "memberOf"}
-        reach: dict[str, dict[str, Any]] = {}
-        for rid in held:
-            for a in role_access.get(rid, []):
-                item = reach.setdefault(a["id"], {**a, "viaRoles": []})
-                item["viaRoles"].append(rid)
-        if reach:
-            u.setdefault("governance", {})["sensitiveAccess"] = sorted(
-                reach.values(), key=lambda a: a["id"]
-            )
+        gov = u.get("governance")
+        if gov is not None:
+            gov.pop("sensitiveAccess", None)
+            if not gov:
+                u.pop("governance")
 
     summary = {
         "classifiedObjects": len(found),

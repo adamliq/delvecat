@@ -480,6 +480,16 @@ are confirmed against a live instance before their connector ships.
   linked (no entities for them yet); wildcards and `$token$` field names are
   skipped; `spath` and automatic key-value fields are taken by name.
 
+### Performance at scale (done)
+
+- `delvecat-ingest synth` generates a realistic ~100k-object catalog through
+  the real pipeline; `make perf` times every page in headless Chromium.
+- Fixed: large sharded catalogs failing to load (argument spread overflow),
+  per-detection upstream walks on Home/Coverage, unbounded Governance and
+  Schemas rendering, O(n²) usage percentiles, users duplicating their roles'
+  access, SPL character scanning, governance loops and propagation. Results
+  and remaining limits in docs/PERFORMANCE.md.
+
 ### Schema catalog features (done)
 
 From a standalone "Sourcetype schema catalog" prototype (mock data), rebuilt

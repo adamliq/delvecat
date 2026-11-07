@@ -41,6 +41,13 @@ const files: Record<string, string> = { "entities/mixed.json": entitiesShard, "e
 const read = async (s: { path: string }) => enc.encode(files[s.path]).buffer as ArrayBuffer;
 
 describe("inlineShards", () => {
+  it("loads shards far larger than the call stack allows to spread (300,000 edges)", async () => {
+    const big = JSON.stringify({ edges: Array.from({ length: 300_000 }, (_, i) => ({ from: `i:host:h${i}`, to: "i:index:fw", type: "feeds" })) });
+    const m: CatalogBundle = { ...manifest, shards: [{ path: "edges.json", kind: "edges", count: 300_000, sha256: await sha(big) }] };
+    const b = await inlineShards(m, async () => enc.encode(big).buffer as ArrayBuffer);
+    expect(b.edges).toHaveLength(300_000);
+  });
+
   it("loads and verifies shards", async () => {
     const b = await inlineShards(manifest, read);
     expect(b.entities).toHaveLength(3);

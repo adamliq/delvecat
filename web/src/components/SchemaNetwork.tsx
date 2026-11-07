@@ -18,10 +18,19 @@ interface Node extends SimulationNodeDatum {
   colorSlot?: number; // 1-3, or undefined for "other / not mapped"
   members?: { st: Entity; field: Entity }[];
   inconsistent?: boolean;
+  labelled?: boolean;
 }
 interface Edge { source: string | Node; target: string | Node; weight: number; shared?: string[] }
 
 const W = 900;
+/** Beyond this a force layout is unreadable (and slow): show the sourcetypes with most fields. */
+export const MAX_SOURCETYPES = 60;
+/** Field nodes shown: the most shared, so the graph stays legible. */
+export const MAX_FIELDS = 40;
+/** Field names labelled; the rest are named on hover and in the detail panel. */
+const LABELLED_FIELDS = 20;
+/** In overlap mode keep each sourcetype's strongest links only. */
+const LINKS_PER_NODE = 3;
 const H = 560;
 const truncate = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
@@ -38,14 +47,18 @@ export function modelSlots(catalog: Catalog, sts: Entity[]): Map<string, number>
  * by how many fields they share (overlap mode). Laid out once with a force
  * simulation; hover or focus a node to see its neighbors, select it for details.
  */
-export function SchemaNetwork({ catalog, sourcetypes, mode, minShared }: {
+export function SchemaNetwork({ catalog, sourcetypes: all, mode, minShared }: {
   catalog: Catalog; sourcetypes: Entity[]; mode: NetworkMode; minShared: number;
 }) {
+  const sourcetypes = useMemo(() => all.length <= MAX_SOURCETYPES ? all
+    : [...all].sort((a, b) => schemaFields(catalog, b).length - schemaFields(catalog, a).length || a.name.localeCompare(b.name)).slice(0, MAX_SOURCETYPES),
+  [catalog, all]);
   const [hover, setHover] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const slots = useMemo(() => modelSlots(catalog, sourcetypes), [catalog, sourcetypes]);
 
-  const { nodes, edges } = useMemo(() => {
+  const { nodes, edges, hiddenFields } = useMemo(() => {
+    let hiddenFields = 0;
     const fieldsOf = new Map(sourcetypes.map((s) => [s.id, schemaFields(catalog, s)]));
     const nodes: Node[] = sourcetypes.map((s) => {
       const model = dataModelsOf(catalog, s).find((m) => slots.has(m.name));
@@ -58,18 +71,28 @@ export function SchemaNetwork({ catalog, sourcetypes, mode, minShared }: {
         const n = fieldName(f);
         byName.set(n, [...(byName.get(n) ?? []), { st: s, field: f }]);
       }
-      for (const [name, members] of byName) {
-        if (members.length < minShared) continue;
+      const shared = [...byName].filter(([, members]) => members.length >= minShared)
+        .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+      shared.slice(0, MAX_FIELDS).forEach(([name, members], rank) => {
         const types = new Set(members.map((m) => fieldType(m.field)).filter((t) => t !== "unknown"));
-        nodes.push({ id: `field:${name}`, kind: "field", label: name, r: 3 + members.length, members, inconsistent: types.size > 1 });
+        nodes.push({ id: `field:${name}`, kind: "field", label: name, r: Math.min(14, 3 + Math.sqrt(members.length) * 1.5), members,
+          inconsistent: types.size > 1, labelled: rank < LABELLED_FIELDS });
         for (const m of members) edges.push({ source: m.st.id, target: `field:${name}`, weight: 1 });
-      }
+      });
+      hiddenFields = Math.max(0, shared.length - MAX_FIELDS);
     } else {
       const names = new Map(sourcetypes.map((s) => [s.id, new Set(fieldsOf.get(s.id)!.map(fieldName))]));
+      const candidates: Edge[] = [];
       for (let i = 0; i < sourcetypes.length; i++) for (let j = i + 1; j < sourcetypes.length; j++) {
         const sim = similarity(names.get(sourcetypes[i].id)!, names.get(sourcetypes[j].id)!);
-        if (sim.shared.length >= minShared) edges.push({ source: sourcetypes[i].id, target: sourcetypes[j].id, weight: sim.shared.length, shared: sim.shared });
+        if (sim.shared.length >= minShared) candidates.push({ source: sourcetypes[i].id, target: sourcetypes[j].id, weight: sim.shared.length, shared: sim.shared });
       }
+      // Keep a link when it is among the strongest few of either end, so the graph stays readable.
+      const best = new Map<string, number>();
+      const byNode = new Map<string, number[]>();
+      for (const e of candidates) for (const id of [e.source as string, e.target as string]) byNode.set(id, [...(byNode.get(id) ?? []), e.weight]);
+      for (const [id, ws] of byNode) best.set(id, ws.sort((a, b) => b - a)[Math.min(LINKS_PER_NODE, ws.length) - 1]);
+      for (const e of candidates) if (e.weight >= best.get(e.source as string)! || e.weight >= best.get(e.target as string)!) edges.push(e);
     }
     const sim = forceSimulation(nodes)
       .force("link", forceLink<Node, Edge>(edges).id((d) => d.id).distance((e) => (mode === "fields" ? 55 : 190 - Math.min(120, e.weight * 8))).strength(mode === "fields" ? 0.5 : 0.3))
@@ -83,7 +106,7 @@ export function SchemaNetwork({ catalog, sourcetypes, mode, minShared }: {
       n.x = Math.max(n.r + 4, Math.min(W - n.r - 4, n.x ?? W / 2));
       n.y = Math.max(n.r + 4, Math.min(H - n.r - 4, n.y ?? H / 2));
     }
-    return { nodes, edges };
+    return { nodes, edges, hiddenFields };
   }, [catalog, sourcetypes, mode, minShared, slots]);
 
   const node = (e: Edge, end: "source" | "target") => e[end] as Node;
@@ -101,6 +124,13 @@ export function SchemaNetwork({ catalog, sourcetypes, mode, minShared }: {
 
   return (
     <div className="stack">
+      {(all.length > sourcetypes.length || hiddenFields > 0) && (
+        <p className="muted small">
+          {all.length > sourcetypes.length && <>Showing the {sourcetypes.length} sourcetypes with the most fields, of {all.length.toLocaleString()} that match. </>}
+          {hiddenFields > 0 && <>Showing the {MAX_FIELDS} most shared fields ({hiddenFields} more not drawn). </>}
+          Filter by data model, owner or search, or raise "shared by at least", to see others.
+        </p>
+      )}
       <div className="network-box">
         <svg viewBox={`0 0 ${W} ${H}`} className="network-svg" role="img" aria-label={mode === "fields" ? "Network of sourcetypes and the field names they share" : "Network of sourcetypes linked by shared fields"}>
           {edges.map((e, i) => {
@@ -122,7 +152,10 @@ export function SchemaNetwork({ catalog, sourcetypes, mode, minShared }: {
                 <circle r={Math.max(n.r + 6, 12)} className="net-hit" />
                 <circle r={n.r} className={cls} />
                 {n.inconsistent && <text className="net-glyph" y={3.5} textAnchor="middle">!</text>}
-                <text x={n.r + 4} y={4} className={`net-label${n.kind === "field" ? " net-label-field" : ""}`}>{truncate(n.label, 24)}</text>
+                <title>{n.kind === "st" ? n.label : `${n.label}: in ${n.members!.length} sourcetypes`}</title>
+                {(n.kind === "st" || n.labelled) && (
+                  <text x={n.r + 4} y={4} className={`net-label${n.kind === "field" ? " net-label-field" : ""}`}>{truncate(n.label, 24)}</text>
+                )}
               </g>
             );
           })}

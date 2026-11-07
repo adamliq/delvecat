@@ -106,13 +106,27 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
 
   const settings: Table = {
     name: "settings",
-    doc: "Splunk settings, one row per key (nested 'observed' values as observed.<key>).",
+    doc: "Splunk settings, one row per key (nested 'observed' values as observed.<key>). Fields are in the fields table.",
     columns: [col("entity_id"), col("key"), col("value")],
-    rows: per((e) =>
+    rows: per((e) => e.type === "field" ? [] :
       Object.entries(e.properties ?? {}).flatMap(([k, v]) =>
         k === "observed" && v && typeof v === "object" && !Array.isArray(v)
           ? Object.entries(v).map(([k2, v2]) => [e.id, `observed.${k2}`, v2 as Cell].map(cell))
           : [[e.id, k, v as Cell].map(cell)])),
+  };
+
+  const fieldsTable: Table = {
+    name: "fields",
+    doc: "Sourcetype fields (sampled or defined in props.conf), one row each.",
+    columns: [
+      col("entity_id"), col("sourcetype"), col("field"), col("numeric", "INTEGER", "1 if every sampled value was a number; NULL if not sampled"),
+      col("fill_rate", "REAL", "Share of sampled events with the field (0-1); NULL if not sampled"),
+      col("distinct_values", "INTEGER"), col("defined_in", "TEXT", "configuration, or NULL when seen in sampled events"),
+    ],
+    rows: E.filter((e) => e.type === "field").map((e) => {
+      const p = (e.properties ?? {}) as { sourcetype?: string; field?: string; numeric?: boolean; definedIn?: string; observed?: { coverage?: number; distinctCount?: number } };
+      return [e.id, p.sourcetype, p.field, p.numeric, p.observed?.coverage, p.observed?.distinctCount, p.definedIn].map(cell);
+    }),
   };
 
   const healthChecks: Table = {
@@ -212,7 +226,7 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
     ].map(cell))),
   };
 
-  return [entities, edges, labels, classifications, properties, settings, healthChecks, lineageIssues,
+  return [entities, edges, labels, classifications, properties, settings, fieldsTable, healthChecks, lineageIssues,
     fieldUsage, columnLineage, riskTable, accessTable, instances, domains, dataProducts];
 }
 
@@ -227,7 +241,7 @@ export function fillDatabase(db: Database, tables: Table[]) {
   }
   db.run("CREATE INDEX edges_from ON edges(from_id)");
   db.run("CREATE INDEX edges_to ON edges(to_id)");
-  for (const t of ["labels", "classifications", "properties", "settings", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]) {
+  for (const t of ["labels", "classifications", "properties", "settings", "fields", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]) {
     db.run(`CREATE INDEX ${t}_entity ON ${t}(entity_id)`);
   }
   db.run("COMMIT");
@@ -304,6 +318,13 @@ FROM field_usage u JOIN entities e ON e.id = u.entity_id
 WHERE e.type = 'correlationSearch'
 GROUP BY u.field
 ORDER BY searches DESC;`,
+  },
+  {
+    title: "Fields missing from most events",
+    sql: `SELECT sourcetype, field, round(fill_rate * 100, 1) AS filled_pct, distinct_values
+FROM fields
+WHERE fill_rate < 0.5
+ORDER BY fill_rate, sourcetype;`,
   },
   {
     title: "Sourcetype fields nobody uses",

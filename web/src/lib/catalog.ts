@@ -93,8 +93,10 @@ export async function inlineShards(
   for (const { shard, body } of parts) {
     const items = body[shard.kind];
     if (!Array.isArray(items)) throw new BundleError(`Shard ${shard.path} has no ${shard.kind} array.`);
-    if (shard.kind === "entities") entities.push(...(items as Entity[]));
-    else edges.push(...(items as Edge[]));
+    // A loop, not push(...items): spreading hundreds of thousands of items into one call
+    // overflows the browser's stack ("Maximum call stack size exceeded").
+    const target: unknown[] = shard.kind === "entities" ? entities : edges;
+    for (const item of items) target.push(item);
   }
   const { shards: _omit, ...rest } = manifest;
   void _omit;

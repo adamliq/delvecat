@@ -1,4 +1,4 @@
-.PHONY: install demo dev test lint build types annotations
+.PHONY: install demo dev test lint build types annotations perf
 
 # Repository that holds annotations/, used for "suggest an edit" links in the demo.
 ANNOTATION_REPO ?= https://github.com/adamliq/delvecat
@@ -47,3 +47,10 @@ test: lint
 
 build: demo
 	cd web && npm run build
+
+SCALE ?= 1.0
+perf:  ## time every page against a synthetic catalog (SCALE=1.0 is ~100k objects; needs Playwright)
+	cd ingestion && uv run delvecat-ingest synth --scale $(SCALE) --out ../web/.large --shard
+	cd web && npm run build && rm -rf dist/large && cp -r .large dist/large
+	cd web && (npx vite preview --port 4173 --strictPort >/dev/null 2>&1 & echo $$! > .preview.pid) && sleep 3 && \
+		node scripts/perf.cjs http://localhost:4173 .large large/catalog.json; kill `cat .preview.pid`; rm -f .preview.pid

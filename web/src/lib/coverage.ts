@@ -1,6 +1,6 @@
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "./catalog";
-import { upstreamOf } from "./lineage";
+import { anyUpstream } from "./lineage";
 
 export interface AttackData {
   version?: string;
@@ -34,7 +34,7 @@ export function isDetection(e: Entity): boolean {
 
 /** Does real data flow into this detection (an upstream index or sourcetype with events)? */
 function hasData(catalog: Catalog, e: Entity): boolean {
-  return upstreamOf(catalog, e.id, 10).some((u) => {
+  return anyUpstream(catalog, e.id, 10, (u) => {
     const o = observed(u);
     if (u.type === "index") return Number(o.totalEventCount ?? 0) > 0;
     if (u.type === "sourcetype") return Number(o.eventCount ?? 0) > 0;
@@ -42,7 +42,20 @@ function hasData(catalog: Catalog, e: Entity): boolean {
   });
 }
 
+const statusCache = new WeakMap<Catalog, Map<string, DetectionStatus>>();
+
+/** Whether a detection can fire, cached per catalog (Home and Coverage both ask). */
 export function detectionStatus(catalog: Catalog, e: Entity): DetectionStatus {
+  let cache = statusCache.get(catalog);
+  if (!cache) statusCache.set(catalog, (cache = new Map()));
+  const hit = cache.get(e.id);
+  if (hit) return hit;
+  const s = computeStatus(catalog, e);
+  cache.set(e.id, s);
+  return s;
+}
+
+function computeStatus(catalog: Catalog, e: Entity): DetectionStatus {
   const techniques = ((props(e).mitreAttack ?? []) as string[]).map((t) => t.toUpperCase());
   const dataModels = catalog.edgesFrom(e.id)
     .filter((x) => x.type === "reads" && catalog.byId.get(x.to)?.type === "dataModel")

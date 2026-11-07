@@ -57,29 +57,37 @@ class SplAnalysis:
 # --- scanning helpers -------------------------------------------------------------------
 
 
-def _scan(s: str):
-    """Yield (index, char, depth) for characters outside quotes and backticks.
+_STRUCTURE = {sep: re.compile(r'["`\\()\[\]' + re.escape(sep) + "]") for sep in ("|", ",", "[")}
 
-    ``depth`` counts open () and [] so callers can find top-level separators.
+
+def _scan(s: str, sep: str = "["):
+    """Yield (index, char, depth) for structural characters outside quotes and backticks:
+    parentheses, brackets and ``sep``. ``depth`` counts open () and [] so callers can
+    find top-level separators.
+
+    Jumps from one interesting character to the next with a regex instead of walking
+    every character, which matters on catalogs with tens of thousands of searches.
     """
     depth = 0
     quote = None
-    i = 0
-    while i < len(s):
+    skip_to = -1
+    pattern = _STRUCTURE.get(sep) or re.compile(r'["`\\()\[\]' + re.escape(sep) + "]")
+    for m in pattern.finditer(s):
+        i = m.start()
+        if i < skip_to:
+            continue
         c = s[i]
         if quote:
             if c == "\\" and quote == '"':
-                i += 2
-                continue
-            if c == quote:
+                skip_to = i + 2
+            elif c == quote:
                 quote = None
-            i += 1
             continue
         if c in ('"', "`"):
             quote = c
-            i += 1
+        elif c == "\\":
             continue
-        if c in "([":
+        elif c in "([":
             yield i, c, depth
             depth += 1
         elif c in ")]":
@@ -87,13 +95,16 @@ def _scan(s: str):
             yield i, c, depth
         else:
             yield i, c, depth
-        i += 1
 
 
 def split_top(s: str, sep: str) -> list[str]:
     """Split on ``sep`` outside quotes, backticks, parentheses and brackets."""
+    if sep not in s:
+        return [s]
+    if not any(c in s for c in '"`(['):
+        return s.split(sep)
     parts, start = [], 0
-    for i, c, depth in _scan(s):
+    for i, c, depth in _scan(s, sep):
         if c == sep and depth == 0:
             parts.append(s[start:i])
             start = i + 1
@@ -103,6 +114,8 @@ def split_top(s: str, sep: str) -> list[str]:
 
 def _subsearches(s: str) -> tuple[str, list[str]]:
     """Remove top-level ``[ ... ]`` groups; return the remaining text and their contents."""
+    if "[" not in s:
+        return s, []
     out, subs = [], []
     start = None
     last = 0

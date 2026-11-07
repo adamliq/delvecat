@@ -1,4 +1,5 @@
 import type { Entity } from "../generated/catalog";
+import type { Catalog } from "./catalog";
 
 export interface EffectiveClassification {
   name: string;
@@ -36,7 +37,35 @@ const gov = (e: Entity) => (e.governance ?? {}) as Gov;
 
 export const effectiveClassifications = (e: Entity) => gov(e).classifications ?? [];
 export const access = (e: Entity) => gov(e).access;
-export const sensitiveAccess = (e: Entity) => gov(e).sensitiveAccess ?? [];
+const userReach = new WeakMap<Catalog, Map<string, SensitiveAccess[]>>();
+
+/**
+ * Sensitive data an object can reach. Roles carry it (inherited roles included);
+ * a user's is the union of their roles', derived here rather than stored on every
+ * user (older bundles that stored it still work).
+ */
+export function sensitiveAccess(e: Entity, catalog?: Catalog): SensitiveAccess[] {
+  const own = gov(e).sensitiveAccess;
+  if (own || e.type !== "user" || !catalog) return own ?? [];
+  let cache = userReach.get(catalog);
+  if (!cache) userReach.set(catalog, (cache = new Map()));
+  let reach = cache.get(e.id);
+  if (!reach) {
+    const byStore = new Map<string, SensitiveAccess>();
+    const roles = catalog.edgesFrom(e.id).filter((x) => x.type === "memberOf").map((x) => x.to).sort();
+    for (const rid of roles) {
+      const role = catalog.byId.get(rid);
+      for (const a of role ? gov(role).sensitiveAccess ?? [] : []) {
+        const item = byStore.get(a.id) ?? { ...a, viaRoles: [] };
+        item.viaRoles = [...(item.viaRoles ?? []), rid];
+        byStore.set(a.id, item);
+      }
+    }
+    reach = [...byStore.values()].sort((a, b) => a.id.localeCompare(b.id));
+    cache.set(e.id, reach);
+  }
+  return reach;
+}
 export const readsClassified = (e: Entity) => gov(e).readsClassified ?? [];
 /** Classifications this object reads but does not pass on (stopsClassifications). */
 export const stoppedClassifications = (e: Entity) => gov(e).stops ?? [];

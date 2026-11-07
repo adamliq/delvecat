@@ -93,9 +93,11 @@ def test_who_can_see_sensitive_data():
     vip = gov(b, "i:kvCollection:vip")["access"]  # read: power; admin imports power
     assert vip["roles"] == ["i:role:admin", "i:role:power"] and vip["users"] == ["i:user:ada"]
     assert "access" not in gov(b, "i:lookup:notes")  # Public is not sensitive
-    ada = {a["id"]: a for a in gov(b, "i:user:ada")["sensitiveAccess"]}
-    assert set(ada) == {"i:index:summary", "i:kvCollection:vip", "i:lookup:ips"}
-    assert ada["i:index:summary"]["filtered"] is False  # srchFilter "*" is no filter
+    # Users are not given their own copy: the web app unions their roles' reach.
+    assert "sensitiveAccess" not in gov(b, "i:user:ada")
+    admin = {a["id"]: a for a in gov(b, "i:role:admin")["sensitiveAccess"]}
+    assert set(admin) == {"i:index:summary", "i:kvCollection:vip", "i:lookup:ips"}
+    assert admin["i:index:summary"]["filtered"] is False  # srchFilter "*" is no filter
     assert summary["exposedToEveryone"] == 1
 
 

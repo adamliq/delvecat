@@ -138,6 +138,10 @@ def propagate(
         if x["type"] == "definesField" and x["to"] in by_id:
             defines[x["from"]].append(_field_name(by_id[x["to"]]))
 
+    # Objects with stop annotations, so the hot loop does not read annotations each time.
+    stoppers = {
+        eid for eid, e in by_id.items() if (e.get("annotations") or {}).get("stopsClassifications")
+    }
     derived: dict[str, dict[str, Any]] = defaultdict(dict)
     readers: dict[str, set[str]] = defaultdict(set)
     stopped: dict[str, set[str]] = defaultdict(set)
@@ -160,18 +164,28 @@ def propagate(
             cols: dict[str, frozenset[str] | None] = cols,
         ) -> frozenset[str] | None:
             """What a node passes on (after stops)."""
-            if stops(by_id[node], cls):
+            if node in stoppers and stops(by_id[node], cls):
                 return frozenset()
             return cols.get(node, frozenset())
 
-        while queue:
-            node = queue.popleft()
-            if depth[node] >= MAX_DEPTH:
-                continue
-            for nxt in succs.get(node, []):
+        # Level by level: everything downstream of the last level's changes is evaluated
+        # once per level (a node with many inputs is not re-evaluated for each of them).
+        # Objects pass changes on while their shortest distance from a seed is under
+        # MAX_DEPTH (as before); levels repeat until nothing changes.
+        frontier = list(queue)
+        level = 0
+        while frontier:
+            level += 1
+            dirty = dict.fromkeys(
+                nxt
+                for node in frontier
+                if depth[node] < MAX_DEPTH
+                for nxt in succs.get(node, [])
+                if by_id[nxt]["type"] != "field"
+            )
+            changed: list[str] = []
+            for nxt in dirty:
                 e = by_id[nxt]
-                if e["type"] == "field":
-                    continue
                 inputs = [(p, out_cols(p)) for p in preds[nxt] if p in cols]
                 inputs = [(p, c) for p, c in inputs if c is ALL or c]
                 if not inputs:
@@ -181,7 +195,7 @@ def propagate(
                     readers[nxt].add(cls)
                 if cls in seeds.get(nxt, {}):
                     new = _union(new, seeds[nxt][cls])
-                if stops(e, cls) and (new is ALL or new):
+                if nxt in stoppers and stops(e, cls) and (new is ALL or new):
                     stopped[nxt].add(cls)
                 old = cols.get(nxt, frozenset())
                 if new is not ALL and not new:
@@ -190,9 +204,10 @@ def propagate(
                 if nxt in cols and merged == old:
                     continue
                 cols[nxt] = merged
-                via.setdefault(nxt, inputs[0][0])
-                depth[nxt] = min(depth.get(nxt, MAX_DEPTH), depth[node] + 1)
-                queue.append(nxt)
+                via.setdefault(nxt, min(p for p, _ in inputs))
+                depth[nxt] = min(depth.get(nxt, level), level)
+                changed.append(nxt)
+            frontier = changed
         for node, c in cols.items():
             if node in seeds and cls in seeds[node]:
                 continue

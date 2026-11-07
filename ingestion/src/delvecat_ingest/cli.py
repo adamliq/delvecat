@@ -357,6 +357,26 @@ def _validate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _synth(args: argparse.Namespace) -> int:
+    import time
+
+    from .synth import build
+
+    print(f"synthetic catalog, scale {args.scale}, seed {args.seed}")
+    bundle = build(args.scale, args.seed)
+    if args.validate:
+        t = time.perf_counter()
+        problems = validate(bundle)
+        print(f"  validate      {time.perf_counter() - t:6.1f}s  {len(problems)} problems")
+        if problems:
+            print(*problems[:20], sep="\n", file=sys.stderr)
+            return 1
+    t = time.perf_counter()
+    write_bundle(bundle, Path(args.out), shard=args.shard)
+    print(f"  write         {time.perf_counter() - t:6.1f}s  {args.out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="delvecat-ingest")
     parser.add_argument("--version", action="version", version=__version__)
@@ -526,6 +546,14 @@ def main(argv: list[str] | None = None) -> int:
     la.add_argument("annotations", help="annotations directory")
     la.add_argument("--bundle", help="also check that every entry matches an entity")
     la.set_defaults(func=_lint_annotations)
+
+    sy = sub.add_parser("synth", help="generate a large synthetic catalog for performance testing")
+    sy.add_argument("--scale", type=float, default=1.0, help="1.0 is about 100,000 objects")
+    sy.add_argument("--seed", type=int, default=7)
+    sy.add_argument("--out", required=True)
+    sy.add_argument("--shard", action="store_true", help="write a manifest plus per-type shards")
+    sy.add_argument("--validate", action="store_true", help="also validate against the schema")
+    sy.set_defaults(func=_synth)
 
     lst = sub.add_parser("extractors", help="list available extractors")
     lst.set_defaults(func=lambda _: print("\n".join(splunk.EXTRACTORS)) or 0)
