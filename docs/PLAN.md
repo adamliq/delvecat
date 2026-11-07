@@ -480,6 +480,31 @@ are confirmed against a live instance before their connector ships.
   linked (no entities for them yet); wildcards and `$token$` field names are
   skipped; `spath` and automatic key-value fields are taken by name.
 
+### Visualizations (done)
+
+Ideas from the other catalogs (Marquez and ODD run-state nodes, Atlas
+classification badges, OpenMetadata / DataHub column-level lineage, profiler
+stats and Data Insights / Analytics, Atlas relationship graph), built from
+data the bundle already has. Colors follow the dataviz reference palette
+(slot 1 blue for single-series marks, a lighter step of the same ramp for
+tracks, fixed status colors), validated against the app's light and dark
+surfaces; status is always icon + label, never color alone.
+
+- Lineage graph: badges per node for critical / warning health, at risk, and
+  sensitive classifications, with a legend and full detail in tooltips.
+- Column lineage diagram (Lineage and Fields used tabs): source fields ->
+  result columns -> columns of the index or lookup written; masked columns
+  faint; sensitive columns badged; hover or focus follows a column; table view.
+- Field profile meters on sourcetype fields: fill rate, distinct values,
+  used by.
+- Insights page: coverage of description, owner, domain and required
+  properties by app, domain or type (custom apps by default), and ranked
+  "most used" charts per type; a usage percentile on each object.
+- Relationship graph: every relationship one hop out, incoming left and
+  outgoing right, grouped and capped per group, with a list view.
+- Not yet: trend lines, schema history, run timelines and data quality
+  timelines need change history, run history or data quality checks first.
+
 ### Column-level classification propagation (done)
 
 - From Apache Atlas's classification propagation, made precise with field

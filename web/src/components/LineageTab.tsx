@@ -1,3 +1,4 @@
+import { ColumnLineage } from "./ColumnLineage";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Entity, EntityType } from "../generated/catalog";
@@ -140,6 +141,8 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
         <p className="muted small">Sources on the left, consumers on the right. Select an object to follow its lineage.</p>
         <LineageGraph catalog={catalog} id={entity.id} up={up} down={down} />
       </section>
+
+      <ColumnLineage catalog={catalog} entity={entity} />
 
       <section className="rel-grid">
         <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}

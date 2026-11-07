@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Catalog } from "../lib/catalog";
 import { typeLabel } from "../lib/labels";
 import { lineageGraph } from "../lib/lineage";
+import { BADGE_LEGEND, badges, type Badge } from "../lib/overlays";
 import { entityPath } from "../lib/routes";
 
 const NODE_W = 210;
@@ -88,12 +89,17 @@ export function LineageGraph({ catalog, id, up, down }: { catalog: Catalog; id: 
           const p = pos.get(entity.id);
           if (!p) return null;
           const broken = Boolean(entity.lineage?.unresolved?.length);
+          const marks = badges(catalog, entity);
+          const label = [`${typeLabel(entity.type)}: ${entity.displayName ?? entity.name}${entity.app ? ` (${entity.app})` : ""}`, ...marks.map((m) => m.title)].join("\n");
           return (
             <Link key={entity.id} to={`${entityPath(entity.id)}?tab=lineage`}
               className={`lineage-node${entity.id === id ? " lineage-node-focus" : ""}${broken ? " lineage-node-broken" : ""}`}
               style={{ left: p.x, top: p.y, width: NODE_W, height: NODE_H }}
-              title={`${typeLabel(entity.type)}: ${entity.displayName ?? entity.name}${entity.app ? ` (${entity.app})` : ""}`}>
-              <span className="lineage-node-type">{typeLabel(entity.type)}{broken ? " · broken ref" : ""}</span>
+              title={label} aria-label={label}>
+              <span className="lineage-node-head">
+                <span className="lineage-node-type">{typeLabel(entity.type)}{broken ? " · broken ref" : ""}</span>
+                {marks.length > 0 && <span className="node-badges" aria-hidden>{marks.map((m) => <NodeBadge key={m.kind} b={m} />)}</span>}
+              </span>
               <span className="lineage-node-name">{entity.displayName ?? entity.name}</span>
             </Link>
           );
@@ -108,6 +114,11 @@ export function LineageGraph({ catalog, id, up, down }: { catalog: Catalog; id: 
         ))}
       </div>
     </div>
+      <ul className="legend lineage-legend" aria-label="Badges">
+        {BADGE_LEGEND.map((l) => (
+          <li key={l.kind}><span className={`node-badge node-badge-${l.kind}`}>{l.text}</span>{l.label}</li>
+        ))}
+      </ul>
       {(graph.hasMoreUp || graph.hasMoreDown) && (
         <p className="muted small">
           {graph.hasMoreUp && "More upstream objects beyond this depth. "}
@@ -116,4 +127,8 @@ export function LineageGraph({ catalog, id, up, down }: { catalog: Catalog; id: 
       )}
     </>
   );
+}
+
+function NodeBadge({ b }: { b: Badge }) {
+  return <span className={`node-badge node-badge-${b.kind}`} title={b.title}>{b.text}</span>;
 }

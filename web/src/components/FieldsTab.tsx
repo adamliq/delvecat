@@ -5,6 +5,7 @@ import type { Catalog } from "../lib/catalog";
 import { effectiveDescription } from "../lib/annotate";
 import { entityPath } from "../lib/routes";
 import { AnnotationChips } from "./EntityBits";
+import { Meter } from "./Meter";
 import { PropValue } from "./PropValue";
 
 interface Table {
@@ -32,18 +33,21 @@ export function fieldsTable(catalog: Catalog, e: Entity): Table | null {
         .filter((f): f is Entity => f?.type === "field")
         .sort((a, b) => Number(observed(b).coverage ?? 0) - Number(observed(a).coverage ?? 0));
       const readers = (f: Entity) => catalog.edgesTo(f.id).filter((x) => x.type === "readsField").length;
+      const maxDistinct = Math.max(1, ...fields.map((f) => Number(observed(f).distinctCount ?? 0)));
+      const maxReaders = Math.max(1, ...fields.map(readers));
       if (!fields.length) return null;
       return {
         caption: "Fields seen in sampled events (search-time extractions, aliases, lookups included) and fields defined in props.conf. Used by counts the searches, dashboards and configuration that read each field.",
-        columns: ["Field", "Coverage", "Distinct values", "Numeric", "Used by", "Annotations"],
+        columns: ["Field", "Fill rate", "Distinct values", "Numeric", "Used by", "Annotations"],
         rows: fields.map((f) => ({
           key: f.id,
           cells: [
             <>{link(f)}{effectiveDescription(f) && <div className="muted small">{effectiveDescription(f)}</div>}</>,
-            pct(observed(f).coverage),
-            num(observed(f).distinctCount),
+            <Meter value={observed(f).coverage} max={1} label={pct(observed(f).coverage)} name={`Fill rate of ${f.displayName ?? f.name}`} />,
+            <Meter value={observed(f).distinctCount} max={maxDistinct} label={num(observed(f).distinctCount)} name={`Distinct values of ${f.displayName ?? f.name}`} />,
             props(f).numeric === undefined ? "—" : props(f).numeric ? "Yes" : "No",
-            readers(f) ? <Link to={entityPath(f.id)}>{readers(f)}</Link> : <span className="muted">0</span>,
+            <Meter value={readers(f)} max={maxReaders} name={`Objects using ${f.displayName ?? f.name}`}
+              label={readers(f) ? <Link to={entityPath(f.id)}>{readers(f)}</Link> : <span className="muted">0</span>} />,
             <AnnotationChips entity={f} compact />,
           ],
         })),
@@ -133,3 +137,4 @@ export function FieldsTab({ table }: { table: Table }) {
     </section>
   );
 }
+

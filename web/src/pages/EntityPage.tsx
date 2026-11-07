@@ -5,6 +5,7 @@ import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
 import { GovernancePanel } from "../components/GovernancePanel";
 import { PropertiesPanel } from "../components/PropertiesPanel";
+import { RelationGraph } from "../components/RelationGraph";
 import { BlastRadius, RiskBanner } from "../components/RiskPanel";
 import { UsagePanel } from "../components/UsagePanel";
 import { isDetection } from "../lib/coverage";
@@ -99,6 +100,7 @@ export function EntityPage() {
     ["annotations", "Annotations"],
     ["raw", "Raw"],
   ];
+  const relView = params.get("view") === "list" ? "list" : "graph";
   const requested = params.get("tab") as Tab | null;
   const tab: Tab = tabs.some(([t]) => t === requested) ? requested! : "overview";
   const selectTab = (t: Tab) => {
@@ -234,8 +236,23 @@ export function EntityPage() {
         groups.length === 0 ? (
           <p className="muted">No relationships found.</p>
         ) : (
-          <div className="rel-grid">
-            {groups.map((g) => <Group key={`${g.direction}:${g.edgeType}`} group={g} />)}
+          <div className="stack">
+            <div className="view-switch" role="group" aria-label="Relationships view">
+              {(["graph", "list"] as const).map((v) => (
+                <button key={v} type="button" className={`btn btn-small${relView === v ? " btn-selected" : ""}`} aria-pressed={relView === v}
+                  onClick={() => { const next = new URLSearchParams(params); next.set("view", v); setParams(next, { replace: true }); }}>
+                  {v === "graph" ? "Graph" : "List"}
+                </button>
+              ))}
+            </div>
+            {relView === "graph" ? (
+              <RelationGraph catalog={catalog} entity={entity} groups={groups}
+                onShowList={() => { const next = new URLSearchParams(params); next.set("view", "list"); setParams(next, { replace: true }); }} />
+            ) : (
+              <div className="rel-grid">
+                {groups.map((g) => <Group key={`${g.direction}:${g.edgeType}`} group={g} />)}
+              </div>
+            )}
           </div>
         )
       )}

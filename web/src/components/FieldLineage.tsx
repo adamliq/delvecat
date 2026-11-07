@@ -1,3 +1,4 @@
+import { ColumnLineage } from "./ColumnLineage";
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
@@ -30,6 +31,7 @@ export function SearchFieldsTab({ catalog, entity }: { catalog: Catalog; entity:
   };
   return (
     <div className="stack">
+      <ColumnLineage catalog={catalog} entity={entity} />
       <section>
         <h2>Fields read <span className="muted">({used.length})</span></h2>
         <p className="muted small">

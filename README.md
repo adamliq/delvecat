@@ -37,6 +37,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
    Classifications follow the data **column by column**: a summary built from
    counts is not PII, and a search only reads PII when it uses a PII field.
    `stopsClassifications` stops a classification at a masking search.
+   **Visualizations**: lineage graphs badge health, risk and sensitive data;
+   a column lineage diagram traces result columns to source fields; a
+   relationship graph shows every link one hop out; an Insights page charts
+   documentation and ownership coverage and the most used objects.
    **At-risk alerts** flag objects that depend, directly or through other
    objects, on something unhealthy, broken or disabled, and show what each
    problem puts at risk.

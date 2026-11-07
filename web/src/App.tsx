@@ -9,6 +9,7 @@ import { EntityPage } from "./pages/EntityPage";
 import { GlossaryPage } from "./pages/GlossaryPage";
 import { GovernancePage } from "./pages/GovernancePage";
 import { HealthPage } from "./pages/HealthPage";
+import { InsightsPage } from "./pages/InsightsPage";
 import { PropertiesPage } from "./pages/PropertiesPage";
 import { Home } from "./pages/Home";
 import { SearchPage } from "./pages/SearchPage";
@@ -42,6 +43,7 @@ function Body() {
       <Route path="/products/:name" element={<DataProductPage />} />
       <Route path="/properties" element={<PropertiesPage />} />
       <Route path="/sql" element={<Suspense fallback={<p className="muted">Loading SQL console…</p>}><SqlPage /></Suspense>} />
+      <Route path="/insights" element={<InsightsPage />} />
       <Route path="/coverage" element={<CoveragePage />} />
       <Route path="/health" element={<HealthPage />} />
       <Route path="/governance" element={<GovernancePage />} />
