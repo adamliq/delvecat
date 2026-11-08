@@ -615,6 +615,29 @@ surfaces; status is always icon + label, never color alone.
 - Example queries, a table browser with column notes, ids linked to entity
   pages, CSV download, and the query kept in the URL for sharing.
 
+### Splunk app, phase 1 (done)
+
+DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud
+(`splunk-app/`, `make splunk-app`). The web app is built for Splunk Web
+(`vite build --mode splunk`) and shown to a `delvecat_user` role. The catalog is
+built outside Splunk as before and stored with `delvecat-ingest publish` in the
+app's KV store collection (gzip + base64 parts, a pointer switched in one write,
+sha256-checked in the browser). That collection is the only thing DelveCat ever
+writes, through a separate allowlist used only by `publish`. Two packages: Splunk's
+page template (10.4+ and Cloud) and a legacy one with its own template (9.x to
+10.3). AppInspect's Cloud checks pass; tested on Splunk 9.4 and 10.4.
+
+Next phases:
+
+- **Phase 2, building inside Splunk.** A scheduled modular input runs ingestion
+  on the search head with the app's own session, tokens for other instances in
+  Splunk's password store from a setup page, a build-status page, and on a
+  search head cluster only one member builds. Needs the ingestion code on
+  Splunk's bundled Python (currently 3.11+) with its dependencies vendored, and
+  without `jsonschema` (compiled code).
+- **Phase 3, per-viewer filtering.** Show each viewer only what their roles can
+  reach, instead of one role seeing everything.
+
 ## 8. Repository layout
 
 ```

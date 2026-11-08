@@ -1,4 +1,4 @@
-.PHONY: install demo dev test lint build types annotations perf
+.PHONY: install demo dev test lint build types annotations perf splunk-app
 
 # Repository that holds annotations/, used for "suggest an edit" links in the demo.
 ANNOTATION_REPO ?= https://github.com/adamliq/delvecat
@@ -54,3 +54,24 @@ perf:  ## time every page against a synthetic catalog (SCALE=1.0 is ~100k object
 	cd web && npm run build && rm -rf dist/large && cp -r .large dist/large
 	cd web && (npx vite preview --port 4173 --strictPort >/dev/null 2>&1 & echo $$! > .preview.pid) && sleep 3 && \
 		node scripts/perf.cjs http://localhost:4173 .large large/catalog.json; kill `cat .preview.pid`; rm -f .preview.pid
+
+# The Splunk app (splunk-app/delvecat): the web app built for Splunk Web, packaged for
+# "Install app from file" or Splunk Cloud (ACS). Two packages: dist/delvecat-<v>.tgz uses
+# Splunk's page template (Splunk 10.4+ and Splunk Cloud); dist/delvecat-<v>-legacy.tgz
+# brings its own (Splunk 9.x to 10.3), from the overlay in splunk-app/legacy.
+APP_VERSION = $(shell sed -n 's/^version = //p' splunk-app/delvecat/default/app.conf | head -1)
+APP_BUILD = splunk-app/delvecat/appserver/static/build
+APP_STAGE = dist/stage
+APP_TAR = COPYFILE_DISABLE=1 tar --exclude='local' --exclude='local.meta' --exclude='*.pyc' \
+	--exclude='.DS_Store' --owner=0 --group=0 --mode='u+rwX,go+rX,go-w' -czf
+splunk-app:
+	cd web && npx tsc -b && npx vite build --mode splunk
+	rm -f $(APP_BUILD)/index.html
+	cp -r web/public/reference $(APP_BUILD)/reference
+	rm -rf $(APP_STAGE) && mkdir -p $(APP_STAGE)/legacy
+	$(APP_TAR) dist/delvecat-$(APP_VERSION).tgz -C splunk-app delvecat
+	cp -r splunk-app/delvecat $(APP_STAGE)/legacy/delvecat
+	cp -r splunk-app/legacy/. $(APP_STAGE)/legacy/delvecat/
+	$(APP_TAR) dist/delvecat-$(APP_VERSION)-legacy.tgz -C $(APP_STAGE)/legacy delvecat
+	rm -rf $(APP_STAGE)
+	@ls -1 dist/delvecat-$(APP_VERSION)*.tgz

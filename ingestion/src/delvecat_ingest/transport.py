@@ -1,7 +1,9 @@
 """Transports that fetch Splunk REST responses and run searches.
 
 Every transport is read-only. ``HttpTransport`` enforces this with
-:func:`check_read_only` before any request leaves the process.
+:func:`check_read_only` before any request leaves the process. The one
+exception is ``delvecat-ingest publish``, which may write the DelveCat app's own
+catalog collection and nothing else (:func:`publish_allowlist`).
 """
 
 from __future__ import annotations
@@ -45,8 +47,22 @@ class EndpointForbidden(PermissionError):
 _GET_DENYLIST = re.compile(r"/(_reload|_new|control|restart|enable|disable|move|dispatch)(/|$|\?)")
 
 
-def check_read_only(method: str, path: str) -> None:
+def publish_allowlist(app: str, collection: str) -> tuple[re.Pattern[str], ...]:
+    """The one place DelveCat may write: its own app's catalog collection in the KV
+    store (``delvecat-ingest publish``). Nothing else in Splunk is ever changed."""
+    for name in (app, collection):
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+            raise ValueError(f"invalid app or collection name {name!r}")
+    base = f"/servicesNS/nobody/{re.escape(app)}/storage/collections/data/{re.escape(collection)}"
+    return (re.compile(rf"^{base}(/batch_save)?/?$"),)
+
+
+def check_read_only(
+    method: str, path: str, allowed_writes: tuple[re.Pattern[str], ...] = ()
+) -> None:
     method = method.upper()
+    if method in ("POST", "DELETE") and any(p.match(path) for p in allowed_writes):
+        return
     if method in ("GET", "HEAD"):
         if _GET_DENYLIST.search(path):
             raise WriteAttemptError(f"DelveCat is read-only; refusing {method} {path}")
@@ -132,7 +148,9 @@ class HttpTransport:
         auth_header: str = "Authorization",
         auth_prefix: str = "Bearer ",
         http_transport: httpx.BaseTransport | None = None,
+        allowed_writes: tuple[re.Pattern[str], ...] = (),
     ):
+        self._allowed_writes = allowed_writes
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"),
             headers={auth_header: f"{auth_prefix}{token}"},
@@ -145,7 +163,7 @@ class HttpTransport:
         self._splunk_json = splunk_json
 
     def request(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
-        check_read_only(method, path)
+        check_read_only(method, path, self._allowed_writes)
         for attempt in range(self._retries + 1):
             try:
                 resp = self._client.request(method, path, **kwargs)

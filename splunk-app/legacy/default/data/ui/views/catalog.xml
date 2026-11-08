@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<!-- Splunk 9.x to 10.3: the app's own page template (Splunk 10.4 deprecates these). -->
+<view template="delvecat:/templates/catalog.html" type="html" isDashboard="False">
+  <label>Catalog</label>
+</view>

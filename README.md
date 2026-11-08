@@ -3,7 +3,9 @@
 A metadata catalog for the Splunk ecosystem: Splunk Enterprise & Cloud,
 Enterprise Security, SOAR, UEBA, Asset and Risk Intelligence, Stream,
 Deployment Server and DB Connect. It is inspired by OpenMetadata, but runs
-as a **static web app** (GitHub Pages friendly) and **never writes to Splunk**.
+as a **static web app** (GitHub Pages friendly) or as a **Splunk app**, and
+**never changes Splunk**: it only reads, and the Splunk app's catalog is the
+one thing it stores (in that app's own KV store collection).
 
 See [docs/PLAN.md](docs/PLAN.md) for the architecture and roadmap.
 
@@ -95,6 +97,13 @@ $env:DELVECAT_SPLUNK_TOKEN = '...'   # or leave unset to be asked
 .\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -Strict
 Get-Help .\scripts\Build-Catalog.ps1 -Full
 ```
+
+### As a Splunk app
+
+`make splunk-app` packages DelveCat as a Splunk app for Splunk Enterprise and
+Splunk Cloud. The catalog opens inside Splunk Web for a `delvecat_user` role.
+Publish a catalog into it with `delvecat-ingest publish`, which writes only
+the app's own KV store collection. See [splunk-app/README.md](splunk-app/README.md).
 
 ### Local Splunk for development
 

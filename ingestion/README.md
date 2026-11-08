@@ -99,6 +99,18 @@ above, with annotations, redaction, `--previous` and `--shard` applied to the
 merge. Tokens are read from environment variables (or asked for without
 echoing) and passed to `delvecat-ingest` only through its environment.
 
+## Publishing to the Splunk app
+
+```bash
+export DELVECAT_PUBLISH_TOKEN=...   # account with the delvecat_publisher role
+uv run delvecat-ingest publish catalog/ --url https://sh.example.com:8089
+```
+
+Stores the catalog in the DelveCat Splunk app's KV store collection (see
+[../splunk-app/README.md](../splunk-app/README.md)). This is the only command
+that writes to Splunk, and it can write only that collection. `--dry-run`
+checks access and size; an unchanged catalog is not rewritten.
+
 ## Publishing safely
 
 Bundles can be redacted before they go anywhere public:
@@ -125,7 +137,9 @@ setting. Names inside SPL text are not rewritten.
 
 The HTTP client refuses any request that could change Splunk: only `GET` is
 allowed (minus endpoints that act on GET, such as `_reload`), plus `POST` to
-an allow-list of search endpoints. Keys that look like credentials and email
+an allow-list of search endpoints. The one exception is `publish`, which may
+also write the DelveCat Splunk app's own catalog collection, and nothing else.
+Keys that look like credentials and email
 addresses are dropped before anything is written.
 
 The service account needs read access to configuration endpoints, and to

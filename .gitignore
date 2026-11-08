@@ -11,3 +11,7 @@ deploy/.dev-token
 web/.large/
 web/dist-prof/
 web/.preview.pid
+dist/
+splunk-app/delvecat/appserver/static/build/
+splunk-app/delvecat/local/
+splunk-app/delvecat/metadata/local.meta

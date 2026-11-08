@@ -1,4 +1,5 @@
 import type { Entity } from "../generated/catalog";
+import { staticBase } from "./splunkSource";
 import type { Catalog } from "./catalog";
 import { anyUpstream } from "./lineage";
 
@@ -152,7 +153,7 @@ export function dataModelCoverage(catalog: Catalog, detections: DetectionStatus[
 }
 
 export async function loadAttack(): Promise<AttackData> {
-  const resp = await fetch(`${import.meta.env.BASE_URL}reference/attack-enterprise.json`);
+  const resp = await fetch(`${staticBase()}reference/attack-enterprise.json`);
   if (!resp.ok) throw new Error(`Could not load ATT&CK reference data (HTTP ${resp.status}).`);
   return resp.json();
 }

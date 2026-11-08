@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { CatalogBundle } from "../generated/catalog";
 import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
 import { riskMap, type Risk } from "./risk";
+import { IN_SPLUNK, fetchSplunkCatalog } from "./splunkSource";
 import { EntitySearch } from "./search";
 import { propertyDefs, propertyFacets } from "./structured";
 
@@ -34,10 +35,28 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>({ status: "loading" });
 
   useEffect(() => {
+    const fail = (err: Error) => setState({ status: "error", message: err.message });
+    const override = new URLSearchParams(window.location.search).get("bundle");
+    if (IN_SPLUNK && !override) {
+      // In the Splunk app: the catalog published to this Splunk's KV store.
+      fetchSplunkCatalog()
+        .then((r) =>
+          r
+            ? setState(ready(r.bundle, `published to Splunk ${r.pointer.publishedAt ?? ""}`.trim()))
+            : fail(
+                new Error(
+                  "No catalog found. Either none has been published to this Splunk yet " +
+                    "(see the app's README), or you need the delvecat_user role.",
+                ),
+              ),
+        )
+        .catch(fail);
+      return;
+    }
     const url = defaultBundleUrl();
     fetchBundle(url)
       .then((b) => setState(ready(b, url)))
-      .catch((err: Error) => setState({ status: "error", message: err.message }));
+      .catch(fail);
   }, []);
 
   // Local files are parsed in the browser and never uploaded anywhere.

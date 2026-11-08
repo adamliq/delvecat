@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- Splunk 10.4 and later (and Splunk Cloud): Splunk's own page template, which loads
+     appserver/static/pages/catalog.js. The legacy package replaces this file (see Makefile). -->
+<view template="pages/splunk_ui_app.html" type="html" isDashboard="False">
+  <label>Catalog</label>
+</view>

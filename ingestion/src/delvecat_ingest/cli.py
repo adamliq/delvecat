@@ -37,6 +37,34 @@ def _token(env: str) -> str | None:
     return token
 
 
+def _publish(args: argparse.Namespace) -> int:
+    from .publish import PublishError, publish
+    from .transport import publish_allowlist
+
+    if not (token := _token(args.token_env)):
+        return 2
+    transport = HttpTransport(
+        args.url,
+        token,
+        verify=_verify(args),
+        allowed_writes=() if args.dry_run else publish_allowlist(args.app, args.collection),
+    )
+    try:
+        publish(
+            Path(args.bundle),
+            transport,
+            app=args.app,
+            collection=args.collection,
+            part_chars=int(args.part_mb * 1024 * 1024),
+            dry_run=args.dry_run,
+            force=args.force,
+        )
+    except PublishError as err:
+        print(f"error: {err}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _verify(args: argparse.Namespace) -> bool | str:
     if args.insecure:
         return False
@@ -554,6 +582,26 @@ def main(argv: list[str] | None = None) -> int:
     sy.add_argument("--shard", action="store_true", help="write a manifest plus per-type shards")
     sy.add_argument("--validate", action="store_true", help="also validate against the schema")
     sy.set_defaults(func=_synth)
+
+    pb = sub.add_parser(
+        "publish",
+        help="store a catalog in the DelveCat Splunk app (its KV store collection only)",
+    )
+    pb.add_argument("bundle", help="bundle file, manifest or directory")
+    pb.add_argument("--url", required=True, help="Splunk management URL, e.g. https://sh:8089")
+    pb.add_argument(
+        "--token-env",
+        default="DELVECAT_PUBLISH_TOKEN",
+        help="environment variable holding a token of an account with the delvecat_publisher role",
+    )
+    pb.add_argument("--app", default="delvecat")
+    pb.add_argument("--collection", default="delvecat_catalog")
+    pb.add_argument("--part-mb", type=float, default=4, help="size of each stored part")
+    pb.add_argument("--ca-bundle")
+    pb.add_argument("--insecure", action="store_true", help="skip TLS verification (dev only)")
+    pb.add_argument("--dry-run", action="store_true", help="check access and size; write nothing")
+    pb.add_argument("--force", action="store_true", help="publish even if unchanged")
+    pb.set_defaults(func=_publish)
 
     lst = sub.add_parser("extractors", help="list available extractors")
     lst.set_defaults(func=lambda _: print("\n".join(splunk.EXTRACTORS)) or 0)

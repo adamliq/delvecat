@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type Rea
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { searchPath } from "../lib/routes";
+import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { state, openFiles } = useCatalogState();
@@ -51,6 +52,14 @@ export function Layout({ children }: { children: ReactNode }) {
             aria-label="Search the catalog"
           />
         </form>
+        {IN_SPLUNK ? (
+          // In the Splunk app the catalog comes from Splunk; this is the way back.
+          <div className="open-buttons">
+            <a className="btn" href={splunkHomeUrl()} title="Back to Splunk's home page">
+              Splunk
+            </a>
+          </div>
+        ) : (
         <div className="open-buttons">
           <button type="button" className="btn" onClick={() => fileInput.current?.click()}
             title="Open a catalog.json bundle from your computer. It is read in the browser and never uploaded.">
@@ -61,6 +70,7 @@ export function Layout({ children }: { children: ReactNode }) {
             Open folder
           </button>
         </div>
+        )}
         <input ref={fileInput} type="file" accept="application/json,.json" multiple hidden onChange={onPick} />
         <input ref={folderInput} type="file" hidden onChange={onPick} />
       </header>

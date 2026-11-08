@@ -1,0 +1,9 @@
+# Only admins and the delvecat_user role see the app; only delvecat_publisher
+# (and admins) can replace the catalog. Create both roles before use (README).
+[]
+access = read : [ admin, sc_admin, delvecat_user, delvecat_publisher ], write : [ admin, sc_admin ]
+export = none
+
+[collections/delvecat_catalog]
+access = read : [ admin, sc_admin, delvecat_user, delvecat_publisher ], write : [ admin, sc_admin, delvecat_publisher ]
+export = none

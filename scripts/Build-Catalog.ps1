@@ -40,6 +40,12 @@
     Sample events per sourcetype to discover fields (slower; powers schemas,
     field lineage and data quality checks).
 
+.PARAMETER PublishUrl
+    After a successful build, store the catalog in the DelveCat Splunk app on this
+    Splunk (management URL). Uses a token of an account with the delvecat_publisher
+    role, from DELVECAT_PUBLISH_TOKEN (or -PublishTokenEnv). This writes only the
+    app's own catalog collection.
+
 .PARAMETER RedactProfile
     none (default), internal (drop personal names) or public (also pseudonymize
     users, hosts and sources, mask IPs, drop internal URLs). public needs
@@ -52,6 +58,10 @@
 
 .EXAMPLE
     .\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -Out D:\catalog -Strict
+
+.EXAMPLE
+    # Build, then publish to the DelveCat app on the search head
+    .\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -PublishUrl https://sh.example.com:8089
 
 .EXAMPLE
     # Splunk Cloud (ACS token in DELVECAT_ACS_TOKEN)
@@ -89,6 +99,8 @@ param(
     [switch] $SingleFile,
     [switch] $NoPrevious,
     [switch] $Strict,
+    [string] $PublishUrl,
+    [string] $PublishTokenEnv = 'DELVECAT_PUBLISH_TOKEN',
     [string] $RepoRoot
 )
 
@@ -205,7 +217,7 @@ if ($PSCmdlet.ParameterSetName -eq 'Config') {
     if (-not $cfg.ContainsKey('Instances') -or @($cfg.Instances).Count -eq 0) { throw "$Config lists no Instances." }
     $instances = @($cfg.Instances)
     $configDir = Split-Path -Parent (Resolve-FullPath $Config)
-    foreach ($key in 'Annotations', 'AnnotationRepo', 'AnnotationBranch', 'RedactProfile', 'Out') {
+    foreach ($key in 'Annotations', 'AnnotationRepo', 'AnnotationBranch', 'RedactProfile', 'Out', 'PublishUrl', 'PublishTokenEnv') {
         if ($cfg.ContainsKey($key) -and -not $PSBoundParameters.ContainsKey($key)) {
             $value = $cfg[$key]
             if ($key -in 'Annotations', 'Out' -and -not [IO.Path]::IsPathRooted($value)) { $value = Join-Path $configDir $value }
@@ -248,6 +260,7 @@ $tokenNames = @($instances | Where-Object { $_.ContainsKey('Url') -and $_.Url } 
         if ($_.ContainsKey('TokenEnv') -and $_.TokenEnv) { $_.TokenEnv } else { 'DELVECAT_SPLUNK_TOKEN' }
     } | Sort-Object -Unique)
 if (@($instances | Where-Object { $_.ContainsKey('AcsStack') -and $_.AcsStack }).Count) { $tokenNames += 'DELVECAT_ACS_TOKEN' }
+if ($PublishUrl -and $tokenNames -notcontains $PublishTokenEnv) { $tokenNames += $PublishTokenEnv }
 $saved = @{}
 foreach ($name in $tokenNames) {
     $saved[$name] = [Environment]::GetEnvironmentVariable($name)
@@ -283,6 +296,13 @@ try {
     if (Test-Path -LiteralPath $Out) { Remove-Item -LiteralPath $Out -Recurse -Force }
     Move-Item -LiteralPath $staging -Destination $Out
     Write-Summary $Out
+    if ($PublishUrl) {
+        Write-Host "Publishing to the DelveCat app on $PublishUrl..."
+        $publish = @('publish', $Out, '--url', $PublishUrl, '--token-env', $PublishTokenEnv)
+        if ($script:CaBundlePath) { $publish += @('--ca-bundle', $script:CaBundlePath) }
+        if ($script:InsecureTls) { $publish += '--insecure' }
+        Invoke-Ingest $publish
+    }
     Write-Host "Open it in DelveCat with 'Open folder' (or 'Open file'), or copy it to web\public\catalog and build the app."
 }
 finally {
