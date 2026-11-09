@@ -19,6 +19,9 @@ make splunk-app
 | `dist/delvecat-<version>.tgz` | Splunk Enterprise 10.4 and later, and Splunk Cloud. Uses Splunk's own page template. |
 | `dist/delvecat-<version>-legacy.tgz` | Splunk Enterprise 9.x to 10.3. Brings its own page template, which Splunk 10.4 deprecates. |
 
+Ready-built packages are also committed in [`packages/`](packages/)
+(rebuild and replace them with `make splunk-app` after changing the app).
+
 Or download them: the *Splunk app* workflow builds both on every push and
 attaches them to the run (Actions > Splunk app > the run > Artifacts), with
 their AppInspect reports. Pushing a tag `v<version>` that matches `app.conf`
