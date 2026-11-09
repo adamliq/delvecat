@@ -75,3 +75,19 @@ describe("fetchSplunkCatalog", () => {
     expect(r?.pointer.generation).toBe("g2");
   });
 });
+
+import { buildSearch, formKey, splQuote } from "./splunkBuild";
+
+describe("build search", () => {
+  it("quotes values so they cannot add arguments or commands", () => {
+    expect(splQuote('a "b" \\ c')).toBe('"a \\"b\\" \\\\ c"');
+    expect(
+      buildSearch({ fields: true, usage: false, redact: "internal", instance: "prod", instanceName: 'x" | delete', webUrl: "https://sh" }),
+    ).toBe('| delvecatbuild fields=true usage=false redact=internal instance="prod" instancename="x\\" | delete" weburl="https://sh"');
+  });
+
+  it("reads Splunk Web's CSRF cookie", () => {
+    expect(formKey("a=1; splunkweb_csrf_token_8000=abc%3D; b=2")).toBe("abc=");
+    expect(formKey("a=1")).toBeNull();
+  });
+});

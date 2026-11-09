@@ -213,7 +213,7 @@ def expand_macros(
             out.append(" ")
             continue
         definition, arg_names = found
-        for arg_name, value in zip(arg_names, args, strict=False):
+        for arg_name, value in zip(arg_names, args):
             definition = definition.replace(f"${arg_name}$", _unquote(value))
         inner, _, inner_unresolved = expand_macros(definition, resolve, depth + 1)
         unresolved.extend(u for u in inner_unresolved if u not in unresolved)

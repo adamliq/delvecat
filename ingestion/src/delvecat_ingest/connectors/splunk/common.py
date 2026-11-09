@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
+from ...compat import UTC
 from ...model import ExtractResult, Ref, Target, edge, entity, fqn
 from ...splunk_rest import as_bool
 from ...transport import Transport
@@ -30,6 +32,8 @@ class Options:
     health_window: str = "-7d"  # scheduler, parsing warnings
     volume_days: int = 14
     max_adhoc_searches: int = 5000
+    # Called with each step's name before it runs (the Splunk app shows build progress).
+    progress: Callable[[str], None] | None = None
 
 
 @dataclass

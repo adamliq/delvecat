@@ -9,9 +9,10 @@ indexes and sourcetypes as ``observed`` values.
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
+from ...compat import UTC
 from ...model import ExtractResult
 from ...transport import SEARCH_MARKER
 from .common import Ctx, add_global, epoch_to_iso, to_int

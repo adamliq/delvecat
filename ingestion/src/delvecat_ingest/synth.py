@@ -16,10 +16,11 @@ from __future__ import annotations
 
 import random
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from .bundle import assemble
+from .compat import UTC
 from .governance import apply_governance
 from .model import ExtractResult, edge, entity, fqn
 from .quality import apply_quality

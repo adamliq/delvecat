@@ -7,3 +7,12 @@ export = none
 [collections/delvecat_catalog]
 access = read : [ admin, sc_admin, delvecat_user, delvecat_publisher ], write : [ admin, sc_admin, delvecat_publisher ]
 export = none
+
+# Building the catalog in Splunk: the people who may publish it.
+[commands/delvecatbuild]
+access = read : [ admin, sc_admin, delvecat_publisher ], write : [ admin, sc_admin ]
+export = none
+
+[searchbnf/delvecatbuild-command]
+access = read : [ admin, sc_admin, delvecat_publisher ], write : [ admin, sc_admin ]
+export = none

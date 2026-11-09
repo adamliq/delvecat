@@ -52,6 +52,8 @@ def run_extractors(
     """Run each extractor, recording ok/skipped/failed without aborting the run."""
     for name, fn in extractors.items():
         connector = f"{prefix}.{name}"
+        if ctx.options.progress:
+            ctx.options.progress(connector)
         try:
             result = fn(ctx, out)
             if isinstance(result, tuple):

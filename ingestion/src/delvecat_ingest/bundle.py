@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from jsonschema import Draft202012Validator, FormatChecker
-
 from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
+from .compat import UTC
 from .fields import define_fields, link_fields
 from .health import apply_usage, evaluate_health, mark_unused
 from .lineage import derive, record_unresolved
@@ -293,6 +292,9 @@ def assemble(
 
 def validate(bundle: dict[str, Any], schema_path: Path | None = None) -> list[str]:
     """Return a list of human-readable problems (empty when valid)."""
+    # Imported here: the Splunk app runs without jsonschema (it ships compiled code).
+    from jsonschema import Draft202012Validator, FormatChecker
+
     schema = json.loads((schema_path or find_schema()).read_text(encoding="utf-8"))
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     problems = [

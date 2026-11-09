@@ -1,16 +1,26 @@
 """Publishing to the DelveCat Splunk app: the one write DelveCat makes."""
 
+from __future__ import annotations
+
 import base64
 import gzip
 import hashlib
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 
 import httpx
 import pytest
 
-from delvecat_ingest.publish import PublishError, encode, publish
+from delvecat_ingest.compat import UTC
+from delvecat_ingest.publish import (
+    PublishError,
+    encode,
+    publish,
+    publish_bundle,
+    read_published,
+    save_doc,
+)
 from delvecat_ingest.transport import (
     HttpTransport,
     WriteAttemptError,
@@ -26,6 +36,22 @@ BUNDLE = {
     "entities": [{"id": f"splunk:index:prod:i{n}", "name": f"i{n}"} for n in range(500)],
     "edges": [],
 }
+
+
+def matches(doc: dict, q: dict) -> bool:
+    """The few KV store query operators publish uses."""
+    for key, cond in q.items():
+        if key == "$and":
+            if not all(matches(doc, c) for c in cond):
+                return False
+        elif isinstance(cond, dict):
+            if "$ne" in cond and doc.get(key) == cond["$ne"]:
+                return False
+            if "$gte" in cond and not (key in doc and doc[key] >= cond["$gte"]):
+                return False
+        elif doc.get(key) != cond:
+            return False
+    return True
 
 
 class FakeKV:
@@ -46,17 +72,23 @@ class FakeKV:
         query = parse_qs(url.query)
         if req.method == "GET":
             docs = list(self.docs.values())
+            key = url.path[len(DATA) + 1 :]
+            if key:
+                return (
+                    httpx.Response(200, json=self.docs[key])
+                    if key in self.docs
+                    else (httpx.Response(404))
+                )
             if "query" in query:
-                q = json.loads(query["query"][0])
-                docs = [d for d in docs if d["_key"] == q["_key"]]
+                docs = [d for d in docs if matches(d, json.loads(query["query"][0]))]
             return httpx.Response(200, json=docs)
         if req.method == "POST" and url.path.endswith("/batch_save"):
             for d in json.loads(req.content):
                 self.docs[d["_key"]] = d
             return httpx.Response(200, json=[])
         if req.method == "DELETE":
-            ne = json.loads(query["query"][0])["generation"]["$ne"]
-            self.docs = {k: d for k, d in self.docs.items() if d.get("generation") == ne}
+            q = json.loads(query["query"][0])
+            self.docs = {k: d for k, d in self.docs.items() if not matches(d, q)}
             return httpx.Response(200)
         return httpx.Response(400)
 
@@ -135,7 +167,7 @@ def test_unchanged_catalog_is_not_rewritten(bundle_file):
     kv.requests.clear()
     again = publish(bundle_file, transport(kv), log=lambda _: None)
     assert again["generation"] == first["generation"]
-    assert [m for m, _ in kv.requests] == ["GET"]
+    assert not [m for m, _ in kv.requests if m != "GET"]
     forced = publish(bundle_file, transport(kv), force=True, log=lambda _: None)
     assert forced["generation"] != first["generation"]
 
@@ -151,7 +183,7 @@ def test_generations_are_unique_within_a_second(bundle_file):
 def test_dry_run_writes_nothing(bundle_file):
     kv = FakeKV()
     publish(bundle_file, transport(kv, writes=False), dry_run=True, log=lambda _: None)
-    assert [m for m, _ in kv.requests] == ["GET"] and not kv.docs
+    assert not [m for m, _ in kv.requests if m != "GET"] and not kv.docs
 
 
 @pytest.mark.parametrize("status", [403, 404])
@@ -162,3 +194,14 @@ def test_missing_app_or_role_is_explained(bundle_file, status):
 
 def test_encode_is_deterministic():
     assert encode(BUNDLE) == encode(BUNDLE)
+
+
+def test_status_doc_survives_and_catalog_reads_back(bundle_file):
+    kv = FakeKV()
+    t = transport(kv)
+    save_doc(t, {"_key": "build", "state": "running"})
+    publish(bundle_file, t, part_chars=1000, log=lambda _: None)
+    publish_bundle(dict(BUNDLE, generatedAt="x"), t, part_chars=700, log=lambda _: None)
+    assert kv.docs["build"]["state"] == "running"
+    assert read_published(t)["generatedAt"] == "x"
+    assert read_published(transport(FakeKV())) is None

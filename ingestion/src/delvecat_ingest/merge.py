@@ -20,12 +20,13 @@ merged result instead).
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import PurePath
 from typing import Any
 
 from . import SCHEMA_VERSION, __version__
 from .bundle import apply_versions, ref_from_json, ref_to_json
+from .compat import UTC
 from .fields import link_fields
 from .governance import apply_governance
 from .health import CONSUMER_EDGES, SEVERITY

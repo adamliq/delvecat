@@ -4,9 +4,15 @@ The DelveCat web app as a Splunk app: the catalog opens inside Splunk Web, for
 the people you choose, with no separate web server. Works on Splunk Enterprise
 and Splunk Cloud.
 
-The catalog is still built outside Splunk, by `delvecat-ingest` (or
-`scripts/Build-Catalog.ps1`), and then published into the app. Building it
-inside Splunk on a schedule is a later phase.
+There are two ways to get a catalog into it:
+
+- **Build it in Splunk, on demand**: the app's *Build* page (or the search
+  command `| delvecatbuild`) reads this Splunk and publishes the catalog. No
+  token, no machine outside Splunk. [Details](#build-in-splunk).
+- **Build it outside and publish it**: `delvecat-ingest` (or
+  `scripts/Build-Catalog.ps1`) then `delvecat-ingest publish`. Needed for a
+  catalog of several instances (indexers, Deployment Server, SOAR...),
+  annotations from a repository, or the public redaction profile.
 
 ## Packages
 
@@ -16,8 +22,8 @@ make splunk-app
 
 | Package | For |
 |---|---|
-| `dist/delvecat-<version>.tgz` | Splunk Enterprise 10.4 and later, and Splunk Cloud. Uses Splunk's own page template. |
-| `dist/delvecat-<version>-legacy.tgz` | Splunk Enterprise 9.x to 10.3. Brings its own page template, which Splunk 10.4 deprecates. |
+| `dist/delvecat-<version>.tgz` | Splunk Enterprise 10.4 and later, and Splunk Cloud. Splunk's own page template; the build command runs on Python 3.13 with Splunk SDK 3. |
+| `dist/delvecat-<version>-legacy.tgz` | Splunk Enterprise 9.x to 10.3. Its own page template (Splunk 10.4 deprecates these); the build command runs on Python 3.9 with Splunk SDK 2. |
 
 Ready-built packages are also committed in [`packages/`](packages/)
 (rebuild and replace them with `make splunk-app` after changing the app).
@@ -27,8 +33,10 @@ attaches them to the run (Actions > Splunk app > the run > Artifacts), with
 their AppInspect reports. Pushing a tag `v<version>` that matches `app.conf`
 publishes them as a GitHub release.
 
-Both pass Splunk AppInspect's Splunk Cloud checks with no failures (the legacy
-package warns about its template). Tested on Splunk 9.4 (legacy) and 10.4.
+The main package passes Splunk AppInspect's Splunk Cloud checks with no
+failures. The legacy package fails one, by design: AppInspect no longer
+accepts Python 3.9, the only Python Splunk 9.x has; it is not meant for Splunk
+Cloud. Tested on Splunk 9.4 (legacy) and 10.4.
 
 ## Install
 
@@ -39,13 +47,53 @@ package warns about its template). Tested on Splunk 9.4 (legacy) and 10.4.
    app's permissions refer to them by name:
    - `delvecat_user`: may open the app and read the catalog. Add it to the
      people who should see the catalog.
-   - `delvecat_publisher`: may replace the catalog. Give it to one service
-     account, with a token (*Settings > Tokens*).
+   - `delvecat_publisher`: may replace the catalog, from the Build page or
+     with `delvecat-ingest publish`. Give it to the people who build (with
+     their usual roles: building runs a search, and reads what they can see),
+     or to one service account with a token for publishing from outside.
 
    Until the roles exist, only admins see the app. Someone without
    `delvecat_user` does not see the app at all (Splunk answers "app not found").
-3. **Publish a catalog** (next section). Then open *DelveCat* from Splunk's
-   app menu.
+3. **Build or publish a catalog** (next sections). Then open *DelveCat* from
+   Splunk's app menu.
+
+## Build in Splunk
+
+Open *DelveCat > Build* (shown to admins and `delvecat_publisher`), choose the
+options and press *Build now*. The page follows the build and shows the new
+catalog when it is done: about 10 seconds on a small Splunk, minutes on a large
+one. The same from a search:
+
+```
+| delvecatbuild [fields=<bool>] [usage=<bool>] [redact=none|internal]
+                [instance=<id>] [instancename=<name>] [dryrun=<bool>] [replacesmaller=<bool>]
+```
+
+- **What it reads**: this Splunk (the search head the app is on) and the
+  products installed on it (Enterprise Security, DB Connect, Stream, Deployment
+  Server), over its REST API and with read-only searches of `_internal` and
+  `_audit`, exactly as `delvecat-ingest build --url` does. It runs as the
+  person who starts it, with their session: **the catalog shows what they can
+  see**, so build as an admin for a complete one.
+- **Options**: `fields=true` samples events to discover fields (slower; feeds
+  schemas, field lineage and quality checks); `usage=false` skips usage and
+  health; `redact=internal` drops personal names; `instance` is the id objects
+  get (keep it the same between builds, so versions and "first seen" dates
+  carry over; the page fills in the current one); `dryrun=true` builds without
+  publishing.
+- **Safeguard**: a catalog with less than half the objects of the current one
+  (not counting fields) is not published, because the builder probably sees
+  less of Splunk than whoever built the current one. The page says so and
+  offers *Build and replace anyway* (`replacesmaller=true`).
+- **One build at a time**: a second build is refused while one runs. *Cancel*
+  stops it (it is an ordinary search job, also in *Activity > Jobs*).
+- **Replaces** the whole catalog with this Splunk's: a catalog of several
+  instances published from outside is replaced (the page warns first).
+- **On a schedule**: save `| delvecatbuild` as a scheduled report if you want
+  one. It runs as the report's owner.
+- **Not in Splunk**: annotations from a repository, the public redaction
+  profile (it needs a secret salt), other instances. Use the command line for
+  those.
 
 ## Publish a catalog
 
@@ -78,16 +126,20 @@ generations are deleted, so a page loading meanwhile never mixes two catalogs
 |---|---|---|
 | The app | `admin`, `sc_admin`, `delvecat_user`, `delvecat_publisher` | `admin`, `sc_admin` |
 | `delvecat_catalog` | the same | `admin`, `sc_admin`, `delvecat_publisher` |
+| `delvecatbuild` command (Build page) | run: `admin`, `sc_admin`, `delvecat_publisher` | `admin`, `sc_admin` |
 
 (`metadata/default.meta`.) The page reads the catalog with the viewer's own
 Splunk session, so these permissions decide who sees it. The catalog is
 deliberately not a file in the app's static folder: Splunk serves those to any
 logged-in user.
 
-**Writing to Splunk.** `delvecat-ingest publish` is the only command that
-writes, and it may write only this collection: `POST` to its `batch_save` and
-`DELETE` of its older documents (`transport.publish_allowlist`). Every other
-request DelveCat sends is read-only, as before.
+Building in Splunk also keeps a `build` document there: who started the
+last build, its progress and result, which the Build page shows.
+
+**Writing to Splunk.** Publishing (`delvecat-ingest publish`, or a build in
+Splunk) is the only writing DelveCat does, and it may write only this
+collection: `POST` to its `batch_save` and `DELETE` of its older documents
+(`transport.publish_allowlist`). Every other request is read-only, as before.
 
 Everyone with `delvecat_user` sees the whole catalog: every index, search,
 role and user it describes, including objects their own Splunk permissions
@@ -112,8 +164,11 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 ```
 splunk-app/
   delvecat/                 the app (built page goes to appserver/static/build/)
-    default/app.conf, collections.conf, data/ui/{nav,views}
+    default/app.conf, collections.conf, commands.conf, searchbnf.conf, data/ui/{nav,views}
     metadata/default.meta   permissions
     appserver/static/pages/catalog.js   loads the page (Splunk's templates load pages/<view>.js)
-  legacy/                   overlay for Splunk 9.x to 10.3: the view and its template
+    bin/delvecatbuild.py    the build command; bin/lib/ is filled by make (packages below)
+  legacy/                   overlay for Splunk 9.x to 10.3: the view, its template, Python 3.9
+  requirements.txt          pure-Python packages bundled in bin/lib (plus delvecat_ingest
+                            and the Splunk SDK: 3.x, or 2.x in the legacy package)
 ```

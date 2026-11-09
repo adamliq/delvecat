@@ -1,7 +1,9 @@
 import { lazy, Suspense } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Link, Route, Routes, useLocation } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { useCatalogState } from "./lib/CatalogContext";
+import { IN_SPLUNK } from "./lib/splunkSource";
+import { BuildPage } from "./pages/BuildPage";
 import { CoveragePage } from "./pages/CoveragePage";
 import { DataProductPage } from "./pages/DataProductPage";
 import { DomainsPage } from "./pages/DomainsPage";
@@ -21,16 +23,26 @@ const SqlPage = lazy(() => import("./pages/SqlPage"));
 
 function Body() {
   const { state } = useCatalogState();
+  const { pathname } = useLocation();
+  // In the Splunk app the Build page works with or without a catalog.
+  if (IN_SPLUNK && pathname === "/build") return <BuildPage />;
   if (state.status === "loading") return <p className="muted">Loading catalog…</p>;
   if (state.status === "error") {
     return (
       <div className="stack">
         <h1>No catalog loaded</h1>
         <p className="error">{state.message}</p>
-        <p>
-          Use <strong>Open bundle</strong> to load a <code>catalog.json</code> produced by{" "}
-          <code>delvecat-ingest</code>. The file is read in your browser and is not uploaded.
-        </p>
+        {IN_SPLUNK ? (
+          <p>
+            <Link to="/build">Build the catalog of this Splunk</Link> (needs the <code>delvecat_publisher</code>{" "}
+            role), or publish one with <code>delvecat-ingest publish</code>.
+          </p>
+        ) : (
+          <p>
+            Use <strong>Open bundle</strong> to load a <code>catalog.json</code> produced by{" "}
+            <code>delvecat-ingest</code>. The file is read in your browser and is not uploaded.
+          </p>
+        )}
       </div>
     );
   }

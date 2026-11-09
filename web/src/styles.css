@@ -477,3 +477,9 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .kpi-sub { font-size: 0.78rem; color: var(--muted); }
 .kpi-sub .status-label { font-size: 0.78rem; }
 .seg-light { color: var(--text); }
+
+/* Build page (Splunk app) */
+.build-form label { display: block; margin: 8px 0; }
+.build-form input[type="text"], .build-form input:not([type]) { width: 18rem; max-width: 100%; }
+.build-form select { width: auto; display: inline-block; }
+.build-form .actions { display: flex; gap: 8px; margin-top: 12px; }

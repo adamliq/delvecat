@@ -102,7 +102,8 @@ Get-Help .\scripts\Build-Catalog.ps1 -Full
 
 `make splunk-app` packages DelveCat as a Splunk app for Splunk Enterprise and
 Splunk Cloud. The catalog opens inside Splunk Web for a `delvecat_user` role.
-Publish a catalog into it with `delvecat-ingest publish`, which writes only
+Build it there on demand (the app's *Build* page, or `| delvecatbuild`), or
+publish one built outside with `delvecat-ingest publish`. Either writes only
 the app's own KV store collection. See [splunk-app/README.md](splunk-app/README.md).
 
 ### Local Splunk for development

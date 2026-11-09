@@ -45,10 +45,16 @@ jobs:
           pkg, path = sys.argv[1:]
           report = json.load(open(path))["reports"][0]
           print(f"{pkg}: {report['summary']}")
+          # The legacy package is for Splunk 9.x to 10.3 on premises, not Splunk Cloud:
+          # Splunk 9.x has only Python 3.9, which AppInspect no longer accepts.
+          known = {"check_commands_conf_python_required"} if "-legacy" in pkg else set()
           bad = 0
           for group in report["groups"]:
               for check in group["checks"]:
                   if check["result"] in ("failure", "error", "warning"):
+                      if check["name"] in known:
+                          print(f"::warning title={check['name']}::{pkg}: expected (Python 3.9)")
+                          continue
                       level = "error" if check["result"] != "warning" else "warning"
                       msg = check["messages"][0]["message"] if check["messages"] else ""
                       print(f"::{level} title={check['name']}::{pkg}: {msg[:400]}")

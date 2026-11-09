@@ -14,6 +14,8 @@ type State =
 interface Ctx {
   state: State;
   openFiles: (files: File[]) => Promise<void>;
+  /** Load the catalog again (after a build in the Splunk app). */
+  reload: () => Promise<void>;
 }
 
 export const CatalogCtx = createContext<Ctx | null>(null);
@@ -34,30 +36,33 @@ function ready(bundle: CatalogBundle, origin: string): State {
 export function CatalogProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>({ status: "loading" });
 
-  useEffect(() => {
+  // In the Splunk app: the catalog published to this Splunk's KV store; elsewhere a URL.
+  const load = useCallback(() => {
     const fail = (err: Error) => setState({ status: "error", message: err.message });
     const override = new URLSearchParams(window.location.search).get("bundle");
     if (IN_SPLUNK && !override) {
-      // In the Splunk app: the catalog published to this Splunk's KV store.
-      fetchSplunkCatalog()
+      return fetchSplunkCatalog()
         .then((r) =>
           r
             ? setState(ready(r.bundle, `published to Splunk ${r.pointer.publishedAt ?? ""}`.trim()))
             : fail(
                 new Error(
                   "No catalog found. Either none has been published to this Splunk yet " +
-                    "(see the app's README), or you need the delvecat_user role.",
+                    "(build it on the Build page, or see the app's README), or you need the delvecat_user role.",
                 ),
               ),
         )
         .catch(fail);
-      return;
     }
     const url = defaultBundleUrl();
-    fetchBundle(url)
+    return fetchBundle(url)
       .then((b) => setState(ready(b, url)))
       .catch(fail);
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   // Local files are parsed in the browser and never uploaded anywhere.
   const openFiles = useCallback(async (files: File[]) => {
@@ -69,7 +74,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(() => ({ state, openFiles }), [state, openFiles]);
+  const value = useMemo(() => ({ state, openFiles, reload: load }), [state, openFiles, load]);
   return <CatalogCtx.Provider value={value}>{children}</CatalogCtx.Provider>;
 }
 

@@ -27,6 +27,7 @@ export function staticBase(): string {
 export const COLLECTION = "delvecat_catalog";
 
 export interface Pointer {
+  publishedBy?: string;
   generation: string;
   parts: number;
   sha256: string;
@@ -105,6 +106,11 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch): Promise<Catalog
   const hash = await sha256Hex(bytes);
   if (hash && hash !== pointer.sha256) throw new BundleError("The published catalog is corrupt (sha256 mismatch).");
   return parseBundle(await gunzip(bytes));
+}
+
+/** The published catalog's pointer document (who published it, and when), or null. */
+export async function readPointer(fetchFn: Fetch = (u, i) => fetch(u, i)): Promise<Pointer | null> {
+  return getDoc<Pointer>("current", fetchFn);
 }
 
 /** The catalog published to this Splunk, or null if none has been published yet. */

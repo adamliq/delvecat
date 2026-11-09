@@ -3,7 +3,7 @@ name = "delvecat-ingest"
 version = "0.1.0"
 description = "Read-only metadata extraction from Splunk into DelveCat catalog bundles"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"  # Splunk 9.x bundles Python 3.9
 license = "Apache-2.0"
 dependencies = [
   "defusedxml>=0.7.1",
@@ -27,7 +27,7 @@ packages = ["src/delvecat_ingest"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]

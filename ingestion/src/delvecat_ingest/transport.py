@@ -149,6 +149,7 @@ class HttpTransport:
         auth_prefix: str = "Bearer ",
         http_transport: httpx.BaseTransport | None = None,
         allowed_writes: tuple[re.Pattern[str], ...] = (),
+        trust_env: bool = True,
     ):
         self._allowed_writes = allowed_writes
         self._client = httpx.Client(
@@ -157,6 +158,7 @@ class HttpTransport:
             verify=verify,
             timeout=timeout,
             transport=http_transport,
+            trust_env=trust_env,  # False for splunkd on the same machine: no proxy
         )
         self._backoff = backoff
         self._retries = retries
@@ -233,7 +235,9 @@ class RecordingTransport:
     """
 
     def __init__(self, inner: Transport, root: Path) -> None:
-        from datetime import UTC, datetime
+        from datetime import datetime
+
+        from .compat import UTC
 
         self.inner = inner
         self.root = root

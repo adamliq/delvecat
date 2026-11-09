@@ -35,9 +35,7 @@ def runs_per_day(cron: str | None) -> float | None:
     if len(parts) != 5:
         return None
     try:
-        minute, hour, dom, month, dow = (
-            _field(p, lo, hi) for p, (lo, hi) in zip(parts, RANGES, strict=True)
-        )
+        minute, hour, dom, month, dow = (_field(p, lo, hi) for p, (lo, hi) in zip(parts, RANGES))
     except ValueError:
         return None
     dow = {0 if d == 7 else d for d in dow}

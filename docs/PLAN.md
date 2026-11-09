@@ -615,7 +615,7 @@ surfaces; status is always icon + label, never color alone.
 - Example queries, a table browser with column notes, ids linked to entity
   pages, CSV download, and the query kept in the URL for sharing.
 
-### Splunk app, phase 1 (done)
+### Splunk app, phases 1 and 2 (done)
 
 DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud
 (`splunk-app/`, `make splunk-app`). The web app is built for Splunk Web
@@ -629,12 +629,18 @@ page template (10.4+ and Cloud) and a legacy one with its own template (9.x to
 
 Next phases:
 
-- **Phase 2, building inside Splunk.** A scheduled modular input runs ingestion
-  on the search head with the app's own session, tokens for other instances in
-  Splunk's password store from a setup page, a build-status page, and on a
-  search head cluster only one member builds. Needs the ingestion code on
-  Splunk's bundled Python (currently 3.11+) with its dependencies vendored, and
-  without `jsonschema` (compiled code).
+- **Phase 2, building inside Splunk (on demand: done).** The app's Build page
+  runs `| delvecatbuild`, a custom search command that builds the catalog of
+  the search head it runs on, with the session of the person who starts it, and
+  publishes it to the app's collection (`inapp.build_here`, then
+  `publish_bundle`). Progress and the result are kept in a `build` document;
+  one build at a time; a much smaller catalog than the current one is not
+  published unasked. Ingestion now runs on Python 3.9 (Splunk 9.x) to 3.13
+  (Splunk 10.x); the app bundles its pure-Python dependencies, without
+  `jsonschema`, and the Splunk SDK (3.x on 10.4+/Cloud, 2.x in the legacy
+  package). Still to do: a built-in schedule (a scheduled report of
+  `| delvecatbuild` works today), other instances with tokens in Splunk's
+  password store, annotations kept in the app.
 - **Phase 3, per-viewer filtering.** Show each viewer only what their roles can
   reach, instead of one role seeing everything.
 

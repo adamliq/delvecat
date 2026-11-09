@@ -1,4 +1,4 @@
-.PHONY: install demo dev test lint build types annotations perf splunk-app
+.PHONY: install demo dev test lint build types annotations perf splunk-app splunk-app-lib
 
 # Repository that holds annotations/, used for "suggest an edit" links in the demo.
 ANNOTATION_REPO ?= https://github.com/adamliq/delvecat
@@ -64,7 +64,25 @@ APP_BUILD = splunk-app/delvecat/appserver/static/build
 APP_STAGE = dist/stage
 APP_TAR = COPYFILE_DISABLE=1 tar --exclude='local' --exclude='local.meta' --exclude='*.pyc' \
 	--exclude='.DS_Store' --owner=0 --group=0 --mode='u+rwX,go+rX,go-w' -czf
-splunk-app:
+APP_LIB = splunk-app/delvecat/bin/lib
+# Splunk 10.4+ and Splunk Cloud run the command on Python 3.13 with the current SDK;
+# the legacy package (Splunk 9.x to 10.3) on Python 3.9, with the last SDK for it.
+SDK = splunk-sdk==3.0.1
+SDK_LEGACY = splunk-sdk==2.1.1
+define vendor  # $(1) target dir, $(2) Python version, $(3) SDK requirement
+	rm -rf $(1) && mkdir -p $(1)
+	cd ingestion && uv pip install --quiet --target $(abspath $(1)) --python-version $(2) \
+		--python-platform linux -r ../splunk-app/requirements.txt "$(3)"
+	# PyYAML falls back to pure Python without its compiled part; no scripts, no caches.
+	find $(1) -name '*.so' -delete
+	rm -rf $(1)/bin $(1)/_yaml
+	cp -r ingestion/src/delvecat_ingest $(1)/delvecat_ingest
+	find $(1) -name __pycache__ -prune -exec rm -rf {} +
+endef
+splunk-app-lib:  ## the Python packages | delvecatbuild needs (pure Python)
+	$(call vendor,$(APP_LIB),3.13,$(SDK))
+
+splunk-app: splunk-app-lib
 	cd web && npx tsc -b && npx vite build --mode splunk
 	rm -f $(APP_BUILD)/index.html
 	cp -r web/public/reference $(APP_BUILD)/reference
@@ -72,6 +90,7 @@ splunk-app:
 	$(APP_TAR) dist/delvecat-$(APP_VERSION).tgz -C splunk-app delvecat
 	cp -r splunk-app/delvecat $(APP_STAGE)/legacy/delvecat
 	cp -r splunk-app/legacy/. $(APP_STAGE)/legacy/delvecat/
+	$(call vendor,$(APP_STAGE)/legacy/delvecat/bin/lib,3.9,$(SDK_LEGACY))
 	$(APP_TAR) dist/delvecat-$(APP_VERSION)-legacy.tgz -C $(APP_STAGE)/legacy delvecat
 	rm -rf $(APP_STAGE)
 	@ls -1 dist/delvecat-$(APP_VERSION)*.tgz

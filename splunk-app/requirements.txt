@@ -1,0 +1,7 @@
+# Python packages bundled into the app (bin/lib) for | delvecatbuild, by make splunk-app.
+# Pure Python, for Python 3.9 (Splunk 9.x) to 3.13 (Splunk 10.x). jsonschema is left
+# out (it needs compiled code); delvecat_ingest itself is copied from ingestion/src.
+# The Splunk SDK differs per package (see the Makefile): 3.x needs Python 3.13.
+httpx==0.28.1
+defusedxml==0.7.1
+pyyaml==6.0.3

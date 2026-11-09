@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type Rea
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { searchPath } from "../lib/routes";
+import { canBuild } from "../lib/splunkBuild";
 import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -15,6 +16,12 @@ export function Layout({ children }: { children: ReactNode }) {
     e.target.value = "";
     if (files.length) void openFiles(files).then(() => navigate("/"));
   };
+
+  // The Build button is for those who may build (delvecat_publisher, admins).
+  const [builder, setBuilder] = useState(false);
+  useEffect(() => {
+    if (IN_SPLUNK) void canBuild().then(setBuilder);
+  }, []);
 
   useEffect(() => {
     // React does not type the non-standard directory picker attribute.
@@ -55,6 +62,11 @@ export function Layout({ children }: { children: ReactNode }) {
         {IN_SPLUNK ? (
           // In the Splunk app the catalog comes from Splunk; this is the way back.
           <div className="open-buttons">
+            {builder && (
+              <NavLink className="btn" to="/build" title="Build the catalog of this Splunk now">
+                Build
+              </NavLink>
+            )}
             <a className="btn" href={splunkHomeUrl()} title="Back to Splunk's home page">
               Splunk
             </a>

@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from jsonschema import Draft202012Validator, FormatChecker
 
 from .bundle import find_schema
 from .structured import apply_values, check_definitions, check_values, missing_required
@@ -86,6 +85,9 @@ def _iso_dates(value: Any) -> Any:
 
 def load_annotations(directory: Path) -> AnnotationSet:
     """Load and validate every ``*.yaml`` / ``*.yml`` file under ``directory``."""
+    # Imported here: the Splunk app runs without jsonschema (it ships compiled code).
+    from jsonschema import Draft202012Validator, FormatChecker
+
     schema = json.loads(find_schema(name="annotations.schema.json").read_text(encoding="utf-8"))
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     result = AnnotationSet()
