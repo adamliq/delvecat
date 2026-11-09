@@ -26,6 +26,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
         working-directory: web
+      - uses: astral-sh/setup-uv@v6  # bundles the build command's Python packages
       - id: version
         run: echo "version=$(sed -n 's/^version = //p' splunk-app/delvecat/default/app.conf | head -1)" >> "$GITHUB_OUTPUT"
       - run: make splunk-app
