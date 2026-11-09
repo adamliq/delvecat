@@ -71,6 +71,10 @@ class DelveCatBuild(GeneratingCommand):
     replacesmaller = Option(require=False, validate=validators.Boolean(), default=False)
     # Comma-separated parts to run (see inapp.PARTS); all of them when not given.
     parts = Option(require=False, validate=validators.Match("parts", r"^[A-Za-z, ]*$"))
+    # Field discovery only in these indexes (comma-separated, * wildcards).
+    fieldindexes = Option(
+        require=False, validate=validators.Match("fieldindexes", r"^[A-Za-z0-9_*, -]*$")
+    )
     # Seconds a single search may run before it is cancelled; 0 for no limit.
     searchtimeout = Option(
         require=False, validate=validators.Integer(minimum=0, maximum=86400), default=300
@@ -110,6 +114,7 @@ class DelveCatBuild(GeneratingCommand):
                 "instance": self.instance,
                 "parts": sorted(parts) if parts is not None else None,
                 "searchTimeout": self.searchtimeout,
+                "fieldIndexes": self.fieldindexes or None,
             },
         }
         self._claim(transport, status)
@@ -140,6 +145,7 @@ class DelveCatBuild(GeneratingCommand):
                 previous=previous,
                 progress=progress,
                 parts=parts,
+                field_indexes=self.fieldindexes,
             )
             # Fields left out (fields=false) are not "seeing less": compare everything else.
             before = _objects(previous) if previous else 0

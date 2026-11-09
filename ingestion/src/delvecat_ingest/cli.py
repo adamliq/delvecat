@@ -22,7 +22,7 @@ from .connectors import (
     stream,
     ueba,
 )
-from .connectors.splunk import Options
+from .connectors.splunk import Options, data
 from .governance import apply_governance
 from .merge import MergeError, merge_bundles
 from .model import ExtractResult, merge_facts
@@ -96,11 +96,17 @@ def _build(args: argparse.Namespace) -> int:
     if args.record and splunk_source:
         transport = RecordingTransport(transport, Path(args.record))
 
+    try:
+        field_indexes = data.parse_index_list(args.field_indexes)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     options = Options(
         inventory_window=args.inventory_window,
         max_hosts=args.max_hosts,
         max_sources=args.max_sources,
         fields=args.fields,
+        field_indexes=field_indexes,
         max_field_sourcetypes=args.max_field_sourcetypes,
         usage=not args.no_usage,
         usage_window=args.usage_window,
@@ -455,6 +461,12 @@ def main(argv: list[str] | None = None) -> int:
         help="sample events per sourcetype to discover fields (slower)",
     )
     inv.add_argument("--max-field-sourcetypes", type=int, default=100)
+    inv.add_argument(
+        "--field-indexes",
+        metavar="INDEX,INDEX",
+        help="with --fields: sample only sourcetypes in these indexes, and only there "
+        "(comma-separated, * wildcards; default all)",
+    )
     use = b.add_argument_group("usage and health")
     use.add_argument(
         "--no-usage",

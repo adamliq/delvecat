@@ -76,7 +76,7 @@ describe("fetchSplunkCatalog", () => {
   });
 });
 
-import { ALL_PARTS, DEFAULT_PARTS, buildSearch, formKey, splQuote, withNeeds } from "./splunkBuild";
+import { ALL_PARTS, DEFAULT_PARTS, buildSearch, formKey, invalidIndexes, splQuote, withNeeds } from "./splunkBuild";
 
 describe("build search", () => {
   it("quotes values so they cannot add arguments or commands", () => {
@@ -95,6 +95,15 @@ describe("build search", () => {
       '| delvecatbuild parts="indexes,inventory,fields" searchtimeout=120 redact=internal instance="prod" ' +
         'instancename="x\\" | delete" weburl="https://sh" replacesmaller=true',
     );
+  });
+
+  it("limits field discovery to valid index names, only when fields are discovered", () => {
+    const base = { searchTimeout: 0, redact: "none" as const, instance: "", instanceName: "" };
+    expect(buildSearch({ ...base, parts: ["fields"], fieldIndexes: " web, app_* ,web" })).toContain(
+      'fieldindexes="web,app_*"',
+    );
+    expect(buildSearch({ ...base, parts: ["indexes"], fieldIndexes: "web" })).not.toContain("fieldindexes");
+    expect(invalidIndexes('web, a b, x" | y')).toEqual(["a b", 'x" | y']);
   });
 
   it("lists every part once, adds what parts need, and leaves field discovery out by default", () => {

@@ -86,3 +86,75 @@ def test_build_page_lists_every_part():
     source = Path(__file__).parents[2] / "web" / "src" / "lib" / "splunkBuild.ts"
     listed = re.findall(r'\{ id: "(\w+)"', source.read_text(encoding="utf-8"))
     assert sorted(listed) == sorted(PARTS)
+
+
+class SpyTransport(FixtureTransport):
+    """Recorded responses, noting each search's SPL."""
+
+    def __init__(self, root):
+        super().__init__(root)
+        self.spl: dict[str, str] = {}
+
+    def search(self, name, spl, *args, **kwargs):
+        self.spl[name] = spl
+        return super().search(name, spl, *args, **kwargs)
+
+
+def _sourcetype_indexes(bundle):
+    return {
+        e["name"]: set(e["properties"]["observed"]["eventsByIndex"])
+        for e in bundle["entities"]
+        if e["type"] == "sourcetype" and (e.get("properties") or {}).get("observed")
+    }
+
+
+def test_field_samples_search_only_where_the_sourcetype_is():
+    spy = SpyTransport(FIXTURE)
+    bundle = build_here(spy, "acme", parts={"fields"})
+    seen = _sourcetype_indexes(bundle)
+    samples = {k.split("/", 1)[1]: v for k, v in spy.spl.items() if k.startswith("fieldsummary/")}
+    assert samples
+    for st, spl in samples.items():
+        assert "index=*" not in spl
+        assert all(f'index="{i}"' in spl for i in seen[st])
+
+
+def test_field_discovery_limited_to_chosen_indexes():
+    from delvecat_ingest.connectors.splunk.data import parse_index_list
+
+    assert parse_index_list(" main, web_* ,main") == ("main", "web_*")
+    assert parse_index_list("") is None
+    with pytest.raises(ValueError, match="invalid index"):
+        parse_index_list('main" OR index=x')
+
+    everything = build_here(FixtureTransport(FIXTURE), "acme", parts={"fields"})
+    target = sorted({i for idx in _sourcetype_indexes(everything).values() for i in idx})[0]
+    spy = SpyTransport(FIXTURE)
+    bundle = build_here(spy, "acme", parts={"fields"}, field_indexes=target)
+    sampled = [k.split("/", 1)[1] for k in spy.spl if k.startswith("fieldsummary/")]
+    seen = _sourcetype_indexes(bundle)
+    assert sampled and all(target in seen[st] for st in sampled)
+    assert all(spy.spl[f"fieldsummary/{st}"].startswith(f'(index="{target}")') for st in sampled)
+    fields_of = {e["properties"]["sourcetype"] for e in bundle["entities"] if e["type"] == "field"}
+    assert fields_of <= set(sampled)
+
+    none = build_here(FixtureTransport(FIXTURE), "acme", parts={"fields"}, field_indexes="nope_*")
+    report = next(r for r in none["ingestionReport"] if r["connector"] == "splunk.fields")
+    assert report["status"] == "partial" and "nope_*" in report["message"]
+
+
+def test_cli_field_indexes(tmp_path, capsys):
+    out = tmp_path / "c.json"
+    base = [
+        "build",
+        "--fixtures",
+        str(FIXTURE),
+        "--instance",
+        "acme",
+        "--fields",
+        "--out",
+        str(out),
+    ]
+    assert main([*base, "--field-indexes", "bad name"]) == 2
+    assert "invalid index" in capsys.readouterr().err
+    assert main([*base, "--field-indexes", "main,_internal"]) == 0

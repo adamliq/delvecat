@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import fnmatch
+import re
 from typing import Any
 
 from ...model import ExtractResult
@@ -10,6 +12,18 @@ from ...transport import EndpointForbidden, EndpointNotFound, SearchError
 from .common import NS, Ctx, add_global, add_ko, content, epoch_to_iso, ref, split_list, to_int
 
 ALL_INDEXES = "(index=* OR index=_*)"
+INDEX_PATTERN = re.compile(r"^[A-Za-z0-9_*-]+$")  # index names, with * wildcards
+
+
+def parse_index_list(text: str | None) -> tuple[str, ...] | None:
+    """'web, main , app_*' -> ('web', 'main', 'app_*'); empty -> None (all indexes)."""
+    names = tuple(dict.fromkeys(p.strip() for p in (text or "").split(",") if p.strip()))
+    if bad := [n for n in names if not INDEX_PATTERN.match(n)]:
+        raise ValueError(f"invalid index name(s): {', '.join(bad)} (letters, digits, _ - and *)")
+    return names or None
+
+
+MAX_SAMPLE_INDEXES = 50  # beyond this, a field sample searches all indexes instead
 
 
 def extract_indexes(ctx: Ctx, out: ExtractResult) -> int:
@@ -248,23 +262,44 @@ def extract_fields(ctx: Ctx, out: ExtractResult) -> int:
         internal_only = all(i.startswith("_") for i in obs.get("eventsByIndex", {}))
         return (internal_only, -obs["eventCount"])  # customer data first, then by volume
 
+    wanted = ctx.options.field_indexes
+    if wanted and (bad := [p for p in wanted if not INDEX_PATTERN.match(p)]):
+        raise ValueError(f"invalid index name(s) for field discovery: {', '.join(bad)}")
+
+    def sample_indexes(e: dict[str, Any]) -> list[str]:
+        """Where to sample a sourcetype: the indexes it was seen in (and that were asked for)."""
+        seen = sorted(e["properties"]["observed"].get("eventsByIndex") or {})
+        if wanted:
+            seen = [i for i in seen if any(fnmatch.fnmatchcase(i, p) for p in wanted)]
+        return seen
+
     sourcetypes = sorted(
         (
             e
             for e in out.entities
             if e["type"] == "sourcetype"
             and (e.get("properties", {}).get("observed") or {}).get("eventCount")
+            and (not wanted or sample_indexes(e))
         ),
         key=rank,
     )[: ctx.options.max_field_sourcetypes]
+    if wanted and not sourcetypes:
+        return 0, f"no sourcetype was seen in the indexes asked for ({', '.join(wanted)})"
     n = 0
     failed: list[str] = []
     for st in sourcetypes:
         name = st["name"].replace('"', '\\"')
+        # Only the indexes the sourcetype is in: far cheaper than all of them on a big Splunk.
+        indexes = sample_indexes(st)
+        where = (
+            "(" + " OR ".join(f'index="{i}"' for i in indexes) + ")"
+            if indexes and len(indexes) <= MAX_SAMPLE_INDEXES
+            else ALL_INDEXES
+        )
         try:
             rows = ctx.transport.search(
                 f"fieldsummary/{st['name']}",
-                f'{ALL_INDEXES} sourcetype="{name}" | head {ctx.options.field_sample_events} '
+                f'{where} sourcetype="{name}" | head {ctx.options.field_sample_events} '
                 "| fieldsummary maxvals=0 | fields field count distinct_count numeric_count",
                 earliest=ctx.options.inventory_window,
             )

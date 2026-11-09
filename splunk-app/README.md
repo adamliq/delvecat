@@ -68,6 +68,7 @@ one. The same from a search:
 | delvecatbuild [fields=<bool>] [usage=<bool>] [redact=none|internal]
                 [instance=<id>] [instancename=<name>] [dryrun=<bool>] [replacesmaller=<bool>]
                 [parts="<part>,<part>,..."] [searchtimeout=<seconds>]
+                [fieldindexes="<index>,<index>,..."]
 ```
 
 - **What it reads**: this Splunk (the search head the app is on) and the
@@ -91,6 +92,12 @@ one. The same from a search:
   as in `inapp.PARTS`). **Only the selected parts are read, so the published
   catalog holds only what they find**: use it to try a slow part, or on a Splunk
   where some parts are not wanted.
+- **Field discovery in chosen indexes**: with field discovery selected, the page
+  offers *Discover fields only in indexes* (comma-separated, `*` wildcards,
+  suggestions from the current catalog; `fieldindexes="web,app_*"` in a
+  search). Only sourcetypes seen in those indexes are sampled, and only there.
+  Without it, each sourcetype is still sampled only in the indexes it was seen
+  in, never across all indexes.
 - **Search time limit**: any single search running longer than this (300
   seconds by default; `searchtimeout=0` for none) is cancelled, and its part
   is reported as timed out while the rest of the build goes on. In field

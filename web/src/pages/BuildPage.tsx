@@ -5,6 +5,7 @@ import { PartsPicker } from "../components/PartsPicker";
 import {
   ALL_PARTS,
   type BuildOptions,
+  invalidIndexes,
   DEFAULT_PARTS,
   DEFAULT_SEARCH_TIMEOUT,
   PART_GROUPS,
@@ -99,6 +100,7 @@ export function BuildPage() {
       // The last build's choices, if it named its parts.
       parts: status?.options?.parts?.filter((id) => ALL_PARTS.includes(id)) ?? o.parts,
       searchTimeout: status?.options?.searchTimeout ?? o.searchTimeout,
+      fieldIndexes: status?.options?.fieldIndexes ?? o.fieldIndexes,
       redact: (status?.options?.redact as BuildOptions["redact"]) ?? o.redact,
       instance: status?.instance ?? fromCatalog?.id ?? "",
       instanceName: fromCatalog?.name && fromCatalog.name !== fromCatalog.id ? fromCatalog.name : "",
@@ -136,6 +138,10 @@ export function BuildPage() {
     }
   };
 
+  const badIndexes = invalidIndexes(opts.fieldIndexes ?? "");
+  const indexNames = [
+    ...new Set((bundle?.entities ?? []).filter((e) => e.type === "index").map((e) => e.name)),
+  ].sort();
   // Field discovery is optional; leaving anything else out makes a partial catalog.
   const partial = DEFAULT_PARTS.some((id) => !opts.parts.includes(id));
   const others = (bundle?.instances ?? []).filter((i) => i.id !== (opts.instance || status?.instance));
@@ -206,6 +212,28 @@ export function BuildPage() {
             onChange={(parts) => setOpts({ ...opts, parts })}
             disabled={running}
           />
+          {opts.parts.includes("fields") && (
+            <label>
+              Discover fields only in indexes{" "}
+              <input
+                value={opts.fieldIndexes ?? ""}
+                placeholder="all indexes"
+                list="delvecat-index-names"
+                onChange={(e) => setOpts({ ...opts, fieldIndexes: e.target.value })}
+                disabled={running}
+                aria-invalid={badIndexes.length > 0}
+              />{" "}
+              <span className="muted">comma-separated, * wildcards (e.g. web, app_*); empty for all</span>
+              <datalist id="delvecat-index-names">
+                {indexNames.map((n) => (
+                  <option key={n} value={n} />
+                ))}
+              </datalist>
+              {badIndexes.length > 0 && (
+                <span className="error"> Not index names: {badIndexes.join(", ")}</span>
+              )}
+            </label>
+          )}
           <label>
             Search time limit{" "}
             <input
@@ -248,7 +276,7 @@ export function BuildPage() {
             </p>
           )}
           <div className="actions">
-            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0}>
+            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0 || badIndexes.length > 0}>
               {running ? "Building…" : busy ? "Starting…" : "Build now"}
             </button>
             {running && status && (

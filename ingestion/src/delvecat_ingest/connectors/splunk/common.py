@@ -27,6 +27,8 @@ class Options:
     fields: bool = False
     max_field_sourcetypes: int = 100
     field_sample_events: int = 1000
+    # Field discovery only in these indexes (names, * wildcards); None for all of them.
+    field_indexes: tuple[str, ...] | None = None
     usage: bool = True
     usage_window: str = "-30d"  # audit, dashboard views, license
     health_window: str = "-7d"  # scheduler, parsing warnings

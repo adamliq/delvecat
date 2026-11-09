@@ -99,6 +99,13 @@ above, with annotations, redaction, `--previous` and `--shard` applied to the
 merge. Tokens are read from environment variables (or asked for without
 echoing) and passed to `delvecat-ingest` only through its environment.
 
+## Field discovery
+
+`--fields` samples up to 1,000 events of each of the 100 busiest observed
+sourcetypes (`--max-field-sourcetypes`), searching only the indexes the
+sourcetype was seen in. `--field-indexes web,app_*` narrows it to the
+sourcetypes in those indexes (`*` wildcards), sampled only there.
+
 ## Search time limit
 
 Every search a build runs (inventory, hosts, sources, forwarders, field

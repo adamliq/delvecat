@@ -13,7 +13,7 @@ from typing import Any
 
 from .bundle import assemble
 from .connectors import db_connect, deployment_server, enterprise_security, splunk, stream
-from .connectors.splunk import Options
+from .connectors.splunk import Options, data
 from .governance import apply_governance
 from .model import ExtractResult, merge_facts
 from .redaction import load_profile, redact_bundle
@@ -60,6 +60,7 @@ def build_here(
     previous: dict[str, Any] | None = None,
     progress: Callable[[str], None] | None = None,
     parts: set[str] | None = None,
+    field_indexes: str | None = None,
 ) -> dict[str, Any]:
     """Extract this Splunk into a catalog bundle (not written anywhere).
 
@@ -79,7 +80,12 @@ def build_here(
     else:
         chosen = set(PARTS)
     platform = {p for p in chosen if p in splunk.EXTRACTORS}
-    options = Options(fields=fields, usage=usage, progress=say)
+    options = Options(
+        fields=fields,
+        usage=usage,
+        progress=say,
+        field_indexes=data.parse_index_list(field_indexes),  # field discovery only there
+    )
     result = (
         splunk.extract(transport, instance_id, options, platform) if platform else ExtractResult()
     )

@@ -107,11 +107,25 @@ export function withNeeds(parts: string[]): string[] {
   return ALL_PARTS.filter((id) => out.has(id));
 }
 
+const INDEX_NAME = /^[A-Za-z0-9_*-]+$/;
+
+/** "web, app_* ,web" -> ["web", "app_*"]. */
+export function parseIndexList(text: string): string[] {
+  return [...new Set(text.split(",").map((s) => s.trim()).filter(Boolean))];
+}
+
+/** Index names that are not valid (letters, digits, _ - and * only). */
+export function invalidIndexes(text: string): string[] {
+  return parseIndexList(text).filter((n) => !INDEX_NAME.test(n));
+}
+
 export interface BuildOptions {
   /** Part ids to run (see PART_GROUPS). */
   parts: string[];
   /** Seconds a single search may run before it is cancelled; 0 for no limit. */
   searchTimeout: number;
+  /** Field discovery only in these indexes: comma-separated, * wildcards; empty for all. */
+  fieldIndexes?: string;
   redact: "none" | "internal";
   instance: string;
   instanceName: string;
@@ -169,6 +183,8 @@ export function buildSearch(o: BuildOptions): string {
     `searchtimeout=${Math.max(0, Math.round(o.searchTimeout))}`,
     `redact=${o.redact}`,
   ];
+  const indexes = parseIndexList(o.fieldIndexes ?? "");
+  if (o.parts.includes("fields") && indexes.length) args.push(`fieldindexes=${splQuote(indexes.join(","))}`);
   if (o.instance.trim()) args.push(`instance=${splQuote(o.instance.trim())}`);
   if (o.instanceName.trim()) args.push(`instancename=${splQuote(o.instanceName.trim())}`);
   if (o.webUrl) args.push(`weburl=${splQuote(o.webUrl)}`);
