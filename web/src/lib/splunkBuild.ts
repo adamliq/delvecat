@@ -5,9 +5,113 @@
  */
 import { APP, COLLECTION, splunkdUrl } from "./splunkSource";
 
+export interface Part {
+  id: string;
+  label: string;
+  /** Runs Splunk searches (time-limited), rather than only reading configuration. */
+  searches?: boolean;
+  /** Slow on a large Splunk. */
+  slow?: boolean;
+  /** Another part it needs, selected with it. */
+  needs?: string;
+}
+
+export interface PartGroup {
+  name: string;
+  parts: Part[];
+}
+
+/**
+ * Every part a build can run, as `| delvecatbuild parts=...` names them (the ingestion's
+ * splunk.EXTRACTORS and inapp.PRODUCTS; a test there checks this list matches).
+ */
+export const PART_GROUPS: PartGroup[] = [
+  {
+    name: "Platform",
+    parts: [
+      { id: "serverInfo", label: "Server information" },
+      { id: "apps", label: "Apps" },
+      { id: "users", label: "Users" },
+      { id: "roles", label: "Roles" },
+    ],
+  },
+  {
+    name: "Data",
+    parts: [
+      { id: "indexes", label: "Indexes" },
+      { id: "sourcetypes", label: "Sourcetype definitions" },
+      { id: "inventory", label: "Data inventory (sourcetypes per index)", searches: true },
+      { id: "hosts", label: "Hosts", searches: true },
+      { id: "sources", label: "Sources", searches: true },
+      { id: "inputs", label: "Inputs" },
+      { id: "forwarders", label: "Forwarders", searches: true },
+      { id: "fields", label: "Discover fields by sampling events", searches: true, slow: true, needs: "inventory" },
+    ],
+  },
+  {
+    name: "Knowledge objects",
+    parts: [
+      { id: "savedSearches", label: "Saved searches and alerts" },
+      { id: "dashboards", label: "Dashboards" },
+      { id: "macros", label: "Macros" },
+      { id: "eventtypes", label: "Event types" },
+      { id: "tags", label: "Tags" },
+      { id: "fieldExtractions", label: "Field extractions" },
+      { id: "fieldAliases", label: "Field aliases" },
+      { id: "calculatedFields", label: "Calculated fields" },
+      { id: "automaticLookups", label: "Automatic lookups" },
+      { id: "transforms", label: "Transforms" },
+      { id: "lookupFiles", label: "Lookup files" },
+      { id: "lookupDefinitions", label: "Lookup definitions" },
+      { id: "kvCollections", label: "KV store collections" },
+      { id: "dataModels", label: "Data models" },
+      { id: "alertActions", label: "Alert actions" },
+      { id: "workflowActions", label: "Workflow actions" },
+    ],
+  },
+  {
+    name: "Usage and health",
+    parts: [
+      { id: "usageSavedSearches", label: "Scheduled search runs", searches: true },
+      { id: "usageAdhocSearches", label: "Ad-hoc searches", searches: true, slow: true },
+      { id: "usageUsers", label: "User activity", searches: true },
+      { id: "usageDashboardViews", label: "Dashboard views", searches: true },
+      { id: "healthScheduler", label: "Scheduler health", searches: true },
+      { id: "healthLicense", label: "License usage", searches: true },
+      { id: "healthDailyVolume", label: "Daily volume", searches: true },
+      { id: "healthIngestDelay", label: "Ingestion delay", searches: true },
+      { id: "healthParsing", label: "Parsing warnings (timestamps, line breaking)", searches: true },
+    ],
+  },
+  {
+    name: "Products",
+    parts: [
+      { id: "enterpriseSecurity", label: "Enterprise Security" },
+      { id: "dbConnect", label: "DB Connect" },
+      { id: "stream", label: "Stream" },
+      { id: "deploymentServer", label: "Deployment Server" },
+    ],
+  },
+];
+
+export const ALL_PARTS: string[] = PART_GROUPS.flatMap((g) => g.parts.map((p) => p.id));
+/** What a build runs unless told otherwise: everything but the slow field discovery. */
+export const DEFAULT_PARTS: string[] = ALL_PARTS.filter((id) => id !== "fields");
+export const DEFAULT_SEARCH_TIMEOUT = 300;
+
+/** Add what the chosen parts need (field discovery needs the data inventory). */
+export function withNeeds(parts: string[]): string[] {
+  const all = PART_GROUPS.flatMap((g) => g.parts);
+  const out = new Set(parts);
+  for (const p of all) if (out.has(p.id) && p.needs) out.add(p.needs);
+  return ALL_PARTS.filter((id) => out.has(id));
+}
+
 export interface BuildOptions {
-  fields: boolean;
-  usage: boolean;
+  /** Part ids to run (see PART_GROUPS). */
+  parts: string[];
+  /** Seconds a single search may run before it is cancelled; 0 for no limit. */
+  searchTimeout: number;
   redact: "none" | "internal";
   instance: string;
   instanceName: string;
@@ -28,6 +132,8 @@ export interface BuildStatus {
   /** "smaller": built but not published, being much smaller than the current catalog. */
   reason?: "smaller" | "error";
   previousEntities?: number;
+  /** The catalog was smaller because only some parts were selected. */
+  partial?: boolean;
   dryRun?: boolean;
   entities?: number;
   edges?: number;
@@ -58,7 +164,11 @@ export function splQuote(value: string): string {
 }
 
 export function buildSearch(o: BuildOptions): string {
-  const args = [`fields=${o.fields}`, `usage=${o.usage}`, `redact=${o.redact}`];
+  const args = [
+    `parts=${splQuote(withNeeds(o.parts).join(","))}`,
+    `searchtimeout=${Math.max(0, Math.round(o.searchTimeout))}`,
+    `redact=${o.redact}`,
+  ];
   if (o.instance.trim()) args.push(`instance=${splQuote(o.instance.trim())}`);
   if (o.instanceName.trim()) args.push(`instancename=${splQuote(o.instanceName.trim())}`);
   if (o.webUrl) args.push(`weburl=${splQuote(o.webUrl)}`);

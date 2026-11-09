@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
+import { PartsPicker } from "../components/PartsPicker";
 import {
+  ALL_PARTS,
   type BuildOptions,
+  DEFAULT_PARTS,
+  DEFAULT_SEARCH_TIMEOUT,
+  PART_GROUPS,
   type BuildStatus,
   cancelBuild,
   canBuild,
@@ -35,8 +40,8 @@ export function BuildPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [opts, setOpts] = useState<BuildOptions>({
-    fields: false,
-    usage: true,
+    parts: DEFAULT_PARTS,
+    searchTimeout: DEFAULT_SEARCH_TIMEOUT,
     redact: "none",
     instance: "",
     instanceName: "",
@@ -91,8 +96,9 @@ export function BuildPage() {
     const fromCatalog = bundle?.instances.find((i) => SPLUNK_KINDS.has(String(i.kind)));
     setOpts((o) => ({
       ...o,
-      fields: status?.options?.fields ?? o.fields,
-      usage: status?.options?.usage ?? o.usage,
+      // The last build's choices, if it named its parts.
+      parts: status?.options?.parts?.filter((id) => ALL_PARTS.includes(id)) ?? o.parts,
+      searchTimeout: status?.options?.searchTimeout ?? o.searchTimeout,
       redact: (status?.options?.redact as BuildOptions["redact"]) ?? o.redact,
       instance: status?.instance ?? fromCatalog?.id ?? "",
       instanceName: fromCatalog?.name && fromCatalog.name !== fromCatalog.id ? fromCatalog.name : "",
@@ -130,6 +136,8 @@ export function BuildPage() {
     }
   };
 
+  // Field discovery is optional; leaving anything else out makes a partial catalog.
+  const partial = DEFAULT_PARTS.some((id) => !opts.parts.includes(id));
   const others = (bundle?.instances ?? []).filter((i) => i.id !== (opts.instance || status?.instance));
   const skipped = (status?.problems ?? []).filter((p) => p.status === "skipped");
   const failed = (status?.problems ?? []).filter((p) => p.status !== "skipped");
@@ -192,23 +200,28 @@ export function BuildPage() {
               disabled={running}
             />
           </label>
+          <PartsPicker
+            groups={PART_GROUPS}
+            selected={opts.parts}
+            onChange={(parts) => setOpts({ ...opts, parts })}
+            disabled={running}
+          />
           <label>
+            Search time limit{" "}
             <input
-              type="checkbox"
-              checked={opts.fields}
-              onChange={(e) => setOpts({ ...opts, fields: e.target.checked })}
+              type="number"
+              min={0}
+              max={86400}
+              step={30}
+              className="input-seconds"
+              value={opts.searchTimeout}
+              onChange={(e) => setOpts({ ...opts, searchTimeout: Math.max(0, Number(e.target.value) || 0) })}
               disabled={running}
             />{" "}
-            Discover fields by sampling events (slower; powers schemas, field lineage and quality checks)
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={opts.usage}
-              onChange={(e) => setOpts({ ...opts, usage: e.target.checked })}
-              disabled={running}
-            />{" "}
-            Usage and health from <code>_internal</code> and <code>_audit</code>
+            seconds per search{" "}
+            <span className="muted">
+              (a search running longer is cancelled and its part reported as timed out; 0 for no limit)
+            </span>
           </label>
           <label>
             Redaction{" "}
@@ -221,6 +234,12 @@ export function BuildPage() {
               <option value="internal">internal: drop personal names</option>
             </select>
           </label>
+          {partial && opts.parts.length > 0 && (
+            <p className="notice">
+              Only the selected parts are read: the published catalog will hold just what they find, and replaces
+              the current one. Use <strong>Select all</strong> for a complete catalog.
+            </p>
+          )}
           {others.length > 0 && (
             <p className="notice">
               The current catalog also has {others.map((i) => i.name).join(", ")}. A build here replaces it with
@@ -229,7 +248,7 @@ export function BuildPage() {
             </p>
           )}
           <div className="actions">
-            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running}>
+            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0}>
               {running ? "Building…" : busy ? "Starting…" : "Build now"}
             </button>
             {running && status && (
@@ -299,10 +318,12 @@ export function BuildPage() {
             <div className="notice">
               <p>
                 <strong>Not published.</strong> This build found {status.entities?.toLocaleString()} objects (not counting fields); the
-                current catalog has {status.previousEntities?.toLocaleString()}. {status.user} probably sees less of
-                this Splunk than whoever built the current one, so publishing would hide objects from everyone.
+                current catalog has {status.previousEntities?.toLocaleString()}.{" "}
+                {status.partial
+                  ? "Only some parts were selected, so the new catalog holds only what they read; publishing it would hide the rest from everyone."
+                  : `${status.user} probably sees less of this Splunk than whoever built the current one, so publishing would hide objects from everyone.`}
               </p>
-              <p>Build as an admin, or replace the catalog anyway.</p>
+              <p>{status.partial ? "Select all parts, or replace the catalog anyway." : "Build as an admin, or replace the catalog anyway."}</p>
               {allowed && (
                 <button type="button" className="btn" onClick={() => void start(true)} disabled={busy || running}>
                   Build and replace anyway

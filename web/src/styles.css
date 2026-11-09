@@ -483,3 +483,16 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .build-form input[type="text"], .build-form input:not([type]) { width: 18rem; max-width: 100%; }
 .build-form select { width: auto; display: inline-block; }
 .build-form .actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* Parts picker (Build page) */
+.parts { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px 12px; margin: 12px 0; }
+.parts legend { font-weight: 600; padding: 0 4px; }
+.build-form .parts label { margin: 3px 0; }
+.parts-all { padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 8px !important; }
+.parts-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 24px; }
+.parts-group-name { margin-top: 6px !important; }
+.parts-item { padding-left: 22px; font-size: 0.92rem; }
+.part-tag { display: inline-block; margin-left: 6px; padding: 0 5px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 0.72rem; color: var(--muted); vertical-align: 1px; }
+.part-tag-slow { color: var(--warn); border-color: currentColor; }
+.build-form input.input-seconds { width: 6rem; }

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from ...model import ExtractResult
-from ...transport import EndpointForbidden, EndpointNotFound, Transport
+from ...transport import EndpointForbidden, EndpointNotFound, SearchTimeout, Transport
 from . import access, data, knowledge, server, usage
 from .common import Ctx, Options
 
@@ -82,6 +82,8 @@ def run_extractors(
                     "message": f"permission denied: {exc}",
                 }
             )
+        except SearchTimeout as exc:
+            out.reports.append({"connector": connector, "status": "failed", "message": str(exc)})
         except Exception as exc:  # report and keep going with the other extractors
             out.reports.append(
                 {

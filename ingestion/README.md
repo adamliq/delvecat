@@ -99,6 +99,16 @@ above, with annotations, redaction, `--previous` and `--shard` applied to the
 merge. Tokens are read from environment variables (or asked for without
 echoing) and passed to `delvecat-ingest` only through its environment.
 
+## Search time limit
+
+Every search a build runs (inventory, hosts, sources, forwarders, field
+sampling, usage and health) is cancelled if it runs longer than
+`--search-timeout` seconds (default 300; 0 for no limit). Its part is reported
+as `failed` with the reason in the bundle's `ingestionReport`, and the build
+goes on with the other parts. With a limit, searches run as ordinary search
+jobs that DelveCat polls and, past the limit, cancels: the one `control` request
+it sends, to its own job.
+
 ## Publishing to the Splunk app
 
 ```bash
@@ -137,7 +147,8 @@ setting. Names inside SPL text are not rewritten.
 
 The HTTP client refuses any request that could change Splunk: only `GET` is
 allowed (minus endpoints that act on GET, such as `_reload`), plus `POST` to
-an allow-list of search endpoints. The one exception is `publish`, which may
+an allow-list of search endpoints (running a search, and cancelling DelveCat's
+own search job when it exceeds the search time limit). The one exception is `publish`, which may
 also write the DelveCat Splunk app's own catalog collection, and nothing else.
 Keys that look like credentials and email
 addresses are dropped before anything is written.

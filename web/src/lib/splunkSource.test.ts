@@ -76,14 +76,32 @@ describe("fetchSplunkCatalog", () => {
   });
 });
 
-import { buildSearch, formKey, splQuote } from "./splunkBuild";
+import { ALL_PARTS, DEFAULT_PARTS, buildSearch, formKey, splQuote, withNeeds } from "./splunkBuild";
 
 describe("build search", () => {
   it("quotes values so they cannot add arguments or commands", () => {
     expect(splQuote('a "b" \\ c')).toBe('"a \\"b\\" \\\\ c"');
     expect(
-      buildSearch({ fields: true, usage: false, redact: "internal", instance: "prod", instanceName: 'x" | delete', webUrl: "https://sh" }),
-    ).toBe('| delvecatbuild fields=true usage=false redact=internal instance="prod" instancename="x\\" | delete" weburl="https://sh"');
+      buildSearch({
+        parts: ["fields", "indexes"],
+        searchTimeout: 120,
+        redact: "internal",
+        instance: "prod",
+        instanceName: 'x" | delete',
+        webUrl: "https://sh",
+        replaceSmaller: true,
+      }),
+    ).toBe(
+      '| delvecatbuild parts="indexes,inventory,fields" searchtimeout=120 redact=internal instance="prod" ' +
+        'instancename="x\\" | delete" weburl="https://sh" replacesmaller=true',
+    );
+  });
+
+  it("lists every part once, adds what parts need, and leaves field discovery out by default", () => {
+    expect(new Set(ALL_PARTS).size).toBe(ALL_PARTS.length);
+    expect(withNeeds(["fields"])).toEqual(["inventory", "fields"]);
+    expect(DEFAULT_PARTS).not.toContain("fields");
+    expect(DEFAULT_PARTS.length).toBe(ALL_PARTS.length - 1);
   });
 
   it("reads Splunk Web's CSRF cookie", () => {

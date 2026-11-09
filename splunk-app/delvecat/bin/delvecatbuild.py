@@ -25,7 +25,7 @@ from splunklib.searchcommands import (  # noqa: E402
     validators,
 )
 
-from delvecat_ingest.inapp import build_here  # noqa: E402
+from delvecat_ingest.inapp import PARTS, build_here, resolve_parts  # noqa: E402
 from delvecat_ingest.publish import (  # noqa: E402
     PublishError,
     publish_bundle,
@@ -69,6 +69,12 @@ class DelveCatBuild(GeneratingCommand):
     dryrun = Option(require=False, validate=validators.Boolean(), default=False)
     # Publish even if the new catalog is much smaller than the current one.
     replacesmaller = Option(require=False, validate=validators.Boolean(), default=False)
+    # Comma-separated parts to run (see inapp.PARTS); all of them when not given.
+    parts = Option(require=False, validate=validators.Match("parts", r"^[A-Za-z, ]*$"))
+    # Seconds a single search may run before it is cancelled; 0 for no limit.
+    searchtimeout = Option(
+        require=False, validate=validators.Integer(minimum=0, maximum=86400), default=300
+    )
 
     def generate(self):
         info = self._metadata.searchinfo
@@ -82,6 +88,12 @@ class DelveCatBuild(GeneratingCommand):
             trust_env=False,
             timeout=600,
             allowed_writes=publish_allowlist(APP, COLLECTION),
+            search_timeout=self.searchtimeout or None,
+        )
+        parts = (
+            {p.strip() for p in self.parts.split(",") if p.strip()}
+            if self.parts is not None
+            else None
         )
         status = {
             "_key": "build",
@@ -96,6 +108,8 @@ class DelveCatBuild(GeneratingCommand):
                 "usage": bool(self.usage),
                 "redact": self.redact,
                 "instance": self.instance,
+                "parts": sorted(parts) if parts is not None else None,
+                "searchTimeout": self.searchtimeout,
             },
         }
         self._claim(transport, status)
@@ -125,19 +139,26 @@ class DelveCatBuild(GeneratingCommand):
                 redact=self.redact,
                 previous=previous,
                 progress=progress,
+                parts=parts,
             )
             # Fields left out (fields=false) are not "seeing less": compare everything else.
             before = _objects(previous) if previous else 0
             after = _objects(bundle)
             if before and after < before * SMALLER and not self.replacesmaller:
-                # Usually someone who can see less of Splunk than whoever built it last.
-                status.update(entities=after, previousEntities=before)
+                # Usually a selection of parts, or someone who sees less of Splunk than
+                # whoever built it last.
+                some = parts is not None and resolve_parts(parts) | {"fields"} != set(PARTS)
+                status.update(entities=after, previousEntities=before, partial=some)
+                why = (
+                    "only some parts were selected, and the catalog holds only what they read"
+                    if some
+                    else "you may see less of this Splunk than "
+                    + (published_by or "whoever built it")
+                )
                 raise MuchSmaller(
                     f"the new catalog has {after:,} objects (not counting fields), "
-                    f"the current one {before:,}: "
-                    f"you may see less of this Splunk than {published_by or 'whoever built it'}. "
-                    "Nothing was published. Build as an admin, or replace it anyway "
-                    "(replacesmaller=true)."
+                    f"the current one {before:,}: {why}. Nothing was published. "
+                    "Replace it anyway with replacesmaller=true."
                 )
             progress("publishing")
             pointer = publish_bundle(

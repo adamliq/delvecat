@@ -21,6 +21,9 @@ _POST_ALLOWLIST = (
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/jobs/?$"),
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/v2/jobs/?$"),
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/parser/?$"),
+    # Cancelling a search job: DelveCat cancels its own searches when they exceed the
+    # search time limit. It affects that job only, never configuration.
+    re.compile(r"^/services/search/jobs/[A-Za-z0-9_.-]+/control/?$"),
 )
 
 
@@ -37,6 +40,10 @@ class EndpointNotFound(LookupError):
 
 class SearchError(RuntimeError):
     """Splunk accepted the search request but reported a fatal error in its messages."""
+
+
+class SearchTimeout(SearchError):
+    """A search ran longer than the search time limit and was cancelled."""
 
 
 class EndpointForbidden(PermissionError):
@@ -150,7 +157,12 @@ class HttpTransport:
         http_transport: httpx.BaseTransport | None = None,
         allowed_writes: tuple[re.Pattern[str], ...] = (),
         trust_env: bool = True,
+        search_timeout: float | None = None,
+        poll: float = 0.5,
     ):
+        # None or 0: searches run as one blocking request with no limit (oneshot).
+        self._search_timeout = search_timeout
+        self._poll = poll
         self._allowed_writes = allowed_writes
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"),
@@ -203,6 +215,8 @@ class HttpTransport:
             query = f"search {stripped}"
         # Tag DelveCat's own searches so usage reports can leave them out (SPL comment).
         query = f"{query} {SEARCH_MARKER}"
+        if self._search_timeout:
+            return self._search_job(name, query, earliest, latest)
         resp = self.request(
             "POST",
             "/services/search/jobs",
@@ -225,6 +239,54 @@ class HttpTransport:
         if fatal:
             raise SearchError(f"search {name}: {'; '.join(fatal)}")
         return body.get("results", [])
+
+    def _search_job(self, name: str, query: str, earliest: str, latest: str) -> list[dict]:
+        """Run a search as a job, cancelling it past the search time limit."""
+        resp = self.request(
+            "POST",
+            "/services/search/jobs",
+            data={
+                "search": query,
+                "exec_mode": "normal",
+                "output_mode": "json",
+                "earliest_time": earliest,
+                "latest_time": latest,
+                "timeout": 120,  # keep the finished job only briefly
+            },
+        )
+        self._check(resp, f"search {name}")
+        sid = resp.json()["sid"]
+        job = f"/services/search/jobs/{sid}"
+        limit = float(self._search_timeout or 0)
+        deadline = time.monotonic() + limit
+        while True:
+            content = self.get(job)["entry"][0]["content"]
+            fatal = [
+                m.get("text", "")
+                for m in content.get("messages") or []
+                if isinstance(m, dict) and m.get("type") in ("FATAL", "ERROR")
+            ]
+            if content.get("isFailed") or content.get("dispatchState") == "FAILED":
+                raise SearchError(f"search {name}: {'; '.join(fatal) or 'failed'}")
+            if content.get("isDone"):
+                if fatal:
+                    raise SearchError(f"search {name}: {'; '.join(fatal)}")
+                break
+            if time.monotonic() >= deadline:
+                self.request("POST", f"{job}/control", data={"action": "cancel"})
+                raise SearchTimeout(
+                    f"search {name} ran longer than the search time limit "
+                    f"({limit:g} s) and was cancelled"
+                )
+            time.sleep(self._poll)
+        results: list[dict[str, Any]] = []
+        page = 10000
+        while True:
+            body = self.get(f"{job}/results", {"count": page, "offset": len(results)})
+            batch = body.get("results", [])
+            results.extend(batch)
+            if len(batch) < page:
+                return results
 
 
 class RecordingTransport:

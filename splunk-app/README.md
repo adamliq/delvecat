@@ -60,13 +60,14 @@ Cloud. Tested on Splunk 9.4 (legacy) and 10.4.
 ## Build in Splunk
 
 Open *DelveCat > Build* (shown to admins and `delvecat_publisher`), choose the
-options and press *Build now*. The page follows the build and shows the new
+parts to read and the options, and press *Build now*. The page follows the build and shows the new
 catalog when it is done: about 10 seconds on a small Splunk, minutes on a large
 one. The same from a search:
 
 ```
 | delvecatbuild [fields=<bool>] [usage=<bool>] [redact=none|internal]
                 [instance=<id>] [instancename=<name>] [dryrun=<bool>] [replacesmaller=<bool>]
+                [parts="<part>,<part>,..."] [searchtimeout=<seconds>]
 ```
 
 - **What it reads**: this Splunk (the search head the app is on) and the
@@ -81,10 +82,25 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
+- **Parts**: the page lists the 41 parts of a build, in groups (platform, data,
+  knowledge objects, usage and health, products), with *Select all* and a box
+  per group. Parts marked *search* run Splunk searches; *slow* ones can take a
+  while on a large Splunk. Everything but field discovery is selected by
+  default. A part's prerequisite comes with it (field discovery needs the data
+  inventory). From a search: `parts="indexes,inventory,savedSearches"` (names
+  as in `inapp.PARTS`). **Only the selected parts are read, so the published
+  catalog holds only what they find**: use it to try a slow part, or on a Splunk
+  where some parts are not wanted.
+- **Search time limit**: any single search running longer than this (300
+  seconds by default; `searchtimeout=0` for none) is cancelled, and its part
+  is reported as timed out while the rest of the build goes on. In field
+  discovery, a sourcetype whose sample times out is skipped. The same limit
+  applies on the command line (`delvecat-ingest build --search-timeout`).
 - **Safeguard**: a catalog with less than half the objects of the current one
   (not counting fields) is not published, because the builder probably sees
   less of Splunk than whoever built the current one. The page says so and
-  offers *Build and replace anyway* (`replacesmaller=true`).
+  offers *Build and replace anyway* (`replacesmaller=true`). With only some parts
+  selected, that is the expected outcome, and the page says so.
 - **One build at a time**: a second build is refused while one runs. *Cancel*
   stops it (it is an ordinary search job, also in *Activity > Jobs*).
 - **Replaces** the whole catalog with this Splunk's: a catalog of several

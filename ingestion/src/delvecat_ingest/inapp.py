@@ -15,7 +15,7 @@ from .bundle import assemble
 from .connectors import db_connect, deployment_server, enterprise_security, splunk, stream
 from .connectors.splunk import Options
 from .governance import apply_governance
-from .model import merge_facts
+from .model import ExtractResult, merge_facts
 from .redaction import load_profile, redact_bundle
 
 PRODUCTS: dict[str, Callable[[Any, str], Any]] = {
@@ -25,6 +25,19 @@ PRODUCTS: dict[str, Callable[[Any, str], Any]] = {
     "enterpriseSecurity": enterprise_security.extract,
 }
 INSTANCE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+# Every part a build can run: the Splunk platform extractors, then the products.
+PARTS = [*splunk.EXTRACTORS, *PRODUCTS]
+# Parts that need another one's results.
+NEEDS = {"fields": "inventory"}
+
+
+def resolve_parts(parts: set[str] | None) -> set[str]:
+    """The parts to run: all of them when none are named, plus what the named ones need."""
+    if parts is None:
+        return set(PARTS)
+    if unknown := parts - set(PARTS):
+        raise ValueError(f"unknown part(s): {', '.join(sorted(unknown))}")
+    return parts | {NEEDS[p] for p in parts if p in NEEDS}
 
 
 def default_instance_id(transport: Any) -> str:
@@ -46,8 +59,12 @@ def build_here(
     redact: str | None = None,
     previous: dict[str, Any] | None = None,
     progress: Callable[[str], None] | None = None,
+    parts: set[str] | None = None,
 ) -> dict[str, Any]:
-    """Extract this Splunk into a catalog bundle (not written anywhere)."""
+    """Extract this Splunk into a catalog bundle (not written anywhere).
+
+    ``parts`` names the parts to run (see PARTS); None runs them all, with field
+    discovery and usage as ``fields`` and ``usage`` say."""
     say = progress or (lambda _: None)
     instance_id = instance_id or default_instance_id(transport)
     if not INSTANCE_ID.match(instance_id):
@@ -56,11 +73,20 @@ def build_here(
         # public needs a secret salt for stable pseudonyms, which the app does not hold.
         raise ValueError("redact must be none or internal here (build public catalogs outside)")
 
+    if parts is not None:
+        chosen = resolve_parts(parts)
+        fields, usage = "fields" in chosen, True  # the chosen parts say it all
+    else:
+        chosen = set(PARTS)
+    platform = {p for p in chosen if p in splunk.EXTRACTORS}
     options = Options(fields=fields, usage=usage, progress=say)
-    result = splunk.extract(transport, instance_id, options)
+    result = (
+        splunk.extract(transport, instance_id, options, platform) if platform else ExtractResult()
+    )
     for name, extract in PRODUCTS.items():
-        say(f"products.{name}")
-        result.extend(extract(transport, instance_id))
+        if name in chosen:
+            say(f"products.{name}")
+            result.extend(extract(transport, instance_id))
 
     instance: dict[str, Any] = {
         "id": instance_id,

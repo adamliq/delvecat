@@ -50,3 +50,39 @@ def test_internal_redaction_and_limits():
 def test_default_instance_id_is_the_server_name():
     assert default_instance_id(FixtureTransport(FIXTURE)) not in ("", None)
     assert default_instance_id(FixtureTransport(Path("/nonexistent"))) == "splunk"
+
+
+def test_only_the_chosen_parts_run():
+    steps: list[str] = []
+    bundle = build_here(
+        FixtureTransport(FIXTURE), "acme", parts={"indexes", "fields"}, progress=steps.append
+    )
+    ran = [s for s in steps if "." in s]
+    # fields needs the inventory, which is added; nothing else runs.
+    assert ran == ["splunk.indexes", "splunk.inventory", "splunk.fields"]
+    types = {e["type"] for e in bundle["entities"]}
+    assert {"index", "field"} <= types and "savedSearch" not in types
+    with pytest.raises(ValueError, match="unknown part"):
+        build_here(FixtureTransport(FIXTURE), "acme", parts={"nope"})
+
+
+def test_products_only_and_all_parts():
+    from delvecat_ingest.inapp import PARTS, resolve_parts
+
+    steps: list[str] = []
+    build_here(
+        FixtureTransport(FIXTURE), "acme", parts={"enterpriseSecurity"}, progress=steps.append
+    )
+    assert [s for s in steps if "." in s] == ["products.enterpriseSecurity"]
+    assert resolve_parts(None) == set(PARTS) and "fields" in PARTS and "dbConnect" in PARTS
+
+
+def test_build_page_lists_every_part():
+    """The Splunk app's Build page names the parts itself (web/src/lib/splunkBuild.ts)."""
+    import re
+
+    from delvecat_ingest.inapp import PARTS
+
+    source = Path(__file__).parents[2] / "web" / "src" / "lib" / "splunkBuild.ts"
+    listed = re.findall(r'\{ id: "(\w+)"', source.read_text(encoding="utf-8"))
+    assert sorted(listed) == sorted(PARTS)

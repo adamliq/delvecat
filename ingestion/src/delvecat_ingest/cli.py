@@ -88,7 +88,9 @@ def _build(args: argparse.Namespace) -> int:
     elif args.url:
         if not (token := _token(args.token_env)):
             return 2
-        transport = HttpTransport(args.url, token, verify=_verify(args))
+        transport = HttpTransport(
+            args.url, token, verify=_verify(args), search_timeout=args.search_timeout or None
+        )
     else:
         transport = FixtureTransport(Path("/nonexistent-delvecat"))  # never queried
     if args.record and splunk_source:
@@ -425,6 +427,14 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--token-env", default="DELVECAT_SPLUNK_TOKEN")
     b.add_argument("--ca-bundle", help="CA bundle for TLS verification")
     b.add_argument("--insecure", action="store_true", help="skip TLS verification (dev only)")
+    b.add_argument(
+        "--search-timeout",
+        type=float,
+        default=300,
+        metavar="SECONDS",
+        help="cancel any search running longer than this (its part is reported as failed); "
+        "0 for no limit (default 300)",
+    )
 
     cloud = b.add_argument_group("Splunk Cloud (ACS)")
     cloud.add_argument("--acs-stack", help="Splunk Cloud stack name, enables the ACS connector")
