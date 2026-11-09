@@ -38,7 +38,9 @@ APP = "delvecat"
 COLLECTION = "delvecat_catalog"
 STALE_SECONDS = 15 * 60  # a "running" status older than this is a build that died
 DATA = f"/servicesNS/nobody/{APP}/storage/collections/data/{COLLECTION}"
-SMALLER = 0.5  # a catalog under half the size of the current one is not published unasked
+# A catalog with under 80% of the current one's objects (not counting fields) is not
+# published unasked: a builder who sees less of Splunk easily loses 20-40% of them.
+SMALLER = 0.8
 
 
 class MuchSmaller(RuntimeError):

@@ -103,9 +103,10 @@ one. The same from a search:
   is reported as timed out while the rest of the build goes on. In field
   discovery, a sourcetype whose sample times out is skipped. The same limit
   applies on the command line (`delvecat-ingest build --search-timeout`).
-- **Safeguard**: a catalog with less than half the objects of the current one
+- **Safeguard**: a catalog with more than 20% fewer objects than the current one
   (not counting fields) is not published, because the builder probably sees
-  less of Splunk than whoever built the current one. The page says so and
+  less of Splunk than whoever built the current one (in testing, an account
+  with the plain `user` role saw 40% fewer objects than an admin). The page says so and
   offers *Build and replace anyway* (`replacesmaller=true`). With only some parts
   selected, that is the expected outcome, and the page says so.
 - **One build at a time**: a second build is refused while one runs. *Cancel*
@@ -181,6 +182,16 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 - After upgrading the app by hand (not through *Manage apps*), Splunk Web may
   serve the old files until an admin opens `/en-US/_bump`.
 - The SQL console (SQLite as WebAssembly) works inside Splunk Web.
+
+## Testing
+
+`test/e2e.cjs` drives the app in a disposable Splunk (for example
+`splunk/splunk:10.4` or `9.4` in Docker, with the package mounted in
+`etc/apps`) through Splunk Web and the REST API. It checks access by role, the
+empty state, builds from the page, every page of the catalog as a viewer, field
+discovery in chosen indexes, partial builds and the size safeguard, cancel,
+two builds at once, a publisher who sees less, and dry runs. The header of the
+script lists the users it expects. Last run: Splunk 10.4 and 9.4, all passing.
 
 ## Layout
 
