@@ -70,6 +70,7 @@ jobs:
           name: delvecat-splunk-app-${{ steps.version.outputs.version }}
           path: |
             dist/delvecat-*.tgz
+            dist/delvecat-*.spl
             dist/delvecat-*-appinspect.json
 
   release:
@@ -94,5 +95,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "DelveCat $GITHUB_REF_NAME" \
-            --notes "Splunk app packages. delvecat-${{ needs.package.outputs.version }}.tgz: Splunk Enterprise 10.4+ and Splunk Cloud. delvecat-${{ needs.package.outputs.version }}-legacy.tgz: Splunk Enterprise 9.x to 10.3. Install and set up: splunk-app/README.md." \
-            dist/delvecat-*.tgz
+            --notes "Splunk app packages. delvecat-${{ needs.package.outputs.version }}.tgz: Splunk Enterprise 10.4+ and Splunk Cloud. delvecat-${{ needs.package.outputs.version }}-legacy.tgz: Splunk Enterprise 9.x to 10.3. Each also as .spl (the same archive). Install and set up: splunk-app/README.md." \
+            dist/delvecat-*.tgz dist/delvecat-*.spl

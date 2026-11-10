@@ -56,7 +56,8 @@ perf:  ## time every page against a synthetic catalog (SCALE=1.0 is ~100k object
 		node scripts/perf.cjs http://localhost:4173 .large large/catalog.json; kill `cat .preview.pid`; rm -f .preview.pid
 
 # The Splunk app (splunk-app/delvecat): the web app built for Splunk Web, packaged for
-# "Install app from file" or Splunk Cloud (ACS). Two packages: dist/delvecat-<v>.tgz uses
+# "Install app from file" or Splunk Cloud (ACS), each as .tgz and .spl (the same archive).
+# Two packages: dist/delvecat-<v>.tgz uses
 # Splunk's page template (Splunk 10.4+ and Splunk Cloud); dist/delvecat-<v>-legacy.tgz
 # brings its own (Splunk 9.x to 10.3), from the overlay in splunk-app/legacy.
 APP_VERSION = $(shell sed -n 's/^version = //p' splunk-app/delvecat/default/app.conf | head -1)
@@ -93,4 +94,7 @@ splunk-app: splunk-app-lib
 	$(call vendor,$(APP_STAGE)/legacy/delvecat/bin/lib,3.9,$(SDK_LEGACY))
 	$(APP_TAR) dist/delvecat-$(APP_VERSION)-legacy.tgz -C $(APP_STAGE)/legacy delvecat
 	rm -rf $(APP_STAGE)
-	@ls -1 dist/delvecat-$(APP_VERSION)*.tgz
+	# The same archives as .spl, Splunk's own extension for app packages.
+	cp dist/delvecat-$(APP_VERSION).tgz dist/delvecat-$(APP_VERSION).spl
+	cp dist/delvecat-$(APP_VERSION)-legacy.tgz dist/delvecat-$(APP_VERSION)-legacy.spl
+	@ls -1 dist/delvecat-$(APP_VERSION)*.tgz dist/delvecat-$(APP_VERSION)*.spl

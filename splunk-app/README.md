@@ -25,7 +25,12 @@ make splunk-app
 | `dist/delvecat-<version>.tgz` | Splunk Enterprise 10.4 and later, and Splunk Cloud. Splunk's own page template; the build command runs on Python 3.13 with Splunk SDK 3. |
 | `dist/delvecat-<version>-legacy.tgz` | Splunk Enterprise 9.x to 10.3. Its own page template (Splunk 10.4 deprecates these); the build command runs on Python 3.9 with Splunk SDK 2. |
 
-Ready-built packages are also committed in [`packages/`](packages/)
+Each package also comes as a `.spl` file (`delvecat-<version>.spl`,
+`delvecat-<version>-legacy.spl`): the same archive with Splunk's own
+extension, which *Install app from file*, `acs apps install private` and
+Splunkbase all accept. Use whichever your process expects.
+
+Ready-built packages (`.tgz` and `.spl`) are also committed in [`packages/`](packages/)
 (rebuild and replace them with `make splunk-app` after changing the app).
 
 Or download them: the *Splunk app* workflow builds both on every push and
