@@ -184,8 +184,13 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 
 - The page has DelveCat's own header (not Splunk's bar); its *Splunk* button
   goes back to Splunk's home page.
-- After upgrading the app by hand (not through *Manage apps*), Splunk Web may
-  serve the old files until an admin opens `/en-US/_bump`.
+- **After an upgrade the page looks old (for example, no Build button)?** The
+  browser is showing the previous version from its cache. Reload with
+  Ctrl+Shift+R (Cmd+Shift+R on a Mac), or have an admin open `/en-US/_bump` and
+  press *Bump version*, which makes every browser fetch the app's files again.
+  From 0.2.1 on, each package has its own `build` number in `app.conf`, which
+  Splunk Web puts in the files' URLs, so upgrades from 0.2.1 onwards show the new
+  page without this. (0.1.0 and 0.2.0 had no build number.)
 - The SQL console (SQLite as WebAssembly) works inside Splunk Web.
 
 ## Testing

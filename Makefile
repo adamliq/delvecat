@@ -61,6 +61,11 @@ perf:  ## time every page against a synthetic catalog (SCALE=1.0 is ~100k object
 # Splunk's page template (Splunk 10.4+ and Splunk Cloud); dist/delvecat-<v>-legacy.tgz
 # brings its own (Splunk 9.x to 10.3), from the overlay in splunk-app/legacy.
 APP_VERSION = $(shell sed -n 's/^version = //p' splunk-app/delvecat/default/app.conf | head -1)
+# app.conf [install] build, stamped into each package: Splunk Web puts it in the URLs of
+# the app's files, so a new number makes browsers fetch the new page after an upgrade
+# (with the same number they keep showing the old one). The commit time (seconds) rises
+# with every commit and works in shallow CI checkouts.
+APP_BUILD_NUMBER ?= $(shell git log -1 --format=%ct 2>/dev/null || date +%s)
 APP_BUILD = splunk-app/delvecat/appserver/static/build
 APP_STAGE = dist/stage
 APP_TAR = COPYFILE_DISABLE=1 tar --exclude='local' --exclude='local.meta' --exclude='*.pyc' \
@@ -87,9 +92,12 @@ splunk-app: splunk-app-lib
 	cd web && npx tsc -b && npx vite build --mode splunk
 	rm -f $(APP_BUILD)/index.html
 	cp -r web/public/reference $(APP_BUILD)/reference
-	rm -rf $(APP_STAGE) && mkdir -p $(APP_STAGE)/legacy
-	$(APP_TAR) dist/delvecat-$(APP_VERSION).tgz -C splunk-app delvecat
-	cp -r splunk-app/delvecat $(APP_STAGE)/legacy/delvecat
+	rm -rf $(APP_STAGE) && mkdir -p $(APP_STAGE)/main $(APP_STAGE)/legacy
+	cp -r splunk-app/delvecat $(APP_STAGE)/main/delvecat
+	sed -i 's/^build = .*/build = $(APP_BUILD_NUMBER)/' $(APP_STAGE)/main/delvecat/default/app.conf
+	grep -q '^build = $(APP_BUILD_NUMBER)$$' $(APP_STAGE)/main/delvecat/default/app.conf
+	$(APP_TAR) dist/delvecat-$(APP_VERSION).tgz -C $(APP_STAGE)/main delvecat
+	cp -r $(APP_STAGE)/main/delvecat $(APP_STAGE)/legacy/delvecat
 	cp -r splunk-app/legacy/. $(APP_STAGE)/legacy/delvecat/
 	$(call vendor,$(APP_STAGE)/legacy/delvecat/bin/lib,3.9,$(SDK_LEGACY))
 	$(APP_TAR) dist/delvecat-$(APP_VERSION)-legacy.tgz -C $(APP_STAGE)/legacy delvecat
