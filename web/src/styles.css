@@ -63,7 +63,11 @@ h2 { font-size: 1.1rem; margin: 0 0 0.6rem; }
 }
 .btn:hover { border-color: var(--accent); }
 
-.content { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+/* Uses wide windows (graphs, tables and the matrix get the room), up to 1680px. */
+.content { flex: 1; width: 100%; max-width: 1680px; margin: 0 auto; padding: 24px 16px; }
+@media (min-width: 1200px) { .content { padding: 24px 32px; } }
+/* Introductions stay readable however wide the window is. */
+.content .lede { max-width: 100ch; }
 .footer { padding: 12px 16px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
 .stack > * + * { margin-top: 24px; }
 .lede { font-size: 1.05rem; margin: 0.4rem 0; }
@@ -428,8 +432,10 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .schema-filters input[type="search"] { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: min(100%, 260px); }
 .schema-filters input[type="range"] { width: 110px; }
 .hit { margin-right: 4px; background: var(--accent-soft); border-radius: 3px; padding: 0 3px; }
-.network-box { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
-.network-svg { display: block; width: 100%; height: auto; }
+/* The network scales with the window between a readable minimum (narrow windows
+   scroll it sideways) and a maximum (wide windows do not blow its labels up). */
+.network-box { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow-x: auto; }
+.network-svg { display: block; width: 100%; min-width: 640px; max-width: 1100px; height: auto; margin: 0 auto; }
 .net-edge { stroke: var(--muted); stroke-opacity: 0.3; }
 .net-edge-lit { stroke-opacity: 0.85; stroke: var(--accent); }
 .net-edge-dim { stroke-opacity: 0.06; }
@@ -496,3 +502,8 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
   font-size: 0.72rem; color: var(--muted); vertical-align: 1px; }
 .part-tag-slow { color: var(--warn); border-color: currentColor; }
 .build-form input.input-seconds { width: 6rem; }
+
+/* Fit any window: long names without spaces (paths, ids, URLs) may break when they
+   must, and form controls never grow past their container. */
+.content, .footer { overflow-wrap: anywhere; }
+select, input, textarea { max-width: 100%; }

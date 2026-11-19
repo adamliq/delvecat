@@ -296,6 +296,35 @@ const sections = {
     await p.close();
   },
 
+  async layout() {
+    // Every page fits the window from phone to wide screen: no sideways scrolling of the
+    // page (graphs and tables may scroll inside their own boxes).
+    const a = await session('admin');
+    const p = a.page;
+    await p.goto(app('#/search?q=_internal&type=index'));
+    await sleep(3000);
+    const idx = await p.locator('main a[href*="entity/"]').first().getAttribute('href');
+    const pages = ['', '#/search?q=index', idx, `${idx}?tab=lineage`, '#/schemas', '#/coverage', '#/health',
+      '#/governance', '#/insights', '#/sql', '#/build'];
+    for (const [w, h] of [[375, 812], [1280, 800], [2560, 1440]]) {
+      await p.setViewportSize({ width: w, height: h });
+      const wide = [];
+      for (const hash of pages) {
+        await p.goto(app(hash));
+        await p.waitForSelector('main h1, main h2', { timeout: 30000 }).catch(() => {});
+        await sleep(1500);
+        const over = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+        if (over > 0) wide.push(`${hash || 'home'} +${over}px`);
+      }
+      check(`${w}px wide: no page scrolls sideways`, wide.length === 0, wide.join(', '));
+      await p.goto(app('#/schemas'));
+      await sleep(2500);
+      const net = await p.locator('.network-svg').first().boundingBox();
+      if (net) check(`${w}px wide: schema network between 640 and 1100px`, net.width >= 639 && net.width <= 1101, `${Math.round(net.width)}px`);
+    }
+    await a.close();
+  },
+
   async dryrun() {
     const before = (await pointer())?.generation;
     const r = await oneshot('| delvecatbuild dryrun=true');
