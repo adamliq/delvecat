@@ -30,6 +30,7 @@ GLOBAL_TYPES = frozenset(
         "dbOutput",
         "dbLookup",
         "externalTable",
+        "federatedProvider",
         "streamDefinition",
         "streamGroup",
         "streamForwarder",

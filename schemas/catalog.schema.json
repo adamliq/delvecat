@@ -239,7 +239,9 @@
         "dbInput",
         "dbOutput",
         "dbLookup",
-        "externalTable"
+        "externalTable",
+        "federatedProvider",
+        "federatedIndex"
       ]
     },
     "Sharing": {

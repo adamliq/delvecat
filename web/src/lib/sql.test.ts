@@ -109,4 +109,24 @@ describe("SQL console", () => {
     const tokens = runQuery(db, EXAMPLES.find((x) => x.title === "Authentication tokens to review")!.sql).rows;
     expect(tokens.map((r) => [r[0], r[1], r[4]])).toEqual([["CI (abc)", "ci", "tokenNoOwner"], ["CI (abc)", "ci", "tokenExpiring"]]);
   });
+
+  it("lists index-time routing and federated indexes", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const st = ent("sourcetype", "fw", {
+      properties: { indexTime: [
+        { rule: "TRANSFORMS-a", transform: "to_risk", actions: ["routeToIndex"], targets: ["risk"] },
+        { rule: "TRANSFORMS-b", transform: "drop_hb", actions: ["drop"], targets: [] },
+      ] },
+    });
+    const prov = ent("federatedProvider", "remote", { properties: { providerType: "splunk" } });
+    const fi = ent("federatedIndex", "federated:soc", {
+      displayName: "soc", app: "sec", properties: { provider: "remote", datasetType: "index", dataset: "notable" },
+    });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [st, prov, fi, search], edges: [{ from: search.id, to: fi.id, type: "reads", origin: "spl" }] }));
+    const routing = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Data dropped"))!.sql).rows;
+    expect(routing.map((r) => r[2])).toEqual(["drop_hb", "to_risk"]);
+    const fed = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Federated indexes"))!.sql).rows;
+    expect(fed).toEqual([["soc", "sec", "remote", "splunk", "index:notable", 1]]);
+  });
 });

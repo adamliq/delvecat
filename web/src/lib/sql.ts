@@ -343,6 +343,29 @@ WHERE type = 'index' AND disabled = 0
 ORDER BY name;`,
   },
   {
+    title: "Data dropped, rerouted or forwarded at index time",
+    sql: `SELECT e.name AS sourcetype, json_extract(r.value, '$.rule') AS rule,
+       json_extract(r.value, '$.transform') AS transform,
+       coalesce(json_extract(r.value, '$.action'), json_extract(r.value, '$.actions')) AS what,
+       json_extract(r.value, '$.targets') AS targets
+FROM entities e, json_each(json_extract(e.settings, '$.indexTime')) r
+WHERE e.type = 'sourcetype'
+ORDER BY (what LIKE '%drop%') DESC, sourcetype;`,
+  },
+  {
+    title: "Federated indexes and where their data lives",
+    sql: `SELECT f.display_name AS federated_index, f.app,
+       json_extract(f.settings, '$.provider') AS provider,
+       json_extract(p.settings, '$.providerType') AS provider_type,
+       json_extract(f.settings, '$.datasetType') || ':' || json_extract(f.settings, '$.dataset') AS remote_dataset,
+       (SELECT count(*) FROM edges x WHERE x.to_id = f.id AND x.type = 'reads') AS searches
+FROM entities f
+LEFT JOIN entities p ON p.type = 'federatedProvider' AND p.instance = f.instance
+     AND p.name = json_extract(f.settings, '$.provider')
+WHERE f.type = 'federatedIndex'
+ORDER BY f.display_name;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

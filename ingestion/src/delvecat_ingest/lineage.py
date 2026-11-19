@@ -21,7 +21,7 @@ from .spl import SplAnalysis, analyze
 
 # Object types an SPL reference may point at; the resolver only matches visible ones.
 KNOWLEDGE_TYPES = frozenset(
-    {"macro", "lookup", "eventtype", "savedSearch", "dataModel", "searchCommand"}
+    {"macro", "lookup", "eventtype", "savedSearch", "dataModel", "searchCommand", "federatedIndex"}
 )
 
 
@@ -35,6 +35,17 @@ def add_command_refs(a: SplAnalysis, known: frozenset[str]) -> None:
     """Turn the commands a search runs into ``uses`` references to custom commands."""
     for name in a.commands & known:
         a.refs.add(("uses", "searchCommand", name, False))
+
+
+def federated_refs(refs):
+    """index=federated:<name> names a federated index (federated search), not an index."""
+    out = set()
+    for edge, target, name, pattern in refs:
+        if target == "index" and name.lower().startswith("federated:"):
+            out.add((edge, "federatedIndex", name, pattern))
+        else:
+            out.add((edge, target, name, pattern))
+    return out
 
 
 class MacroLibrary:
@@ -131,7 +142,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         for name in saved_refs:
             combined.refs.add(("reads", "savedSearch", name, False))
 
-        for edge_type, target_type, name, pattern in sorted(combined.refs):
+        for edge_type, target_type, name, pattern in sorted(federated_refs(combined.refs)):
             if e["type"] == "macro" and target_type == "macro" and name == e["name"]:
                 continue
             refs.append(

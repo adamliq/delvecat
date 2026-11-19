@@ -138,6 +138,8 @@ def extract_indexes(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     dirs = _bucket_dirs(ctx)
     for e in iter_entries(ctx.transport, "/services/data/indexes", {"datatype": "all"}):
+        if e["name"].startswith("federated:"):
+            continue  # a federated index (federated search), catalogued by extract_federated
         c = content(e)
         frozen_secs = to_int(c.get("frozenTimePeriodInSecs"))
         storage = index_storage(c, dirs.get(e["name"]) or {})
@@ -637,4 +639,64 @@ def extract_fields(ctx: Ctx, out: ExtractResult) -> int:
     if failed:
         shown = ", ".join(failed[:5]) + (f" and {len(failed) - 5} more" if len(failed) > 5 else "")
         return n, f"{len(failed)} of {len(sourcetypes)} sourcetypes could not be sampled: {shown}"
+    return n
+
+
+# --- federated search ------------------------------------------------------------------
+
+
+def extract_federated(ctx: Ctx, out: ExtractResult) -> int:
+    """Federated search: providers (a remote Splunk deployment, or Amazon S3 through
+    AWS Glue) and federated indexes, the local names searches use for a remote dataset
+    (index=federated:<name>). The provider's password is never listed by Splunk."""
+    n = 0
+    providers = list(iter_entries(ctx.transport, f"{NS}/data/federated/provider"))
+    for e in providers:
+        c = content(e)
+        kind = c.get("type") or None
+        add_global(
+            ctx,
+            out,
+            "federatedProvider",
+            e["name"],
+            disabled=as_bool(c.get("disabled", False)),
+            properties={
+                "providerType": kind,  # splunk or aws_s3
+                "mode": c.get("mode") or None,  # standard or transparent
+                "hostPort": c.get("hostPort") or None,
+                "serviceAccount": c.get("serviceAccount") or None,
+                "appContext": c.get("appContext") or None,
+                "indexesAllowed": split_list(c.get("fedSrchIndexesAllowed")),
+                "connectivityStatus": c.get("connectivityStatus") or None,
+                # Amazon S3 (Splunk Cloud): where the data is and which tables may be read
+                "awsRegion": c.get("aws_region") or None,
+                "awsAccountId": c.get("aws_account_id") or None,
+                "glueDatabase": c.get("database") or None,
+                "glueTablesAllowed": split_list(c.get("aws_glue_tables_allowlist")),
+                "s3PathsAllowed": split_list(c.get("aws_s3_paths_allowlist")),
+            },
+        )
+        n += 1
+    for e in iter_entries(ctx.transport, f"{NS}/data/federated/index"):
+        c = content(e)
+        provider = c.get("federated.provider") or None
+        dataset = str(c.get("federated.dataset") or "")
+        kind, _, name = dataset.partition(":")
+        ent = add_ko(
+            ctx,
+            out,
+            "federatedIndex",
+            e,
+            display_name=e["name"].removeprefix("federated:"),
+            properties={
+                "provider": provider,
+                # what it reads on the remote side: index, savedsearch, lastjob,
+                # datamodel, metricindex, or aws_glue_table
+                "datasetType": kind if name else None,
+                "dataset": name or dataset or None,
+            },
+        )
+        if provider:
+            out.refs.append(ref(ent["id"], "federatedProvider", provider, "uses"))
+        n += 1
     return n

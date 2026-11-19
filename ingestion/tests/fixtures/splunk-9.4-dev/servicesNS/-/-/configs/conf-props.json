@@ -1,0 +1,176 @@
+{
+ "entry": [
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "TRANSFORMS": "",
+    "TRANSFORMS-route": "fw_drop_heartbeat, fw_threats_to_risk",
+    "TRANSFORMS-fwd": "fw_copy_to_siem",
+    "SEDCMD-mask_cards": "s/\\d{12}(\\d{4})/XXXXXXXXXXXX\\1/g",
+    "REPORT-kv": "acme_fw_kv"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-props/acme:fw",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "acme:fw",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "TRANSFORMS": "",
+    "TRANSFORMS-audit": "fw_audit_to_os"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-props/source::/var/log/acme/audit*.log",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "source::/var/log/acme/audit*.log",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "TRANSFORMS": "",
+    "TRANSFORMS-legacy": "legacy_ingest_eval"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-props/host::legacy-*",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "host::legacy-*",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "TRANSFORMS": "",
+    "SHOULD_LINEMERGE": "false"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/search/configs/conf-props/access_combined",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "access_combined",
+   "updated": "2026-11-06T07:33:03+00:00"
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 4
+ }
+}

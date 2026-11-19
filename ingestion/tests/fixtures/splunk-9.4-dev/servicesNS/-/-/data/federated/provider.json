@@ -1,0 +1,47 @@
+{
+ "entry": [
+  {
+   "name": "remote_soc",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/data/federated/provider/remote_soc",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "appContext": "search",
+    "connectivityStatus": "valid",
+    "disabled": false,
+    "fedSrchIndexesAllowed": "*",
+    "hostPort": "soc-sh.acme.example:8089",
+    "mode": "standard",
+    "serviceAccount": "fed_svc",
+    "type": "splunk",
+    "useFSHKnowledgeObjects": "0"
+   }
+  },
+  {
+   "name": "s3_archive",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/data/federated/provider/s3_archive",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "type": "aws_s3",
+    "aws_region": "eu-central-1",
+    "aws_account_id": "123456789012",
+    "database": "acme_lake",
+    "aws_glue_tables_allowlist": "vpc_flow,cloudtrail",
+    "aws_s3_paths_allowlist": "s3://acme-lake/vpc/,s3://acme-lake/ct/"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 2
+ }
+}

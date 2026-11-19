@@ -214,7 +214,17 @@ def extract_roles(ctx: Ctx, out: ExtractResult) -> int:
         )
         # Effective access: the role's own patterns plus those inherited from imported roles.
         effective = sorted(set(allowed) | set(split_list(c.get("imported_srchIndexesAllowed"))))
-        out.refs.extend(ref(ent["id"], "index", p, "grantsAccess", pattern=True) for p in effective)
+        # "federated:..." patterns grant federated indexes (federated search), not indexes.
+        out.refs.extend(
+            ref(
+                ent["id"],
+                "federatedIndex" if p.startswith("federated:") else "index",
+                p,
+                "grantsAccess",
+                pattern=True,
+            )
+            for p in effective
+        )
         out.refs.extend(ref(ent["id"], "role", r, "inherits") for r in imported)
         n += 1
     return n

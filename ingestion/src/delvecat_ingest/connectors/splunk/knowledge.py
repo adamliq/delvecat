@@ -8,8 +8,9 @@ import re
 from typing import Any
 
 from ...dashboards import parse_dashboard
-from ...model import ExtractResult
+from ...model import ExtractResult, fqn
 from ...splunk_rest import as_bool, iter_entries
+from ...transport import EndpointForbidden, EndpointNotFound
 from . import security
 from .common import (
     NS,
@@ -457,11 +458,209 @@ _TRANSFORM_KEYS = (
 )
 
 
+# DEST_KEY -> what an index-time transform does with a matching event.
+_DEST_ACTIONS = {
+    "_metadata:index": "routeToIndex",
+    "_syslog_routing": "forwardSyslog",
+    "_tcp_routing": "forwardTcp",
+    "_http_routing": "forwardHttp",
+    "_index_and_forward_routing": "indexAndForward",
+    "metadata:sourcetype": "setSourcetype",
+    "metadata:host": "setHost",
+    "metadata:source": "setSource",
+    "_raw": "rewriteRaw",
+    "_meta": "indexedField",
+}
+_INGEST_EVAL_FIELDS = {
+    "index": "routeToIndex",
+    "_raw": "rewriteRaw",
+    "sourcetype": "setSourcetype",
+    "host": "setHost",
+    "source": "setSource",
+}
+_STRING = re.compile(r'"([^"]*)"')
+# Conditions inside an eval expression: their string literals are patterns or values to
+# compare, not results (if(match(_raw,"secret"),"restricted",index) -> "restricted").
+_PREDICATE_CALL = re.compile(
+    r"\b(?:match|like|searchmatch|cidrmatch|in|replace|substr|mvfind|len|lower|upper)\s*\("
+)
+_COMPARISON = re.compile(r'(?:==|!=|=|<=|>=|<|>)\s*"[^"]*"')
+
+
+def _without_predicates(expr: str) -> str:
+    """Remove predicate calls (with balanced parentheses) and comparisons to literals."""
+    out, i = [], 0
+    for m in _PREDICATE_CALL.finditer(expr):
+        if m.start() < i:
+            continue
+        out.append(expr[i : m.start()])
+        depth, j, quote = 1, m.end(), False
+        while j < len(expr) and depth:
+            ch = expr[j]
+            if ch == '"':
+                quote = not quote
+            elif not quote and ch == "(":
+                depth += 1
+            elif not quote and ch == ")":
+                depth -= 1
+            j += 1
+        i = j
+    out.append(expr[i:])
+    return _COMPARISON.sub(" ", "".join(out))
+
+
+def _ingest_eval_actions(expr: str) -> list[dict[str, Any]]:
+    """INGEST_EVAL = index=if(...,"restricted",index), queue=if(...,"nullQueue",...), x=..."""
+    from ...spl import split_top
+
+    out: list[dict[str, Any]] = []
+    for assignment in split_top(expr, ","):
+        name, eq, value = assignment.partition("=")
+        name = name.strip().strip("'\"")
+        if not eq or not name:
+            continue
+        literals = [v for v in _STRING.findall(_without_predicates(value)) if v]
+        if name == "queue":
+            if "nullQueue" in literals:
+                out.append({"action": "drop", "conditional": value.strip() != '"nullQueue"'})
+            continue
+        action = _INGEST_EVAL_FIELDS.get(name, "indexedField")
+        item: dict[str, Any] = {"action": action, "expression": value.strip()}
+        if action == "routeToIndex":
+            item["targets"] = literals
+        elif action == "indexedField":
+            item["field"] = name
+        out.append(item)
+    return out
+
+
+def index_time_actions(c: dict[str, Any]) -> list[dict[str, Any]]:
+    """What a transform does at index time (empty for search-time transforms): route to
+    another index, drop (nullQueue), forward, rewrite the event, set metadata, or write
+    indexed fields. Targets that come from the event ($1) are not listed."""
+    actions: list[dict[str, Any]] = []
+    dest = str(c.get("DEST_KEY") or "").strip()
+    fmt = str(c.get("FORMAT") or "").strip()
+    if dest:
+        if dest.lower() == "queue":
+            if fmt.lower() == "nullqueue":
+                actions.append({"action": "drop"})
+            elif fmt.lower() == "indexqueue":
+                actions.append({"action": "keep"})
+        elif action := _DEST_ACTIONS.get(dest.lower()):
+            item: dict[str, Any] = {"action": action}
+            if fmt and "$" not in fmt and action != "rewriteRaw":
+                target = fmt.split("::", 1)[1] if "::" in fmt else fmt
+                item["targets"] = split_list(target) if action.startswith("forward") else [target]
+            actions.append(item)
+    elif as_bool(c.get("WRITE_META", False)):
+        actions.append({"action": "indexedField"})
+    if c.get("INGEST_EVAL"):
+        actions.extend(_ingest_eval_actions(str(c["INGEST_EVAL"])))
+    return actions
+
+
+def _add_transform(ctx: Ctx, out: ExtractResult, e: dict[str, Any]) -> dict[str, Any]:
+    c = content(e)
+    actions = index_time_actions(c)
+    ent = add_ko(
+        ctx,
+        out,
+        "transform",
+        e,
+        properties={
+            **{k: c.get(k) for k in _TRANSFORM_KEYS},
+            "INGEST_EVAL": c.get("INGEST_EVAL") or None,
+            "indexTime": actions or None,
+        },
+    )
+    for a in actions:
+        if a["action"] == "routeToIndex":
+            out.refs.extend(ref(ent["id"], "index", t, "writes") for t in a.get("targets", []))
+    return ent
+
+
 def extract_transforms(ctx: Ctx, out: ExtractResult) -> int:
+    """Transforms, search-time and index-time. Splunk's transform list leaves out those
+    with only an INGEST_EVAL; they are read from transforms.conf."""
     n = 0
+    seen: set[tuple[str | None, str]] = set()
     for e in iter_entries(ctx.transport, f"{NS}/data/transforms/extractions"):
+        _add_transform(ctx, out, e)
+        seen.add((acl(e)[0], e["name"]))
+        n += 1
+    try:
+        conf = list(iter_entries(ctx.transport, f"{NS}/configs/conf-transforms"))
+    except (EndpointNotFound, EndpointForbidden):
+        conf = []
+    for e in conf:
+        if content(e).get("INGEST_EVAL") and (acl(e)[0], e["name"]) not in seen:
+            _add_transform(ctx, out, e)
+            seen.add((acl(e)[0], e["name"]))
+            n += 1
+    return n
+
+
+def extract_index_time_rules(ctx: Ctx, out: ExtractResult) -> int:
+    """props.conf TRANSFORMS- and SEDCMD- rules: which sourcetypes (or source::/host::
+    patterns) each index-time transform applies to. Links sourcetype -> transform, and
+    sourcetype -> index for data a transform routes there; the sourcetype records a
+    summary (what is routed, dropped, forwarded or masked)."""
+    transforms: dict[tuple[str | None, str], dict[str, Any]] = {}
+    for ent in out.entities:
+        if ent["type"] == "transform":
+            transforms[(ent.get("app"), ent["name"])] = ent
+    by_name: dict[str, list[dict[str, Any]]] = {}
+    for (_, name), ent in transforms.items():
+        by_name.setdefault(name, []).append(ent)
+    sourcetypes: dict[str, list[dict[str, Any]]] = {}
+    for ent in out.entities:  # a sourcetype may be added by several parts
+        if ent["type"] == "sourcetype":
+            sourcetypes.setdefault(ent["name"], []).append(ent)
+    n = 0
+    for e in iter_entries(ctx.transport, f"{NS}/configs/conf-props"):
         c = content(e)
-        add_ko(ctx, out, "transform", e, properties={k: c.get(k) for k in _TRANSFORM_KEYS})
+        stanza, app = e["name"], acl(e)[0]
+        rules = [
+            (k, v)
+            for k, v in c.items()
+            if (k.startswith("TRANSFORMS-") or k.startswith("SEDCMD-")) and v not in (None, "")
+        ]
+        if not rules or stanza == "default":
+            continue
+        st = stanza_sourcetype(stanza)
+        summary: list[dict[str, Any]] = []
+        for key, value in rules:
+            if key.startswith("SEDCMD-"):
+                summary.append({"rule": key, "action": "mask", "sed": value, "app": app})
+                continue
+            for name in split_list(value):
+                ent = transforms.get((app, name)) or next(iter(by_name.get(name, [])), None)
+                actions = ((ent or {}).get("properties") or {}).get("indexTime") or []
+                summary.append(
+                    {
+                        "rule": key,
+                        "transform": name,
+                        "app": app,
+                        "actions": [a["action"] for a in actions],
+                        "targets": sorted({t for a in actions for t in a.get("targets", [])}),
+                    }
+                )
+                if ent is None:
+                    continue
+                applies = ent["properties"].setdefault("appliesTo", [])
+                if stanza not in applies:
+                    applies.append(stanza)
+                if st:
+                    out.refs.append(ref(ent["id"], "sourcetype", st, "uses", known_is_from=False))
+                    for a in actions:
+                        if a["action"] == "routeToIndex":
+                            for t in a.get("targets", []):
+                                out.refs.append(
+                                    ref(fqn(ctx.instance, "sourcetype", st), "index", t, "feeds")
+                                )
+        for target in sourcetypes.get(st or "", []):
+            target.setdefault("properties", {}).setdefault("indexTime", []).extend(summary)
         n += 1
     return n
 

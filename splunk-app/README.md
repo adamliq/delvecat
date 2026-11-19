@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 49 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 51 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -105,6 +105,15 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Index-time routing, filtering and masking**: a sourcetype's page lists what
+  its `props.conf` rules do to its events before they are indexed: routed to
+  another index, dropped (`nullQueue`), forwarded, rewritten or masked (`SEDCMD`),
+  with links to the transforms; `INGEST_EVAL` included. A transform routing to an
+  index that does not exist is flagged. SQL: "Data dropped, rerouted or forwarded
+  at index time".
+- **Federated search**: federated providers (remote Splunk or Amazon S3) and
+  federated indexes, linked to the searches that use `index=federated:<name>`.
+  SQL: "Federated indexes and where their data lives".
 - **Index storage and retention**: each index page shows its retention (days or
   size, whichever comes first), how full it is, its oldest data, and its tiers
   with location, size and buckets, named both ways: hot/warm/cold/frozen/thawed

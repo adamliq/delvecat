@@ -64,7 +64,9 @@ export type EntityType =
   | "dbInput"
   | "dbOutput"
   | "dbLookup"
-  | "externalTable";
+  | "externalTable"
+  | "federatedProvider"
+  | "federatedIndex";
 /**
  * The Splunk product an entity belongs to.
  */

@@ -56,6 +56,182 @@
    },
    "name": "acme_fw_kv",
    "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "REGEX": "action=heartbeat",
+    "FORMAT": "nullQueue",
+    "DEST_KEY": "queue",
+    "SOURCE_KEY": "",
+    "disabled": false
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/fw_drop_heartbeat",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "fw_drop_heartbeat",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "REGEX": "severity=(high|critical)",
+    "FORMAT": "risk",
+    "DEST_KEY": "_MetaData:Index",
+    "SOURCE_KEY": "",
+    "disabled": false
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/fw_threats_to_risk",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "fw_threats_to_risk",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "REGEX": ".",
+    "FORMAT": "siem_group, archive_group",
+    "DEST_KEY": "_TCP_ROUTING",
+    "SOURCE_KEY": "",
+    "disabled": false
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/fw_copy_to_siem",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "fw_copy_to_siem",
+   "updated": "2026-11-06T07:33:03+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "author": "admin",
+   "content": {
+    "REGEX": ".",
+    "FORMAT": "os",
+    "DEST_KEY": "_MetaData:Index",
+    "SOURCE_KEY": "",
+    "disabled": false
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/fw_audit_to_os",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "list": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv",
+    "move": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/data/transforms/extractions/acme_fw_kv"
+   },
+   "name": "fw_audit_to_os",
+   "updated": "2026-11-06T07:33:03+00:00"
   }
  ],
  "generator": {
@@ -65,7 +241,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 1
+  "total": 5
  },
  "updated": "2026-11-06T07:34:37+00:00"
 }

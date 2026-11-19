@@ -21,7 +21,13 @@ from statistics import median
 from typing import Any
 
 from .cron import runs_per_day
-from .lineage import KNOWLEDGE_TYPES, MacroLibrary, add_command_refs, command_names
+from .lineage import (
+    KNOWLEDGE_TYPES,
+    MacroLibrary,
+    add_command_refs,
+    command_names,
+    federated_refs,
+)
 from .model import Target
 from .resolve import Resolver
 from .spl import analyze
@@ -122,7 +128,7 @@ def apply_usage(
             _merge_usage(d.setdefault("usage", {}), {"panelSearchRuns": runs, "lastUsed": last})
         a = analyze(row["search"], macros.resolver(app, None))
         add_command_refs(a, commands)
-        for _, target_type, name, pattern in a.refs:
+        for _, target_type, name, pattern in federated_refs(a.refs):
             if pattern and name.strip("_") in ("*", ""):
                 continue  # "index=*" says nothing about which indexes matter
             target = Target(
@@ -342,6 +348,33 @@ def _retention_checks(
     )
 
 
+def _routing_checks(
+    e: dict[str, Any], index_names: set[tuple[Any, str]], checks: list[dict[str, str]]
+) -> None:
+    """An index-time transform that routes events to an index this instance does not
+    have. Where the events are indexed, a missing index means they are discarded (or
+    land in lastChanceIndex, if one is set)."""
+    p = e.get("properties") or {}
+    missing = sorted(
+        {
+            t
+            for a in p.get("indexTime") or []
+            if a.get("action") == "routeToIndex"
+            for t in a.get("targets") or []
+            if (e.get("instance"), t) not in index_names
+        }
+    )
+    if missing:
+        _check(
+            checks,
+            "routeToMissingIndex",
+            "warning",
+            f"Routes events to {', '.join(missing)}, not an index on this instance: where "
+            "the events are indexed, a missing index means they are discarded "
+            "(or go to lastChanceIndex)",
+        )
+
+
 def _token_checks(
     e: dict[str, Any], as_of: datetime, users: set[tuple[str, str]] | None, checks: list
 ) -> None:
@@ -396,6 +429,8 @@ def evaluate_health(
     scheduler_since = _parse(scheduler_since_iso)
     # Users per instance, for tokens; None where users were not collected.
     user_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "user"}
+    index_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "index"}
+    with_indexes = {i for i, _ in index_names}
     with_users = {i for i, _ in user_names}
     for e in entities:
         if e.get("disabled"):
@@ -442,6 +477,8 @@ def evaluate_health(
                 )
         elif e["type"] == "input" and (e.get("properties") or {}).get("kind") == "http":
             _hec_checks(e, usage, checks)
+        elif e["type"] == "transform" and e.get("instance") in with_indexes:
+            _routing_checks(e, index_names, checks)
         elif e["type"] == "authToken":
             _token_checks(e, as_of, user_names if e.get("instance") in with_users else None, checks)
         elif e["type"] == "deploymentClient":

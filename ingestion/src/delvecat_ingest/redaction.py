@@ -212,6 +212,14 @@ def redact_bundle(
             for k in HOST_PROPS:
                 if props.get(k) and str(props[k]) in hosts:
                     props[k] = rename("host", str(props[k]))
+        if e["type"] == "federatedProvider":
+            # Where the remote data is and the account used to read it.
+            if profile.urls == "drop":
+                for k in ("hostPort", "awsAccountId", "s3PathsAllowed"):
+                    if props.pop(k, None):
+                        counts["urls"] += 1
+            if profile.users == "pseudonymize" and props.get("serviceAccount"):
+                props["serviceAccount"] = rename("user", str(props["serviceAccount"]))
         if profile.urls == "drop" and e["type"] == "index":
             # Object-store locations (SmartStore remote path, Splunk Cloud Self Storage
             # bucket) name the customer's cloud account.

@@ -15,6 +15,8 @@ const SPECIAL: Partial<Record<EntityType, string>> = {
   authGroup: "Identity Group",
   authToken: "Authentication Token",
   scheduledView: "Scheduled View",
+  federatedProvider: "Federated Provider",
+  federatedIndex: "Federated Index",
   kvCollection: "KV Store Collection",
   correlationSearch: "Detection",
   adaptiveResponseAction: "Alert Action",

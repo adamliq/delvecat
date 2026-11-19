@@ -82,6 +82,38 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Index-time routing, filtering and masking
+
+Transforms record what they do at index time (`properties.indexTime`): route to
+another index (`DEST_KEY = _MetaData:Index`), drop (`queue` = `nullQueue`), keep
+only matching events (`indexQueue`), forward (`_TCP_ROUTING`, `_SYSLOG_ROUTING`,
+`_HTTP_ROUTING`), rewrite the event (`_raw`), change sourcetype, host or source,
+or write indexed fields; `INGEST_EVAL` assignments are read the same way
+(string results only; a condition's patterns are not targets). Transforms that
+have only an `INGEST_EVAL` are read from `transforms.conf` (Splunk's transform
+list leaves them out).
+
+Part `indexTimeRules` reads `props.conf`: each sourcetype's `TRANSFORMS-` rules
+link it to its transforms (`uses`), routed data adds `sourcetype feeds index`
+and `transform writes index` edges, and the sourcetype records a summary
+(`properties.indexTime`) including `SEDCMD-` masking. `source::` and `host::`
+rules are recorded on the transform (`appliesTo`). A transform routing to an
+index this instance does not have gets a `routeToMissingIndex` warning: where the
+data is indexed, events for a missing index are discarded (or go to
+`lastChanceIndex`). On a search head, check against the indexers.
+
+### Federated search
+
+`federatedProvider` objects (a remote Splunk deployment, standard or transparent
+mode, or Amazon S3 through AWS Glue) and `federatedIndex` objects (the local
+name of a remote dataset: an index, saved search, last job, data model or Glue
+table) with a `uses` edge to their provider. Searches on
+`index=federated:<name>` read the federated index; role patterns
+`federated:...` grant access to them. Splunk lists federated indexes among its
+indexes too; they are catalogued once. Splunk never lists a provider's
+password; the public profile also drops the remote host, AWS account and S3
+paths, and pseudonymizes the service account.
+
 ### Index storage and retention
 
 Each index records its retention (`retentionDays`, from `frozenTimePeriodInSecs`;

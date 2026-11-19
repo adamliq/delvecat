@@ -1,0 +1,37 @@
+{
+ "entry": [
+  {
+   "name": "federated:soc_notables",
+   "id": "x1",
+   "acl": {
+    "app": "acme_secops",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "disabled": false,
+    "federated.dataset": "index:notable",
+    "federated.provider": "remote_soc"
+   }
+  },
+  {
+   "name": "federated:vpc_flow",
+   "id": "x2",
+   "acl": {
+    "app": "acme_secops",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "disabled": false,
+    "federated.dataset": "aws_glue_table:vpc_flow",
+    "federated.provider": "s3_archive"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 2
+ }
+}
