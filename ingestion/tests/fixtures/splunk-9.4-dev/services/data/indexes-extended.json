@@ -1,0 +1,36 @@
+{
+ "entry": [
+  {
+   "name": "web",
+   "acl": {
+    "app": "acme_web",
+    "owner": "nobody",
+    "sharing": "global"
+   },
+   "content": {
+    "bucket_dirs": {
+     "home": {
+      "capacity": "0.000",
+      "event_count": "1200000",
+      "event_min_time": "1790000000",
+      "event_max_time": "1793940000",
+      "hot_bucket_count": "2",
+      "warm_bucket_count": "14",
+      "warm_bucket_size": "820.5"
+     },
+     "cold": {
+      "bucket_count": "40",
+      "bucket_size": "3120.25",
+      "capacity": "0.000"
+     },
+     "thawed": null
+    }
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

@@ -26,6 +26,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "hosts": data.extract_hosts,
     "sources": data.extract_sources,
     "inputs": data.extract_inputs,
+    "otherInputs": data.extract_conf_inputs,
     "modularInputs": data.extract_modular_inputs,
     "forwarders": data.extract_forwarders,
     "alertActions": knowledge.extract_alert_actions,

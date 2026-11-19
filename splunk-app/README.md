@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 48 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 49 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -105,6 +105,15 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Index storage and retention**: each index page shows its retention (days or
+  size, whichever comes first), how full it is, its oldest data, and its tiers
+  with location, size and buckets, named both ways: hot/warm/cold/frozen/thawed
+  and Splunk Cloud's searchable storage (DDAS), Active Archive (DDAA) and Self
+  Storage (DDSS). An index near its size limit is flagged: it loses data by size
+  before its retention period. SQL: "Index retention and storage".
+- **Other inputs**: *Batch, Windows and other inputs* adds the inputs only
+  `inputs.conf` lists: batch, Windows event logs, perfmon, registry, AD, host,
+  network and print monitoring, PowerShell, SSL and file-change inputs.
 - **Scheduled views and Pivot reports**: *Scheduled views* lists dashboards
   emailed as PDFs on a schedule (schedule, recipients, failed runs), linked to
   their dashboard; a report made in Pivot names its data model and dataset.

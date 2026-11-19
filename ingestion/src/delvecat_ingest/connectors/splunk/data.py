@@ -26,10 +26,121 @@ def parse_index_list(text: str | None) -> tuple[str, ...] | None:
 MAX_SAMPLE_INDEXES = 50  # beyond this, a field sample searches all indexes instead
 
 
+def _mb(value: Any) -> float | None:
+    """A size in MB as Splunk writes it ("0.082", 12, "") -> 0.08; 0 caps mean none."""
+    try:
+        return round(float(value), 2)
+    except (TypeError, ValueError):
+        return None
+
+
+def _cap(value: Any) -> int | None:
+    """A size limit: 0 or empty means no limit of its own."""
+    n = to_int(value)
+    return n if n else None
+
+
+def _bucket_dirs(ctx: Ctx) -> dict[str, dict[str, Any]]:
+    """Actual size and buckets per tier (data/indexes-extended), when Splunk offers it."""
+    try:
+        entries = iter_entries(
+            ctx.transport, "/services/data/indexes-extended", {"datatype": "all"}
+        )
+        return {e["name"]: content(e).get("bucket_dirs") or {} for e in entries}
+    except (EndpointNotFound, EndpointForbidden):
+        return {}
+
+
+def _dir_stats(d: Any) -> dict[str, Any]:
+    """{'bucket_count': '3', 'bucket_size': '12.5'} (or cold_/warm_ prefixed) -> numbers."""
+    if not isinstance(d, dict):
+        return {}
+    buckets = sum(to_int(v) or 0 for k, v in d.items() if k.endswith("bucket_count"))
+    size = sum(_mb(v) or 0 for k, v in d.items() if k.endswith("bucket_size") or k == "size")
+    return {"buckets": buckets, "sizeMB": round(size, 2)}
+
+
+def index_storage(c: dict[str, Any], dirs: dict[str, Any]) -> dict[str, Any]:
+    """Where an index keeps its data, tier by tier, and what happens to it when it
+    freezes. Tiers use Splunk Enterprise's names (hot, warm, cold, frozen, thawed);
+    the web app also shows Splunk Cloud's (searchable storage, Active Archive, Self
+    Storage)."""
+    remote = c.get("remotePath") or None
+    home, cold, thawed = (_dir_stats(dirs.get(k)) for k in ("home", "cold", "thawed"))
+    home_raw = dirs.get("home") if isinstance(dirs.get("home"), dict) else {}
+    tiers: list[dict[str, Any]] = [
+        {
+            "tier": "hot",
+            "path": c.get("homePath") or None,
+            "buckets": to_int(home_raw.get("hot_bucket_count")),
+            "maxBuckets": to_int(c.get("maxHotBuckets")),  # "auto" -> None
+        },
+        {
+            "tier": "warm",
+            # SmartStore: warm buckets live in the remote store, cached locally.
+            "path": remote or c.get("homePath") or None,
+            "remote": True if remote else None,
+            "buckets": to_int(home_raw.get("warm_bucket_count")),
+            "sizeMB": _mb(home_raw.get("warm_bucket_size")),
+            "maxBuckets": to_int(c.get("maxWarmDBCount")),
+        },
+    ]
+    # hot + warm share homePath and its cap
+    tiers[0]["maxSizeMB"] = tiers[1]["maxSizeMB"] = _cap(c.get("homePath.maxDataSizeMB"))
+    if not remote:  # SmartStore has no cold tier of its own
+        tiers.append(
+            {
+                "tier": "cold",
+                "path": c.get("coldPath") or None,
+                "maxSizeMB": _cap(c.get("coldPath.maxDataSizeMB")),
+                **({k: v for k, v in cold.items()} if cold else {}),
+            }
+        )
+    frozen = frozen_action(c)
+    tiers.append({"tier": "frozen", **frozen})
+    tiers.append({"tier": "thawed", "path": c.get("thawedPath") or None, **thawed})
+    return {
+        "model": "smartStore" if remote else "classic",
+        "tiers": [{k: v for k, v in t.items() if v is not None} for t in tiers],
+        "maxDataSize": c.get("maxDataSize") or None,  # bucket size: auto, auto_high_volume, MB
+        "oldestEventInHome": epoch_to_iso(home_raw.get("event_min_time")),
+        "homeSizeMB": home.get("sizeMB"),
+    }
+
+
+def frozen_action(c: dict[str, Any]) -> dict[str, Any]:
+    """What happens to data older than the retention period (or over the size limit):
+    deleted, archived to a directory or by a script, or, in Splunk Cloud, kept in
+    Dynamic Data Active Archive (DDAA) or the customer's own Self Storage (DDSS)."""
+    if c.get("archiver.selfStorageProvider") or c.get("archiver.selfStorageBucketPath"):
+        return {
+            "action": "selfStorage",
+            "provider": c.get("archiver.selfStorageProvider") or None,
+            "path": c.get("archiver.selfStorageBucketPath") or None,
+        }
+    if as_bool(c.get("archiver.enableDataArchive", False)) or c.get("archiver.coldStorageProvider"):
+        days = to_int(c.get("archiver.coldStorageRetentionPeriod")) or to_int(
+            c.get("archiver.maxDataArchiveRetentionPeriod")
+        )
+        return {
+            "action": "activeArchive",
+            "provider": c.get("archiver.coldStorageProvider") or None,
+            "archiveRetentionDays": days,
+        }
+    if c.get("coldToFrozenDir"):
+        return {"action": "archiveDir", "path": c["coldToFrozenDir"]}
+    if c.get("coldToFrozenScript"):
+        return {"action": "archiveScript", "path": c["coldToFrozenScript"]}
+    return {"action": "delete"}
+
+
 def extract_indexes(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
+    dirs = _bucket_dirs(ctx)
     for e in iter_entries(ctx.transport, "/services/data/indexes", {"datatype": "all"}):
         c = content(e)
+        frozen_secs = to_int(c.get("frozenTimePeriodInSecs"))
+        storage = index_storage(c, dirs.get(e["name"]) or {})
         add_global(
             ctx,
             out,
@@ -40,10 +151,19 @@ def extract_indexes(ctx: Ctx, out: ExtractResult) -> int:
             updatedAt=e.get("updated"),
             properties={
                 "datatype": c.get("datatype", "event"),
+                # Retention: data freezes when it is older than retentionDays or the index
+                # is over maxTotalDataSizeMB, whichever comes first. Splunk Cloud calls the
+                # first "searchable retention".
+                "retentionDays": round(frozen_secs / 86400, 1) if frozen_secs else None,
                 "maxTotalDataSizeMB": to_int(c.get("maxTotalDataSizeMB")),
-                "frozenTimePeriodInSecs": to_int(c.get("frozenTimePeriodInSecs")),
+                "maxGlobalDataSizeMB": _cap(c.get("maxGlobalDataSizeMB")),  # SmartStore
+                "frozenTimePeriodInSecs": frozen_secs,
+                "frozenAction": storage["tiers"][-2]["action"],
                 "homePath": c.get("homePath") or None,
+                "coldPath": c.get("coldPath") or None,
+                "remotePath": c.get("remotePath") or None,
                 "coldToFrozenDir": c.get("coldToFrozenDir") or None,
+                "storage": storage,
                 "internal": e["name"].startswith("_"),
             },
             observed={
@@ -217,6 +337,86 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
                 if c.get("sourcetype"):
                     out.refs.append(ref(ent["id"], "sourcetype", c["sourcetype"], "feeds"))
             n += 1
+    return n
+
+
+# Input kinds Splunk has no REST endpoint list for (or only on Windows): read from
+# inputs.conf itself. "fschange" stanzas are written "fschange:<path>".
+CONF_INPUT_KINDS = (
+    "batch",
+    "WinEventLog",
+    "perfmon",
+    "WinRegMon",
+    "admon",
+    "WinHostMon",
+    "WinNetMon",
+    "WinPrintMon",
+    "powershell",
+    "powershell2",
+    "splunktcp-ssl",
+    "tcp-ssl",
+    "fschange",
+)
+
+
+def _conf_inputs(ctx: Ctx) -> list[dict[str, Any]]:
+    if "conf-inputs" not in ctx.cache:
+        try:
+            ctx.cache["conf-inputs"] = list(
+                iter_entries(ctx.transport, f"{NS}/configs/conf-inputs")
+            )
+        except (EndpointNotFound, EndpointForbidden):
+            ctx.cache["conf-inputs"] = []
+    return ctx.cache["conf-inputs"]
+
+
+def extract_conf_inputs(ctx: Ctx, out: ExtractResult) -> int:
+    """Batch, Windows (event logs, perfmon, registry, AD, host, network, print),
+    PowerShell, SSL and file-change inputs, from inputs.conf."""
+    n = 0
+    seen: set[tuple[str | None, str]] = set()
+    for e in _conf_inputs(ctx):
+        stanza = e["name"]
+        kind, sep, target = stanza.partition("://")
+        if not sep and stanza.startswith("fschange:"):
+            kind, target = "fschange", stanza[len("fschange:") :]
+        if kind not in CONF_INPUT_KINDS or not target:
+            continue
+        name = f"{kind}://{target}"
+        app = (e.get("acl") or {}).get("app")
+        if (app, name) in seen:
+            continue
+        seen.add((app, name))
+        c = content(e)
+        ent = add_ko(
+            ctx,
+            out,
+            "input",
+            e,
+            name=name,
+            properties={
+                "kind": kind,
+                "index": c.get("index") or None,
+                "sourcetype": c.get("sourcetype") or None,
+                "host": c.get("host") or None,
+                "source": c.get("source") or None,
+                "interval": c.get("interval") or None,
+                # batch inputs delete each file once read ("sinkhole")
+                "deletesFilesAfterReading": (c.get("move_policy") == "sinkhole")
+                if kind == "batch"
+                else None,
+                "renderXml": as_bool(c.get("renderXml", False)) if kind == "WinEventLog" else None,
+                "counters": (c.get("counters") or None) if kind == "perfmon" else None,
+            },
+        )
+        if not ent.get("disabled"):
+            index = c.get("index")
+            out.refs.append(
+                ref(ent["id"], "index", index if index and index != "default" else "main", "feeds")
+            )
+            if c.get("sourcetype"):
+                out.refs.append(ref(ent["id"], "sourcetype", c["sourcetype"], "feeds"))
+        n += 1
     return n
 
 

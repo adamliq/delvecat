@@ -46,6 +46,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "hosts", label: "Hosts", searches: true },
       { id: "sources", label: "Sources", searches: true },
       { id: "inputs", label: "Inputs" },
+      { id: "otherInputs", label: "Batch, Windows and other inputs (inputs.conf)" },
       { id: "modularInputs", label: "Modular inputs (add-ons)" },
       { id: "forwarders", label: "Forwarders", searches: true },
       { id: "fields", label: "Discover fields by sampling events", searches: true, slow: true, needs: "inventory" },

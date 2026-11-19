@@ -381,6 +381,176 @@
    },
    "name": "udp://5514",
    "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "move_policy": "sinkhole",
+    "index": "main",
+    "crcSalt": "<SOURCE>"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/search/configs/conf-inputs/batch://$SPLUNK_HOME/var/spool/splunk",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "list": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "move": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514"
+   },
+   "name": "batch://$SPLUNK_HOME/var/spool/splunk",
+   "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": false,
+    "index": "wineventlog",
+    "renderXml": "true",
+    "sourcetype": "XmlWinEventLog"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/WinEventLog://Security",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "list": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "move": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514"
+   },
+   "name": "WinEventLog://Security",
+   "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": true,
+    "index": "os",
+    "counters": "% Processor Time",
+    "interval": "60"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/perfmon://CPU",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "list": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "move": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514"
+   },
+   "name": "perfmon://CPU",
+   "updated": "2026-11-06T01:54:28+00:00"
+  },
+  {
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "disabled": true,
+    "index": "main"
+   },
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/search/configs/conf-inputs/fschange:/etc",
+   "links": {
+    "_reload": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/_reload",
+    "alternate": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "disable": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/disable",
+    "edit": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "list": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514",
+    "move": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514/move",
+    "remove": "/servicesNS/nobody/TA-acme-firewall/configs/conf-inputs/udp%3A%252F%252F5514"
+   },
+   "name": "fschange:/etc",
+   "updated": "2026-11-06T01:54:28+00:00"
   }
  ],
  "generator": {
@@ -390,7 +560,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 8
+  "total": 12
  },
  "updated": "2026-11-06T07:34:41+00:00"
 }

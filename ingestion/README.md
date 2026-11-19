@@ -82,6 +82,30 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Index storage and retention
+
+Each index records its retention (`retentionDays`, from `frozenTimePeriodInSecs`;
+Splunk Cloud's "searchable retention") and size limit (`maxTotalDataSizeMB`, or
+`maxGlobalDataSizeMB` with SmartStore): data freezes at whichever comes first.
+`storage.tiers` lists hot, warm, cold, frozen and thawed with their location,
+size limit and, where Splunk reports them (`data/indexes-extended`), actual size
+and buckets. SmartStore indexes (`remotePath`) keep warm buckets in the remote
+store and have no cold tier. `frozenAction` says what happens to frozen data:
+`delete`, `archiveDir`, `archiveScript`, or in Splunk Cloud `activeArchive`
+(Dynamic Data Active Archive, with its retention) or `selfStorage` (Dynamic Data
+Self Storage, the customer's bucket). The web app names tiers in both
+vocabularies (hot/warm/cold = Splunk Cloud's searchable storage, DDAS). An index
+at 90% of its size limit gets a `retentionBySize` warning: it freezes data by size
+before its retention period. The public profile drops object-store locations.
+
+### Other inputs
+
+Besides the inputs Splunk lists over REST (monitor, TCP, UDP, scripted,
+splunktcp, HEC, modular), the inputs only `inputs.conf` lists are catalogued too
+(part `otherInputs`): `batch` (with `deletesFilesAfterReading` for sinkhole),
+Windows (`WinEventLog`, `perfmon`, `WinRegMon`, `admon`, `WinHostMon`,
+`WinNetMon`, `WinPrintMon`), PowerShell, SSL TCP and `fschange`.
+
 ### Scheduled views and Pivot reports
 
 A scheduled view (a dashboard rendered as a PDF and emailed on a schedule,

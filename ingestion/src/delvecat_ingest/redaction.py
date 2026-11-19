@@ -212,6 +212,15 @@ def redact_bundle(
             for k in HOST_PROPS:
                 if props.get(k) and str(props[k]) in hosts:
                     props[k] = rename("host", str(props[k]))
+        if profile.urls == "drop" and e["type"] == "index":
+            # Object-store locations (SmartStore remote path, Splunk Cloud Self Storage
+            # bucket) name the customer's cloud account.
+            if props.pop("remotePath", None):
+                counts["urls"] += 1
+            for tier in (props.get("storage") or {}).get("tiers") or []:
+                if "://" in str(tier.get("path") or ""):
+                    tier.pop("path")
+                    counts["urls"] += 1
         if profile.urls == "drop":
             for k in URL_PROPS:
                 if props.pop(k, None) is not None:

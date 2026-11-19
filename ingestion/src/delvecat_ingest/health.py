@@ -40,6 +40,7 @@ FORWARDER_SILENT_HOURS = 1
 HEALTH_WINDOW_DAYS = 7
 TOKEN_EXPIRY_WARNING_DAYS = 14  # a token expiring this soon breaks whatever uses it
 TOKEN_STALE_DAYS = 90  # not used for this long: probably not needed
+RETENTION_SIZE_RATIO = 0.9  # an index this full freezes data by size, not by age
 ALERT_NOISY_PER_DAY = 24  # an alert firing more than hourly on average is hard to act on
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
 
@@ -317,6 +318,30 @@ def _hec_checks(e: dict[str, Any], u: dict[str, Any], checks: list[dict[str, str
         _check(checks, "hecErrors", "warning", f"{u['hecErrors']:,} requests failed")
 
 
+def _retention_checks(
+    e: dict[str, Any], obs: dict[str, Any], as_of: datetime, checks: list[dict[str, str]]
+) -> None:
+    """An index near its size limit freezes (deletes or archives) its oldest data by
+    size, so it keeps less than its retention period says."""
+    p = e.get("properties") or {}
+    limit = p.get("maxGlobalDataSizeMB") or p.get("maxTotalDataSizeMB")
+    size = obs.get("currentDBSizeMB")
+    if not limit or size is None or size < RETENTION_SIZE_RATIO * limit:
+        return
+    kept = ""
+    if (age := _age_hours(as_of, obs.get("earliestEvent"))) is not None:
+        kept = f"; its oldest data is {_fmt_age(age)} old"
+    days = p.get("retentionDays")
+    _check(
+        checks,
+        "retentionBySize",
+        "warning",
+        f"Uses {size:,} MB of its {limit:,} MB limit: the oldest data is frozen by size"
+        + (f" before its {days:g}-day retention" if days else "")
+        + kept,
+    )
+
+
 def _token_checks(
     e: dict[str, Any], as_of: datetime, users: set[tuple[str, str]] | None, checks: list
 ) -> None:
@@ -388,6 +413,8 @@ def evaluate_health(
         usage = e.get("usage") or {}
         if e["type"] in ("index", "sourcetype"):
             _data_checks(e, obs, as_of, checks)
+        if e["type"] == "index":
+            _retention_checks(e, obs, as_of, checks)
         elif e["type"] in ("savedSearch", "correlationSearch", "scheduledView"):
             _scheduler_checks(e, usage, checks)
             _alert_checks(e, usage, checks)

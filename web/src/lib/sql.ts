@@ -332,6 +332,17 @@ WHERE e.type = 'authToken'
 ORDER BY h.status = 'critical' DESC, e.display_name;`,
   },
   {
+    title: "Index retention and storage",
+    sql: `SELECT name, json_extract(settings, '$.retentionDays') AS retention_days,
+       json_extract(settings, '$.maxTotalDataSizeMB') AS size_limit_mb,
+       json_extract(settings, '$.observed.currentDBSizeMB') AS size_mb,
+       json_extract(settings, '$.frozenAction') AS when_frozen,
+       json_extract(settings, '$.storage.model') AS storage
+FROM entities
+WHERE type = 'index' AND disabled = 0
+ORDER BY name;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

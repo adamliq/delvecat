@@ -11,6 +11,7 @@ import { RelationGraph } from "../components/RelationGraph";
 import { SchemaTab } from "../components/SchemaTab";
 import { BlastRadius, RiskBanner } from "../components/RiskPanel";
 import { UsagePanel } from "../components/UsagePanel";
+import { StoragePanel } from "../components/StoragePanel";
 import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
@@ -83,7 +84,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage"]);
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)),
   );
@@ -189,6 +190,7 @@ export function EntityPage() {
           <GovernancePanel catalog={catalog} entity={entity} />
 
           <UsagePanel entity={entity} />
+          {entity.type === "index" && <StoragePanel entity={entity} />}
 
           <BlastRadius catalog={catalog} entity={entity} />
 
