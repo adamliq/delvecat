@@ -125,11 +125,15 @@ const sections = {
 
   async build() {
     const a = await session('admin');
+    // The page starts from the previous build's parts (by design); with none, the default.
+    const prevParts = (await buildDoc())?.options?.parts;
+    const expected = prevParts ? prevParts.length : 47;
     const t0 = Date.now();
     const doc = await uiBuild(a.page);
     check('default build from the page finishes and publishes', doc?.state === 'done' && !doc.dryRun,
       `${doc?.entities} objects, ${doc?.edges} relationships in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
-    check('default build ran 47 parts (no field discovery)', doc?.options?.parts?.length === 47 && !doc.options.parts.includes('fields'));
+    check(`build ran the page's starting selection (${expected} parts)`,
+      doc?.options?.parts?.length === expected && (!!prevParts || !doc.options.parts.includes('fields')));
     const problems = (doc?.problems || []).filter((p) => p.status !== 'skipped');
     check('no part failed', problems.length === 0, problems.map((p) => p.connector + ': ' + p.message).join('; '));
     const text = await mainText(a.page);
