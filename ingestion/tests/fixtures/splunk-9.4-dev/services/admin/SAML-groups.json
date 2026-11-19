@@ -1,0 +1,36 @@
+{
+ "entry": [
+  {
+   "name": "acme-soc-analysts",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "roles": [
+     "user",
+     "acme_soc"
+    ]
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "acme-splunk-admins",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "roles": [
+     "admin"
+    ]
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 2
+ }
+}

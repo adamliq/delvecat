@@ -218,7 +218,8 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
 
     members: dict[str, set[str]] = defaultdict(set)  # role id -> user ids
     for edge in edges:
-        if edge["type"] == "memberOf":
+        # Identity groups are memberOf roles too, but they are not users.
+        if edge["type"] == "memberOf" and (by_id.get(edge["from"]) or {}).get("type") == "user":
             members[edge["to"]].add(edge["from"])
 
     def users_of(role_ids: set[str]) -> set[str]:

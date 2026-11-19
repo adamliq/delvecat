@@ -1,0 +1,17 @@
+{
+ "entry": [
+  {
+   "name": "authentication",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "authType": "SAML",
+    "authSettings": "acme_okta"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ]
+}

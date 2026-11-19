@@ -1,0 +1,44 @@
+{
+ "entry": [
+  {
+   "name": "aws_cloudtrail",
+   "acl": {
+    "app": "Splunk_TA_aws",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "AWS CloudTrail",
+    "description": "Collect CloudTrail events from SQS"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "journald",
+   "acl": {
+    "app": "journald_input",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "Systemd Journald Input for Splunk"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "checkapp",
+   "acl": {
+    "app": "splunk_instrumentation",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "checkapp"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 3
+ }
+}

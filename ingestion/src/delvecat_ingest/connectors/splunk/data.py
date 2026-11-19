@@ -220,6 +220,79 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
     return n
 
 
+# Settings every input has; the rest of a modular input's settings are its own.
+_STANDARD_INPUT_KEYS = frozenset(
+    {
+        "index",
+        "sourcetype",
+        "host",
+        "source",
+        "interval",
+        "disabled",
+        "host_resolved",
+        "python.version",
+        "python.required",
+        "run_only_one",
+        "start_by_shell",
+        "passAuth",
+        "_rcvbuf",
+    }
+)
+
+
+def extract_modular_inputs(ctx: Ctx, out: ExtractResult) -> int:
+    """Inputs of the kinds add-ons define (modular inputs: cloud services, APIs, journald,
+    ...): one per configured stanza, feeding its index and sourcetype like other inputs.
+    Their own settings are listed by name only: values may be accounts, URLs or keys."""
+    try:
+        kinds = list(iter_entries(ctx.transport, "/services/data/modular-inputs"))
+    except (EndpointNotFound, EndpointForbidden):
+        return 0
+    n = 0
+    for kind in kinds:
+        scheme = kind["name"]
+        title = content(kind).get("title") or None
+        try:
+            entries = list(iter_entries(ctx.transport, f"{NS}/data/inputs/{scheme}"))
+        except (EndpointNotFound, EndpointForbidden):
+            continue
+        for e in entries:
+            c = content(e)
+            own = sorted(
+                k
+                for k, v in c.items()
+                if not k.startswith("eai:")
+                and k not in _STANDARD_INPUT_KEYS
+                and v not in (None, "")
+            )
+            ent = add_ko(
+                ctx,
+                out,
+                "input",
+                e,
+                name=f"{scheme}://{e['name']}",
+                properties={
+                    "kind": scheme,
+                    "modular": True,
+                    "modularInputTitle": title,
+                    "index": c.get("index") or None,
+                    "sourcetype": c.get("sourcetype") or None,
+                    "host": c.get("host") or None,
+                    "source": c.get("source") or None,
+                    "interval": c.get("interval") or None,
+                    "settingNames": own or None,
+                },
+            )
+            if not ent.get("disabled"):
+                index = c.get("index")
+                target = index if index and index != "default" else "main"
+                out.refs.append(ref(ent["id"], "index", target, "feeds"))
+                if c.get("sourcetype"):
+                    out.refs.append(ref(ent["id"], "sourcetype", c["sourcetype"], "feeds"))
+            n += 1
+    return n
+
+
 def extract_forwarders(ctx: Ctx, out: ExtractResult) -> int:
     """Forwarders seen connecting to this instance's indexers (from _internal metrics)."""
     rows = ctx.transport.search(

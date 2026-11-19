@@ -45,4 +45,21 @@ describe("user reach", () => {
     ]);
     expect(sensitiveAccess(u)).toEqual([]); // without the catalog only stored data is read
   });
+
+  it("gives identity groups (SAML, LDAP) the reach of the roles they map to", async () => {
+    const { Catalog } = await import("./catalog");
+    const { sensitiveAccess } = await import("./governance");
+    const role = {
+      id: "i:role:soc", type: "role" as const, name: "soc", product: "splunk" as const, instance: "i",
+      governance: { sensitiveAccess: [{ id: "i:index:x", classifications: ["PII"], how: "search", filtered: false }] },
+    };
+    const g = { id: "i:authGroup:saml:soc-analysts", type: "authGroup" as const, name: "saml:soc-analysts", product: "splunk" as const, instance: "i" };
+    const c = new Catalog({
+      schemaVersion: "0.1.2", generatedAt: "2026-01-01T00:00:00Z", generator: { name: "t", version: "0" },
+      instances: [{ id: "i", name: "i", kind: "splunkEnterprise" }],
+      entities: [role, g],
+      edges: [{ from: g.id, to: role.id, type: "memberOf" }],
+    });
+    expect(sensitiveAccess(g, c).map((a) => [a.id, a.viaRoles])).toEqual([["i:index:x", ["i:role:soc"]]]);
+  });
 });

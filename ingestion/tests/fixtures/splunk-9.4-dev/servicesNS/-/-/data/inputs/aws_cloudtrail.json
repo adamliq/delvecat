@@ -1,0 +1,27 @@
+{
+ "entry": [
+  {
+   "name": "acme_prod_trail",
+   "acl": {
+    "app": "Splunk_TA_aws",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "index": "main",
+    "sourcetype": "aws:cloudtrail",
+    "interval": "30",
+    "disabled": false,
+    "aws_account": "acme-prod",
+    "aws_region": "eu-west-1",
+    "sqs_queue": "acme-cloudtrail-queue",
+    "secret_key": "should-never-appear",
+    "remove_files_when_done": "0"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 1
+ }
+}

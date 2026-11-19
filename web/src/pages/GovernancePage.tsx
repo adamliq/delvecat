@@ -45,6 +45,7 @@ export function GovernancePage() {
   const reachableIds = new Set(reachable.map((s) => s.id));
   const roles = catalog.entities.filter((e) => e.type === "role" && sensitiveAccess(e).some((a) => reachableIds.has(a.id)));
   const users = catalog.entities.filter((e) => e.type === "user" && sensitiveAccess(e, catalog).some((a) => reachableIds.has(a.id)));
+  const groups = catalog.entities.filter((e) => e.type === "authGroup" && sensitiveAccess(e, catalog).some((a) => reachableIds.has(a.id)));
   const everyone = matching.filter((s) => access(s)?.everyone);
   const consumers = catalog.entities.filter((e) => readsClassified(e).some((c) => matchesClass(c, filter)));
   const taxonomy = catalog.bundle.classifications ?? [];
@@ -98,6 +99,9 @@ export function GovernancePage() {
           <div className="tile static"><span className="tile-num">{matching.length}</span><span className="tile-label">sensitive data stores</span></div>
           <div className="tile static"><span className="tile-num">{roles.length}</span><span className="tile-label">roles can reach them</span></div>
           <div className="tile static"><span className="tile-num">{users.length}</span><span className="tile-label">users can reach them</span></div>
+          {groups.length > 0 && (
+            <div className="tile static"><span className="tile-num">{groups.length}</span><span className="tile-label">identity groups (SAML, LDAP) can reach them</span></div>
+          )}
           <div className="tile static"><span className="tile-num">{everyone.length}</span><span className="tile-label">readable by every role</span></div>
         </div>
       </section>

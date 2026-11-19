@@ -180,6 +180,7 @@
         "app",
         "user",
         "role",
+        "authGroup",
         "index",
         "sourcetype",
         "source",

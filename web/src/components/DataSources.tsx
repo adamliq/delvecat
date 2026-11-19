@@ -11,7 +11,7 @@ const GROUPS: { title: string; types: EntityType[]; hint: string }[] = [
   { title: "Databases", types: ["externalTable", "dbConnection", "dbInput"], hint: "DB Connect inputs and the tables they read" },
   { title: "Network streams", types: ["streamDefinition", "streamGroup"], hint: "Splunk Stream protocols captured into this data" },
   { title: "Deployment", types: ["serverClass", "deploymentApp"], hint: "Deployment Server classes and apps that configure the inputs" },
-  { title: "Inputs", types: ["input"], hint: "Monitor, network, scripted and HEC inputs" },
+  { title: "Inputs", types: ["input"], hint: "Monitor, network, scripted, HEC and modular (add-on) inputs" },
 ];
 
 /** "Where does this data come from?" for indexes and sourcetypes. */

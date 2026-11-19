@@ -33,6 +33,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "apps", label: "Apps" },
       { id: "users", label: "Users" },
       { id: "roles", label: "Roles" },
+      { id: "authGroups", label: "SAML and LDAP group mappings" },
     ],
   },
   {
@@ -44,6 +45,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "hosts", label: "Hosts", searches: true },
       { id: "sources", label: "Sources", searches: true },
       { id: "inputs", label: "Inputs" },
+      { id: "modularInputs", label: "Modular inputs (add-ons)" },
       { id: "forwarders", label: "Forwarders", searches: true },
       { id: "fields", label: "Discover fields by sampling events", searches: true, slow: true, needs: "inventory" },
     ],

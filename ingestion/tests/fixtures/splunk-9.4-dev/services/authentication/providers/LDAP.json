@@ -1,0 +1,24 @@
+{
+ "entry": [
+  {
+   "name": "acme_ad",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "host": "ad.acme.example",
+    "port": 636,
+    "SSLEnabled": true,
+    "disabled": false,
+    "bindDN": "CN=svc-splunk,OU=Service,DC=acme,DC=example",
+    "bindDNpassword": "********"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 1
+ }
+}

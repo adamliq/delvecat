@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 42 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 44 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -101,6 +101,10 @@ one. The same from a search:
   writes to (To, Cc, Bcc) and from, and the email action its defaults. An
   address is searchable, and the SQL console has "Who alert emails go to".
   `redact=internal` keeps only the domains (`*@corp.example`).
+- **Modular inputs and identity groups**: *Modular inputs (add-ons)* lists the
+  inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
+  lists the identity groups that grant roles (member counts only), and the
+  instance card's details say how people log in.
 - **HTTP Event Collector**: *Inputs* lists each HEC token (never its value)
   and HEC's own on/off state; *HTTP Event Collector token use* adds events,
   volume and rejected requests per token, with the reason (for example an index

@@ -69,6 +69,19 @@ and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
 
+### Modular inputs and identity groups
+
+Inputs that add-ons define (modular inputs: cloud services, APIs, journald...)
+are `input` objects like the built-in kinds, with `modular: true`, the input
+kind's title and `feeds` edges to their index and sourcetype. Their own settings
+are listed by name only (`settingNames`): values can be accounts, queues or keys.
+
+SAML and LDAP groups mapped to Splunk roles are `authGroup` objects with
+`memberOf` edges to those roles, so a group reaches what its roles reach. An
+LDAP group records its strategy and how many members it has, never who they
+are. The instance records how people log in (`authentication`: Splunk, LDAP or
+SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
+
 ### HTTP Event Collector
 
 Each HEC token is an `input` (kind `http`): its default and allowed indexes,

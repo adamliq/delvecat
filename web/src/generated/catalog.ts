@@ -5,6 +5,7 @@ export type EntityType =
   | "app"
   | "user"
   | "role"
+  | "authGroup"
   | "index"
   | "sourcetype"
   | "source"

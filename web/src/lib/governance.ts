@@ -46,7 +46,8 @@ const userReach = new WeakMap<Catalog, Map<string, SensitiveAccess[]>>();
  */
 export function sensitiveAccess(e: Entity, catalog?: Catalog): SensitiveAccess[] {
   const own = gov(e).sensitiveAccess;
-  if (own || e.type !== "user" || !catalog) return own ?? [];
+  // Users and identity groups (SAML/LDAP) reach what their roles reach.
+  if (own || (e.type !== "user" && e.type !== "authGroup") || !catalog) return own ?? [];
   let cache = userReach.get(catalog);
   if (!cache) userReach.set(catalog, (cache = new Map()));
   let reach = cache.get(e.id);

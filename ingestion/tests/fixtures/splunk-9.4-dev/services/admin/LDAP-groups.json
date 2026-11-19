@@ -1,0 +1,27 @@
+{
+ "entry": [
+  {
+   "name": "legacy-ops",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "roles": [
+     "power"
+    ],
+    "strategy": "acme_ad",
+    "type": "static",
+    "users": [
+     "CN=Jane Doe,OU=People,DC=acme,DC=example",
+     "CN=Sam Lee,OU=People,DC=acme,DC=example"
+    ]
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 1
+ }
+}

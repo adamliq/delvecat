@@ -1,0 +1,22 @@
+{
+ "entry": [
+  {
+   "name": "default",
+   "acl": {
+    "app": "journald_input",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "index": "os",
+    "sourcetype": "journald",
+    "disabled": true,
+    "journalctl-unit": "sshd"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  }
+ ],
+ "paging": {
+  "total": 1
+ }
+}
