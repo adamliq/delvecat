@@ -14,6 +14,7 @@ export const PRODUCT_LABELS: Record<Product, string> = {
 const SPECIAL: Partial<Record<EntityType, string>> = {
   authGroup: "Identity Group",
   authToken: "Authentication Token",
+  scheduledView: "Scheduled View",
   kvCollection: "KV Store Collection",
   correlationSearch: "Detection",
   adaptiveResponseAction: "Alert Action",

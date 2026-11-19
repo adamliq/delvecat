@@ -63,7 +63,7 @@ def test_internal_keeps_domains_public_drops(bundle):
         "cc": ["$result.owner$"],
         "from": "*@acme.example",
     }
-    assert counts["emails"] == 4
+    assert counts["emails"] == 4 + 3  # the alert, plus the scheduled view's three
     public = copy.deepcopy(bundle)
     redact_bundle(public, load_profile("public"), salt="t")
     assert "alertRecipients" not in _props(public)

@@ -84,6 +84,21 @@
    "success": "5",
    "total": "5",
    "user": "nobody"
+  },
+  {
+   "app": "acme_web",
+   "avgRuntime": "41.5",
+   "continued": "0",
+   "failed": "1",
+   "first": "1793603000",
+   "last": "1793948000",
+   "maxRuntime": "60.2",
+   "savedsearch_name": "_ScheduledView__storefront_health",
+   "skipped": "0",
+   "success": "0",
+   "total": "1",
+   "user": "admin",
+   "lastReason": ""
   }
  ],
  "spl": "index=_internal sourcetype=scheduler savedsearch_name=* | stats count(eval(status=\"success\")) as success count(eval(status=\"skipped\")) as skipped count(eval(status=\"continued\")) as continued count(eval(like(status, \"%fail%\") OR status=\"abandoned\")) as failed count as total avg(run_time) as avgRuntime max(run_time) as maxRuntime min(_time) as first max(_time) as last latest(reason) as lastReason by app, savedsearch_name, user"

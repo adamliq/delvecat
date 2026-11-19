@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import type { Entity } from "../generated/catalog";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { DataSources } from "../components/DataSources";
 import { DetectionPanel } from "../components/DetectionPanel";
@@ -82,7 +83,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot"]);
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)),
   );
@@ -213,6 +214,7 @@ export function EntityPage() {
             </section>
           ))}
 
+          {!!props.pivot && <PivotSource entity={entity} pivot={props.pivot as { dataModel: string; dataset: string }} />}
           <EmailRecipients recipients={props.alertRecipients} />
           {/* The email alert action's defaults, for searches that set none. */}
           {!!(props.defaultRecipients || props.sender) && (
@@ -284,6 +286,24 @@ export function EntityPage() {
 }
 
 /** Who an email alert action writes to. A $token$ is filled in when the alert fires. */
+/** A report made in Pivot: the data model and dataset it pivots on. */
+function PivotSource({ entity, pivot }: { entity: Entity; pivot: { dataModel: string; dataset: string } }) {
+  const { catalog } = useCatalog();
+  const model = catalog.entities.find(
+    (e) => e.type === "dataModel" && e.instance === entity.instance && e.name === pivot.dataModel,
+  );
+  return (
+    <section>
+      <h2>Pivot</h2>
+      <p>
+        Built in Pivot on data model{" "}
+        {model ? <Link to={`/entity/${encodeURIComponent(model.id)}`}>{model.displayName ?? model.name}</Link> : <code>{pivot.dataModel}</code>}
+        , dataset <code>{pivot.dataset}</code>.
+      </p>
+    </section>
+  );
+}
+
 function EmailRecipients({ recipients, title = "Email recipients" }: { recipients: unknown; title?: string }) {
   if (!recipients || typeof recipients !== "object") return null;
   const r = recipients as { to?: string[]; cc?: string[]; bcc?: string[]; from?: string };

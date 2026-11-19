@@ -299,7 +299,7 @@ LIMIT 25;`,
 FROM entities e,
      json_each(json_extract(e.settings, '$.alertRecipients')) j,
      json_each(CASE json_type(j.value) WHEN 'array' THEN j.value ELSE json_array(j.value) END) r
-WHERE e.type IN ('savedSearch', 'correlationSearch') AND j.key != 'from'
+WHERE e.type IN ('savedSearch', 'correlationSearch', 'scheduledView') AND j.key != 'from'
 GROUP BY recipient, field
 ORDER BY alerts DESC, recipient;`,
   },

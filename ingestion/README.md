@@ -82,6 +82,18 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Scheduled views and Pivot reports
+
+A scheduled view (a dashboard rendered as a PDF and emailed on a schedule,
+*Export > Schedule PDF Delivery*) is a `scheduledView` object with a `reads`
+edge to its dashboard: schedule, subject, paper size and orientation, and its
+recipients (same rules and redaction as alert recipients). Its scheduler runs
+and failures count as for a scheduled search. Splunk also lists it among saved
+searches as `_ScheduledView__<dashboard>`; it is catalogued only once.
+
+A report made in Pivot (`| pivot <data model> <dataset> ...`) records which
+(`properties.pivot`), besides the `reads` edge to the data model.
+
 ### Authentication tokens
 
 Each Splunk authentication token is an `authToken` object: the user it is for

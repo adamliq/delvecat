@@ -388,7 +388,7 @@ def evaluate_health(
         usage = e.get("usage") or {}
         if e["type"] in ("index", "sourcetype"):
             _data_checks(e, obs, as_of, checks)
-        elif e["type"] in ("savedSearch", "correlationSearch"):
+        elif e["type"] in ("savedSearch", "correlationSearch", "scheduledView"):
             _scheduler_checks(e, usage, checks)
             _alert_checks(e, usage, checks)
             props = e.get("properties") or {}

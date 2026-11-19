@@ -27,6 +27,7 @@ export type EntityType =
   | "transform"
   | "workflowAction"
   | "dashboard"
+  | "scheduledView"
   | "input"
   | "forwarder"
   | "correlationSearch"

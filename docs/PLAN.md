@@ -81,7 +81,7 @@ Common aspects on every entity: `description`, `owners`, `tags`,
 | Platform | `instance` (role: search head, SHC, indexer cluster, HF, DS, Cloud stack), `app`, `user`, `role`, `authGroup`, `authToken` (metadata only) |
 | Data | `index` (events/metrics), `sourcetype`, `source`, `host`, `field`, `dataModel` (+ datasets, acceleration), `lookup` (CSV / KV store), `kvCollection` |
 | Knowledge objects | `savedSearch` (report / alert / scheduled), `macro`, `searchCommand` (custom commands from apps), `eventtype`, `tag`, `fieldAlias`, `calculatedField`, `fieldExtraction`, `transform`, `workflowAction` |
-| Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels |
+| Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels, `scheduledView` (dashboard PDF by email), Pivot reports |
 | Ingestion | `input` (monitor, HEC token *name*, scripted, modular, splunktcp), `forwarder` |
 | Cloud | ACS: indexes, HEC token metadata, IP allow lists, installed apps; Ingest Actions rulesets; Edge/Ingest Processor pipelines (SPL2) — later |
 

@@ -45,7 +45,7 @@ def extract_saved_search_runs(ctx: Ctx, out: ExtractResult) -> int:
     for r in rows:
         out.usage.append(
             {
-                "types": ["savedSearch", "correlationSearch"],
+                "types": ["savedSearch", "correlationSearch", "scheduledView"],
                 "name": r.get("savedsearch_name"),
                 "app": r.get("app"),
                 "usage": {
@@ -148,7 +148,7 @@ def extract_scheduler(ctx: Ctx, out: ExtractResult) -> int:
     for r in rows:
         out.usage.append(
             {
-                "types": ["savedSearch", "correlationSearch"],
+                "types": ["savedSearch", "correlationSearch", "scheduledView"],
                 "name": r.get("savedsearch_name"),
                 "app": r.get("app"),
                 "owner": r.get("user"),
