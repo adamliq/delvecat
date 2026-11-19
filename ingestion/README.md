@@ -69,6 +69,22 @@ and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
 
+### HTTP Event Collector
+
+Each HEC token is an `input` (kind `http`): its default and allowed indexes,
+sourcetype, output group and description, with `feeds` edges to its indexes.
+The token value is never read into the catalog. HEC's own settings (on or off
+for the whole instance, port, SSL) go on the instance as `httpEventCollector`;
+while HEC is off, its tokens feed nothing and are flagged critical.
+
+The `usageHec` part reads HEC's metrics (`_introspection`,
+`http_event_collector_metrics`) for events, bytes and errors per token, and
+`_internal` (`HttpInputDataHandler` errors) for why requests were rejected,
+such as an index the token may not write to. Requests with an invalid token are
+only counted, on the instance: the token they tried may be someone's real one.
+Health then flags rejected requests and requests to a disabled token, and
+cleanup lists tokens that received no events in the usage window.
+
 ## Several instances
 
 Build each instance with its own `--instance`, then merge:

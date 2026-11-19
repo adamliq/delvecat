@@ -213,6 +213,45 @@ def _scheduler_checks(
         )
 
 
+def _window(spl: str | None) -> str:
+    """Splunk's relative time ("-7d") in words ("the last 7 days")."""
+    import re
+
+    m = re.fullmatch(r"-(\d+)(d|h|m)", spl or "")
+    if not m:
+        return spl or ""
+    n, unit = int(m.group(1)), {"d": "day", "h": "hour", "m": "minute"}[m.group(2)]
+    return f"the last {n} {unit}{'s' if n != 1 else ''}"
+
+
+def _hec_checks(e: dict[str, Any], u: dict[str, Any], checks: list[dict[str, str]]) -> None:
+    """An HTTP Event Collector token: HEC switched off, rejected requests, requests sent
+    to it while disabled (disabled tokens are not evaluated otherwise)."""
+    if (e.get("properties") or {}).get("hecEnabled") is False:
+        _check(
+            checks,
+            "hecOff",
+            "critical",
+            "HTTP Event Collector is turned off on this instance: the token receives nothing",
+        )
+    rejected = u.get("hecRejections") or []
+    if rejected:
+        total = sum(r.get("count") or 0 for r in rejected)
+        why = "; ".join(
+            f"{r['reason']}" + (f" ({r['index']})" if r.get("index") else "") + f" ×{r['count']}"
+            for r in rejected[:3]
+        )
+        window = u.get("hecRejectionWindow")
+        _check(
+            checks,
+            "hecRejected",
+            "warning",
+            f"{total:,} requests rejected{f' in {_window(window)}' if window else ''}: {why}",
+        )
+    elif u.get("hecErrors"):
+        _check(checks, "hecErrors", "warning", f"{u['hecErrors']:,} requests failed")
+
+
 def evaluate_health(
     entities: list[dict[str, Any]], as_of_iso: str | None, scheduler_since_iso: str | None = None
 ) -> None:
@@ -221,6 +260,13 @@ def evaluate_health(
     for e in entities:
         if e.get("disabled"):
             e.pop("health", None)
+            sent = (e.get("usage") or {}).get("hecRequestsToDisabled")
+            if sent:  # a disabled HEC token someone still sends to: their data is lost
+                msg = f"{sent:,} requests sent to this disabled token were refused"
+                e["health"] = {
+                    "status": "warning",
+                    "checks": [{"check": "hecDisabledInUse", "status": "warning", "message": msg}],
+                }
             continue
         checks: list[dict[str, str]] = []
         obs = (e.get("properties") or {}).get("observed") or {}
@@ -251,6 +297,8 @@ def evaluate_health(
                     "warning" if age < 24 else "critical",
                     f"Last data {_fmt_age(age)} ago",
                 )
+        elif e["type"] == "input" and (e.get("properties") or {}).get("kind") == "http":
+            _hec_checks(e, usage, checks)
         elif e["type"] == "deploymentClient":
             age = _age_hours(as_of, obs.get("lastPhoneHome"))
             interval = (obs.get("phoneHomeIntervalSecs") or 60) / 3600
@@ -325,11 +373,21 @@ def mark_unused(
                 reason = "Empty, never searched, and nothing writes to it"
         elif t == "user" and audit and not u.get("searches"):
             reason = "No searches in the usage window"
+        elif (
+            t == "input"
+            and "usageHec" in available
+            and (e.get("properties") or {}).get("kind") == "http"
+            and not u.get("hecEvents")
+        ):
+            reason = "HTTP Event Collector token: no events received in the usage window"
         if reason:
             u = e.setdefault("usage", {})
             u["unused"] = True
             u["reason"] = reason
-            if e.get("app") in builtin_apps or e.get("sharing") == "system":
+            # HEC tokens live in Splunk's own apps (search, splunk_httpinput) but are made by
+            # people, so an idle one is never "built-in" (hidden from cleanup by default).
+            hec_token = t == "input" and (e.get("properties") or {}).get("kind") == "http"
+            if not hec_token and (e.get("app") in builtin_apps or e.get("sharing") == "system"):
                 u["builtin"] = True
             n += 1
         elif "usage" in e:

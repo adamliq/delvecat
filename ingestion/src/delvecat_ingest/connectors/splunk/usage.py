@@ -271,6 +271,89 @@ def extract_parsing_warnings(ctx: Ctx, out: ExtractResult) -> int:
     return len(per_st)
 
 
+def extract_hec_usage(ctx: Ctx, out: ExtractResult) -> int:
+    """HTTP Event Collector use per token: events, bytes and errors from HEC's metrics
+    (_introspection), and why requests were rejected (_internal).
+
+    The metrics record a token only in minutes it was used. Requests with an invalid
+    token are counted for the instance; the token they tried is never read into the
+    catalog (it may be someone's real token)."""
+    rows = ctx.transport.search(
+        "usage_hec",
+        "index=_introspection sourcetype=http_event_collector_metrics "
+        "data.series=http_event_collector_token "
+        "| rename data.token_name as token "
+        "| eval used=if('data.num_of_events'>0, _time, null()) "
+        "| stats sum(data.num_of_events) as events sum(data.total_bytes_received) as bytes "
+        "sum(data.num_of_requests) as requests sum(data.num_of_errors) as errors "
+        "sum(data.num_of_parser_errors) as parserErrors "
+        "sum(data.num_of_requests_to_disabled_token) as toDisabled "
+        "max(used) as last by token",
+        earliest=ctx.options.usage_window,
+    )
+    for r in rows:
+        if not r.get("token"):
+            continue
+        out.usage.append(
+            {
+                "types": ["input"],
+                "name": f"http://{r['token']}",
+                "usage": {
+                    "hecEvents": to_int(r.get("events")) or 0,
+                    "hecBytes": to_int(r.get("bytes")) or 0,
+                    "hecRequests": to_int(r.get("requests")) or 0,
+                    "hecErrors": (to_int(r.get("errors")) or 0)
+                    + (to_int(r.get("parserErrors")) or 0),
+                    "hecRequestsToDisabled": to_int(r.get("toDisabled")) or 0,
+                    "lastUsed": epoch_to_iso(r.get("last")),
+                    "hecWindow": ctx.options.usage_window,
+                },
+            }
+        )
+    # Why requests were rejected, per token (HttpInputDataHandler logs each one).
+    rejected = ctx.transport.search(
+        "usage_hec_rejections",
+        "index=_internal sourcetype=splunkd component=HttpInputDataHandler log_level=ERROR "
+        '| rex "token name=(?<token>[^,]+)" '
+        '| rex "status_message=\\"(?<reason>[^\\"]+)\\"" '
+        "| rex \"invalid_index='(?<badIndex>[^']+)'\" "
+        '| fillnull value="" badIndex '  # stats drops events missing a "by" field
+        "| stats count max(_time) as last by token, reason, badIndex",
+        earliest=ctx.options.health_window,
+    )
+    by_token: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    invalid_token = 0
+    for r in rejected:
+        token, count = r.get("token"), to_int(r.get("count")) or 0
+        if not token or token == "unknown":  # an invalid token: count it, keep nothing else
+            invalid_token += count
+            continue
+        by_token[token].append(
+            {
+                "reason": r.get("reason") or "rejected",
+                "index": r.get("badIndex") or None,
+                "count": count,
+                "last": epoch_to_iso(r.get("last")),
+            }
+        )
+    for token, reasons in by_token.items():
+        reasons.sort(key=lambda x: -x["count"])
+        out.usage.append(
+            {
+                "types": ["input"],
+                "name": f"http://{token}",
+                "usage": {
+                    "hecRejections": reasons[:10],
+                    "hecRejectionWindow": ctx.options.health_window,
+                },
+            }
+        )
+    hec = out.instance_facts.setdefault("properties", {}).setdefault("httpEventCollector", {})
+    hec["invalidTokenRequests"] = invalid_token
+    hec["usageWindow"] = ctx.options.usage_window
+    return len(rows)
+
+
 USAGE_EXTRACTORS = {
     "usageSavedSearches": extract_saved_search_runs,
     "usageAdhocSearches": extract_adhoc_searches,
@@ -281,6 +364,7 @@ USAGE_EXTRACTORS = {
     "healthDailyVolume": extract_daily_volume,
     "healthIngestDelay": extract_ingest_delay,
     "healthParsing": extract_parsing_warnings,
+    "usageHec": extract_hec_usage,
 }
 
 

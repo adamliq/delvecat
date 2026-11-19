@@ -119,7 +119,7 @@ const sections = {
     await a.page.click('text=Build the catalog of this Splunk');
     await a.page.waitForSelector('fieldset.parts', { timeout: 20000 });
     const all = await a.page.locator('.parts-all').innerText();
-    check('Build page opens from the empty state, default 40 of 41 parts', /40 of 41/.test(all), all.trim());
+    check('Build page opens from the empty state, default 41 of 42 parts', /41 of 42/.test(all), all.trim());
     await a.close();
   },
 
@@ -129,7 +129,7 @@ const sections = {
     const doc = await uiBuild(a.page);
     check('default build from the page finishes and publishes', doc?.state === 'done' && !doc.dryRun,
       `${doc?.entities} objects, ${doc?.edges} relationships in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
-    check('default build ran 40 parts (no field discovery)', doc?.options?.parts?.length === 40 && !doc.options.parts.includes('fields'));
+    check('default build ran 41 parts (no field discovery)', doc?.options?.parts?.length === 41 && !doc.options.parts.includes('fields'));
     const problems = (doc?.problems || []).filter((p) => p.status !== 'skipped');
     check('no part failed', problems.length === 0, problems.map((p) => p.connector + ': ' + p.message).join('; '));
     const text = await mainText(a.page);
@@ -211,7 +211,7 @@ const sections = {
         await p.click('input[aria-label="Select all parts"]'); // none
         await p.click('input[aria-label="Select all of Platform"]');
         const n = await p.locator('.parts-all').innerText();
-        check('picker: Select all clears, a group selects its 4 parts', /4 of 41/.test(n), n.trim());
+        check('picker: Select all clears, a group selects its 4 parts', /4 of 42/.test(n), n.trim());
         check('picker warns about a partial catalog', (await mainText(p)).includes('Only the selected parts are read'));
       },
     });
@@ -229,7 +229,7 @@ const sections = {
         if (!(await p.isChecked('input[aria-label="Select all parts"]'))) await p.click('input[aria-label="Select all parts"]');
       },
     });
-    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 41, `${doc?.entities} objects`);
+    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 42, `${doc?.entities} objects`);
     await a.close();
   },
 

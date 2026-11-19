@@ -81,6 +81,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "healthDailyVolume", label: "Daily volume", searches: true },
       { id: "healthIngestDelay", label: "Ingestion delay", searches: true },
       { id: "healthParsing", label: "Parsing warnings (timestamps, line breaking)", searches: true },
+      { id: "usageHec", label: "HTTP Event Collector token use", searches: true },
     ],
   },
   {

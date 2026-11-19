@@ -153,8 +153,28 @@ INPUT_ENDPOINTS = {
 }
 
 
+def _hec_global(ctx: Ctx, out: ExtractResult) -> bool:
+    """HTTP Event Collector's own settings (the [http] stanza): on or off for the whole
+    instance, port and SSL. Recorded on the instance; returns whether HEC is on."""
+    try:
+        entries = list(iter_entries(ctx.transport, "/services/data/inputs/http/http"))
+    except (EndpointNotFound, EndpointForbidden):
+        return True  # unknown: judge each token by its own setting only
+    if not entries:
+        return True
+    c = content(entries[0])
+    enabled = not as_bool(c.get("disabled", False))
+    out.instance_facts.setdefault("properties", {})["httpEventCollector"] = {
+        "enabled": enabled,
+        "port": to_int(c.get("port")),
+        "ssl": as_bool(c.get("enableSSL", True)),
+    }
+    return enabled
+
+
 def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
+    hec_on = _hec_global(ctx, out)
     for kind, path in INPUT_ENDPOINTS.items():
         try:
             entries = list(iter_entries(ctx.transport, f"{NS}/{path}"))
@@ -163,6 +183,8 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
         for e in entries:
             c = content(e)
             name = e["name"]
+            if kind == "http" and name == "http":
+                continue  # the global [http] stanza, read above
             if kind == "http" and name.startswith("http://"):
                 name = name[len("http://") :]
             ent = add_ko(
@@ -180,9 +202,14 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
                     "source": c.get("source") or None,
                     "interval": c.get("interval") or None,
                     "useAck": as_bool(c.get("useACK", False)) if kind == "http" else None,
+                    # HEC tokens: where events go, and whether HEC itself is on. The token
+                    # value is never read into the catalog.
+                    "outputGroup": (c.get("outputgroup") or None) if kind == "http" else None,
+                    "hecEnabled": hec_on if kind == "http" else None,
                 },
             )
-            if not ent.get("disabled"):  # a disabled input does not feed anything
+            # A disabled input, or a token while HEC is off, feeds nothing.
+            if not ent.get("disabled") and (kind != "http" or hec_on):
                 index = c.get("index")
                 targets = {index if index and index != "default" else "main"}
                 targets.update(split_list(c.get("indexes")))

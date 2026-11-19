@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 41 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 42 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -97,6 +97,11 @@ one. The same from a search:
   as in `inapp.PARTS`). **Only the selected parts are read, so the published
   catalog holds only what they find**: use it to try a slow part, or on a Splunk
   where some parts are not wanted.
+- **HTTP Event Collector**: *Inputs* lists each HEC token (never its value)
+  and HEC's own on/off state; *HTTP Event Collector token use* adds events,
+  volume and rejected requests per token, with the reason (for example an index
+  the token may not write to). An idle token shows under unused objects, and
+  the instance card counts requests made with an invalid token.
 - **Field discovery in chosen indexes**: with field discovery selected, the page
   offers *Discover fields only in indexes* (comma-separated, `*` wildcards,
   suggestions from the current catalog; `fieldindexes="web,app_*"` in a

@@ -8,6 +8,15 @@ import { StatusLabel } from "../pages/HealthPage";
 import { Sparkline } from "./Sparkline";
 
 const fmtDate = (s?: string) => (s ? new Date(s).toLocaleString() : "—");
+/** Splunk's relative time ("-30d") in words ("the last 30 days"). */
+const fmtWindow = (w: string) => {
+  const m = /^-(\d+)([dhm])$/.exec(w);
+  if (!m) return w;
+  const unit = { d: "day", h: "hour", m: "minute" }[m[2] as "d" | "h" | "m"];
+  return `the last ${m[1]} ${unit}${m[1] === "1" ? "" : "s"}`;
+};
+const fmtBytes = (n: number) =>
+  n >= 1e9 ? `${(n / 1e9).toFixed(1)} GB` : n >= 1e6 ? `${(n / 1e6).toFixed(1)} MB` : `${Math.round(n / 1e3)} KB`;
 
 export function UsagePanel({ entity }: { entity: Entity }) {
   const { catalog } = useCatalog();
@@ -22,7 +31,23 @@ export function UsagePanel({ entity }: { entity: Entity }) {
   if (u?.panelSearchRuns) facts.push(["Panel searches", u.panelSearchRuns.toLocaleString()]);
   if (u?.searches) facts.push(["Searches run", u.searches.toLocaleString()]);
   if (u?.adhocSearches) facts.push(["Referenced by ad-hoc searches", u.adhocSearches.toLocaleString()]);
-  if (u?.lastUsed) facts.push(["Last used", fmtDate(u.lastUsed)]);
+  // HTTP Event Collector tokens (inputs of kind "http"): what they received, and what was refused.
+  const hec = u as Record<string, unknown> | undefined;
+  if (typeof hec?.hecEvents === "number") {
+    const bytes = Number(hec.hecBytes ?? 0);
+    facts.push([
+      "Events received",
+      `${hec.hecEvents.toLocaleString()} (${fmtBytes(bytes)})${hec.hecWindow ? ` in ${fmtWindow(String(hec.hecWindow))}` : ""}`,
+    ]);
+  }
+  const rejections = (hec?.hecRejections as { reason: string; index?: string; count: number }[] | undefined) ?? [];
+  if (rejections.length) {
+    facts.push([
+      "Rejected requests",
+      rejections.map((r) => `${r.count.toLocaleString()} × ${r.reason}${r.index ? ` (index ${r.index})` : ""}`).join("; "),
+    ]);
+  }
+  if (u?.lastUsed) facts.push([typeof hec?.hecEvents === "number" ? "Last event" : "Last used", fmtDate(u.lastUsed)]);
   const popularity = percentile !== undefined && (
     <Meter value={percentile} max={100} name="Usage percentile"
       label={<>used more than {percentile}% of {pluralTypeLabel(entity.type).toLowerCase()} <a href="#/insights" className="small">insights</a></>} />

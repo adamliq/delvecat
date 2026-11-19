@@ -88,6 +88,7 @@ export function Home() {
                 {i.version && <> · {i.version}</>}
               </div>
               {i.roles?.length ? <p className="small">Roles: {i.roles.join(", ")}</p> : null}
+              <HecSummary hec={(i.properties as Record<string, unknown> | undefined)?.httpEventCollector} />
               {i.properties && Object.keys(i.properties).length > 0 && (
                 <details>
                   <summary>Details</summary>
@@ -260,5 +261,28 @@ export function Home() {
         </section>
       )}
     </div>
+  );
+}
+
+/** HTTP Event Collector on an instance: on or off, port, and requests with invalid tokens. */
+function HecSummary({ hec }: { hec: unknown }) {
+  if (!hec || typeof hec !== "object") return null;
+  const h = hec as { enabled?: boolean; port?: number; ssl?: boolean; invalidTokenRequests?: number; usageWindow?: string };
+  const invalid = h.invalidTokenRequests ?? 0;
+  return (
+    <p className="small">
+      HTTP Event Collector:{" "}
+      {h.enabled === false ? (
+        <span className="status-label status-critical">✕ off</span>
+      ) : (
+        <>on{h.port ? `, port ${h.port}` : ""}{h.ssl === false ? " (no SSL)" : ""}</>
+      )}
+      {invalid > 0 && (
+        <>
+          {" "}
+          · <span className="status-label status-warning">! {invalid.toLocaleString()} requests with an invalid token</span>
+        </>
+      )}
+    </p>
   );
 }

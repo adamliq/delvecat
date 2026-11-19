@@ -1,0 +1,19 @@
+{
+ "earliest": "-7d",
+ "results": [
+  {
+   "token": "acme_storefront",
+   "reason": "Incorrect index",
+   "badIndex": "web_debug",
+   "count": "42",
+   "last": "1793921400.112"
+  },
+  {
+   "token": "unknown",
+   "reason": "Invalid token",
+   "badIndex": "",
+   "count": "17",
+   "last": "1793930011.004"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "earliest": "-30d",
+ "results": [
+  {
+   "token": "acme_storefront",
+   "events": "1284512",
+   "bytes": "903421877",
+   "requests": "212407",
+   "errors": "0",
+   "parserErrors": "42",
+   "toDisabled": "0",
+   "last": "1793942950.383"
+  }
+ ]
+}
