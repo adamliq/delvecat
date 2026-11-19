@@ -4,6 +4,7 @@ props/transforms, lookups, KV store collections, data models, workflow actions."
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from ...dashboards import parse_dashboard
@@ -29,6 +30,40 @@ def _saved_search_kind(c: dict[str, Any]) -> str:
     if c.get("alert_type", "always") != "always":
         return "alert"
     return "scheduledReport"
+
+
+_ADDRESS_SPLIT = re.compile(r"[,;\s]+")
+
+
+def _addresses(value: Any) -> list[str]:
+    """'a@x.com, b@x.com;$result.owner$' -> ['a@x.com', 'b@x.com', '$result.owner$']."""
+    out: list[str] = []
+    for part in _ADDRESS_SPLIT.split(str(value or "")):
+        part = part.strip().strip("<>")
+        dynamic = part.startswith("$") and part.endswith("$")
+        if part and ("@" in part or dynamic) and part not in out:
+            out.append(part)
+    return out
+
+
+def email_recipients(c: dict[str, Any]) -> dict[str, Any] | None:
+    """Who an email alert action writes to: to, cc, bcc and the sender, as configured
+    (a $token$ is filled in when the alert fires). None without the email action.
+    Stored as "alertRecipients": a key without "email" in it, which redact() would drop."""
+    if "email" not in split_list(c.get("actions")) and not as_bool(c.get("action.email", False)):
+        return None
+    rec = {
+        "to": _addresses(c.get("action.email.to")),
+        "cc": _addresses(c.get("action.email.cc")),
+        "bcc": _addresses(c.get("action.email.bcc")),
+        "from": (_addresses(c.get("action.email.from")) or [None])[0],
+    }
+    return {k: v for k, v in rec.items() if v} or None
+
+
+def _default_recipients(c: dict[str, Any]) -> dict[str, list[str]] | None:
+    rec = {k: _addresses(c.get(k)) for k in ("to", "cc", "bcc")}
+    return {k: v for k, v in rec.items() if v} or None
 
 
 def extract_saved_searches(ctx: Ctx, out: ExtractResult) -> int:
@@ -59,6 +94,7 @@ def extract_saved_searches(ctx: Ctx, out: ExtractResult) -> int:
                 "uiDispatchApp": c.get("request.ui_dispatch_app") or None,
                 "visible": as_bool(c.get("is_visible", True)),
                 "realtime": str(c.get("dispatch.earliest_time", "")).startswith("rt"),
+                "alertRecipients": email_recipients(c),
             },
             observed={"nextScheduledTime": c.get("next_scheduled_time") or None},
         )
@@ -124,6 +160,12 @@ def extract_alert_actions(ctx: Ctx, out: ExtractResult) -> int:
             properties={
                 "custom": as_bool(c.get("is_custom", False)),
                 "payloadFormat": c.get("payload_format") or None,
+                # The email action's defaults, used when a search sets none: the sender as
+                # written ("splunk" gets the server's host name) and default recipients.
+                "sender": (str(c.get("from") or "").strip() or None)
+                if e["name"] == "email"
+                else None,
+                "defaultRecipients": _default_recipients(c) if e["name"] == "email" else None,
             },
         )
         n += 1

@@ -259,7 +259,7 @@ export function BuildPage() {
               disabled={running}
             >
               <option value="none">none</option>
-              <option value="internal">internal: drop personal names</option>
+              <option value="internal">internal: drop personal names, keep only email domains</option>
             </select>
           </label>
           {partial && opts.parts.length > 0 && (

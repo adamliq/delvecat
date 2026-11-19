@@ -228,7 +228,9 @@ are confirmed against a live instance before their connector ships.
   `edges.json` with sha256 checks; the web app loads either form and can open
   a bundle folder from disk.
 - Safety: GETs that act (`_reload`, `control`, `dispatch`, ...) are refused
-  alongside all writes; email addresses are dropped with credentials.
+  alongside all writes; email addresses are dropped with credentials (except
+  email alert recipients and senders, collected since 0.3.0 and redacted by the
+  `internal` and `public` profiles).
 - Deferred: SPL-derived lineage (Phase 3), dashboard panel parsing (Phase 3),
   data model acceleration status and `_audit` usage (Phase 6).
 

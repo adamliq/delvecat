@@ -2581,7 +2581,12 @@
     "search": "index=firewall sourcetype=acme:fw action=blocked NOT dest_port IN (80,443,53) | `rare_port_threshold(5)`",
     "skip_scheduled_realtime_idxc": "0",
     "vsid": "",
-    "workload_pool": ""
+    "workload_pool": "",
+    "action.email": "1",
+    "action.email.to": "secops-oncall@acme.example, jane.doe@acme.example",
+    "action.email.cc": "$result.owner$",
+    "action.email.from": "splunk-alerts@acme.example",
+    "action.email.subject": "Splunk Alert: $name$"
    },
    "id": "https://localhost:8089/servicesNS/nobody/acme_secops/saved/searches/Firewall%20-%20Denied%20Outbound%20to%20Rare%20Ports",
    "links": {

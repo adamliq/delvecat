@@ -55,7 +55,12 @@ function toDoc(e: Entity): Doc {
   const p = (e.properties ?? {}) as Record<string, unknown>;
   const a = e.annotations ?? {};
   const queries = Array.isArray(p.searches) ? (p.searches as { query?: string; ref?: string }[]).flatMap((s) => [s.query, s.ref]) : [];
-  const body = [p.search, p.definition, p.expression, ...queries].filter((v) => typeof v === "string").join(" ");
+  // Email alert recipients and senders, so an address finds the alerts that write to it.
+  const rec = { ...((p.defaultRecipients ?? {}) as object), ...((p.alertRecipients ?? {}) as object) };
+  const addresses = Object.values(rec as Record<string, unknown>).flat().concat(p.sender ?? []);
+  const body = [p.search, p.definition, p.expression, ...queries, ...addresses]
+    .filter((v) => typeof v === "string")
+    .join(" ");
   return {
     id: e.id,
     name: e.name,

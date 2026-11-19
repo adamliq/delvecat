@@ -290,6 +290,17 @@ ORDER BY dependents DESC
 LIMIT 25;`,
   },
   {
+    title: "Who alert emails go to",
+    sql: `SELECT r.value AS recipient, j.key AS field, count(*) AS alerts,
+       group_concat(e.name, ' | ') AS searches
+FROM entities e,
+     json_each(json_extract(e.settings, '$.alertRecipients')) j,
+     json_each(CASE json_type(j.value) WHEN 'array' THEN j.value ELSE json_array(j.value) END) r
+WHERE e.type IN ('savedSearch', 'correlationSearch') AND j.key != 'from'
+GROUP BY recipient, field
+ORDER BY alerts DESC, recipient;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

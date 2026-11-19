@@ -81,7 +81,11 @@ export function EntityPage() {
   const { observed, ...props } = (entity.properties ?? {}) as Record<string, unknown>;
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
-  const rest = Object.entries(props).filter(([k]) => !(k in CODE) && !(isDetection(entity) && DETECTION_KEYS.has(k)));
+  // Shown in their own section (EmailRecipients).
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender"]);
+  const rest = Object.entries(props).filter(
+    ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)),
+  );
   const groups = relationGroups(catalog, entity.id);
   const relCount = groups.reduce((n, g) => n + g.entities.length, 0);
   const fields = fieldsTable(catalog, entity);
@@ -209,6 +213,14 @@ export function EntityPage() {
             </section>
           ))}
 
+          <EmailRecipients recipients={props.alertRecipients} />
+          {/* The email alert action's defaults, for searches that set none. */}
+          {!!(props.defaultRecipients || props.sender) && (
+            <EmailRecipients
+              title="Default email recipients"
+              recipients={{ ...(props.defaultRecipients as object), from: props.sender }}
+            />
+          )}
           {rest.length > 0 && (
             <section>
               <h2>Properties</h2>
@@ -268,5 +280,48 @@ export function EntityPage() {
 
       {tab === "raw" && <pre className="code raw">{JSON.stringify(entity, null, 2)}</pre>}
     </div>
+  );
+}
+
+/** Who an email alert action writes to. A $token$ is filled in when the alert fires. */
+function EmailRecipients({ recipients, title = "Email recipients" }: { recipients: unknown; title?: string }) {
+  if (!recipients || typeof recipients !== "object") return null;
+  const r = recipients as { to?: string[]; cc?: string[]; bcc?: string[]; from?: string };
+  const rows: [string, string[]][] = [
+    ["To", r.to ?? []],
+    ["Cc", r.cc ?? []],
+    ["Bcc", r.bcc ?? []],
+    ["From", r.from ? [r.from] : []],
+  ];
+  const shown = rows.filter(([, v]) => v.length);
+  if (!shown.length) return null;
+  const isToken = (a: string) => a.startsWith("$") && a.endsWith("$");
+  return (
+    <section>
+      <h2>{title}</h2>
+      <dl className="facts">
+        {shown.map(([k, v]) => (
+          <div key={k} className="fact-pair">
+            <dt>{k}</dt>
+            <dd>
+              {v.map((a, i) => (
+                <span key={a}>
+                  {i > 0 && ", "}
+                  {isToken(a) ? (
+                    <span title="Filled in when the alert fires">
+                      <code>{a}</code> <span className="muted small">(from the results)</span>
+                    </span>
+                  ) : !a.includes("@") ? (
+                    <span title="Splunk adds the server's host name">{a}</span>
+                  ) : (
+                    <a href={`#/search?q=${encodeURIComponent(a)}`} title="Other alerts that email this address">{a}</a>
+                  )}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

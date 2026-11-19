@@ -97,6 +97,10 @@ one. The same from a search:
   as in `inapp.PARTS`). **Only the selected parts are read, so the published
   catalog holds only what they find**: use it to try a slow part, or on a Splunk
   where some parts are not wanted.
+- **Email alert recipients**: each alert with the email action lists who it
+  writes to (To, Cc, Bcc) and from, and the email action its defaults. An
+  address is searchable, and the SQL console has "Who alert emails go to".
+  `redact=internal` keeps only the domains (`*@corp.example`).
 - **HTTP Event Collector**: *Inputs* lists each HEC token (never its value)
   and HEC's own on/off state; *HTTP Event Collector token use* adds events,
   volume and rejected requests per token, with the reason (for example an index

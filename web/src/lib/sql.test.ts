@@ -63,6 +63,25 @@ describe("SQL console", () => {
     expect(runQuery(db, EXAMPLES[0].sql).rows.map((r) => r[1])).toEqual(["busy"]);
   });
 
+  it("lists alert email recipients", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const alert = {
+      ...search,
+      id: "t:savedSearch:app/mail",
+      name: "mail",
+      properties: { ...search.properties, alertRecipients: { to: ["a@x.example", "b@x.example"], cc: ["a@x.example"], from: "s@x.example" } },
+    };
+    const b = { ...bundle, entities: [...bundle.entities, alert] };
+    fillDatabase(db, catalogTables(b, riskMap(new Catalog(b))));
+    const rows = runQuery(db, EXAMPLES.find((x) => x.title === "Who alert emails go to")!.sql).rows;
+    expect(rows.map((r) => [r[0], r[1], r[2]])).toEqual([
+      ["a@x.example", "cc", 1],
+      ["a@x.example", "to", 1],
+      ["b@x.example", "to", 1],
+    ]);
+  });
+
   it("has a risk table", async () => {
     const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
     const db = new SQL.Database();

@@ -10,6 +10,8 @@ Profiles say what to do with each kind of personal or infrastructure detail:
 - ``ips``: IPv4/IPv6 addresses anywhere in the bundle (``mask`` / ``keep``)
 - ``urls``: internal URLs such as instance web URLs, threat-intel feeds, DB hosts
   (``drop`` / ``keep``); curated annotation links are kept
+- ``emails``: addresses email alert actions send to and from (``keep`` /
+  ``domain``: only the part after ``@`` / ``drop``); ``$tokens$`` are kept
 
 Pseudonyms are keyed hashes (HMAC-SHA256). With a stable secret salt
 (``DELVECAT_REDACT_SALT``) the same user gets the same pseudonym in every build;
@@ -49,10 +51,12 @@ class Profile:
     sources: str = "keep"
     ips: str = "keep"
     urls: str = "keep"
+    emails: str = "keep"
 
 
 PROFILES = {
-    "internal": Profile("internal", realNames="drop"),
+    # The part of an address before "@" is usually a person's name.
+    "internal": Profile("internal", realNames="drop", emails="domain"),
     "public": Profile(
         "public",
         realNames="drop",
@@ -61,6 +65,7 @@ PROFILES = {
         sources="pseudonymize",
         ips="mask",
         urls="drop",
+        emails="drop",
     ),
 }
 ALLOWED = {
@@ -70,6 +75,7 @@ ALLOWED = {
     "sources": {"keep", "pseudonymize"},
     "ips": {"keep", "mask"},
     "urls": {"keep", "drop"},
+    "emails": {"keep", "domain", "drop"},
 }
 
 
@@ -112,6 +118,35 @@ def _mask_ips(value: Any) -> Any:
     return value
 
 
+def _redact_emails(props: dict[str, Any], mode: str) -> int:
+    """Email alert recipients and senders: keep only the domain, or drop them."""
+    n = 0
+
+    def domain(address: str) -> str:
+        if address.startswith("$") and address.endswith("$"):
+            return address  # filled in when the alert fires: not an address yet
+        return "*@" + address.rsplit("@", 1)[1] if "@" in address else address
+
+    for key in ("alertRecipients", "defaultRecipients"):
+        if not (rec := props.get(key)):
+            continue
+        n += sum(len(v) if isinstance(v, list) else 1 for v in rec.values())
+        if mode == "drop":
+            props.pop(key)
+        else:
+            props[key] = {
+                k: (list(dict.fromkeys(domain(a) for a in v)) if isinstance(v, list) else domain(v))
+                for k, v in rec.items()
+            }
+    if props.get("sender"):
+        n += 1
+        if mode == "drop":
+            props.pop("sender")
+        else:
+            props["sender"] = domain(props["sender"])
+    return n
+
+
 def redact_bundle(
     bundle: dict[str, Any], profile: Profile, salt: str | None = None
 ) -> dict[str, Any]:
@@ -120,7 +155,7 @@ def redact_bundle(
     stable = bool(salt)
     pseudo = _Pseudonyms((salt or secrets.token_hex(16)).encode())
     entities = bundle["entities"]
-    counts = {"users": 0, "hosts": 0, "sources": 0, "realNames": 0, "urls": 0}
+    counts = {"users": 0, "hosts": 0, "sources": 0, "realNames": 0, "urls": 0, "emails": 0}
 
     users = {e["name"] for e in entities if e["type"] == "user"} | {
         e["owner"] for e in entities if e.get("owner") and e["owner"] != "nobody"
@@ -184,6 +219,8 @@ def redact_bundle(
                 props.pop("dns", None)
         if profile.ips == "mask":
             props.pop("ip", None)
+        if profile.emails != "keep":
+            counts["emails"] += _redact_emails(props, profile.emails)
         if e["id"] in id_map:
             e["id"] = id_map[e["id"]]
 

@@ -162,6 +162,7 @@ uv run delvecat-ingest redact catalog/ --redact-profile public --out public/   #
 | source paths | keep | pseudonymize |
 | IP addresses | keep | mask |
 | internal URLs, DB hosts | keep | drop |
+| email alert addresses | domain only (`*@corp.example`) | drop |
 
 A YAML file (`--redact-profile-file`) can `extends: public` and change any
 setting. Names inside SPL text are not rewritten.
@@ -173,8 +174,12 @@ allowed (minus endpoints that act on GET, such as `_reload`), plus `POST` to
 an allow-list of search endpoints (running a search, and cancelling DelveCat's
 own search job when it exceeds the search time limit). The one exception is `publish`, which may
 also write the DelveCat Splunk app's own catalog collection, and nothing else.
-Keys that look like credentials and email
-addresses are dropped before anything is written.
+Keys that look like credentials are dropped before anything is written.
+Email addresses are collected in one place only: who email alert actions write
+to and from (`alertRecipients` on searches; `defaultRecipients` and `sender` on
+the email action), as configured, with `$tokens$` kept as written. Users' own
+email addresses are not collected, and `--record`ings still drop every email
+key. The `internal` redaction profile keeps only the domains, `public` drops them.
 
 The service account needs read access to configuration endpoints, and to
 `_internal` for forwarder discovery. Endpoints it cannot read are reported as
