@@ -47,6 +47,26 @@ export function UsagePanel({ entity }: { entity: Entity }) {
       rejections.map((r) => `${r.count.toLocaleString()} × ${r.reason}${r.index ? ` (index ${r.index})` : ""}`).join("; "),
     ]);
   }
+  // Alerts and detections: how often they triggered, not just ran.
+  if (typeof hec?.alertFires === "number") {
+    const fires = hec.alertFires;
+    const window = hec.alertWindow ? ` in ${fmtWindow(String(hec.alertWindow))}` : "";
+    const suppressed = Number(hec.alertsSuppressed ?? 0);
+    facts.push([
+      "Fired",
+      (fires ? `${fires.toLocaleString()} time${fires === 1 ? "" : "s"}${window}` : `Never${window}`) +
+        (suppressed ? ` (${suppressed.toLocaleString()} more suppressed by throttling)` : ""),
+    ]);
+    if (hec.lastFired) facts.push(["Last fired", fmtDate(String(hec.lastFired))]);
+  }
+  // Authentication tokens: lifetime and use, from their metadata.
+  if (entity.type === "authToken") {
+    const p = (entity.properties ?? {}) as Record<string, unknown>;
+    facts.push(["Token for", String(p.user ?? "—")]);
+    facts.push(["Issued", `${fmtDate(p.issuedAt as string | undefined)}${p.issuedBy ? ` by ${p.issuedBy}` : ""}`]);
+    facts.push(["Expires", p.neverExpires ? "Never" : fmtDate(p.expiresAt as string | undefined)]);
+    facts.push(["Last used", p.lastUsed ? fmtDate(String(p.lastUsed)) : "Never"]);
+  }
   if (u?.lastUsed) facts.push([typeof hec?.hecEvents === "number" ? "Last event" : "Last used", fmtDate(u.lastUsed)]);
   const popularity = percentile !== undefined && (
     <Meter value={percentile} max={100} name="Usage percentile"

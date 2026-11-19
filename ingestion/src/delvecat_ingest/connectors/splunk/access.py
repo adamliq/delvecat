@@ -8,7 +8,7 @@ from typing import Any
 from ...model import ExtractResult
 from ...splunk_rest import as_bool, iter_entries
 from ...transport import EndpointForbidden, EndpointNotFound
-from .common import Ctx, add_global, content, permissions, ref, split_list
+from .common import Ctx, add_global, content, epoch_to_iso, permissions, ref, split_list
 
 
 def extract_apps(ctx: Ctx, out: ExtractResult) -> int:
@@ -67,6 +67,50 @@ def extract_users(ctx: Ctx, out: ExtractResult) -> int:
             },
         )
         out.refs.extend(ref(ent["id"], "role", r, "memberOf") for r in roles)
+        n += 1
+    return n
+
+
+def extract_auth_tokens(ctx: Ctx, out: ExtractResult) -> int:
+    """Splunk authentication tokens: who each one is for, when it expires and was last
+    used, enabled or not. Splunk never lists a token's value, and neither does DelveCat;
+    the client address it was last used from is not kept either."""
+    n = 0
+    for e in iter_entries(ctx.transport, "/services/authorization/tokens"):
+        c = content(e)
+        claims = c.get("claims") or {}
+        user = str(claims.get("sub") or "").strip() or None
+        audience = str(claims.get("aud") or "").strip() or None
+        roles = claims.get("roles") or []
+        issuer = str(claims.get("iss") or "")
+        token_id = e["name"]
+        ent = add_global(
+            ctx,
+            out,
+            "authToken",
+            token_id,
+            displayName=f"{audience or 'Token'} ({token_id[:8]})",
+            owner=user,
+            disabled=str(c.get("status") or "enabled").lower() != "enabled",
+            description=audience,
+            properties={
+                "user": user,
+                "audience": audience,
+                # "admin from <host id>": who created it.
+                "issuedBy": issuer.split(" from ", 1)[0] or None,
+                "issuedAt": epoch_to_iso(claims.get("iat")),
+                "expiresAt": epoch_to_iso(claims.get("exp")),
+                "neverExpires": not epoch_to_iso(claims.get("exp")),
+                "notBefore": epoch_to_iso(claims.get("nbr")),
+                "lastUsed": epoch_to_iso(c.get("lastUsed")),
+                "status": c.get("status") or None,
+                "identityProvider": claims.get("idp") or None,
+                # ["*"]: the user's own roles; otherwise the token is limited to these.
+                "restrictedRoles": None if roles in (["*"], "*", []) else split_list(roles),
+            },
+        )
+        if user:
+            out.refs.append(ref(ent["id"], "user", user, "contains", known_is_from=False))
         n += 1
     return n
 

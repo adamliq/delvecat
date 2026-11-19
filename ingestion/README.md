@@ -82,6 +82,28 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Authentication tokens
+
+Each Splunk authentication token is an `authToken` object: the user it is for
+(an edge from that user), audience, who issued it and when, expiry, last use and
+whether it is enabled. Splunk never lists a token's value and DelveCat never
+reads one; the client address it was last used from is not kept either. Health
+checks flag tokens that expired (delete them), expire within 14 days, never
+expire, have not been used for 90 days, or belong to a user Splunk no longer has
+(checked only when users were collected). Expired, stale and orphaned tokens
+also appear in the cleanup report. The public redaction profile pseudonymizes
+token users like every other user name.
+
+### Fired alerts
+
+How often each alert or detection actually triggered in the usage window, not
+just ran (`usage.alertFires`, `alertsSuppressed`, `lastFired`). Two records are
+combined: the scheduler log (every run, with the actions it triggered and
+whether throttling suppressed it) and `_audit` `alert_fired` (tracked alerts,
+including ones with no actions); per alert the larger count is used, so nothing
+is counted twice. An alert with no record reads 0 ("never fired"). An alert
+firing more than 24 times a day on average gets an `alertNoisy` warning.
+
 ### Custom search commands
 
 Each command an app adds in `commands.conf` is a `searchCommand` object in that

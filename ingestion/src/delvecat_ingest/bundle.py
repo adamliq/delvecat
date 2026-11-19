@@ -12,7 +12,7 @@ from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
 from .compat import UTC
 from .fields import define_fields, link_fields
-from .health import apply_usage, evaluate_health, mark_unused
+from .health import apply_usage, evaluate_health, fill_alert_fires, mark_unused
 from .lineage import derive, record_unresolved
 from .link import link_hosts
 from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
@@ -249,6 +249,10 @@ def assemble(
         if r["status"] == "ok" and r["connector"].startswith("splunk.")
     }
     apply_usage(entities, result.usage, result.adhoc_searches)
+    if "usageAlerts" in available:
+        fill_alert_fires(
+            entities, (result.instance_facts.get("properties") or {}).get("alertUsageWindow")
+        )
     instance_since = [(i.get("properties") or {}).get("schedulerLogSince") for i in instances]
     since = (result.instance_facts.get("properties") or {}).get("schedulerLogSince") or next(
         (x for x in instance_since if x), None

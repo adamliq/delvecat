@@ -354,6 +354,49 @@ def extract_hec_usage(ctx: Ctx, out: ExtractResult) -> int:
     return len(rows)
 
 
+def extract_alert_fires(ctx: Ctx, out: ExtractResult) -> int:
+    """How often each alert actually fired, as opposed to ran.
+
+    Two records of a firing: the scheduler log (every run, with the actions it
+    triggered and whether throttling suppressed it) and ``_audit`` ``alert_fired``
+    (tracked alerts only, including ones with no actions). Per alert the larger count
+    is used, so a firing recorded in both is counted once."""
+    rows = ctx.transport.search(
+        "usage_alert_fires",
+        "(index=_internal sourcetype=scheduler savedsearch_name=* status=success) "
+        "OR (index=_audit action=alert_fired) "
+        "| eval name=coalesce(ss_name, savedsearch_name), ssApp=coalesce(ss_app, app) "
+        '| eval sched=if(sourcetype=="scheduler" AND alert_actions!="" AND suppressed!="1", 1, 0), '
+        'supp=if(sourcetype=="scheduler" AND suppressed=="1", 1, 0), '
+        'audit=if(action=="alert_fired", 1, 0), '
+        "firedAt=if(sched==1 OR audit==1, _time, null()) "
+        "| stats sum(sched) as schedFired sum(supp) as suppressed sum(audit) as auditFired "
+        "max(firedAt) as last by ssApp, name "
+        "| where schedFired>0 OR suppressed>0 OR auditFired>0",
+        earliest=ctx.options.usage_window,
+    )
+    for r in rows:
+        if not r.get("name"):
+            continue
+        fires = max(to_int(r.get("schedFired")) or 0, to_int(r.get("auditFired")) or 0)
+        out.usage.append(
+            {
+                "types": ["savedSearch", "correlationSearch"],
+                "name": r["name"],
+                "app": r.get("ssApp"),
+                "usage": {
+                    "alertFires": fires,
+                    "alertsSuppressed": to_int(r.get("suppressed")) or 0,
+                    "lastFired": epoch_to_iso(r.get("last")),
+                    "alertWindow": ctx.options.usage_window,
+                },
+            }
+        )
+    # Alerts with no record fired zero times in this window (set after matching).
+    out.instance_facts.setdefault("properties", {})["alertUsageWindow"] = ctx.options.usage_window
+    return len(rows)
+
+
 USAGE_EXTRACTORS = {
     "usageSavedSearches": extract_saved_search_runs,
     "usageAdhocSearches": extract_adhoc_searches,
@@ -365,6 +408,7 @@ USAGE_EXTRACTORS = {
     "healthIngestDelay": extract_ingest_delay,
     "healthParsing": extract_parsing_warnings,
     "usageHec": extract_hec_usage,
+    "usageAlerts": extract_alert_fires,
 }
 
 

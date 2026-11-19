@@ -89,4 +89,24 @@ describe("SQL console", () => {
     expect(runQuery(db, "SELECT entity_id, severity, cause_id, hops FROM risk").rows).toEqual([[search.id, "warning", idx.id, 1]]);
     expect(runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Problems"))!.sql).rows[0][4]).toBe(1);
   });
+
+  it("lists alerts by firings and tokens to review", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const alert = ent("savedSearch", "noisy", { usage: { alertFires: 900, alertsSuppressed: 3, alertWindow: "-30d" } });
+    const quiet = ent("savedSearch", "quiet", { usage: { alertFires: 0, alertWindow: "-30d" } });
+    const token = ent("authToken", "abc", {
+      displayName: "CI (abc)",
+      properties: { user: "ci", expiresAt: "2026-01-02T00:00:00Z" },
+      health: { status: "critical", checks: [
+        { check: "tokenExpiring", status: "warning", message: "soon" },
+        { check: "tokenNoOwner", status: "critical", message: "gone" },
+      ] },
+    });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [alert, quiet, token, idx] }));
+    const fires = runQuery(db, EXAMPLES.find((x) => x.title === "Alerts by how often they fire")!.sql).rows;
+    expect(fires.map((r) => [r[0], r[3], r[4]])).toEqual([["noisy", 900, 3], ["quiet", 0, null]]);
+    const tokens = runQuery(db, EXAMPLES.find((x) => x.title === "Authentication tokens to review")!.sql).rows;
+    expect(tokens.map((r) => [r[0], r[1], r[4]])).toEqual([["CI (abc)", "ci", "tokenNoOwner"], ["CI (abc)", "ci", "tokenExpiring"]]);
+  });
 });

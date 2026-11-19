@@ -181,6 +181,7 @@
         "user",
         "role",
         "authGroup",
+        "authToken",
         "index",
         "sourcetype",
         "source",
@@ -460,6 +461,21 @@
             },
             "panelSearchRuns": {
               "type": "integer"
+            },
+            "alertFires": {
+              "description": "Times the alert or detection triggered in alertWindow (not runs).",
+              "type": "integer"
+            },
+            "alertsSuppressed": {
+              "description": "Triggers suppressed by throttling in alertWindow.",
+              "type": "integer"
+            },
+            "lastFired": {
+              "type": "string"
+            },
+            "alertWindow": {
+              "description": "Splunk relative time the alert counts cover, e.g. -30d.",
+              "type": "string"
             },
             "lastUsed": {
               "type": "string"

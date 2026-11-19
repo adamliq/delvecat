@@ -50,6 +50,8 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("readable_by_everyone", "INTEGER", "1 if every role can read it"),
       col("unused", "INTEGER", "1 if no recorded use"),
       col("runs", "INTEGER"), col("searches", "INTEGER"), col("views", "INTEGER"),
+      col("alert_fires", "INTEGER", "Alerts and detections: times triggered in the usage window"),
+      col("alerts_suppressed", "INTEGER", "Triggers suppressed by throttling"),
       col("last_used"), col("updated_at"), col("first_seen_at"), col("version", "INTEGER"),
       col("url", "TEXT", "Link to the object in Splunk"),
       col("settings", "TEXT", "Splunk settings as JSON; use json_extract(settings, '$.cronSchedule')"),
@@ -58,7 +60,8 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
     rows: E.map((e) => [
       e.id, e.type, e.name, e.displayName, e.product, e.instance, e.app, e.owner, e.sharing, e.disabled ?? false,
       effectiveDescription(e), e.annotations?.domain, e.health?.status, isSensitive(e), access(e)?.everyone,
-      e.usage?.unused, e.usage?.runs, e.usage?.searches, e.usage?.views, e.usage?.lastUsed,
+      e.usage?.unused, e.usage?.runs, e.usage?.searches, e.usage?.views,
+      e.usage?.alertFires, e.usage?.alertsSuppressed, e.usage?.lastUsed,
       e.updatedAt, e.firstSeenAt, e.version, e.sourceUrl, e.properties, e.annotations?.properties,
     ].map(cell)),
   };
@@ -310,6 +313,23 @@ LEFT JOIN entities s ON s.id = x.from_id
 WHERE c.type = 'searchCommand'
 GROUP BY c.id
 ORDER BY used_by_count DESC, c.app, c.name;`,
+  },
+  {
+    title: "Alerts by how often they fire",
+    sql: `SELECT name, app, type, alert_fires, alerts_suppressed, runs,
+       json_extract(settings, '$.cronSchedule') AS schedule
+FROM entities
+WHERE alert_fires IS NOT NULL
+ORDER BY alert_fires DESC, name;`,
+  },
+  {
+    title: "Authentication tokens to review",
+    sql: `SELECT e.display_name, json_extract(e.settings, '$.user') AS user,
+       json_extract(e.settings, '$.expiresAt') AS expires,
+       json_extract(e.settings, '$.lastUsed') AS last_used, h.check_name, h.status, h.message
+FROM entities e JOIN health_checks h ON h.entity_id = e.id
+WHERE e.type = 'authToken'
+ORDER BY h.status = 'critical' DESC, e.display_name;`,
   },
   {
     title: "Detections with no annotated owner",

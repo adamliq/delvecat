@@ -78,7 +78,7 @@ Common aspects on every entity: `description`, `owners`, `tags`,
 ### Splunk platform (Enterprise & Cloud)
 | Area | Entity types |
 |---|---|
-| Platform | `instance` (role: search head, SHC, indexer cluster, HF, DS, Cloud stack), `app`, `user`, `role` |
+| Platform | `instance` (role: search head, SHC, indexer cluster, HF, DS, Cloud stack), `app`, `user`, `role`, `authGroup`, `authToken` (metadata only) |
 | Data | `index` (events/metrics), `sourcetype`, `source`, `host`, `field`, `dataModel` (+ datasets, acceleration), `lookup` (CSV / KV store), `kvCollection` |
 | Knowledge objects | `savedSearch` (report / alert / scheduled), `macro`, `searchCommand` (custom commands from apps), `eventtype`, `tag`, `fieldAlias`, `calculatedField`, `fieldExtraction`, `transform`, `workflowAction` |
 | Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels |

@@ -6,6 +6,7 @@ export type EntityType =
   | "user"
   | "role"
   | "authGroup"
+  | "authToken"
   | "index"
   | "sourcetype"
   | "source"
@@ -244,6 +245,19 @@ export interface Entity {
     searches?: number;
     adhocSearches?: number;
     panelSearchRuns?: number;
+    /**
+     * Times the alert or detection triggered in alertWindow (not runs).
+     */
+    alertFires?: number;
+    /**
+     * Triggers suppressed by throttling in alertWindow.
+     */
+    alertsSuppressed?: number;
+    lastFired?: string;
+    /**
+     * Splunk relative time the alert counts cover, e.g. -30d.
+     */
+    alertWindow?: string;
     lastUsed?: string;
     runtimeSecs?: number | null;
     scheduler?: {

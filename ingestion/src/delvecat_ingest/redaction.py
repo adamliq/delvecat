@@ -204,6 +204,10 @@ def redact_bundle(
             counts["sources"] += 1
         if profile.users == "pseudonymize" and e.get("owner") in users:
             e["owner"] = rename("user", e["owner"])
+        if profile.users == "pseudonymize" and e["type"] == "authToken":
+            for k in ("user", "issuedBy"):
+                if props.get(k):
+                    props[k] = rename("user", str(props[k]))
         if profile.hosts == "pseudonymize":
             for k in HOST_PROPS:
                 if props.get(k) and str(props[k]) in hosts:

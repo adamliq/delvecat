@@ -38,6 +38,9 @@ SKIP_CRITICAL_RATIO = 0.50
 RUNTIME_WARNING_SECS = 300
 FORWARDER_SILENT_HOURS = 1
 HEALTH_WINDOW_DAYS = 7
+TOKEN_EXPIRY_WARNING_DAYS = 14  # a token expiring this soon breaks whatever uses it
+TOKEN_STALE_DAYS = 90  # not used for this long: probably not needed
+ALERT_NOISY_PER_DAY = 24  # an alert firing more than hourly on average is hard to act on
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
 
 KO_TYPES = (
@@ -73,7 +76,7 @@ def _merge_usage(target: dict[str, Any], new: dict[str, Any]) -> None:
     for k, v in new.items():
         if v is None:
             continue
-        if k == "lastUsed":
+        if k in ("lastUsed", "lastFired"):
             target[k] = _later(target.get(k), v)
         elif isinstance(v, (int, float)) and isinstance(target.get(k), (int, float)):
             target[k] += v
@@ -132,6 +135,56 @@ def apply_usage(
                 _merge_usage(e.setdefault("usage", {}), {"adhocSearches": runs, "lastUsed": last})
 
 
+def is_alert(e: dict[str, Any]) -> bool:
+    """A scheduled alert with a trigger condition, or a detection (not a report that
+    acts on every run)."""
+    p = e.get("properties") or {}
+    if e.get("disabled") or not p.get("isScheduled", True):
+        return False
+    # A detection always alerts: its notables are its firings.
+    return e["type"] == "correlationSearch" or (
+        e["type"] == "savedSearch" and p.get("kind") == "alert"
+    )
+
+
+def fill_alert_fires(entities: list[dict[str, Any]], window: str | None) -> int:
+    """After the fired-alerts part ran: alerts with no record fired zero times."""
+    n = 0
+    for e in entities:
+        if is_alert(e) and "alertFires" not in (e.get("usage") or {}):
+            u = e.setdefault("usage", {})
+            u["alertFires"] = 0
+            u["alertsSuppressed"] = 0
+            if window:
+                u["alertWindow"] = window
+            n += 1
+    return n
+
+
+def _days(window: str | None) -> float | None:
+    import re
+
+    m = re.fullmatch(r"-(\d+)(d|h)", window or "")
+    if not m:
+        return None
+    return int(m.group(1)) / (24 if m.group(2) == "h" else 1)
+
+
+def _alert_checks(e: dict[str, Any], u: dict[str, Any], checks: list[dict[str, str]]) -> None:
+    fires, days = u.get("alertFires"), _days(u.get("alertWindow"))
+    if not fires or not days or not is_alert(e):
+        return
+    per_day = fires / days
+    if per_day > ALERT_NOISY_PER_DAY:
+        _check(
+            checks,
+            "alertNoisy",
+            "warning",
+            f"Fired {fires:,} times in {_window(u['alertWindow'])} (about {per_day:,.0f} a day): "
+            "too often for each one to be acted on",
+        )
+
+
 # --- health ---------------------------------------------------------------------------
 
 
@@ -145,7 +198,10 @@ def _age_hours(as_of: datetime, ts: Any) -> float | None:
 
 
 def _fmt_age(hours: float) -> str:
-    return f"{hours / 24:.1f} days" if hours >= 48 else f"{hours:.0f} hours"
+    if hours >= 48:
+        return f"{hours / 24:.1f} days"
+    n = round(hours)
+    return f"{n} hour{'' if n == 1 else 's'}"
 
 
 def _data_checks(
@@ -261,11 +317,61 @@ def _hec_checks(e: dict[str, Any], u: dict[str, Any], checks: list[dict[str, str
         _check(checks, "hecErrors", "warning", f"{u['hecErrors']:,} requests failed")
 
 
+def _token_checks(
+    e: dict[str, Any], as_of: datetime, users: set[tuple[str, str]] | None, checks: list
+) -> None:
+    """An authentication token: expired or about to, never expiring, unused for a long
+    time, or belonging to a user Splunk no longer has."""
+    p = e.get("properties") or {}
+    expires = _parse(p.get("expiresAt"))
+    if expires is not None:
+        days_left = (expires - as_of).total_seconds() / 86400
+        if days_left <= 0:
+            _check(
+                checks,
+                "tokenExpired",
+                "warning",
+                f"Expired {_fmt_age(-days_left * 24)} ago: it no longer works; delete it",
+            )
+        elif days_left <= TOKEN_EXPIRY_WARNING_DAYS:
+            _check(
+                checks,
+                "tokenExpiring",
+                "warning",
+                f"Expires in {_fmt_age(days_left * 24)}: whatever uses it stops working then",
+            )
+    elif p.get("neverExpires"):
+        _check(checks, "tokenNoExpiry", "warning", "Never expires")
+    if expires is None or expires > as_of:
+        last = _age_hours(as_of, p.get("lastUsed"))
+        issued = _age_hours(as_of, p.get("issuedAt"))
+        if last is not None and last > TOKEN_STALE_DAYS * 24:
+            _check(checks, "tokenStale", "warning", f"Not used for {_fmt_age(last)}")
+        elif last is None and issued is not None and issued > TOKEN_STALE_DAYS * 24:
+            _check(
+                checks,
+                "tokenStale",
+                "warning",
+                f"Never used since it was issued {_fmt_age(issued)} ago",
+            )
+    user = p.get("user")
+    if users is not None and (not user or (e.get("instance"), user) not in users):
+        _check(
+            checks,
+            "tokenNoOwner",
+            "critical",
+            "Its user no longer exists in Splunk" if user else "No user",
+        )
+
+
 def evaluate_health(
     entities: list[dict[str, Any]], as_of_iso: str | None, scheduler_since_iso: str | None = None
 ) -> None:
     as_of = _parse(as_of_iso) or datetime.now().astimezone()
     scheduler_since = _parse(scheduler_since_iso)
+    # Users per instance, for tokens; None where users were not collected.
+    user_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "user"}
+    with_users = {i for i, _ in user_names}
     for e in entities:
         if e.get("disabled"):
             e.pop("health", None)
@@ -284,6 +390,7 @@ def evaluate_health(
             _data_checks(e, obs, as_of, checks)
         elif e["type"] in ("savedSearch", "correlationSearch"):
             _scheduler_checks(e, usage, checks)
+            _alert_checks(e, usage, checks)
             props = e.get("properties") or {}
             if props.get("isScheduled") and not usage.get("scheduler") and scheduler_since:
                 rate = runs_per_day(props.get("cronSchedule"))
@@ -308,6 +415,8 @@ def evaluate_health(
                 )
         elif e["type"] == "input" and (e.get("properties") or {}).get("kind") == "http":
             _hec_checks(e, usage, checks)
+        elif e["type"] == "authToken":
+            _token_checks(e, as_of, user_names if e.get("instance") in with_users else None, checks)
         elif e["type"] == "deploymentClient":
             age = _age_hours(as_of, obs.get("lastPhoneHome"))
             interval = (obs.get("phoneHomeIntervalSecs") or 60) / 3600
@@ -380,6 +489,14 @@ def mark_unused(
             searched = consumers.get(e["id"]) or u.get("adhocSearches") or producers.get(e["id"])
             if not obs.get("totalEventCount") and not searched and not e["name"].startswith("_"):
                 reason = "Empty, never searched, and nothing writes to it"
+        elif t == "authToken" and (
+            stale := [
+                c
+                for c in (e.get("health") or {}).get("checks", [])
+                if c["check"] in ("tokenExpired", "tokenStale", "tokenNoOwner")
+            ]
+        ):
+            reason = f"Authentication token: {stale[0]['message']}"
         elif t == "user" and audit and not u.get("searches"):
             reason = "No searches in the usage window"
         elif (

@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 45 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 47 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -105,6 +105,15 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Authentication tokens**: *Authentication tokens* lists each token's user,
+  audience, expiry and last use (never its value) and flags expired, expiring,
+  never-expiring, unused (90 days) and orphaned tokens. Reading tokens needs the
+  `list_tokens_all` capability (admins have it); without it the part is
+  reported as skipped (permission denied).
+- **Fired alerts**: *Fired alerts* counts how often each alert and detection
+  actually triggered (and how often throttling suppressed it), not just ran:
+  "Never" marks alerts that may not be needed, and one firing more than 24
+  times a day is flagged as noisy. SQL: "Alerts by how often they fire".
 - **Custom search commands**: *Custom search commands* lists the commands
   each app adds (script, protocol, risky or not), linked to the searches,
   dashboards and macros that run them. The SQL console has "Custom search

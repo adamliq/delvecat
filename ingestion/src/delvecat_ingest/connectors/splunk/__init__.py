@@ -19,6 +19,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "users": access.extract_users,
     "roles": access.extract_roles,
     "authGroups": access.extract_auth_groups,
+    "authTokens": access.extract_auth_tokens,
     "indexes": data.extract_indexes,
     "sourcetypes": knowledge.extract_sourcetype_definitions,
     "inventory": data.extract_inventory,

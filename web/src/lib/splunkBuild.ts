@@ -34,6 +34,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "users", label: "Users" },
       { id: "roles", label: "Roles" },
       { id: "authGroups", label: "SAML and LDAP group mappings" },
+      { id: "authTokens", label: "Authentication tokens (never their values)" },
     ],
   },
   {
@@ -85,6 +86,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "healthIngestDelay", label: "Ingestion delay", searches: true },
       { id: "healthParsing", label: "Parsing warnings (timestamps, line breaking)", searches: true },
       { id: "usageHec", label: "HTTP Event Collector token use", searches: true },
+      { id: "usageAlerts", label: "Fired alerts", searches: true },
     ],
   },
   {

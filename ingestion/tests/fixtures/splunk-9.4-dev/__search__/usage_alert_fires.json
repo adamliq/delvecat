@@ -1,0 +1,29 @@
+{
+ "earliest": "-30d",
+ "results": [
+  {
+   "ssApp": "acme_secops",
+   "name": "Firewall - Denied Outbound to Rare Ports",
+   "schedFired": "3",
+   "suppressed": "12",
+   "auditFired": "3",
+   "last": "1793900000.5"
+  },
+  {
+   "ssApp": "DA-ESS-ContentUpdate",
+   "name": "ESCU - Brute Force Access Behavior Detected",
+   "schedFired": "1500",
+   "suppressed": "0",
+   "auditFired": "0",
+   "last": "1793940000"
+  },
+  {
+   "ssApp": "acme_web",
+   "name": "Web - Hourly Status Summary",
+   "schedFired": "720",
+   "suppressed": "0",
+   "auditFired": "0",
+   "last": "1793939100"
+  }
+ ]
+}
