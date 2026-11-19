@@ -301,6 +301,17 @@ GROUP BY recipient, field
 ORDER BY alerts DESC, recipient;`,
   },
   {
+    title: "Custom search commands and the searches that run them",
+    sql: `SELECT c.app, c.name AS command, json_extract(c.settings, '$.protocol') AS protocol,
+       count(s.id) AS used_by_count, group_concat(s.name, ' | ') AS used_by
+FROM entities c
+LEFT JOIN edges x ON x.to_id = c.id AND x.type = 'uses'
+LEFT JOIN entities s ON s.id = x.from_id
+WHERE c.type = 'searchCommand'
+GROUP BY c.id
+ORDER BY used_by_count DESC, c.app, c.name;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

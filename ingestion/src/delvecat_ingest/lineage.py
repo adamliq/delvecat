@@ -20,7 +20,21 @@ from .model import Ref, Target
 from .spl import SplAnalysis, analyze
 
 # Object types an SPL reference may point at; the resolver only matches visible ones.
-KNOWLEDGE_TYPES = frozenset({"macro", "lookup", "eventtype", "savedSearch", "dataModel"})
+KNOWLEDGE_TYPES = frozenset(
+    {"macro", "lookup", "eventtype", "savedSearch", "dataModel", "searchCommand"}
+)
+
+
+def command_names(entities: list[dict[str, Any]]) -> frozenset[str]:
+    """Names of the catalogued custom search commands. Only these become references:
+    Splunk's own compiled commands (stats, eval...) are not catalogued."""
+    return frozenset(e["name"] for e in entities if e["type"] == "searchCommand")
+
+
+def add_command_refs(a: SplAnalysis, known: frozenset[str]) -> None:
+    """Turn the commands a search runs into ``uses`` references to custom commands."""
+    for name in a.commands & known:
+        a.refs.add(("uses", "searchCommand", name, False))
 
 
 class MacroLibrary:
@@ -91,6 +105,7 @@ def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
 def derive(entities: list[dict[str, Any]]) -> list[Ref]:
     """Analyze SPL on every entity; return references and set ``entity["lineage"]``."""
     macros = MacroLibrary(entities)
+    commands = command_names(entities)
     refs: list[Ref] = []
     for e in entities:
         sources = _spl_sources(e)
@@ -107,6 +122,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         combined.warnings.extend((e.get("lineage") or {}).get("warnings", []))
         for spl, fragment, label in sources:
             a = analyze(spl, macros.resolver(app, owner), fragment=fragment)
+            add_command_refs(a, commands)
             combined.merge(a)
             if a.implicit_index:
                 combined.warnings.append(

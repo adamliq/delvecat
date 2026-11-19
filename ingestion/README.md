@@ -82,6 +82,18 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Custom search commands
+
+Each command an app adds in `commands.conf` is a `searchCommand` object in that
+app, with how it runs: script file and type, protocol (`v2` chunked, or legacy
+`v1`), generating or streaming, and Splunk's `risky` flag. Every search,
+dashboard panel, macro or other SPL that runs a command gets a `uses` edge to
+it, resolved with Splunk's sharing rules (an app-only command serves only its
+own app). A search that runs a command its app cannot see lists it under
+`lineage.unresolved`. Ad-hoc searches in `_audit` count as use, so a command
+nothing runs shows under unused objects. Splunk's compiled commands (`stats`,
+`eval`...) are not in `commands.conf` and are not catalogued.
+
 ### HTTP Event Collector
 
 Each HEC token is an `input` (kind `http`): its default and allowed indexes,

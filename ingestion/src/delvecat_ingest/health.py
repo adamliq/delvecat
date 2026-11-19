@@ -21,7 +21,7 @@ from statistics import median
 from typing import Any
 
 from .cron import runs_per_day
-from .lineage import MacroLibrary
+from .lineage import KNOWLEDGE_TYPES, MacroLibrary, add_command_refs, command_names
 from .model import Target
 from .resolve import Resolver
 from .spl import analyze
@@ -40,7 +40,15 @@ FORWARDER_SILENT_HOURS = 1
 HEALTH_WINDOW_DAYS = 7
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
 
-KO_TYPES = ("macro", "lookup", "eventtype", "dataModel", "kvCollection", "tag")
+KO_TYPES = (
+    "macro",
+    "lookup",
+    "eventtype",
+    "dataModel",
+    "kvCollection",
+    "tag",
+    "searchCommand",
+)
 CONSUMER_EDGES = ("uses", "reads")
 SEVERITY = {"ok": 0, "warning": 1, "critical": 2}
 
@@ -101,6 +109,7 @@ def apply_usage(
     if not adhoc:
         return
     macros = MacroLibrary(entities)
+    commands = command_names(entities)
     resolver = Resolver(entities)
     dashboards = {(e.get("app"), e["name"]): e for e in entities if e["type"] == "dashboard"}
     for row in adhoc:
@@ -108,6 +117,7 @@ def apply_usage(
         if row.get("dashboard") and (d := dashboards.get((app, row["dashboard"]))):
             _merge_usage(d.setdefault("usage", {}), {"panelSearchRuns": runs, "lastUsed": last})
         a = analyze(row["search"], macros.resolver(app, None))
+        add_command_refs(a, commands)
         for _, target_type, name, pattern in a.refs:
             if pattern and name.strip("_") in ("*", ""):
                 continue  # "index=*" says nothing about which indexes matter
@@ -116,8 +126,7 @@ def apply_usage(
                 name,
                 app,
                 pattern,
-                visible_only=target_type
-                in ("macro", "lookup", "eventtype", "savedSearch", "dataModel"),
+                visible_only=target_type in KNOWLEDGE_TYPES,
             )
             for e in resolver.candidates(target):
                 _merge_usage(e.setdefault("usage", {}), {"adhocSearches": runs, "lastUsed": last})

@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 44 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 45 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -105,6 +105,10 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Custom search commands**: *Custom search commands* lists the commands
+  each app adds (script, protocol, risky or not), linked to the searches,
+  dashboards and macros that run them. The SQL console has "Custom search
+  commands and the searches that run them".
 - **HTTP Event Collector**: *Inputs* lists each HEC token (never its value)
   and HEC's own on/off state; *HTTP Event Collector token use* adds events,
   volume and rejected requests per token, with the reason (for example an index

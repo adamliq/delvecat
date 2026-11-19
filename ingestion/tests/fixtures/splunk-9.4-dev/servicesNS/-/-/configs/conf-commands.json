@@ -1,0 +1,157 @@
+{
+ "entry": [
+  {
+   "name": "iconify",
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "changes_colorder": "1",
+    "disabled": false,
+    "enableheader": "1",
+    "filename": "iconify.py",
+    "generates_timeorder": "0",
+    "generating": "0",
+    "is_risky": "0",
+    "maxinputs": "50000",
+    "outputheader": "0",
+    "overrides_timeorder": "0",
+    "pass_timezone": "0",
+    "passauth": "0",
+    "perf_warn_limit": "0",
+    "python.required": "latest",
+    "required_fields": "*",
+    "requires_preop": "0",
+    "retainsevents": "1",
+    "streaming": "1",
+    "supports_getinfo": "0",
+    "supports_rawargs": "1",
+    "type": "python"
+   },
+   "updated": "1970-01-01T00:00:00+00:00",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/search/configs/conf-commands/iconify"
+  },
+  {
+   "name": "xmlkv",
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "global"
+   },
+   "author": "nobody",
+   "content": {
+    "changes_colorder": "1",
+    "disabled": false,
+    "enableheader": "1",
+    "filename": "xmlkv.py",
+    "generates_timeorder": "0",
+    "generating": "0",
+    "is_risky": "0",
+    "maxinputs": "50000",
+    "outputheader": "0",
+    "pass_timezone": "0",
+    "passauth": "0",
+    "perf_warn_limit": "0",
+    "python.required": "latest",
+    "required_fields": "*",
+    "requires_preop": "0",
+    "retainsevents": "0",
+    "streaming": "1",
+    "supports_getinfo": "0",
+    "type": "python"
+   },
+   "updated": "1970-01-01T00:00:00+00:00",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/search/configs/conf-commands/xmlkv"
+  },
+  {
+   "name": "threatscore",
+   "acl": {
+    "app": "acme_secops",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "admin",
+   "content": {
+    "changes_colorder": "1",
+    "disabled": false,
+    "enableheader": "1",
+    "filename": "threatscore.py",
+    "generates_timeorder": "0",
+    "generating": "0",
+    "is_risky": "0",
+    "maxinputs": "50000",
+    "outputheader": "0",
+    "overrides_timeorder": "0",
+    "pass_timezone": "0",
+    "passauth": "0",
+    "perf_warn_limit": "0",
+    "required_fields": "*",
+    "requires_preop": "0",
+    "retainsevents": "1",
+    "streaming": "1",
+    "supports_getinfo": "0",
+    "type": "python",
+    "chunked": "1",
+    "python.required": "3.13"
+   },
+   "updated": "1970-01-01T00:00:00+00:00",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/acme_secops/configs/conf-commands/threatscore"
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 3
+ }
+}

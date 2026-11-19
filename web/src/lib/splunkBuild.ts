@@ -56,6 +56,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "savedSearches", label: "Saved searches and alerts" },
       { id: "dashboards", label: "Dashboards" },
       { id: "macros", label: "Macros" },
+      { id: "searchCommands", label: "Custom search commands" },
       { id: "eventtypes", label: "Event types" },
       { id: "tags", label: "Tags" },
       { id: "fieldExtractions", label: "Field extractions" },

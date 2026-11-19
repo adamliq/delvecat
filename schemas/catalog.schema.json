@@ -192,6 +192,7 @@
         "kvCollection",
         "savedSearch",
         "macro",
+        "searchCommand",
         "eventtype",
         "tag",
         "fieldAlias",

@@ -17,6 +17,7 @@ export type EntityType =
   | "kvCollection"
   | "savedSearch"
   | "macro"
+  | "searchCommand"
   | "eventtype"
   | "tag"
   | "fieldAlias"

@@ -36,6 +36,7 @@ class SplAnalysis:
     dynamic: bool = False  # contains $tokens$
     warnings: list[str] = field(default_factory=list)
     fields: FieldAnalysis | None = None  # field-level lineage
+    commands: set[str] = field(default_factory=set)  # every command run after a pipe
 
     def merge(self, other: SplAnalysis) -> None:
         if other.fields is not None:
@@ -46,6 +47,7 @@ class SplAnalysis:
                     self.fields.source = "events"
                 self.fields.merge(other.fields)
         self.refs |= other.refs
+        self.commands |= other.commands
         for m in other.unresolved_macros:
             if m not in self.unresolved_macros:
                 self.unresolved_macros.append(m)
@@ -488,6 +490,9 @@ def analyze(
     return out
 
 
+_COMMAND_NAME = re.compile(r"^[a-z_][a-z0-9_]*$")
+
+
 def _analyze_pipeline(spl: str, out: SplAnalysis, *, fragment: bool) -> None:
     text = spl.strip()
     starts_with_pipe = text.startswith("|")
@@ -509,4 +514,6 @@ def _analyze_pipeline(spl: str, out: SplAnalysis, *, fragment: bool) -> None:
             if not has_index and not fragment and not uses_knowledge and not out.dynamic:
                 out.implicit_index = True
         else:
+            if _COMMAND_NAME.match(name):
+                out.commands.add(name)
             _command(name, rest, out)

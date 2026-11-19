@@ -218,6 +218,42 @@ def extract_macros(ctx: Ctx, out: ExtractResult) -> int:
     return n
 
 
+def _flag(c: dict[str, Any], key: str) -> bool | None:
+    return as_bool(c[key]) if key in c and c[key] not in (None, "") else None
+
+
+def extract_search_commands(ctx: Ctx, out: ExtractResult) -> int:
+    """Custom search commands (commands.conf): which app adds each command and how it runs.
+    Splunk's compiled commands (stats, eval...) are not in commands.conf and are not listed."""
+    n = 0
+    for e in iter_entries(ctx.transport, f"{NS}/configs/conf-commands"):
+        c = content(e)
+        generating = str(c.get("generating") or "").strip().lower()
+        add_ko(
+            ctx,
+            out,
+            "searchCommand",
+            e,
+            name=e["name"].lower(),
+            properties={
+                "filename": c.get("filename") or None,
+                "scriptType": c.get("type") or None,
+                # Protocol v2 ("chunked") is the current one; v1 is legacy.
+                "protocol": "v2" if as_bool(c.get("chunked", False)) else "v1",
+                "generating": generating == "stream" or as_bool(generating or False),
+                "streaming": _flag(c, "streaming"),
+                "retainsEvents": _flag(c, "retainsevents"),
+                # Splunk asks before running a risky command from a link (SPL safeguards).
+                "risky": _flag(c, "is_risky"),
+                "passAuth": _flag(c, "passauth"),
+                "requiresSearchInfo": _flag(c, "requires_srinfo"),
+                "pythonRequired": c.get("python.required") or c.get("python.version") or None,
+            },
+        )
+        n += 1
+    return n
+
+
 def extract_eventtypes(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     for e in iter_entries(ctx.transport, f"{NS}/saved/eventtypes"):

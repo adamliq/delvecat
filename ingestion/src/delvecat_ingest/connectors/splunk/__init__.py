@@ -31,6 +31,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "savedSearches": knowledge.extract_saved_searches,
     "dashboards": knowledge.extract_dashboards,
     "macros": knowledge.extract_macros,
+    "searchCommands": knowledge.extract_search_commands,
     "eventtypes": knowledge.extract_eventtypes,
     "tags": knowledge.extract_tags,
     "fieldExtractions": knowledge.extract_field_extractions,
