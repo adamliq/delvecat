@@ -1,0 +1,30 @@
+{
+ "items": [
+  {
+   "id": "agg-1",
+   "name": "Group by user",
+   "description": "One finding group per user per day",
+   "enabled": true,
+   "rule_type": "aggregation",
+   "group_by": "user",
+   "time_window": "1d",
+   "detection_names": [
+    "Access - Excessive Failed Logins - Rule",
+    "ESCU - Brute Force Access Behavior Detected"
+   ],
+   "updated_time": "2026-10-01T10:00:00Z"
+  },
+  {
+   "id": "sup-1",
+   "name": "Known pentest",
+   "description": "Red team engagement",
+   "enabled": true,
+   "rule_type": "suppression",
+   "condition": "src_ip=10.9.9.9",
+   "expiration_time": "2026-12-31T00:00:00Z",
+   "detection_names": [
+    "ESCU - Suspicious PowerShell Execution"
+   ]
+  }
+ ]
+}

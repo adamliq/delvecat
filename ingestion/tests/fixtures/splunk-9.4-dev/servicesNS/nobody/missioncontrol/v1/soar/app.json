@@ -1,0 +1,13 @@
+{
+ "items": [
+  {
+   "id": 101,
+   "name": "VirusTotal v3",
+   "app_version": "2.3.1",
+   "product_vendor": "VirusTotal",
+   "configured": true,
+   "asset_count": 1,
+   "password": "never-this-either"
+  }
+ ]
+}

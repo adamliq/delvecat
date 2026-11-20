@@ -82,6 +82,29 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### Enterprise Security triage
+
+The `enterpriseSecurity` part also reads how findings are handled:
+
+- `esReviewStatus`: the statuses findings and investigations move through
+  (`/services/alerts/reviewstatuses`): type, default, whether it closes them.
+- `esSuppression`: finding (notable) suppressions
+  (`alerts/suppressions`, eventtypes `notable_suppression-<name>`) with their
+  search, the detections they name (`source=`, `uses` edges) and time window,
+  and, from ES 8, finding suppression rules. A suppression whose window has ended
+  gets `suppressionExpired` and goes to the cleanup report; one that names only a
+  detection gets `suppressesWholeDetection` (every finding of it is hidden).
+- ES 8 (Mission Control, `/servicesNS/nobody/missioncontrol`):
+  `esAggregationRule` (finding aggregation into finding groups),
+  `esAutomationRule` (playbooks run on matching findings; edges to detections
+  and SOAR playbooks), `esQueue` (with read/write roles) and the `soarApp`s
+  configured for ES. Plain settings are kept; anything named like a secret,
+  token, password or key is not. ES 7 has no Mission Control: those are skipped.
+
+The Mission Control responses are read defensively (a list, or an object holding
+one; names from `name`/`title`/`label`): their shapes were not available to test
+against a live ES 8.
+
 ### SPL2 (Splunk 10 and later)
 
 Part `spl2` reads Splunk's Data Orchestrator (`/services/orchestrator/v1`, a

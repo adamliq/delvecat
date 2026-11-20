@@ -375,6 +375,30 @@ def _routing_checks(
         )
 
 
+def _suppression_checks(e: dict[str, Any], as_of: datetime, checks: list[dict[str, str]]) -> None:
+    """An ES suppression that has ended (suppresses nothing) or that hides every finding
+    of a detection (nothing narrows it but the detection's name)."""
+    p = e.get("properties") or {}
+    end = _parse(p.get("end"))
+    if end is not None and end <= as_of:
+        _check(
+            checks,
+            "suppressionExpired",
+            "warning",
+            f"Ended {_fmt_age((as_of - end).total_seconds() / 3600)} ago: it suppresses "
+            "nothing now; delete it",
+        )
+    elif p.get("wholeDetection"):
+        _check(
+            checks,
+            "suppressesWholeDetection",
+            "warning",
+            "Suppresses every finding of "
+            + ", ".join(p.get("detections") or [])
+            + ": nothing else narrows it",
+        )
+
+
 def _token_checks(
     e: dict[str, Any], as_of: datetime, users: set[tuple[str, str]] | None, checks: list
 ) -> None:
@@ -479,6 +503,8 @@ def evaluate_health(
             _hec_checks(e, usage, checks)
         elif e["type"] == "transform" and e.get("instance") in with_indexes:
             _routing_checks(e, index_names, checks)
+        elif e["type"] == "esSuppression":
+            _suppression_checks(e, as_of, checks)
         elif e["type"] == "authToken":
             _token_checks(e, as_of, user_names if e.get("instance") in with_users else None, checks)
         elif e["type"] == "deploymentClient":
@@ -561,6 +587,10 @@ def mark_unused(
             ]
         ):
             reason = f"Authentication token: {stale[0]['message']}"
+        elif t == "esSuppression" and any(
+            c["check"] == "suppressionExpired" for c in (e.get("health") or {}).get("checks", [])
+        ):
+            reason = "Suppression that has ended"
         elif t == "user" and audit and not u.get("searches"):
             reason = "No searches in the usage window"
         elif (

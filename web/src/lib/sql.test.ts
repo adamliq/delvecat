@@ -151,4 +151,18 @@ describe("SQL console", () => {
     const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("External datastores"))!.sql).rows;
     expect(rows).toEqual([["sec", "signin_archive", "azure_abs", "Azure", "azure_lake_conn", '["servicePrincipal"]', "lake", "logs", "entra"]]);
   });
+
+  it("lists detections muted, grouped or automated in ES", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const det = ent("correlationSearch", "Brute Force");
+    const sup = ent("esSuppression", "Mute", { health: { status: "warning", checks: [{ check: "suppressesWholeDetection", status: "warning", message: "x" }] } });
+    const auto = ent("esAutomationRule", "Enrich");
+    fillDatabase(db, catalogTables({ ...bundle, entities: [det, sup, auto], edges: [
+      { from: sup.id, to: det.id, type: "uses", origin: "config" },
+      { from: auto.id, to: det.id, type: "uses", origin: "config" },
+    ] }));
+    const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Detections muted"))!.sql).rows;
+    expect(rows).toEqual([["Brute Force", "esAutomationRule", "Enrich", 0, null], ["Brute Force", "esSuppression", "Mute", 0, "suppressesWholeDetection"]]);
+  });
 });

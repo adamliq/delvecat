@@ -105,6 +105,11 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Enterprise Security triage**: review statuses, finding suppressions (with
+  the detections they mute; ended ones and ones hiding a whole detection are
+  flagged), and on ES 8 finding aggregation and suppression rules, automation
+  rules, queues and the SOAR apps configured for ES. SQL: "Detections muted,
+  grouped or automated in ES".
 - **Azure**: SmartStore volumes and Self Storage on Azure Blob Storage (also S3
   and Google Cloud Storage) are named on an index's storage tiers (provider,
   container, storage account); inputs of the Microsoft Azure and Microsoft Cloud

@@ -244,7 +244,12 @@
         "federatedIndex",
         "spl2Connection",
         "spl2Module",
-        "spl2Dataset"
+        "spl2Dataset",
+        "esReviewStatus",
+        "esSuppression",
+        "esAggregationRule",
+        "esAutomationRule",
+        "esQueue"
       ]
     },
     "Sharing": {

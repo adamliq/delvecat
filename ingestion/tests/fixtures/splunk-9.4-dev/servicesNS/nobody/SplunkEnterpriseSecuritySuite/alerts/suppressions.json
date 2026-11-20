@@ -1,0 +1,75 @@
+{
+ "entry": [
+  {
+   "name": "notable_suppression-Scanner noise",
+   "id": "https://127.0.0.1:8089/x/notable_suppression-Scanner noise",
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "owner": "nobody",
+    "sharing": "global",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "search": "source=\"Access - Excessive Failed Logins - Rule\" src=10.20.30.40",
+    "description": "Vulnerability scanner",
+    "disabled": false
+   }
+  },
+  {
+   "name": "notable_suppression-Mute brute force",
+   "id": "https://127.0.0.1:8089/x/notable_suppression-Mute brute force",
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "owner": "nobody",
+    "sharing": "global",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "search": "source=\"ESCU - Brute Force Access Behavior Detected\"",
+    "description": "Too noisy",
+    "disabled": false
+   }
+  },
+  {
+   "name": "notable_suppression-Change window",
+   "id": "https://127.0.0.1:8089/x/notable_suppression-Change window",
+   "acl": {
+    "app": "SA-ThreatIntelligence",
+    "owner": "nobody",
+    "sharing": "global",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "search": "source=\"ESCU - Rare Outbound Port Traffic\" _time>=1788220800 _time<1790726400",
+    "description": "September change window",
+    "disabled": false
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 3
+ }
+}

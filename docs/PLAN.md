@@ -91,7 +91,9 @@ Common aspects on every entity: `description`, `owners`, `tags`,
 `correlationSearch` / `detection` (ES 8), `findingType` (notable), `riskRule`
 and risk modifiers, `riskObjectType`, `threatIntelSource`,
 `assetIdentitySource`, `adaptiveResponseAction`, `analyticStory`
-(incl. ESCU content), `responseTemplate`, `investigationType`.
+(incl. ESCU content), `responseTemplate`, `investigationType`, `esReviewStatus`,
+`esSuppression` (notable suppressions, ES 8 suppression rules), and ES 8 Mission Control
+`esAggregationRule`, `esAutomationRule`, `esQueue`, configured `soarApp`s.
 Classifications: MITRE ATT&CK techniques/tactics, kill-chain phase, CIM data
 model. Coverage views: detections per data model / ATT&CK technique, and which
 detections are blind because their source data is missing or stale.

@@ -69,7 +69,12 @@ export type EntityType =
   | "federatedIndex"
   | "spl2Connection"
   | "spl2Module"
-  | "spl2Dataset";
+  | "spl2Dataset"
+  | "esReviewStatus"
+  | "esSuppression"
+  | "esAggregationRule"
+  | "esAutomationRule"
+  | "esQueue";
 /**
  * The Splunk product an entity belongs to.
  */

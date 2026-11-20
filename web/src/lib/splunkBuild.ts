@@ -97,7 +97,7 @@ export const PART_GROUPS: PartGroup[] = [
   {
     name: "Products",
     parts: [
-      { id: "enterpriseSecurity", label: "Enterprise Security" },
+      { id: "enterpriseSecurity", label: "Enterprise Security (incl. suppressions, review statuses, ES 8 automation and queues)" },
       { id: "dbConnect", label: "DB Connect" },
       { id: "stream", label: "Stream" },
       { id: "deploymentServer", label: "Deployment Server" },

@@ -1,0 +1,17 @@
+{
+ "items": [
+  {
+   "id": "auto-1",
+   "name": "Enrich brute force",
+   "description": "Run enrichment playbook on new brute-force findings",
+   "enabled": true,
+   "trigger": "finding_created",
+   "playbook": {
+    "name": "enrich_identity",
+    "id": 12
+   },
+   "detection": "ESCU - Brute Force Access Behavior Detected",
+   "api_token": "never-store-me"
+  }
+ ]
+}

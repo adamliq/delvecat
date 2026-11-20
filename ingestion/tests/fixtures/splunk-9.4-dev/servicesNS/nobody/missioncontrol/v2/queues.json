@@ -1,0 +1,19 @@
+{
+ "items": [
+  {
+   "id": "q-1",
+   "name": "Tier 1",
+   "description": "First-line triage",
+   "default": true,
+   "permissions": {
+    "read": [
+     "ess_analyst",
+     "ess_admin"
+    ],
+    "write": [
+     "ess_admin"
+    ]
+   }
+  }
+ ]
+}

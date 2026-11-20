@@ -393,6 +393,17 @@ WHERE d.type = 'spl2Dataset'
 ORDER BY data_source, d.app, d.name;`,
   },
   {
+    title: "Detections muted, grouped or automated in ES",
+    sql: `SELECT d.name AS detection, r.type AS rule_type, r.name AS rule, r.disabled,
+       (SELECT group_concat(h.check_name, ', ') FROM health_checks h WHERE h.entity_id = r.id) AS issues
+FROM edges x
+JOIN entities r ON r.id = x.from_id
+JOIN entities d ON d.id = x.to_id
+WHERE d.type = 'correlationSearch' AND x.type = 'uses'
+  AND r.type IN ('esSuppression', 'esAggregationRule', 'esAutomationRule')
+ORDER BY d.name, r.type;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e
