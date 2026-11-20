@@ -140,3 +140,24 @@ def test_public_profile_hides_azure_locations_and_tenant():
     text = json.dumps([e for e in bundle["entities"] if e["type"].startswith("spl2")])
     for v in ("acmesecuritylake", "acmeexports", "9a8b7c6d-1111", "entra/signins"):
         assert v not in text
+
+
+class Starting(FixtureTransport):
+    """The orchestrator just after a restart: 503."""
+
+    def get(self, path, params=None):
+        if path.startswith("/services/orchestrator/"):
+            import httpx
+
+            request = httpx.Request("GET", "https://x" + path)
+            raise httpx.HTTPStatusError(
+                "503", request=request, response=httpx.Response(503, request=request)
+            )
+        return super().get(path, params)
+
+
+def test_orchestrator_starting_is_skipped_not_failed():
+    bundle, _, _ = _build(Starting(FIXTURE))
+    report = {r["connector"]: r for r in bundle["ingestionReport"]}
+    assert report["splunk.spl2"]["status"] == "skipped"
+    assert "not running yet" in report["splunk.spl2"]["message"]

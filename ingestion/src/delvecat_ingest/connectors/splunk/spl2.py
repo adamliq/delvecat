@@ -171,7 +171,24 @@ def connection_properties(c: dict[str, Any], status: str) -> dict[str, Any]:
     return props
 
 
+def _starting(exc: Exception) -> bool:
+    """502/503/504: the orchestrator is not up yet (e.g. just after a restart)."""
+    status = getattr(getattr(exc, "response", None), "status_code", None)
+    return status in (502, 503, 504)
+
+
 def extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
+    try:
+        return _extract_spl2(ctx, out)
+    except Exception as exc:
+        if _starting(exc):
+            raise EndpointNotFound(
+                "SPL2 orchestrator not running yet (it starts a minute after splunkd)"
+            ) from exc
+        raise
+
+
+def _extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     # Connections: the Splunk deployments SPL2 runs against. Published ones are in effect;
     # a draft is an edit not published yet. No secret is returned, only the account name.
