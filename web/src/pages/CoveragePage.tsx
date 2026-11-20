@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DataTable } from "../components/DataTable";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCatalog } from "../lib/CatalogContext";
 import {
@@ -89,22 +90,20 @@ export function CoveragePage() {
       {blocked.length > 0 && (
         <section>
           <h2>Detections that cannot fire</h2>
-          <div className="table-wrap">
-            <table className="mini-table">
-              <thead><tr><th>Detection</th><th>Why</th><th>Techniques</th><th>Data models</th></tr></thead>
-              <tbody>
-                {blocked.map((d) => (
-                  <tr key={d.entity.id}>
-                    <td><DetectionLink d={d} /></td>
-                    <td><span className="status-label status-warning">! {STATE_LABELS[d.state]}</span>
-                      {d.entity.lineage?.unresolved?.length ? <div className="muted small">{d.entity.lineage.unresolved.join(", ")}</div> : null}</td>
-                    <td>{d.techniques.join(", ") || "—"}</td>
-                    <td>{d.dataModels.join(", ") || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            rows={blocked}
+            rowKey={(d) => d.entity.id}
+            csvName="delvecat-detections-that-cannot-fire.csv"
+            columns={[
+              { label: "Detection", value: (d) => d.entity.displayName ?? d.entity.name, render: (d) => <DetectionLink d={d} /> },
+              { label: "Why", value: (d) => STATE_LABELS[d.state], render: (d) => (
+                <><span className="status-label status-warning">! {STATE_LABELS[d.state]}</span>
+                  {d.entity.lineage?.unresolved?.length ? <div className="muted small">{d.entity.lineage.unresolved.join(", ")}</div> : null}</>
+              ) },
+              { label: "Techniques", value: (d) => d.techniques.join(", ") },
+              { label: "Data models", value: (d) => d.dataModels.join(", ") },
+            ]}
+          />
         </section>
       )}
 
@@ -159,22 +158,18 @@ export function CoveragePage() {
       {models.length > 0 && (
         <section>
           <h2>CIM data models used by detections</h2>
-          <div className="table-wrap">
-            <table className="mini-table">
-              <thead><tr><th>Data model</th><th>In catalog</th><th>Data flowing in</th><th>Accelerated</th><th>Detections</th></tr></thead>
-              <tbody>
-                {models.map((m) => (
-                  <tr key={m.name}>
-                    <td>{m.entity ? <Link to={`${entityPath(m.entity.id)}?tab=lineage`}>{m.name}</Link> : m.name}</td>
-                    <td>{m.entity ? "Yes" : <span className="status-label status-warning">! Missing</span>}</td>
-                    <td>{m.hasData ? <span className="status-label status-good">✓ Yes</span> : <span className="status-label status-warning">! No</span>}</td>
-                    <td>{m.accelerated ? "Yes" : "No"}</td>
-                    <td>{m.detections.map((d, i) => <span key={d.entity.id}>{i > 0 && ", "}<DetectionLink d={d} /></span>)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            rows={models}
+            rowKey={(m) => m.name}
+            csvName="delvecat-cim-data-models.csv"
+            columns={[
+              { label: "Data model", value: (m) => m.name, render: (m) => (m.entity ? <Link to={`${entityPath(m.entity.id)}?tab=lineage`}>{m.name}</Link> : m.name) },
+              { label: "In catalog", value: (m) => !!m.entity, render: (m) => (m.entity ? "Yes" : <span className="status-label status-warning">! Missing</span>) },
+              { label: "Data flowing in", value: (m) => !!m.hasData, render: (m) => (m.hasData ? <span className="status-label status-good">✓ Yes</span> : <span className="status-label status-warning">! No</span>) },
+              { label: "Accelerated", value: (m) => !!m.accelerated, render: (m) => (m.accelerated ? "Yes" : "No") },
+              { label: "Detections", value: (m) => m.detections.length, render: (m) => m.detections.map((d, i) => <span key={d.entity.id}>{i > 0 && ", "}<DetectionLink d={d} /></span>) },
+            ]}
+          />
         </section>
       )}
 

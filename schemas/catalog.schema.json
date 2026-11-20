@@ -756,6 +756,10 @@
             "type": "integer"
           }
         },
+        "durationSecs": {
+          "description": "How long the part took, in seconds.",
+          "type": "number"
+        },
         "instance": {
           "description": "Instance the report is about (set when bundles are merged).",
           "type": "string"

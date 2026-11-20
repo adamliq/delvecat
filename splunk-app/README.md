@@ -204,6 +204,23 @@ one. The same from a search:
   profile (it needs a secret salt), other instances. Use the command line for
   those.
 
+## Using the catalog
+
+- **Findings** (header, with a count): every warning and critical check in one
+  list, most severe first (data and scheduler problems, tokens, noisy alerts,
+  suppressions, routing to missing indexes, retention by size, acceleration),
+  filterable by severity, finding, area, app and text, with links and CSV.
+- **Tables** on Findings, Health, Coverage and Governance sort by any column
+  (click its header) and download as CSV.
+- **Browse** groups its type filter by area (Data, Inputs and forwarding,
+  Searches, Knowledge objects, Platform and access, Enterprise Security, SOAR,
+  ...) when expanded, and search also finds objects by the values they hold
+  (tenant ids, buckets, servers, Event Hub names, containers...).
+- **Home** says what the catalog covers: each part of the build, read, skipped
+  (and why) or failed, with objects found and time taken; the **Build** page
+  shows the same for the last build and has *Reset to defaults* for the parts
+  (it otherwise starts from the last build's selection).
+
 ## Publish a catalog
 
 ```sh

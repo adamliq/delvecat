@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { EntityType } from "../generated/catalog";
+import { CoverageReport } from "../components/CoverageReport";
 import { PropValue } from "../components/PropValue";
 import { effectiveDescription } from "../lib/annotate";
 import { detectionStatus, isDetection } from "../lib/coverage";
@@ -45,7 +46,6 @@ export function Home() {
   const byType = [...catalog.countBy("type").entries()].sort((a, b) => b[1] - a[1]);
   const byProduct = [...catalog.countBy("product").entries()];
   const report = bundle.ingestionReport ?? [];
-  const notOk = report.filter((r) => r.status !== "ok");
   const changes = bundle.changes;
   const total = bundle.entities.length || 1;
   const described = bundle.entities.filter((e) => effectiveDescription(e)).length;
@@ -238,26 +238,8 @@ export function Home() {
 
       {report.length > 0 && (
         <section>
-          <h2>Ingestion report</h2>
-          {notOk.length === 0 && <p className="muted">All {report.length} extractors completed.</p>}
-          <details open={notOk.length > 0}>
-            <summary>{notOk.length ? `${notOk.length} extractor(s) need attention` : "Show all extractors"}</summary>
-            <div className="table-wrap">
-              <table className="mini-table">
-                <thead><tr><th>Extractor</th><th>Status</th><th>Counts</th><th>Notes</th></tr></thead>
-                <tbody>
-                  {[...notOk, ...report.filter((r) => r.status === "ok")].map((r) => (
-                    <tr key={r.connector}>
-                      <td><code>{r.connector}</code></td>
-                      <td><span className={`status status-${r.status}`}>{r.status}</span></td>
-                      <td>{r.counts ? Object.entries(r.counts).map(([k, v]) => `${k}: ${v.toLocaleString()}`).join(", ") : ""}</td>
-                      <td>{r.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
+          <h2>What this catalog covers</h2>
+          <CoverageReport bundle={bundle} />
         </section>
       )}
     </div>

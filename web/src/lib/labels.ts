@@ -69,3 +69,22 @@ export function pluralTypeLabel(type: EntityType): string {
   if (/[^aeiou]y$/.test(label)) return `${label.slice(0, -1)}ies`;
   return `${label}s`;
 }
+
+/** Areas object types fall into (the Browse page groups its type filter by them). */
+export const TYPE_GROUPS: [string, string[]][] = [
+  ["Data", ["index", "sourcetype", "source", "host", "field", "dataModel", "lookup", "automaticLookup", "kvCollection", "federatedIndex", "federatedProvider", "accelerationSummary"]],
+  ["Inputs and forwarding", ["input", "forwarder", "outputGroup", "addOnAccount", "serverClass", "deploymentApp", "deploymentClient", "streamForwarder", "streamGroup", "streamDefinition"]],
+  ["Searches, alerts and dashboards", ["savedSearch", "dashboard", "scheduledView", "adaptiveResponseAction"]],
+  ["Knowledge objects", ["macro", "eventtype", "tag", "fieldAlias", "calculatedField", "fieldExtraction", "transform", "workflowAction", "searchCommand"]],
+  ["Platform and access", ["instance", "app", "user", "role", "authGroup", "authToken"]],
+  ["Enterprise Security", ["correlationSearch", "findingType", "riskRule", "threatIntelSource", "assetIdentitySource", "analyticStory", "responseTemplate", "esReviewStatus", "esSuppression", "esAggregationRule", "esAutomationRule", "esQueue"]],
+  ["SOAR", ["soarPlaybook", "soarCustomFunction", "soarApp", "soarAsset", "soarLabel", "soarWorkbook"]],
+  ["UEBA and Asset & Risk Intelligence", ["uebaDataSource", "uebaModel", "uebaAnomalyType", "uebaThreatRule", "uebaOutputConnector", "ariSource", "ariAssetType", "ariMetric", "ariExposure"]],
+  ["DB Connect", ["dbConnection", "dbIdentity", "dbInput", "dbOutput", "dbLookup", "externalTable"]],
+  ["SPL2 and Data Management", ["spl2Module", "spl2Dataset", "spl2Connection", "dmCatalogObject"]],
+];
+
+const GROUP_OF = new Map(TYPE_GROUPS.flatMap(([g, types]) => types.map((t) => [t, g] as const)));
+
+/** The area a type belongs to ("Other" for one not listed). */
+export const typeGroup = (type: string): string => GROUP_OF.get(type) ?? "Other";

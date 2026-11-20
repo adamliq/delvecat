@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
+import { findings } from "../lib/findings";
 import { searchPath } from "../lib/routes";
 import { canBuild } from "../lib/splunkBuild";
 import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
@@ -9,6 +10,10 @@ export function Layout({ children }: { children: ReactNode }) {
   const { state, openFiles } = useCatalogState();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
+  const findingCount = useMemo(
+    () => (state.status === "ready" ? findings(state.catalog.entities).length : 0),
+    [state],
+  );
   const fileInput = useRef<HTMLInputElement>(null);
   const folderInput = useRef<HTMLInputElement>(null);
   const onPick = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +50,9 @@ export function Layout({ children }: { children: ReactNode }) {
           <NavLink to="/schemas">Schemas</NavLink>
           <NavLink to="/glossary">Glossary</NavLink>
           <NavLink to="/coverage">Coverage</NavLink>
+          <NavLink to="/findings">
+            Findings{findingCount > 0 && <span className="nav-badge" aria-label={`${findingCount} findings`}>{findingCount > 999 ? "999+" : findingCount}</span>}
+          </NavLink>
           <NavLink to="/health">Health</NavLink>
           <NavLink to="/governance">Governance</NavLink>
           <NavLink to="/insights">Insights</NavLink>

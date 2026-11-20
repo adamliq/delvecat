@@ -49,6 +49,28 @@ interface Doc {
   owner: string;
   tags: string;
   body: string;
+  values: string;
+}
+
+// Property keys already indexed (as body) or not worth searching.
+const VALUE_SKIP = new Set(["search", "definition", "expression", "searches", "alertRecipients", "defaultRecipients", "sender", "observed", "datasets", "fields"]);
+const MAX_VALUES = 60;
+const DATE = /^\d{4}-\d{2}-\d{2}[T ]/;
+
+/** Short text values of an object's properties (tenant ids, buckets, servers, Event Hub
+ * names...), so a value finds the objects that hold it. Long text and dates are left out. */
+export function propertyValues(props: unknown, out: string[] = [], depth = 0): string[] {
+  if (out.length >= MAX_VALUES || depth > 5 || props === null || props === undefined) return out;
+  if (typeof props === "string") {
+    if (props.length >= 2 && props.length <= 200 && !DATE.test(props)) out.push(props);
+  } else if (Array.isArray(props)) {
+    for (const v of props) propertyValues(v, out, depth + 1);
+  } else if (typeof props === "object") {
+    for (const [k, v] of Object.entries(props as Record<string, unknown>)) {
+      if (!VALUE_SKIP.has(k)) propertyValues(v, out, depth + 1);
+    }
+  }
+  return out;
 }
 
 function toDoc(e: Entity): Doc {
@@ -70,6 +92,7 @@ function toDoc(e: Entity): Doc {
     owner: [e.owner, ...(a.owners ?? [])].filter(Boolean).join(" "),
     tags: [...(a.tags ?? []), ...(a.classifications ?? []), ...(a.glossaryTerms ?? [])].join(" "),
     body,
+    values: [...new Set(propertyValues(p))].join(" "),
   };
 }
 
@@ -91,12 +114,12 @@ export class EntitySearch {
     this.facetNames = Object.keys(this.facets);
     this.byId = new Map(entities.map((e) => [e.id, e]));
     this.index = new MiniSearch<Doc>({
-      fields: ["name", "displayName", "description", "app", "owner", "tags", "body"],
+      fields: ["name", "displayName", "description", "app", "owner", "tags", "body", "values"],
       storeFields: ["id"],
       // SPL and Splunk names use _, -, :, ., / and backticks as separators.
       tokenize: (text) => text.split(/[\s_\-:./`|=,()[\]"'*@]+/).filter(Boolean),
       searchOptions: {
-        boost: { name: 4, displayName: 3, tags: 2, description: 1.5 },
+        boost: { name: 4, displayName: 3, tags: 2, description: 1.5, values: 0.5 },
         prefix: true,
         fuzzy: (term) => (term.length > 4 ? 0.2 : false),
         combineWith: "AND",

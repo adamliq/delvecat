@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable
 
 from ...model import ExtractResult
@@ -77,6 +78,8 @@ def run_extractors(
         connector = f"{prefix}.{name}"
         if ctx.options.progress:
             ctx.options.progress(connector)
+        started = time.monotonic()
+        before = len(out.reports)
         try:
             result = fn(ctx, out)
             if isinstance(result, tuple):
@@ -115,6 +118,10 @@ def run_extractors(
                     "message": f"{type(exc).__name__}: {exc}",
                 }
             )
+        # How long the part took (the Build page shows it).
+        for r in out.reports[before:]:
+            if r.get("connector") == connector:
+                r["durationSecs"] = round(time.monotonic() - started, 2)
 
 
 def extract(

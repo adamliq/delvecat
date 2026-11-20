@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { DataTable } from "../components/DataTable";
 import { Link } from "react-router-dom";
 import type { Entity, EntityType } from "../generated/catalog";
 import { Sparkline } from "../components/Sparkline";
@@ -6,7 +7,7 @@ import { useCatalog } from "../lib/CatalogContext";
 import { dailySeries, downloadText, healthStatus, isBuiltin, isUnused, toCsv } from "../lib/health";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
 import { riskMap } from "../lib/risk";
-import { entityPath, searchPath } from "../lib/routes";
+import { entityPath } from "../lib/routes";
 
 const ICON = { critical: "✕", warning: "!", ok: "✓" } as const;
 
@@ -30,27 +31,24 @@ function IssueTable({ title, entities, empty, spark = false }: {
   return (
     <section>
       <h2>{title} <span className="muted">({entities.length})</span></h2>
-      {entities.length === 0 ? <p className="muted">{empty}</p> : (
-        <div className="table-wrap">
-          <table className="mini-table">
-            <thead><tr><th>Object</th><th>Status</th><th>Findings</th>{spark && <th>Daily events</th>}</tr></thead>
-            <tbody>
-              {sorted.map((e) => {
-                const series = spark ? dailySeries(e) : null;
-                return (
-                  <tr key={e.id}>
-                    <td><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
-                      {e.app && <div className="muted small">{e.app}</div>}</td>
-                    <td><StatusLabel status={healthStatus(e)} /></td>
-                    <td>{e.health!.checks.map((c) => <div key={c.check}>{c.message}</div>)}</td>
-                    {spark && <td>{series ? <Sparkline series={series} label={`Daily events for ${e.name}`} /> : "—"}</td>}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        rows={sorted}
+        rowKey={(e) => e.id}
+        empty={<p className="muted">{empty}</p>}
+        columns={[
+          { label: "Object", value: (e) => e.displayName ?? e.name, render: (e) => (
+            <><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
+              {e.app && <div className="muted small">{e.app}</div>}</>
+          ) },
+          { label: "Status", value: (e) => (healthStatus(e) === "critical" ? 0 : 1), render: (e) => <StatusLabel status={healthStatus(e)} /> },
+          { label: "Findings", value: (e) => e.health!.checks.map((c) => c.message).join("; "),
+            render: (e) => e.health!.checks.map((c) => <div key={c.check}>{c.message}</div>) },
+          ...(spark ? [{ label: "Daily events", noSort: true, value: () => "", render: (e: Entity) => {
+            const series = dailySeries(e);
+            return series ? <Sparkline series={series} label={`Daily events for ${e.name}`} /> : "—";
+          } }] : []),
+        ]}
+      />
     </section>
   );
 }
@@ -78,30 +76,24 @@ function AtRisk() {
         Objects that depend, directly or through other objects, on something with a health finding, a broken reference or
         a disabled object. When something has several sources, one bad source only partly affects it.
       </p>
-      {rows.length === 0 ? <p className="muted">Nothing depends on an object with a problem.</p> : (
-        <div className="table-wrap">
-          <table className="mini-table">
-            <thead><tr><th>Object</th><th>Risk</th><th>Caused by</th></tr></thead>
-            <tbody>
-              {rows.slice(0, 500).map(({ entity: e, risk }) => (
-                <tr key={e.id}>
-                  <td><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
-                    {e.app && <div className="muted small">{e.app}</div>}</td>
-                  <td><StatusLabel status={risk.severity} /></td>
-                  <td>
-                    {risk.causes.map((c) => (
-                      <div key={c.root.id}>
-                        <Link to={entityPath(c.root.id)}>{c.root.displayName ?? c.root.name}</Link>: {c.problems.map((p) => p.summary).join("; ")}
-                        <span className="muted small"> · {c.depth === 1 ? "direct" : `${c.depth} hops`}{c.partial ? " · partly" : ""}</span>
-                      </div>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        rows={rows}
+        rowKey={(r) => r.entity.id}
+        empty={<p className="muted">Nothing depends on an object with a problem.</p>}
+        columns={[
+          { label: "Object", value: ({ entity: e }) => e.displayName ?? e.name, render: ({ entity: e }) => (
+            <><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>
+              {e.app && <div className="muted small">{e.app}</div>}</>
+          ) },
+          { label: "Risk", value: ({ risk }) => (risk.severity === "critical" ? 0 : 1), render: ({ risk }) => <StatusLabel status={risk.severity} /> },
+          { label: "Caused by", value: ({ risk }) => risk.causes.map((c) => c.root.displayName ?? c.root.name).join("; "), render: ({ risk }) => risk.causes.map((c) => (
+            <div key={c.root.id}>
+              <Link to={entityPath(c.root.id)}>{c.root.displayName ?? c.root.name}</Link>: {c.problems.map((p) => p.summary).join("; ")}
+              <span className="muted small"> · {c.depth === 1 ? "direct" : `${c.depth} hops`}{c.partial ? " · partly" : ""}</span>
+            </div>
+          )) },
+        ]}
+      />
     </section>
   );
 }
@@ -174,23 +166,19 @@ export function HealthPage() {
           Judged from the usage window of audit, scheduler and web logs, plus lineage: an object is unused when nothing in the
           catalog depends on it and no one ran, viewed or referenced it. Review before deleting anything.
         </p>
-        {unused.length === 0 ? <p className="muted">Nothing unused{builtin ? "" : " in custom apps"}.</p> : (
-          <div className="table-wrap">
-            <table className="mini-table">
-              <thead><tr><th>Object</th><th>App</th><th>Why</th></tr></thead>
-              <tbody>
-                {unused.slice(0, 500).map((e) => (
-                  <tr key={e.id}>
-                    <td><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link></td>
-                    <td>{e.app ?? "—"}{e.usage?.builtin && <span className="muted small"> (built-in)</span>}</td>
-                    <td>{e.usage?.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {unused.length > 500 && <p className="muted small">Showing 500 of {unused.length}. <Link to={searchPath({ usage: "unused" })}>Browse all</Link> or download the CSV.</p>}
-          </div>
-        )}
+        <DataTable
+          rows={unused}
+          rowKey={(e) => e.id}
+          empty={<p className="muted">Nothing unused{builtin ? "" : " in custom apps"}.</p>}
+          columns={[
+            { label: "Object", value: (e) => e.displayName ?? e.name, render: (e) => (
+              <><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link></>
+            ) },
+            { label: "Type", value: (e) => typeLabel(e.type) },
+            { label: "App", value: (e) => e.app ?? "", render: (e) => <>{e.app ?? "—"}{e.usage?.builtin && <span className="muted small"> (built-in)</span>}</> },
+            { label: "Why", value: (e) => e.usage?.reason ?? "" },
+          ]}
+        />
       </section>
     </div>
   );

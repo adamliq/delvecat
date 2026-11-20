@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { DataTable } from "../components/DataTable";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
@@ -32,7 +33,6 @@ export function GovernancePage() {
   const { catalog } = useCatalog();
   const [params, setParams] = useSearchParams();
   const filter = params.get("classification") ?? "";
-  const [rows, setRows] = useState(PAGE);
   const [consumerRows, setConsumerRows] = useState(PAGE);
   const byId = catalog.byId;
 
@@ -120,27 +120,26 @@ export function GovernancePage() {
 
       <section>
         <h2>Sensitive data and who can reach it</h2>
-        <div className="table-wrap">
-          <table className="mini-table">
-            <thead><tr><th>Data</th><th>Classification</th><th>Roles</th><th>Users</th></tr></thead>
-            <tbody>
-              {matching.slice(0, rows).map((s) => {
-                const a = access(s);
-                return (
-                  <tr key={s.id}>
-                    <td><span className="muted rel-type">{typeLabel(s.type)}</span> <Name e={s} /></td>
-                    <td>{effectiveClassifications(s).filter((c) => c.sensitive && matchesClass(c.name, filter)).map((c) => (
-                      <div key={c.name}>{c.name} <span className="muted small">{HOW_LABEL[c.how]}{c.via && byId.get(c.via) ? <> (<Name e={byId.get(c.via)} />)</> : null}{c.columns?.length ? <> · in <code>{c.columns.join(", ")}</code></> : null}</span></div>
-                    ))}</td>
-                    <td>{a ? <Few ids={a.roles} render={(r) => <><Name e={byId.get(r)} />{a.filteredRoles.includes(r) && <span className="muted small"> (filtered)</span>}</>} /> : <span className="muted">no role (sourcetype or table)</span>}</td>
-                    <td>{a ? (a.users.length ? <Few ids={a.users} render={(u) => <Name e={byId.get(u)} />} /> : <span className="muted">none</span>) : "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {matching.length > rows && <button type="button" className="btn btn-small" onClick={() => setRows(rows + PAGE)}>Show {Math.min(PAGE, matching.length - rows)} more of {matching.length - rows}</button>}
+        <DataTable
+          rows={matching}
+          rowKey={(s) => s.id}
+          csvName="delvecat-sensitive-data-access.csv"
+          columns={[
+            { label: "Data", value: (s) => s.displayName ?? s.name, render: (s) => <><span className="muted rel-type">{typeLabel(s.type)}</span> <Name e={s} /></> },
+            { label: "Classification", value: (s) => effectiveClassifications(s).filter((c) => c.sensitive && matchesClass(c.name, filter)).map((c) => c.name).join(", "),
+              render: (s) => effectiveClassifications(s).filter((c) => c.sensitive && matchesClass(c.name, filter)).map((c) => (
+                <div key={c.name}>{c.name} <span className="muted small">{HOW_LABEL[c.how]}{c.via && byId.get(c.via) ? <> (<Name e={byId.get(c.via)} />)</> : null}{c.columns?.length ? <> · in <code>{c.columns.join(", ")}</code></> : null}</span></div>
+              )) },
+            { label: "Roles", value: (s) => access(s)?.roles.length ?? -1, render: (s) => {
+              const a = access(s);
+              return a ? <Few ids={a.roles} render={(r) => <><Name e={byId.get(r)} />{a.filteredRoles.includes(r) && <span className="muted small"> (filtered)</span>}</>} /> : <span className="muted">no role (sourcetype or table)</span>;
+            } },
+            { label: "Users", value: (s) => access(s)?.users.length ?? -1, render: (s) => {
+              const a = access(s);
+              return a ? (a.users.length ? <Few ids={a.users} render={(u) => <Name e={byId.get(u)} />} /> : <span className="muted">none</span>) : "—";
+            } },
+          ]}
+        />
       </section>
 
       {roles.length > 0 && reachable.length > 0 && (

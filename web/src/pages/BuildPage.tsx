@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { PartsPicker } from "../components/PartsPicker";
+import { CoverageReport } from "../components/CoverageReport";
 import {
   ALL_PARTS,
   type BuildOptions,
@@ -32,6 +33,8 @@ function seconds(from?: string, to?: string) {
 }
 
 /** Build the catalog of this Splunk on demand (Splunk app only). */
+const sameParts = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
+
 export function BuildPage() {
   const { state, reload } = useCatalogState();
   const bundle = state.status === "ready" ? state.catalog.bundle : null;
@@ -174,6 +177,12 @@ export function BuildPage() {
         ) : (
           <p className="muted">No catalog has been published yet.</p>
         )}
+        {bundle?.ingestionReport?.length ? (
+          <>
+            <h3>What the last build did</h3>
+            <CoverageReport bundle={bundle} />
+          </>
+        ) : null}
       </section>
 
       {allowed === false && (
@@ -206,6 +215,21 @@ export function BuildPage() {
               disabled={running}
             />
           </label>
+          <div className="parts-reset">
+            <span className="muted small">
+              {sameParts(opts.parts, DEFAULT_PARTS)
+                ? "The default parts are selected."
+                : "Starts from the last build's selection."}
+            </span>
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => setOpts({ ...opts, parts: DEFAULT_PARTS })}
+              disabled={running || sameParts(opts.parts, DEFAULT_PARTS)}
+            >
+              Reset to defaults
+            </button>
+          </div>
           <PartsPicker
             groups={PART_GROUPS}
             selected={opts.parts}

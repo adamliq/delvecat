@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import type { EntityType, Product } from "../generated/catalog";
 import { EntityRow } from "../components/EntityBits";
 import { useCatalog } from "../lib/CatalogContext";
-import { PRODUCT_LABELS, pluralTypeLabel } from "../lib/labels";
+import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup } from "../lib/labels";
 import { type Facet, type Filters, type Sort } from "../lib/search";
 import { exportFileName, resultRows } from "../lib/exportResults";
 import { downloadText, toCsv } from "../lib/health";
@@ -49,6 +49,17 @@ function valueLabel(facet: Facet, value: string): string {
   return value;
 }
 
+/** Type values grouped by area, in the order of TYPE_GROUPS; "Other" last. */
+function groupTypes(entries: [string, number][]): [string, [string, number][]][] {
+  const order = [...TYPE_GROUPS.map(([g]) => g), "Other"];
+  const groups = new Map<string, [string, number][]>();
+  for (const e of entries) {
+    const g = typeGroup(e[0]);
+    groups.set(g, [...(groups.get(g) ?? []), e]);
+  }
+  return order.filter((g) => groups.has(g)).map((g) => [g, groups.get(g)!]);
+}
+
 function FacetBox({ facet, counts, selected, onToggle }: {
   facet: Facet;
   counts: Map<string, number>;
@@ -64,12 +75,17 @@ function FacetBox({ facet, counts, selected, onToggle }: {
   return (
     <fieldset className="facet">
       <legend>{facetTitle(facet)}</legend>
-      {shown.map(([value, n]) => (
-        <label key={value} className="facet-option">
-          <input type="checkbox" checked={selected.includes(value)} onChange={() => onToggle(value)} />
-          <span className="facet-label">{valueLabel(facet, value)}</span>
-          <span className="facet-count">{n.toLocaleString()}</span>
-        </label>
+      {(facet === "type" && open ? groupTypes(entries) : [["", shown] as [string, [string, number][]]]).map(([group, items]) => (
+        <div key={group || "all"} className={group ? "facet-group" : undefined}>
+          {group && <div className="facet-group-title">{group}</div>}
+          {items.map(([value, n]) => (
+            <label key={value} className="facet-option">
+              <input type="checkbox" checked={selected.includes(value)} onChange={() => onToggle(value)} />
+              <span className="facet-label">{valueLabel(facet, value)}</span>
+              <span className="facet-count">{n.toLocaleString()}</span>
+            </label>
+          ))}
+        </div>
       ))}
       {entries.length > FACET_PREVIEW && (
         <button type="button" className="link-btn" onClick={() => setOpen(!open)}>

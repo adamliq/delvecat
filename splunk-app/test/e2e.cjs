@@ -169,6 +169,8 @@ const sections = {
     await visit('#/schemas', 'h1', 'Schemas page', (t) => /Schema/i.test(t));
     await visit('#/coverage', 'h1', 'Coverage page', (t) => /coverage/i.test(t));
     await visit('#/health', 'h1', 'Health page', (t) => /health/i.test(t));
+    await visit('#/findings', 'h1', 'Findings page', (t) => /Findings/.test(t) && /critical/.test(t));
+    await visit('', 'h1', 'home says what the catalog covers', (t) => /What this catalog covers/.test(t) && /\d+ read/.test(t));
     await visit('#/governance', 'h1', 'Governance page', (t) => /Governance/i.test(t));
     await visit('#/insights', 'h1', 'Insights page', (t) => /Insights/i.test(t));
     await v.page.goto(app('#/sql'));
