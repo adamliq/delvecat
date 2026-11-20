@@ -181,6 +181,14 @@ const sections = {
     try { await v.page.waitForSelector('main table tbody tr', { timeout: 20000 }); } catch {}
     const rows = await v.page.locator('main table tbody tr').count();
     check('viewer: SQL console runs a query', rows > 3, `${rows} rows`);
+    const chartBtn = v.page.locator('.sql-results-bar button:has-text("Chart")');
+    if (await chartBtn.count()) await chartBtn.click();
+    check('viewer: SQL result drawn as a chart', (await v.page.locator('.sql-chart svg .chart-bar').count()) > 3);
+    await v.page.locator('textarea').fill('SELECT lastused FROM entities');
+    await v.page.click('button:has-text("Run")');
+    await sleep(500);
+    const err = await v.page.locator('.sql-error').innerText().catch(() => '');
+    check('viewer: SQL error suggests a close column', /Did you mean last_used/.test(err.replace(/\s+/g, ' ')), err.slice(0, 80));
     check('viewer has no Build button with a catalog either', (await v.page.locator('.open-buttons a:has-text("Build")').count()) === 0);
     check('viewer pages without script errors', v.errors.length === 0, v.errors.join('; '));
     await v.close();

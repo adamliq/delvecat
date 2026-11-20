@@ -1,24 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import initSqlJs, { type Database, type SqlValue } from "sql.js";
-import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
+import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
-import { downloadText, toCsv } from "../lib/health";
-import { entityPath } from "../lib/routes";
-import { riskMap } from "../lib/risk";
-import { catalogTables, EXAMPLES, fillDatabase, runQuery, type QueryResult, type Table } from "../lib/sql";
+import { EXAMPLES, runQuery, type QueryResult } from "../lib/sql";
+import { catalogDb, type CatalogDb } from "../lib/sqlDb";
+import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
+import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
+import * as store from "../lib/sqlStore";
 
-const SHOWN = 1000;
+type DbState = { status: "loading" } | { status: "error"; message: string } | ({ status: "ready" } & CatalogDb);
+type Side = "examples" | "tables" | "history" | "saved";
 
-type DbState = { status: "loading" } | { status: "ready"; db: Database; tables: Table[] } | { status: "error"; message: string };
-
-function Cell({ value, ids }: { value: SqlValue; ids: { has(id: string): boolean } }) {
-  if (value === null) return <span className="muted">NULL</span>;
-  if (value instanceof Uint8Array) return <span className="muted">[{value.length} bytes]</span>;
-  const s = String(value);
-  if (typeof value === "string" && ids.has(s)) return <Link to={entityPath(s)}>{s}</Link>;
-  return s.length > 200 ? <span title={s}>{s.slice(0, 200)}…</span> : <>{s}</>;
-}
+const when = (iso: string) => new Date(iso).toLocaleString();
 
 export default function SqlPage() {
   const { catalog } = useCatalog();
@@ -26,38 +20,51 @@ export default function SqlPage() {
   const [sql, setSql] = useState(params.get("q") ?? EXAMPLES[0].sql);
   const [db, setDb] = useState<DbState>({ status: "loading" });
   const [result, setResult] = useState<QueryResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ErrorHelp | null>(null);
+  const [hints, setHints] = useState<string[]>([]);
+  const [side, setSide] = useState<Side>("examples");
+  const [exampleFilter, setExampleFilter] = useState("");
+  const [history, setHistory] = useState(store.history);
+  const [savedQueries, setSaved] = useState(store.saved);
+  const [copied, setCopied] = useState(false);
+  const editor = useRef<SqlEditorHandle>(null);
   const lastRun = useRef<string | null>(null);
 
   useEffect(() => {
-    let db: Database | undefined;
     let cancelled = false;
     setDb({ status: "loading" });
-    initSqlJs({ locateFile: () => wasmUrl })
-      .then((SQL) => {
-        if (cancelled) return;
-        db = new SQL.Database();
-        const tables = catalogTables(catalog.bundle, riskMap(catalog));
-        fillDatabase(db, tables);
-        setDb({ status: "ready", db, tables });
-      })
+    catalogDb(catalog)
+      .then((d) => !cancelled && setDb({ status: "ready", ...d }))
       .catch((e: unknown) => !cancelled && setDb({ status: "error", message: String(e) }));
     return () => {
-      cancelled = true;
-      db?.close();
+      cancelled = true; // the database stays cached for the next visit
     };
   }, [catalog]);
+
+  const tables = db.status === "ready" ? db.tables : [];
 
   const run = useCallback((text: string) => {
     if (db.status !== "ready") return;
     lastRun.current = text;
     setParams((p) => { const next = new URLSearchParams(p); next.set("q", text); return next; }, { replace: true });
     try {
-      setResult(runQuery(db.db, text));
+      const r = runQuery(db.db, text);
+      setResult(r);
       setError(null);
+      setHistory(store.remember(text, r.rows.length));
+      // JSON paths the query reads from settings that no object has: likely a typo.
+      setHints(jsonPaths(text).filter((path) => {
+        try {
+          const n = runQuery(db.db, `SELECT count(*) FROM entities WHERE json_extract(settings, '${path.replace(/'/g, "''")}') IS NOT NULL`);
+          return n.rows[0]?.[0] === 0;
+        } catch {
+          return false;
+        }
+      }).map((path) => `No object's settings contain ${path}: check the key (an object's Raw tab shows its properties).`));
     } catch (e) {
       setResult(null);
-      setError(e instanceof Error ? e.message : String(e));
+      setHints([]);
+      setError(explainError(e instanceof Error ? e.message : String(e), text, db.tables));
     }
   }, [db, setParams]);
 
@@ -70,8 +77,36 @@ export default function SqlPage() {
     }
   }, [db, linked, run]);
 
-  const download = () => result && downloadText("delvecat-query.csv",
-    toCsv([result.columns, ...result.rows.map((r) => r.map((v) => (v instanceof Uint8Array ? "" : (v ?? undefined))))]));
+  const load = (text: string) => { setSql(text); run(text); };
+  const copyLink = async () => {
+    const url = new URL(window.location.href);
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      window.prompt("Copy this link", url.toString());
+    }
+  };
+  const saveQuery = () => {
+    const name = window.prompt("Save this query as", savedQueries.find((s) => s.sql === sql.trim())?.name ?? "");
+    if (name) { setSaved(store.save(name, sql)); setSide("saved"); }
+  };
+  const fixError = (suggestion: string) => {
+    const m = /no such (?:column|table|function): ([\w.]+)/i.exec(error?.message ?? "");
+    if (!m) return;
+    const name = m[1].split(".").pop()!;
+    const fixed = sql.replace(new RegExp(`\\b${name}\\b`), suggestion);
+    setSql(fixed);
+    run(fixed);
+  };
+
+  const examples = useMemo(() => {
+    const f = exampleFilter.trim().toLowerCase();
+    const items = EXAMPLES.map((x) => ({ ...x, ...exampleInfo(x.title) }))
+      .filter((x) => !f || `${x.title} ${x.description} ${x.group}`.toLowerCase().includes(f));
+    return EXAMPLE_GROUPS.map((g) => [g, items.filter((x) => x.group === g)] as const).filter(([, xs]) => xs.length);
+  }, [exampleFilter]);
 
   return (
     <div className="stack">
@@ -82,74 +117,111 @@ export default function SqlPage() {
 
       <div className="sql-layout">
         <div className="sql-main">
-          <label className="sql-examples">
-            <span className="muted small">Examples</span>
-            <select value="" onChange={(e) => { const x = EXAMPLES[Number(e.target.value)]; if (x) { setSql(x.sql); run(x.sql); } }}>
-              <option value="">Choose an example query…</option>
-              {EXAMPLES.map((x, i) => <option key={x.title} value={i}>{x.title}</option>)}
-            </select>
-          </label>
-          <textarea
-            className="sql-editor"
-            aria-label="SQL query"
-            spellCheck={false}
-            wrap="off"
-            value={sql}
-            rows={8}
-            onChange={(e) => setSql(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(sql); }
-            }}
-          />
+          <SqlEditor ref={editor} value={sql} onChange={setSql} onRun={() => run(sql)} tables={tables} errorLine={error?.line} />
           <div className="sql-actions">
             <button className="btn btn-primary" onClick={() => run(sql)} disabled={db.status !== "ready"}>Run</button>
-            <span className="muted small">Ctrl+Enter to run</span>
-            {result && result.rows.length > 0 && <button className="btn" onClick={download}>Download CSV</button>}
+            <button className="btn" onClick={() => setSql(formatSql(sql))}>Format</button>
+            <button className="btn" onClick={saveQuery} disabled={!sql.trim()}>Save…</button>
+            <button className="btn" onClick={() => void copyLink()}>{copied ? "Link copied" : "Copy link"}</button>
+            <span className="muted small">Ctrl+Enter to run · Tab to complete</span>
           </div>
 
           {db.status === "loading" && <p className="muted">Loading SQLite…</p>}
           {db.status === "error" && <p className="error">Could not start SQLite: {db.message}</p>}
-          {error && <p className="error" role="alert">{error}</p>}
-          {result && (
-            <div>
-              <p className="muted small" role="status">
-                {result.rows.length.toLocaleString()} row{result.rows.length === 1 ? "" : "s"} in {result.ms.toFixed(0)} ms
-                {result.rows.length > SHOWN && <> · showing the first {SHOWN.toLocaleString()}; the CSV has them all</>}
-              </p>
-              {result.columns.length > 0 && (
-                <div className="table-wrap">
-                  <table className="mini-table sql-results">
-                    <thead><tr>{result.columns.map((c, i) => <th key={i}>{c}</th>)}</tr></thead>
-                    <tbody>
-                      {result.rows.slice(0, SHOWN).map((r, i) => (
-                        <tr key={i}>{r.map((v, j) => <td key={j}><Cell value={v} ids={catalog.byId} /></td>)}</tr>
-                      ))}
-                    </tbody>
-                  </table>
+          {error && (
+            <div className="error sql-error" role="alert">
+              <div>{error.message}{error.line ? <span className="muted small"> · line {error.line}, column {error.column}</span> : null}</div>
+              {error.suggestion && (
+                <div>
+                  Did you mean <code>{error.suggestion}</code>?{" "}
+                  <button type="button" className="btn btn-small" onClick={() => fixError(error.suggestion!)}>Use {error.suggestion}</button>
                 </div>
               )}
             </div>
           )}
+          {hints.map((h) => <p key={h} className="notice small">{h}</p>)}
+          {result && <SqlResults result={result} ids={catalog.byId} />}
         </div>
 
-        <aside className="sql-schema" aria-label="Tables">
-          <h2>Tables</h2>
-          {db.status === "ready" && db.tables.map((t) => (
+        <aside className="sql-schema" aria-label="Examples, tables, history and saved queries">
+          <div className="seg sql-side-tabs" role="tablist">
+            {(["examples", "tables", "history", "saved"] as Side[]).map((s) => (
+              <button key={s} type="button" role="tab" aria-selected={side === s} className={side === s ? "active" : undefined} onClick={() => setSide(s)}>
+                {s === "examples" ? "Examples" : s === "tables" ? "Tables" : s === "history" ? "History" : `Saved${savedQueries.length ? ` (${savedQueries.length})` : ""}`}
+              </button>
+            ))}
+          </div>
+
+          {side === "examples" && (
+            <div className="sql-examples-list">
+              <input type="search" placeholder="Search examples" aria-label="Search examples" value={exampleFilter} onChange={(e) => setExampleFilter(e.target.value)} />
+              {examples.map(([group, xs]) => (
+                <div key={group}>
+                  <div className="facet-group-title">{group}</div>
+                  <ul className="plain-list">
+                    {xs.map((x) => (
+                      <li key={x.title}>
+                        <button type="button" className="link-btn sql-example" onClick={() => load(x.sql)}>{x.title}</button>
+                        {x.description && <div className="muted small">{x.description}</div>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {!examples.length && <p className="muted small">No example matches.</p>}
+            </div>
+          )}
+
+          {side === "tables" && db.status === "ready" && db.tables.map((t) => (
             <details key={t.name}>
               <summary>
                 <code>{t.name}</code> <span className="muted small">{t.rows.length.toLocaleString()}</span>
               </summary>
               <p className="small">{t.doc}</p>
               <ul className="plain-list small">
+                <li><button type="button" className="link-btn" onClick={() => editor.current?.insert(t.name)} title="Insert at the cursor"><code>{t.name}</code></button> <span className="muted">insert the table name</span></li>
                 {t.columns.map((c) => (
-                  <li key={c.name}><code>{c.name}</code> <span className="muted">{c.type.toLowerCase()}{c.doc ? ` · ${c.doc}` : ""}</span></li>
+                  <li key={c.name}>
+                    <button type="button" className="link-btn" onClick={() => editor.current?.insert(c.name)} title="Insert at the cursor"><code>{c.name}</code></button>{" "}
+                    <span className="muted">{c.type.toLowerCase()}{c.doc ? ` · ${c.doc}` : ""}</span>
+                  </li>
                 ))}
               </ul>
-              <button className="btn btn-small" onClick={() => { const q = `SELECT * FROM ${t.name} LIMIT 100;`; setSql(q); run(q); }}>
-                Preview
-              </button>
+              <button className="btn btn-small" onClick={() => load(`SELECT * FROM ${t.name} LIMIT 100;`)}>Preview</button>
             </details>
           ))}
+
+          {side === "history" && (
+            <div>
+              {history.length === 0 ? <p className="muted small">Queries you run appear here (in this browser only).</p> : (
+                <>
+                  <ul className="plain-list sql-history">
+                    {history.map((h) => (
+                      <li key={h.sql}>
+                        <button type="button" className="link-btn" onClick={() => load(h.sql)} title={h.sql}><code>{h.sql.replace(/\s+/g, " ").slice(0, 90)}</code></button>
+                        <div className="muted small">{when(h.at)}{h.rows !== undefined ? ` · ${h.rows.toLocaleString()} rows` : ""}</div>
+                      </li>
+                    ))}
+                  </ul>
+                  <button type="button" className="btn btn-small" onClick={() => { store.clearHistory(); setHistory([]); }}>Clear history</button>
+                </>
+              )}
+            </div>
+          )}
+
+          {side === "saved" && (
+            savedQueries.length === 0 ? <p className="muted small">Save a query with <em>Save…</em>; saved queries stay in this browser.</p> : (
+              <ul className="plain-list sql-history">
+                {savedQueries.map((s) => (
+                  <li key={s.name}>
+                    <button type="button" className="link-btn" onClick={() => load(s.sql)} title={s.sql}>{s.name}</button>{" "}
+                    <button type="button" className="link-btn muted small" onClick={() => setSaved(store.unsave(s.name))} aria-label={`Delete saved query ${s.name}`}>delete</button>
+                    <div className="muted small"><code>{s.sql.replace(/\s+/g, " ").slice(0, 70)}</code></div>
+                  </li>
+                ))}
+              </ul>
+            )
+          )}
         </aside>
       </div>
     </div>

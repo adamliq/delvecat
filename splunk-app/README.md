@@ -221,6 +221,15 @@ one. The same from a search:
   shows the same for the last build and has *Reset to defaults* for the parts
   (it otherwise starts from the last build's selection).
 
+- **SQL console**: highlighted editor with table and column suggestions as you
+  type (Tab or Enter), *Format*, and errors that say where they are and suggest a
+  close name ("Did you mean `last_used`?"); a note when a JSON path in the query is
+  in no object's settings. Results sort, filter, collapse long JSON and download as
+  CSV; a label-and-number result can be drawn as bars (dates as a line). Examples
+  are grouped and searchable; history (last 50) and saved queries stay in your
+  browser; *Copy link* shares a query. The database is built once per catalog and
+  reused when you come back to the page.
+
 ## Publish a catalog
 
 ```sh
