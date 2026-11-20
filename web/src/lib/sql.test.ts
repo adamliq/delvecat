@@ -138,4 +138,17 @@ describe("SQL console", () => {
     const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("SPL2 modules"))!.sql).rows;
     expect(rows).toEqual([["web", "web_errors", "jlee", "power, user", "index:web"]]);
   });
+
+  it("lists external datastores with their connections", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const conn = ent("spl2Connection", "azure_lake_conn", { properties: { dataSource: "Azure", authMethods: ["servicePrincipal"] } });
+    const ds = ent("spl2Dataset", "signin_archive", {
+      app: "sec",
+      properties: { kind: "azure_abs", dataSource: "Azure", connection: "azure_lake_conn", storageAccount: "lake", container: "logs", directory: "entra" },
+    });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [conn, ds] }));
+    const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("External datastores"))!.sql).rows;
+    expect(rows).toEqual([["sec", "signin_archive", "azure_abs", "Azure", "azure_lake_conn", '["servicePrincipal"]', "lake", "logs", "entra"]]);
+  });
 });

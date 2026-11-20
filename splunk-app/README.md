@@ -112,8 +112,11 @@ one. The same from a search:
   ID, ...) and from where, never keys or secrets.
 - **SPL2 (Splunk 10 and later)**: *SPL2 modules, datasets and connections*
   lists SPL2 modules (owner, permissions, source, the datasets they read),
-  SPL2-native datasets, and the connections SPL2 runs against (name, host, port,
-  account). Skipped on Splunk 9.x. SQL: "SPL2 modules, who can read them and
+  SPL2-native datastores (Azure Blob / Data Lake Storage, AWS, Snowflake: data
+  source, connection, storage account, container, directory, format), and
+  connections (Splunk: name, host, port, account; Azure and other external
+  stores: data source, auth method, tenant), never credentials. SQL: "External
+  datastores (Azure, AWS, Snowflake) and their connections". Skipped on Splunk 9.x. SQL: "SPL2 modules, who can read them and
   what they read".
 - **Index-time routing, filtering and masking**: a sourcetype's page lists what
   its `props.conf` rules do to its events before they are indexed: routed to

@@ -56,6 +56,20 @@ def _pages(ctx: Ctx, path: str, params: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
+def _dataset_detail(ctx: Ctx, d: dict[str, Any]) -> dict[str, Any]:
+    """The dataset with its properties (the list may leave them out)."""
+    if any(isinstance(d.get(k), dict) for k in ("properties", "datasetConfig")):
+        return d
+    key = d.get("id") or d.get("resourceName")
+    if not key:
+        return d
+    try:
+        full = ctx.transport.get(f"{API}/datasets/{str(key).lstrip('~.')}", {})
+    except (EndpointNotFound, EndpointForbidden):
+        return d
+    return {**d, **full} if isinstance(full, dict) else d
+
+
 def app_of(namespace: str | None) -> str | None:
     m = _APP_NAMESPACE.match(namespace or "")
     return m.group(1) if m else None
@@ -84,6 +98,79 @@ def spl2_reads(definition: str, kinds: dict[str, str]) -> list[tuple[str, str]]:
     return out
 
 
+# Unified (Federated Analytics) connections and datasets reach external stores: Amazon S3,
+# Azure Blob Storage / Data Lake, Snowflake, Splunk DDSS. Their credentials (auths,
+# datasetSecret) are never read; only settings that say where the data is.
+_SECRET_KEY = re.compile(r"(auth|secret|password|passwd|credential|token|key$|apikey)", re.I)
+_LOCATION_KEYS = (
+    "storageAccount",
+    "container",
+    "containerName",
+    "directory",
+    "filePrefix",
+    "dataFormat",
+    "compressionType",
+    "region",
+    "bucket",
+    "database",
+    "schema",
+    "table",
+    "warehouse",
+)
+_AZURE_KINDS = ("azure_blob", "azure_abs", "dmx_azure_blob")
+
+
+def _location(d: dict[str, Any]) -> dict[str, Any]:
+    """Where a dataset's data is, from the dataset or its properties/datasetConfig."""
+    found: dict[str, Any] = {}
+    for src in (d, d.get("properties"), d.get("datasetConfig"), d.get("connectionProperties")):
+        if not isinstance(src, dict):
+            continue
+        for k in _LOCATION_KEYS:
+            v = src.get(k)
+            if v not in (None, "", {}, []) and k not in found and isinstance(v, (str, int)):
+                found["container" if k == "containerName" else k] = v
+    return found
+
+
+def data_source(item: dict[str, Any]) -> str | None:
+    """AWS, Azure, Snowflake, DDSS or Splunk."""
+    ds = item.get("dataSource") or item.get("data_source")
+    if not ds and str(item.get("kind") or "").lower() in _AZURE_KINDS:
+        ds = "Azure"
+    if not ds and (item.get("hostnameip") or item.get("serviceaccountuser")):
+        ds = "Splunk"
+    return str(ds) if ds else None
+
+
+def connection_properties(c: dict[str, Any], status: str) -> dict[str, Any]:
+    """A connection, Splunk or unified, without its credentials."""
+    auths = c.get("auths") if isinstance(c.get("auths"), list) else []
+    methods = sorted(
+        {str(a.get("authMethod")) for a in auths if isinstance(a, dict) and a.get("authMethod")}
+    )
+    tenants = sorted(
+        {str(a.get("tenantId")) for a in auths if isinstance(a, dict) and a.get("tenantId")}
+    )
+    props: dict[str, Any] = {
+        "dataSource": data_source(c),
+        "description": c.get("description") or None,
+        "created": c.get("created") or None,
+        "host": c.get("hostnameip") or None,
+        "port": to_int(c.get("port")),
+        "account": c.get("serviceaccountuser") or None,
+        "connectionType": c.get("connectionType") or None,
+        "supportedCapabilities": c.get("supportedCapabilities") or None,
+        "accessLevel": c.get("accessLevel") or c.get("visibility") or None,
+        "authMethods": methods or None,
+        # Azure: the Entra ID tenant the app registration is in (an id, not a secret).
+        "azureTenantId": (tenants[0] if len(tenants) == 1 else tenants) or None,
+        "status": status,
+    }
+    props.update({k: v for k, v in _location(c).items() if not _SECRET_KEY.search(k)})
+    return props
+
+
 def extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     # Connections: the Splunk deployments SPL2 runs against. Published ones are in effect;
@@ -105,13 +192,8 @@ def extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
                 type="spl2Connection",
                 name=c["name"],
                 instance=ctx.instance,
-                properties={
-                    "created": c.get("created") or None,
-                    "host": c.get("hostnameip") or None,
-                    "port": to_int(c.get("port")),
-                    "account": c.get("serviceaccountuser") or None,
-                    "status": "published" if c["name"] in names else "draft",
-                },
+                description=c.get("description") or None,
+                properties=connection_properties(c, "published" if c["name"] in names else "draft"),
             )
         )
         n += 1
@@ -138,6 +220,9 @@ def extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
                 updatedAt=d.get("updatedAt") or None,
                 properties={
                     "kind": d.get("kind"),
+                    "dataSource": data_source(d),
+                    "connection": d.get("connection") or None,
+                    **_location(_dataset_detail(ctx, d)),
                     "namespace": d.get("namespace") or None,
                     "module": d.get("module") or None,
                     "resourceName": d.get("resourceName") or None,
@@ -146,6 +231,8 @@ def extract_spl2(ctx: Ctx, out: ExtractResult) -> int:
         )
         if e := app_edge(ctx, app, eid):
             out.edges.append(e)
+        if d.get("connection"):
+            out.refs.append(ref(eid, "spl2Connection", str(d["connection"]), "uses"))
         n += 1
 
     # Modules: SPL2 code saved in an app, with its own permissions.

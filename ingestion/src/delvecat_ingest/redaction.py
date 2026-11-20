@@ -212,11 +212,26 @@ def redact_bundle(
             for k in HOST_PROPS:
                 if props.get(k) and str(props[k]) in hosts:
                     props[k] = rename("host", str(props[k]))
-        if e["type"] == "spl2Connection":
-            if profile.urls == "drop" and props.pop("host", None):
-                counts["urls"] += 1
-            if profile.users == "pseudonymize" and props.get("account"):
-                props["account"] = rename("user", str(props["account"]))
+        if e["type"] in ("spl2Connection", "spl2Dataset") and profile.urls == "drop":
+            # Where external data is, and the tenant it is in, identify the customer.
+            for k in (
+                "host",
+                "azureTenantId",
+                "storageAccount",
+                "container",
+                "directory",
+                "bucket",
+                "database",
+                "warehouse",
+            ):
+                if props.pop(k, None):
+                    counts["urls"] += 1
+        if (
+            e["type"] == "spl2Connection"
+            and profile.users == "pseudonymize"
+            and props.get("account")
+        ):
+            props["account"] = rename("user", str(props["account"]))
         if e["type"] == "federatedProvider":
             # Where the remote data is and the account used to read it.
             if profile.urls == "drop":

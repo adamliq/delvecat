@@ -24,6 +24,7 @@ def test_connections_name_host_port_account_only():
     _, by_id, _ = _build()
     c = by_id["acme:spl2Connection:soc_cluster"]
     assert c["properties"] == {
+        "dataSource": "Splunk",
         "host": "https://soc-sh.acme.example",
         "port": 8089,
         "account": "spl2_svc",
@@ -49,7 +50,11 @@ def test_module_with_owner_permissions_source_and_lineage():
 def test_spl2_native_datasets_only():
     bundle, by_id, _ = _build()
     native = [e for e in bundle["entities"] if e["type"] == "spl2Dataset"]
-    assert [(e["name"], e["properties"]["kind"]) for e in native] == [("vpc_flow_s3", "fa_aws_s3")]
+    assert sorted((e["name"], e["properties"]["kind"]) for e in native) == [
+        ("signin_archive", "azure_abs"),
+        ("vpc_flow_s3", "fa_aws_s3"),
+        ("web_export", "dmx_azure_blob"),
+    ]
 
 
 def test_helpers():
@@ -87,3 +92,51 @@ def test_public_profile_hides_connection_hosts_and_accounts():
     redact_bundle(bundle, load_profile("public"), salt="t")
     text = json.dumps([e for e in bundle["entities"] if e["type"] == "spl2Connection"])
     assert "soc-sh.acme.example" not in text and "spl2_svc" not in text
+
+
+def test_azure_connection_without_credentials():
+    bundle, by_id, _ = _build()
+    c = by_id["acme:spl2Connection:azure_lake_conn"]
+    p = c["properties"]
+    assert p["dataSource"] == "Azure" and p["authMethods"] == ["servicePrincipal"]
+    assert p["azureTenantId"] == "9a8b7c6d-1111-2222-3333-444455556666"
+    assert p["storageAccount"] == "acmesecuritylake" and p["container"] == "logs"
+    assert p["supportedCapabilities"] == ["search", "export"] and p["accessLevel"] == "PUBLISHED"
+    assert c["description"] == "Security data lake on ADLS"
+    text = json.dumps(bundle)
+    assert "never-store-this" not in text and "app-id-1" not in text
+
+
+def test_azure_datastores_with_location_and_connection():
+    bundle, by_id, edges = _build()
+    lake = by_id["acme:spl2Dataset:~.apps.acme_secops.signin_archive"]
+    assert lake["app"] == "acme_secops"
+    want = {
+        "kind": "azure_abs",
+        "dataSource": "Azure",
+        "connection": "azure_lake_conn",
+        "storageAccount": "acmesecuritylake",
+        "container": "logs",
+        "directory": "entra/signins",
+        "dataFormat": "parquet",
+    }
+    assert {k: lake["properties"].get(k) for k in want} == want
+    assert (lake["id"], "acme:spl2Connection:azure_lake_conn", "uses") in edges
+    export = by_id["acme:spl2Dataset:~.apps.acme_web.web_export"]
+    p = export["properties"]
+    assert p["dataSource"] == "Azure" and p["kind"] == "dmx_azure_blob"
+    assert (p["storageAccount"], p["container"], p["directory"]) == (
+        "acmeexports",
+        "splunk-export",
+        "web",
+    )
+    assert p["compressionType"] == "gzip" and p["filePrefix"] == "web_"
+    assert "never-store-this-either" not in json.dumps(bundle)
+
+
+def test_public_profile_hides_azure_locations_and_tenant():
+    bundle, _, _ = _build()
+    redact_bundle(bundle, load_profile("public"), salt="t")
+    text = json.dumps([e for e in bundle["entities"] if e["type"].startswith("spl2")])
+    for v in ("acmesecuritylake", "acmeexports", "9a8b7c6d-1111", "entra/signins"):
+        assert v not in text

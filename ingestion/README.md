@@ -96,13 +96,28 @@ splunkd sidecar; GET requests only):
   index, lookup or saved search, as the orchestrator's own dataset list names
   them; `from $statement` references within the module are not datasets.
 - `spl2Dataset`: datasets of SPL2-native kinds (anything but indexes, lookups
-  and saved searches, which are catalogued as themselves), e.g. Federated
-  Analytics on AWS (`fa_aws_lake`, `fa_aws_s3`).
+  and saved searches, which are catalogued as themselves): Federated Analytics
+  datastores on AWS (`fa_aws_lake`, `fa_aws_s3`), Azure (`azure_blob`,
+  `azure_abs` for Azure Blob Storage / Data Lake Storage, and `dmx_azure_blob`
+  export destinations), Snowflake and others. Each records its `dataSource`
+  (AWS, Azure, Snowflake, DDSS, Splunk), its `connection` (a `uses` edge to the
+  connection) and where the data is: storage account, container, directory, file
+  prefix, format and compression (or region and bucket, database and table).
+  The dataset's secret (`datasetSecret`) is never read.
+- Unified (Federated Analytics) connections are `spl2Connection` objects too,
+  with `dataSource`, connection type, capabilities, access level, the
+  authentication methods used (e.g. `servicePrincipal`) and, for Azure, the
+  Entra ID tenant id. Credentials (`auths`) are never read.
+
+Azure datastores and unified connections are Splunk Cloud features (behind
+Splunk's Federated Analytics flags); Splunk Enterprise 10.4 refuses to create
+them, so they are tested against the shapes of Splunk's own request schemas.
 
 Splunk 9.x has no orchestrator: the part is reported as skipped. After a
 restart the orchestrator answers 404 for about a minute until it is up. Listing
 modules needs `list_spl2_modules`. The public profile drops connection hosts and
-pseudonymizes their accounts.
+pseudonymizes their accounts; it also drops storage accounts, containers,
+directories, buckets and the Azure tenant id.
 
 ### Index-time routing, filtering and masking
 

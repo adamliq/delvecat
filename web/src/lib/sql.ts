@@ -378,6 +378,21 @@ WHERE m.type = 'spl2Module'
 ORDER BY m.app, m.name;`,
   },
   {
+    title: "External datastores (Azure, AWS, Snowflake) and their connections",
+    sql: `SELECT d.app, d.name AS datastore, json_extract(d.settings, '$.kind') AS kind,
+       json_extract(d.settings, '$.dataSource') AS data_source,
+       json_extract(d.settings, '$.connection') AS connection,
+       json_extract(c.settings, '$.authMethods') AS auth,
+       coalesce(json_extract(d.settings, '$.storageAccount'), json_extract(d.settings, '$.bucket')) AS account_or_bucket,
+       json_extract(d.settings, '$.container') AS container,
+       json_extract(d.settings, '$.directory') AS directory
+FROM entities d
+LEFT JOIN entities c ON c.type = 'spl2Connection' AND c.instance = d.instance
+     AND c.name = json_extract(d.settings, '$.connection')
+WHERE d.type = 'spl2Dataset'
+ORDER BY data_source, d.app, d.name;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e
