@@ -19,7 +19,8 @@ import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
-import { PropValue } from "../components/PropValue";
+import { PropContext, PropValue } from "../components/PropValue";
+import { propLabel } from "../lib/propertyFormat";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
 import { relationGroups, type RelationGroup } from "../lib/relations";
@@ -159,6 +160,7 @@ export function EntityPage() {
       </div>
 
       {tab === "overview" && (
+        <PropContext.Provider value={{ catalog, entity }}>
         <div className="stack">
           <dl className="facts">
             <dt>Product</dt>
@@ -232,7 +234,7 @@ export function EntityPage() {
               <h2>Properties</h2>
               <dl className="facts">
                 {rest.map(([k, v]) => (
-                  <div key={k} className="fact-pair"><dt>{k}</dt><dd><PropValue value={v} /></dd></div>
+                  <div key={k} className="fact-pair"><dt title={k}>{propLabel(k)}</dt><dd><PropValue value={v} name={k} /></dd></div>
                 ))}
               </dl>
             </section>
@@ -247,6 +249,7 @@ export function EntityPage() {
             </section>
           )}
         </div>
+        </PropContext.Provider>
       )}
 
       {tab === "fields" && (entity.type === "sourcetype" ? <SchemaTab catalog={catalog} entity={entity} /> : fields && <FieldsTab table={fields} />)}

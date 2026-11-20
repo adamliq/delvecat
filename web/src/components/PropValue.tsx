@@ -1,13 +1,39 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
+import { Link } from "react-router-dom";
+import type { Entity } from "../generated/catalog";
+import type { Catalog } from "../lib/catalog";
+import { isIsoDate, numberWithUnit, propLabel, REFERENCE_KEYS, relative, valueLabel } from "../lib/propertyFormat";
 
 const isScalar = (v: unknown) => v === null || ["string", "number", "boolean"].includes(typeof v);
 
-/** Render arbitrary JSON property values: scalars, lists, maps and lists of records. */
-export function PropValue({ value }: { value: unknown }): ReactNode {
+/** The object whose properties are shown, so names of other objects can link to them. */
+export const PropContext = createContext<{ catalog: Catalog; entity: Entity } | null>(null);
+
+function Reference({ type, name }: { type: string; name: string }) {
+  const ctx = useContext(PropContext);
+  if (!ctx || !type) return <>{name}</>;
+  const target = ctx.catalog.entities.find(
+    (e) => e.type === type && e.instance === ctx.entity.instance && e.name === name,
+  );
+  return target ? <Link to={`/entity/${encodeURIComponent(target.id)}`}>{name}</Link> : <>{name}</>;
+}
+
+/** A property value, readable: units from its key, local dates, links to named objects. */
+export function PropValue({ value, name }: { value: unknown; name?: string }): ReactNode {
   if (value === null || value === undefined || value === "") return <span className="muted">—</span>;
   if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (typeof value === "number") return value.toLocaleString();
-  if (typeof value === "string") return value;
+  if (typeof value === "number") return (name && numberWithUnit(name, value)) ?? value.toLocaleString();
+  if (typeof value === "string") {
+    if (isIsoDate(value)) {
+      return (
+        <time dateTime={value} title={value}>
+          {new Date(value).toLocaleString()} <span className="muted">({relative(value)})</span>
+        </time>
+      );
+    }
+    if (name && REFERENCE_KEYS[name]) return <Reference type={REFERENCE_KEYS[name]} name={value} />;
+    return valueLabel(name, value);
+  }
   if (Array.isArray(value)) {
     if (!value.length) return <span className="muted">none</span>;
     if (value.every(isScalar)) {
@@ -24,10 +50,10 @@ export function PropValue({ value }: { value: unknown }): ReactNode {
     return (
       <div className="table-wrap">
         <table className="mini-table">
-          <thead><tr>{cols.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+          <thead><tr>{cols.map((c) => <th key={c}>{propLabel(c)}</th>)}</tr></thead>
           <tbody>
             {records.map((r, i) => (
-              <tr key={i}>{cols.map((c) => <td key={c}><PropValue value={r?.[c]} /></td>)}</tr>
+              <tr key={i}>{cols.map((c) => <td key={c}><PropValue value={r?.[c]} name={c} /></td>)}</tr>
             ))}
           </tbody>
         </table>
@@ -39,7 +65,7 @@ export function PropValue({ value }: { value: unknown }): ReactNode {
   return (
     <dl className="facts nested">
       {entries.map(([k, v]) => (
-        <div key={k} className="fact-pair"><dt>{k}</dt><dd><PropValue value={v} /></dd></div>
+        <div key={k} className="fact-pair"><dt title={k}>{propLabel(k)}</dt><dd><PropValue value={v} name={k} /></dd></div>
       ))}
     </dl>
   );
