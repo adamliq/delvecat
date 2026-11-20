@@ -158,3 +158,16 @@ def test_cli_field_indexes(tmp_path, capsys):
     assert main([*base, "--field-indexes", "bad name"]) == 2
     assert "invalid index" in capsys.readouterr().err
     assert main([*base, "--field-indexes", "main,_internal"]) == 0
+
+
+def test_build_command_accepts_every_part_name():
+    import re
+
+    from delvecat_ingest.inapp import PARTS
+
+    # The search command validates parts= with a pattern; a part name it rejects makes
+    # every page build that includes it fail (as "spl2", the first with a digit, did).
+    source = Path(__file__).parents[2] / "splunk-app" / "delvecat" / "bin" / "delvecatbuild.py"
+    pattern = re.search(r'Match\("parts", r"([^"]+)"\)', source.read_text(encoding="utf-8"))
+    assert pattern, "parts validator not found"
+    assert re.fullmatch(pattern.group(1), ",".join(PARTS))

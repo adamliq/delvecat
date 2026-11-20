@@ -72,7 +72,7 @@ class DelveCatBuild(GeneratingCommand):
     # Publish even if the new catalog is much smaller than the current one.
     replacesmaller = Option(require=False, validate=validators.Boolean(), default=False)
     # Comma-separated parts to run (see inapp.PARTS); all of them when not given.
-    parts = Option(require=False, validate=validators.Match("parts", r"^[A-Za-z, ]*$"))
+    parts = Option(require=False, validate=validators.Match("parts", r"^[A-Za-z0-9, ]*$"))
     # Field discovery only in these indexes (comma-separated, * wildcards).
     fieldindexes = Option(
         require=False, validate=validators.Match("fieldindexes", r"^[A-Za-z0-9_*, -]*$")
