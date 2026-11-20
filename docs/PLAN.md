@@ -84,6 +84,7 @@ Common aspects on every entity: `description`, `owners`, `tags`,
 | Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels, `scheduledView` (dashboard PDF by email), Pivot reports |
 | Ingestion | `input` (monitor, HEC token *name*, scripted, modular, splunktcp, batch, Windows event log/perfmon/registry/AD/host/network/print, PowerShell), `forwarder` |
 | SPL2 (Splunk 10+) | `spl2Connection`, `spl2Module` (source, permissions, datasets read), `spl2Dataset` (SPL2-native kinds) |
+| Outputs and acceleration | `outputGroup` (tcpout, syslog, httpout, rfs), `accelerationSummary` (data model and report acceleration) |
 | Federated search | `federatedProvider` (remote Splunk, Amazon S3), `federatedIndex` |
 | Cloud | ACS: indexes, HEC token metadata, IP allow lists, installed apps; Ingest Actions rulesets; Edge/Ingest Processor pipelines (SPL2) — later |
 

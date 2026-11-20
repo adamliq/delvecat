@@ -147,6 +147,29 @@ modules needs `list_spl2_modules`. The public profile drops connection hosts and
 pseudonymizes their accounts; it also drops storage accounts, containers,
 directories, buckets and the Azure tenant id.
 
+### Forwarding outputs
+
+Part `outputs` reads `outputs.conf` (`configs/conf-outputs`): each group as
+`outputGroup` named `tcpout:<group>`, `syslog:<group>`, `httpout` or
+`rfs:<name>` (Ingest Actions destinations, e.g. S3): receiving servers or
+indexer discovery (with its cluster manager), acknowledgement, compression,
+SSL, protocol, HEC URI, object store; whether it is a default group. The
+instance records its default groups and `indexAndForward` (only when forwarding
+is configured). Index-time transforms that forward (`_TCP_ROUTING`,
+`_SYSLOG_ROUTING`, `_HTTP_ROUTING`) `write` to their groups, and HEC tokens with
+an `outputgroup` `feed` theirs. SSL passwords, `pass4SymmKey` (which Splunk's
+REST API returns in clear) and HEC tokens are never read; the public profile
+drops servers, URIs and paths.
+
+### Acceleration summaries
+
+Part `accelerationSummaries` reads `admin/summarization` (data model summaries,
+`by_tstats=true`, and report summaries) as `accelerationSummary`: size,
+completeness, time range, last use and number of uses, buckets, last build and
+its error, `accelerates` edges to the data model or saved searches. Checks:
+`summaryError` (last build failed) and `summaryUnused` (no search used it for
+30 days, or ever: it costs disk and CPU), which also lists it as unused.
+
 ### Data Management catalog
 
 Part `dataManagementCatalog` reads the Data Management metadata catalog

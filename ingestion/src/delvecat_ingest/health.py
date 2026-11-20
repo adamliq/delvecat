@@ -46,6 +46,7 @@ FORWARDER_SILENT_HOURS = 1
 HEALTH_WINDOW_DAYS = 7
 TOKEN_EXPIRY_WARNING_DAYS = 14  # a token expiring this soon breaks whatever uses it
 TOKEN_STALE_DAYS = 90  # not used for this long: probably not needed
+SUMMARY_UNUSED_DAYS = 30  # an acceleration summary no search used for this long
 RETENTION_SIZE_RATIO = 0.9  # an index this full freezes data by size, not by age
 ALERT_NOISY_PER_DAY = 24  # an alert firing more than hourly on average is hard to act on
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
@@ -375,6 +376,33 @@ def _routing_checks(
         )
 
 
+def _summary_checks(e: dict[str, Any], as_of: datetime, checks: list[dict[str, str]]) -> None:
+    """An acceleration summary whose last build failed, or that no search has used for a
+    while (it still costs disk and the CPU to keep it built)."""
+    p = e.get("properties") or {}
+    if p.get("lastError"):
+        _check(checks, "summaryError", "warning", f"Last build failed: {p['lastError']}")
+    size = f" ({p['sizeMB']:,} MB)" if p.get("sizeMB") else ""
+    last = _age_hours(as_of, p.get("lastAccess"))
+    built = _age_hours(as_of, p.get("lastBuilt"))
+    if last is not None and last > SUMMARY_UNUSED_DAYS * 24:
+        _check(
+            checks,
+            "summaryUnused",
+            "warning",
+            f"No search has used it for {_fmt_age(last)}{size}: it costs disk and CPU to keep "
+            "built; consider turning acceleration off",
+        )
+    elif last is None and built is not None and built > SUMMARY_UNUSED_DAYS * 24:
+        _check(
+            checks,
+            "summaryUnused",
+            "warning",
+            f"No search has ever used it{size}: it costs disk and CPU to keep built; "
+            "consider turning acceleration off",
+        )
+
+
 def _suppression_checks(e: dict[str, Any], as_of: datetime, checks: list[dict[str, str]]) -> None:
     """An ES suppression that has ended (suppresses nothing) or that hides every finding
     of a detection (nothing narrows it but the detection's name)."""
@@ -503,6 +531,8 @@ def evaluate_health(
             _hec_checks(e, usage, checks)
         elif e["type"] == "transform" and e.get("instance") in with_indexes:
             _routing_checks(e, index_names, checks)
+        elif e["type"] == "accelerationSummary":
+            _summary_checks(e, as_of, checks)
         elif e["type"] == "esSuppression":
             _suppression_checks(e, as_of, checks)
         elif e["type"] == "authToken":
@@ -587,6 +617,10 @@ def mark_unused(
             ]
         ):
             reason = f"Authentication token: {stale[0]['message']}"
+        elif t == "accelerationSummary" and any(
+            c["check"] == "summaryUnused" for c in (e.get("health") or {}).get("checks", [])
+        ):
+            reason = "Acceleration summary no search uses"
         elif t == "esSuppression" and any(
             c["check"] == "suppressionExpired" for c in (e.get("health") or {}).get("checks", [])
         ):

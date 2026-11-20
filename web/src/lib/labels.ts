@@ -27,6 +27,8 @@ const SPECIAL: Partial<Record<EntityType, string>> = {
   esQueue: "Queue",
   dmCatalogObject: "Data Management Catalog Object",
   addOnAccount: "Add-on Account",
+  outputGroup: "Output Group",
+  accelerationSummary: "Acceleration Summary",
   responseTemplate: "Response Plan",
   kvCollection: "KV Store Collection",
   correlationSearch: "Detection",

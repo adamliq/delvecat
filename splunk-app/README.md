@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 54 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 56 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -105,6 +105,13 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Forwarding outputs**: where this Splunk sends data (indexer groups, indexer
+  discovery, syslog, HTTP, Ingest Actions destinations), linked to the transforms
+  and HEC tokens that use them; never passwords, keys or tokens. SQL: "Where data
+  is forwarded".
+- **Acceleration summaries**: data model and report acceleration with size,
+  completeness and last use; summaries no search uses (30 days) and failed builds
+  are flagged. SQL: "Acceleration summaries by size and last use".
 - **Enterprise Security triage**: review statuses, finding suppressions (with
   the detections they mute; ended ones and ones hiding a whole detection are
   flagged), and on ES 8 finding aggregation and suppression rules, automation

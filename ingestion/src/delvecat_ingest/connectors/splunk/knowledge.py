@@ -577,7 +577,18 @@ def _add_transform(ctx: Ctx, out: ExtractResult, e: dict[str, Any]) -> dict[str,
     for a in actions:
         if a["action"] == "routeToIndex":
             out.refs.extend(ref(ent["id"], "index", t, "writes") for t in a.get("targets", []))
+        elif a["action"] in _FORWARD_KIND:
+            kind = _FORWARD_KIND[a["action"]]
+            targets = a.get("targets") or ([""] if kind == "httpout" else [])
+            out.refs.extend(
+                ref(ent["id"], "outputGroup", f"{kind}:{t}" if t else kind, "writes")
+                for t in targets
+            )
     return ent
+
+
+# Index-time forwarding -> the outputs.conf stanza kind it names.
+_FORWARD_KIND = {"forwardTcp": "tcpout", "forwardSyslog": "syslog", "forwardHttp": "httpout"}
 
 
 def extract_transforms(ctx: Ctx, out: ExtractResult) -> int:

@@ -176,4 +176,18 @@ describe("SQL console", () => {
     const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Microsoft add-on"))!.sql).rows;
     expect(rows).toEqual([["Office 365", "Management Activity", "o365://audit", 0, "o365", "acme_tenant", "t1", "Worldwide"]]);
   });
+
+  it("lists outputs and acceleration summaries", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const og = ent("outputGroup", "tcpout:siem", { displayName: "siem", properties: { kind: "tcpout", default: false, servers: ["a:9997"] } });
+    const tr = ent("transform", "copy_to_siem");
+    const big = ent("accelerationSummary", "DM_x", { displayName: "Data model acceleration: X", properties: { sizeMB: 900, completePercent: 100, accessCount: 0 }, usage: { unused: true } });
+    const small = ent("accelerationSummary", "R1", { displayName: "Report acceleration: Y", properties: { sizeMB: 5, completePercent: 50, accessCount: 3 } });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [og, tr, big, small], edges: [{ from: tr.id, to: og.id, type: "writes", origin: "config" }] }));
+    const outs = runQuery(db, EXAMPLES.find((x) => x.title === "Where data is forwarded")!.sql).rows;
+    expect(outs).toEqual([["siem", "tcpout", 0, 0, '["a:9997"]', "copy_to_siem"]]);
+    const sums = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Acceleration summaries"))!.sql).rows;
+    expect(sums.map((r) => [r[0], r[1], r[5]])).toEqual([["Data model acceleration: X", 900, 1], ["Report acceleration: Y", 5, null]]);
+  });
 });

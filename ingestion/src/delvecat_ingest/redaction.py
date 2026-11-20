@@ -251,6 +251,11 @@ def redact_bundle(
             for k in ("subscription_id", "tenant_id", "workspace_id"):
                 if (ms.get("settings") or {}).pop(k, None):
                     counts["urls"] += 1
+        if profile.urls == "drop" and e["type"] == "outputGroup":
+            # Where data is sent: receiving hosts, HEC URI, cluster manager, S3 paths.
+            for k in ("servers", "uri", "clusterManager", "path", "bucket", "storageAccount"):
+                if props.pop(k, None):
+                    counts["urls"] += 1
         if profile.urls == "drop" and e["type"] == "addOnAccount":
             for k in ("tenantId", "clientId", "tenantSubdomain"):
                 if props.pop(k, None):

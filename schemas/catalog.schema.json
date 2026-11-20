@@ -251,7 +251,9 @@
         "esAutomationRule",
         "esQueue",
         "dmCatalogObject",
-        "addOnAccount"
+        "addOnAccount",
+        "outputGroup",
+        "accelerationSummary"
       ]
     },
     "Sharing": {

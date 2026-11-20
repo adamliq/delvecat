@@ -419,6 +419,28 @@ WHERE i.type = 'input' AND json_extract(i.settings, '$.microsoft') IS NOT NULL
 ORDER BY add_on, service, input;`,
   },
   {
+    title: "Where data is forwarded",
+    sql: `SELECT o.display_name AS output_group, json_extract(o.settings, '$.kind') AS kind,
+       o.disabled, json_extract(o.settings, '$.default') AS is_default,
+       coalesce(json_extract(o.settings, '$.servers'), json_extract(o.settings, '$.uri'),
+                json_extract(o.settings, '$.path'), json_extract(o.settings, '$.indexerDiscovery')) AS destination,
+       (SELECT group_concat(f.name, ', ') FROM edges x JOIN entities f ON f.id = x.from_id
+         WHERE x.to_id = o.id) AS sent_by
+FROM entities o
+WHERE o.type = 'outputGroup'
+ORDER BY kind, output_group;`,
+  },
+  {
+    title: "Acceleration summaries by size and last use",
+    sql: `SELECT s.display_name AS summary, json_extract(s.settings, '$.sizeMB') AS size_mb,
+       json_extract(s.settings, '$.completePercent') AS complete_pct,
+       json_extract(s.settings, '$.lastAccess') AS last_used,
+       json_extract(s.settings, '$.accessCount') AS uses, s.unused
+FROM entities s
+WHERE s.type = 'accelerationSummary'
+ORDER BY size_mb DESC;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

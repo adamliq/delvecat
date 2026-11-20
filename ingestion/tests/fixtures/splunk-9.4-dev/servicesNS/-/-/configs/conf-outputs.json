@@ -1,0 +1,136 @@
+{
+ "entry": [
+  {
+   "name": "tcpout",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-outputs/tcpout",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "defaultGroup": "primary_indexers",
+    "indexAndForward": "1",
+    "useACK": "0"
+   }
+  },
+  {
+   "name": "tcpout:primary_indexers",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-outputs/tcpout:primary_indexers",
+   "acl": {
+    "app": "TA-acme-firewall",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "indexerDiscovery": "cm1",
+    "useACK": "1",
+    "clientCert": "$SPLUNK_HOME/etc/auth/client.pem",
+    "sslPassword": "$7$fake-encrypted"
+   }
+  },
+  {
+   "name": "tcpout:siem_group",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-outputs/tcpout:siem_group",
+   "acl": {
+    "app": "TA-acme-firewall",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "server": "siem1.acme.example:9997, siem2.acme.example:9997",
+    "compressed": "true"
+   }
+  },
+  {
+   "name": "tcpout:archive_group",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-outputs/tcpout:archive_group",
+   "acl": {
+    "app": "TA-acme-firewall",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": true,
+    "server": "archive.acme.example:9997"
+   }
+  },
+  {
+   "name": "indexer_discovery:cm1",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-outputs/indexer_discovery:cm1",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "manager_uri": "https://cm.acme.example:8089",
+    "pass4SymmKey": "cleartext-p4sk-should-never-appear"
+   }
+  },
+  {
+   "name": "syslog",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-outputs/syslog",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "type": "udp"
+   }
+  },
+  {
+   "name": "syslog:siem_syslog",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-acme-firewall/configs/conf-outputs/syslog:siem_syslog",
+   "acl": {
+    "app": "TA-acme-firewall",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "server": "siem-syslog.acme.example:514",
+    "type": "tcp"
+   }
+  },
+  {
+   "name": "httpout",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-outputs/httpout",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "uri": "https://hec.acme.example:8088",
+    "httpEventCollectorToken": "hec-token-should-never-appear",
+    "batchSize": "65536"
+   }
+  },
+  {
+   "name": "rfs:s3_archive",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-outputs/rfs:s3_archive",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "path": "s3://acme-ia-archive/raw"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 9
+ }
+}

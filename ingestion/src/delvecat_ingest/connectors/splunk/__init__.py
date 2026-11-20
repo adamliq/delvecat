@@ -6,7 +6,17 @@ from collections.abc import Callable
 
 from ...model import ExtractResult
 from ...transport import EndpointForbidden, EndpointNotFound, SearchTimeout, Transport
-from . import access, data, data_management, knowledge, microsoft, server, spl2, usage
+from . import (
+    access,
+    data,
+    data_management,
+    knowledge,
+    microsoft,
+    outputs,
+    server,
+    spl2,
+    usage,
+)
 from .common import Ctx, Options
 
 # An extractor returns its entity count, or (count, message) when it only partly succeeded.
@@ -30,6 +40,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "modularInputs": data.extract_modular_inputs,
     "microsoftAccounts": microsoft.extract_microsoft_accounts,
     "forwarders": data.extract_forwarders,
+    "outputs": outputs.extract_outputs,
     "federated": data.extract_federated,
     "alertActions": knowledge.extract_alert_actions,
     "savedSearches": knowledge.extract_saved_searches,
@@ -49,6 +60,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "lookupDefinitions": knowledge.extract_lookup_definitions,
     "kvCollections": knowledge.extract_kv_collections,
     "dataModels": knowledge.extract_data_models,
+    "accelerationSummaries": outputs.extract_acceleration_summaries,
     "workflowActions": knowledge.extract_workflow_actions,
     "spl2": spl2.extract_spl2,
     "dataManagementCatalog": data_management.extract_catalog_objects,

@@ -391,6 +391,10 @@ def extract_inputs(ctx: Ctx, out: ExtractResult) -> int:
                     "hecEnabled": hec_on if kind == "http" else None,
                 },
             )
+            if kind == "http" and c.get("outputgroup"):
+                out.refs.append(
+                    ref(ent["id"], "outputGroup", f"tcpout:{c['outputgroup']}", "feeds")
+                )
             # A disabled input, or a token while HEC is off, feeds nothing.
             if not ent.get("disabled") and (kind != "http" or hec_on):
                 index = c.get("index")

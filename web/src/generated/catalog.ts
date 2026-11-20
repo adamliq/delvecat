@@ -76,7 +76,9 @@ export type EntityType =
   | "esAutomationRule"
   | "esQueue"
   | "dmCatalogObject"
-  | "addOnAccount";
+  | "addOnAccount"
+  | "outputGroup"
+  | "accelerationSummary";
 /**
  * The Splunk product an entity belongs to.
  */

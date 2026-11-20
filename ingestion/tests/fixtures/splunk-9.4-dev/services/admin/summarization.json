@@ -1,0 +1,63 @@
+{
+ "entry": [
+  {
+   "name": "tstats:DM_acme_web_Acme_Web",
+   "content": {
+    "summary.id": "DM_acme_web_Acme_Web",
+    "summary.size": 524288000,
+    "summary.complete": 0.98,
+    "summary.earliest_time": 1791331200,
+    "summary.latest_time": 1793923200,
+    "summary.time_range": 2592000,
+    "summary.access_time": 1793836800,
+    "summary.access_count": 412,
+    "summary.buckets": 36,
+    "summary.mod_time": 1793923200,
+    "summary.is_inprogress": false,
+    "summary.last_error": "",
+    "summary.latest_run_duration": 12.5
+   }
+  },
+  {
+   "name": "tstats:DM_Splunk_SA_CIM_Network_Traffic",
+   "content": {
+    "summary.id": "DM_Splunk_SA_CIM_Network_Traffic",
+    "summary.size": 2147483648,
+    "summary.complete": 1,
+    "summary.access_time": 0,
+    "summary.access_count": 0,
+    "summary.mod_time": 1793923200,
+    "summary.time_range": 7776000,
+    "summary.is_inprogress": false,
+    "summary.last_error": "Search auto-canceled"
+   }
+  },
+  {
+   "name": "sid:ABC_acme_web_admin_NS1",
+   "content": {
+    "summary.id": "ABC_acme_web_admin_NS1",
+    "summary.size": 10485760,
+    "summary.complete": 1,
+    "summary.access_time": 1785542400,
+    "summary.access_count": 3,
+    "summary.mod_time": 1793923200,
+    "summary.is_inprogress": false,
+    "summary.last_error": "",
+    "saved_searches": {
+     "nobody;acme_web;Web - Top Error Pages": {
+      "app": "acme_web",
+      "name": "Web - Top Error Pages",
+      "owner": "admin",
+      "sharing": "app"
+     }
+    },
+    "saved_searches.count": 1
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 3
+ }
+}
