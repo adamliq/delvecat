@@ -412,6 +412,10 @@ export interface ConnectorReport {
     [k: string]: number;
   };
   /**
+   * How long the part took, in seconds.
+   */
+  durationSecs?: number;
+  /**
    * Instance the report is about (set when bundles are merged).
    */
   instance?: string;
