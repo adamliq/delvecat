@@ -21,4 +21,12 @@ describe("search by values", () => {
     const values = propertyValues({ a: "x1", b: "2026-11-19T20:50:17Z", c: "y".repeat(300), d: ["z1", { e: "w1" }], search: "index=web" });
     expect(values).toEqual(["x1", "z1", "w1"]);
   });
+
+  it("ranks an exact value first, even one word search splits", () => {
+    const macro = ent("macro", "rangemap", { definition: "rangemap field=x low=0-9 elevated=10-1" });
+    const out2 = ent("outputGroup", "tcpout:siem2", { servers: ["10.9.0.1:9997"] });
+    const s2 = new EntitySearch([macro, out2]);
+    expect(s2.search("10.9.0.1")[0].name).toBe("tcpout:siem2");
+    expect(s2.search("10.9.0.1:9997")[0].name).toBe("tcpout:siem2");
+  });
 });

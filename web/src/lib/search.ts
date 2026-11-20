@@ -59,6 +59,20 @@ const DATE = /^\d{4}-\d{2}-\d{2}[T ]/;
 
 /** Short text values of an object's properties (tenant ids, buckets, servers, Event Hub
  * names...), so a value finds the objects that hold it. Long text and dates are left out. */
+/** A value and its parts worth looking up whole: "10.9.0.1:9997" -> also "10.9.0.1";
+ * "s3://acme-lake/raw" -> also "acme-lake". Lower-cased. */
+export function valueKeys(value: string): string[] {
+  const v = value.toLowerCase();
+  const out = [v];
+  const noScheme = v.replace(/^[a-z][a-z0-9+.-]*:\/\//, "");
+  if (noScheme !== v) out.push(noScheme);
+  const host = noScheme.split("/")[0];
+  if (host && host !== noScheme) out.push(host);
+  const hostOnly = host.replace(/:\d+$/, "");
+  if (hostOnly && hostOnly !== host) out.push(hostOnly);
+  return out;
+}
+
 export function propertyValues(props: unknown, out: string[] = [], depth = 0): string[] {
   if (out.length >= MAX_VALUES || depth > 5 || props === null || props === undefined) return out;
   if (typeof props === "string") {
@@ -105,6 +119,8 @@ export interface SearchResult {
 export class EntitySearch {
   private readonly index: MiniSearch<Doc>;
   private readonly byId: Map<string, Entity>;
+  /** Whole values (and their host:port / URL parts), lower-cased, to the objects holding them. */
+  private readonly exact = new Map<string, string[]>();
 
   readonly facets: Record<Facet, FacetFn>;
   readonly facetNames: Facet[];
@@ -126,12 +142,25 @@ export class EntitySearch {
       },
     });
     this.index.addAll(entities.map(toDoc));
+    for (const e of entities) {
+      for (const v of new Set(propertyValues(e.properties ?? {}).flatMap(valueKeys))) {
+        const ids = this.exact.get(v);
+        if (!ids) this.exact.set(v, [e.id]);
+        else if (ids[ids.length - 1] !== e.id) ids.push(e.id);
+      }
+    }
   }
 
   private matching(query: string): Entity[] {
     const q = query.trim();
     if (!q) return this.entities;
-    return this.index.search(q).map((r) => this.byId.get(r.id as string)!).filter(Boolean);
+    // A query that is exactly a value an object holds (an IP, a tenant id, a bucket) ranks
+    // those objects first: word search splits such values into pieces.
+    const exact = (this.exact.get(q.toLowerCase()) ?? []).map((id) => this.byId.get(id)!).filter(Boolean);
+    const words = this.index.search(q).map((r) => this.byId.get(r.id as string)!).filter(Boolean);
+    if (!exact.length) return words;
+    const seen = new Set(exact.map((e) => e.id));
+    return [...exact, ...words.filter((e) => !seen.has(e.id))];
   }
 
   query(query: string, filters: Filters = {}, sort: Sort = "relevance"): SearchResult {
