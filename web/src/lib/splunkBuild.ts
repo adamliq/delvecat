@@ -76,6 +76,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "alertActions", label: "Alert actions" },
       { id: "workflowActions", label: "Workflow actions" },
       { id: "spl2", label: "SPL2 modules, datasets and connections (Splunk 10+)" },
+      { id: "dataManagementCatalog", label: "Data Management catalog (Splunk Cloud)" },
     ],
   },
   {

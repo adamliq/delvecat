@@ -249,7 +249,8 @@
         "esSuppression",
         "esAggregationRule",
         "esAutomationRule",
-        "esQueue"
+        "esQueue",
+        "dmCatalogObject"
       ]
     },
     "Sharing": {

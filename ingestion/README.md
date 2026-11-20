@@ -101,6 +101,11 @@ The `enterpriseSecurity` part also reads how findings are handled:
   configured for ES. Plain settings are kept; anything named like a secret,
   token, password or key is not. ES 7 has no Mission Control: those are skipped.
 
+- ES 8 response plans (`missioncontrol/public/v2/responseplans`, the
+  organisation's plans; ES 7 called them response templates) as
+  `responseTemplate`: name, description, creator, created, updated and by whom,
+  status (published or draft) and the template it came from.
+
 The Mission Control responses are read defensively (a list, or an object holding
 one; names from `name`/`title`/`label`): their shapes were not available to test
 against a live ES 8.
@@ -141,6 +146,15 @@ restart the orchestrator answers 404 for about a minute until it is up. Listing
 modules needs `list_spl2_modules`. The public profile drops connection hosts and
 pseudonymizes their accounts; it also drops storage accounts, containers,
 directories, buckets and the Azure tenant id.
+
+### Data Management catalog
+
+Part `dataManagementCatalog` reads the Data Management metadata catalog
+(`splunk-data-management` app, `mdc/v1alpha2/catalog-objects`, paged): each
+object as `dmCatalogObject` with name, resource name, kind, type, namespace,
+creator and created time; one describing an index `mapsTo` it. Served by a
+Splunk Cloud service: Splunk Enterprise 10.4 has the app but not the service,
+and the part is skipped.
 
 ### Index-time routing, filtering and masking
 

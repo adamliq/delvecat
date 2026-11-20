@@ -1,0 +1,28 @@
+{
+ "items": [
+  {
+   "id": "rp-001",
+   "_key": "rp-001",
+   "name": "Phishing response",
+   "description": "Triage and contain reported phishing",
+   "creator": "jlee",
+   "create_time": 1790000000,
+   "update_time": 1793000000000,
+   "updated_by": "admin",
+   "template_status": "published",
+   "template_id": "tpl-phish"
+  },
+  {
+   "id": "rp-002",
+   "_key": "rp-002",
+   "name": "Ransomware",
+   "description": "",
+   "creator": "admin",
+   "create_time": "2026-09-01T10:00:00Z",
+   "update_time": "2026-10-15T08:00:00Z",
+   "updated_by": "admin",
+   "template_status": "draft",
+   "template_id": ""
+  }
+ ]
+}

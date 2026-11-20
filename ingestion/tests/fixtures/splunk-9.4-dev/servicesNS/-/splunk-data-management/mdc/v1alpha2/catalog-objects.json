@@ -1,0 +1,35 @@
+{
+ "items": [
+  {
+   "id": "co-1",
+   "name": "web",
+   "resourceName": "indexes.web",
+   "kind": "splunk_index",
+   "type": "dataset",
+   "namespace": "indexes",
+   "createdBy": "nobody",
+   "created": "2026-08-01T00:00:00Z"
+  },
+  {
+   "id": "co-2",
+   "name": "fw_to_s3",
+   "resourceName": "pipelines.fw_to_s3",
+   "kind": "ingest_processor_pipeline",
+   "type": "pipeline",
+   "namespace": "pipelines",
+   "createdBy": "jlee",
+   "created": "2026-10-02T00:00:00Z"
+  },
+  {
+   "id": "co-3",
+   "name": "archive_bucket",
+   "resourceName": "destinations.archive_bucket",
+   "kind": "s3_destination",
+   "type": "destination",
+   "namespace": "destinations",
+   "createdBy": "admin",
+   "created": "2026-10-03T00:00:00Z"
+  }
+ ],
+ "total": 3
+}

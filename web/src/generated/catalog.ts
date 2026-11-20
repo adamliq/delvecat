@@ -74,7 +74,8 @@ export type EntityType =
   | "esSuppression"
   | "esAggregationRule"
   | "esAutomationRule"
-  | "esQueue";
+  | "esQueue"
+  | "dmCatalogObject";
 /**
  * The Splunk product an entity belongs to.
  */

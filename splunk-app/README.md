@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 52 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 53 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -108,8 +108,11 @@ one. The same from a search:
 - **Enterprise Security triage**: review statuses, finding suppressions (with
   the detections they mute; ended ones and ones hiding a whole detection are
   flagged), and on ES 8 finding aggregation and suppression rules, automation
-  rules, queues and the SOAR apps configured for ES. SQL: "Detections muted,
-  grouped or automated in ES".
+  rules, queues, the SOAR apps configured for ES and response plans. SQL:
+  "Detections muted, grouped or automated in ES".
+- **Data Management catalog (Splunk Cloud)**: the objects the Data Management
+  metadata catalog lists (datasets, pipelines, destinations...) with kind, type,
+  namespace and creator. Skipped on Splunk Enterprise, which lacks the service.
 - **Azure**: SmartStore volumes and Self Storage on Azure Blob Storage (also S3
   and Google Cloud Storage) are named on an index's storage tiers (provider,
   container, storage account); inputs of the Microsoft Azure and Microsoft Cloud

@@ -364,6 +364,54 @@ def extract_soar_apps(ctx: Ctx, out: ExtractResult) -> int:
     return n
 
 
+RESPONSE_PLAN_FIELDS = (
+    "id,_key,name,description,creator,create_time,update_time,updated_by,"
+    "template_status,template_id"
+)
+
+
+def extract_response_plans(ctx: Ctx, out: ExtractResult) -> int:
+    """ES 8 response plans (formerly response templates): the organisation's plans."""
+    body = ctx.transport.get(
+        f"{MC}/public/v2/responseplans",
+        {"fields": RESPONSE_PLAN_FIELDS, "sort": "update_time:-1", "type": "orgPlans"},
+    )
+    n = 0
+    for item in _mc_items(body):
+        name = item.get("name") or item.get("_key") or item.get("id")
+        if not name:
+            continue
+        add_global(
+            ctx,
+            out,
+            "responseTemplate",
+            str(name),
+            product=PRODUCT,
+            description=item.get("description") or None,
+            updatedAt=_iso(item.get("update_time")),
+            properties={
+                "planId": item.get("id") or item.get("_key") or None,
+                "creator": item.get("creator") or None,
+                "created": _iso(item.get("create_time")),
+                "updatedBy": item.get("updated_by") or None,
+                "status": item.get("template_status") or None,
+                "templateId": item.get("template_id") or None,
+            },
+        )
+        n += 1
+    return n
+
+
+def _iso(value: Any) -> str | None:
+    """Epoch seconds (or milliseconds) or an ISO string -> ISO."""
+    if value in (None, ""):
+        return None
+    if isinstance(value, (int, float)) or str(value).replace(".", "", 1).isdigit():
+        v = float(value)
+        return epoch_to_iso(v / 1000 if v > 1e11 else v)
+    return str(value)
+
+
 EXTRACTORS = {
     "threatIntel": extract_threat_intel,
     "assetIdentity": extract_asset_identity,
@@ -374,6 +422,7 @@ EXTRACTORS = {
     "automationRules": extract_automation_rules,
     "queues": extract_queues,
     "soarApps": extract_soar_apps,
+    "responsePlans": extract_response_plans,
 }
 
 

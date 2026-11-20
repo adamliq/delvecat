@@ -25,6 +25,8 @@ const SPECIAL: Partial<Record<EntityType, string>> = {
   esAggregationRule: "Finding Aggregation Rule",
   esAutomationRule: "Automation Rule",
   esQueue: "Queue",
+  dmCatalogObject: "Data Management Catalog Object",
+  responseTemplate: "Response Plan",
   kvCollection: "KV Store Collection",
   correlationSearch: "Detection",
   adaptiveResponseAction: "Alert Action",

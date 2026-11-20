@@ -37,6 +37,7 @@ import yaml
 HOST_TYPES = ("host", "forwarder", "deploymentClient", "streamForwarder")
 HOST_PROPS = ("hostname", "dns", "host", "serverName")
 URL_PROPS = ("url", "webUrl", "linkUri")
+USER_PROPS = ("creator", "createdBy", "updatedBy")
 DB_HOST_PROPS = ("host", "port")
 IPV4 = re.compile(r"\b(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}\b")
 IPV6 = re.compile(r"\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b")
@@ -204,6 +205,11 @@ def redact_bundle(
             counts["sources"] += 1
         if profile.users == "pseudonymize" and e.get("owner") in users:
             e["owner"] = rename("user", e["owner"])
+        if profile.users == "pseudonymize":
+            # Who created or changed an object (response plans, catalog objects...).
+            for k in USER_PROPS:
+                if props.get(k) and props[k] not in ("nobody", "system"):
+                    props[k] = rename("user", str(props[k]))
         if profile.users == "pseudonymize" and e["type"] == "authToken":
             for k in ("user", "issuedBy"):
                 if props.get(k):
