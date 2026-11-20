@@ -1,0 +1,28 @@
+{
+ "__list__": [
+  {
+   "resourceType": "module",
+   "resourceName": "~.apps.acme_web.web_errors",
+   "role": "admin",
+   "operations": [
+    "write"
+   ]
+  },
+  {
+   "resourceType": "module",
+   "resourceName": "~.apps.acme_web.web_errors",
+   "role": "power",
+   "operations": [
+    "read"
+   ]
+  },
+  {
+   "resourceType": "module",
+   "resourceName": "~.apps.acme_web.web_errors",
+   "role": "user",
+   "operations": [
+    "read"
+   ]
+  }
+ ]
+}

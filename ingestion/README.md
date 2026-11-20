@@ -82,6 +82,28 @@ LDAP group records its strategy and how many members it has, never who they
 are. The instance records how people log in (`authentication`: Splunk, LDAP or
 SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
 
+### SPL2 (Splunk 10 and later)
+
+Part `spl2` reads Splunk's Data Orchestrator (`/services/orchestrator/v1`, a
+splunkd sidecar; GET requests only):
+
+- `spl2Connection`: the Splunk deployments SPL2 runs against, with name, host,
+  port and account only (no secret is returned). Published connections, plus
+  drafts not yet published (`status`).
+- `spl2Module`: SPL2 code saved in an app: owner, version, description, source
+  (`definition`) and permissions (read and write roles, from the module
+  permissions API). `from <dataset>` statements become `reads` edges to the
+  index, lookup or saved search, as the orchestrator's own dataset list names
+  them; `from $statement` references within the module are not datasets.
+- `spl2Dataset`: datasets of SPL2-native kinds (anything but indexes, lookups
+  and saved searches, which are catalogued as themselves), e.g. Federated
+  Analytics on AWS (`fa_aws_lake`, `fa_aws_s3`).
+
+Splunk 9.x has no orchestrator: the part is reported as skipped. After a
+restart the orchestrator answers 404 for about a minute until it is up. Listing
+modules needs `list_spl2_modules`. The public profile drops connection hosts and
+pseudonymizes their accounts.
+
 ### Index-time routing, filtering and masking
 
 Transforms record what they do at index time (`properties.indexTime`): route to

@@ -212,6 +212,11 @@ def redact_bundle(
             for k in HOST_PROPS:
                 if props.get(k) and str(props[k]) in hosts:
                     props[k] = rename("host", str(props[k]))
+        if e["type"] == "spl2Connection":
+            if profile.urls == "drop" and props.pop("host", None):
+                counts["urls"] += 1
+            if profile.users == "pseudonymize" and props.get("account"):
+                props["account"] = rename("user", str(props["account"]))
         if e["type"] == "federatedProvider":
             # Where the remote data is and the account used to read it.
             if profile.urls == "drop":

@@ -66,7 +66,10 @@ export type EntityType =
   | "dbLookup"
   | "externalTable"
   | "federatedProvider"
-  | "federatedIndex";
+  | "federatedIndex"
+  | "spl2Connection"
+  | "spl2Module"
+  | "spl2Dataset";
 /**
  * The Splunk product an entity belongs to.
  */

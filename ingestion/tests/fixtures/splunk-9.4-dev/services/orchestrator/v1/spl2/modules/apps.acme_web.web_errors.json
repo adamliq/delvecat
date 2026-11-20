@@ -1,0 +1,12 @@
+{
+ "namespace": "~.apps.acme_web",
+ "name": "web_errors",
+ "definition": "$errors = from web where status >= 500 | stats count() by host;\n$owners = from asset_owners;\n$top = from $errors | sort - count | head 10;\n$missing = from no_such_dataset;",
+ "createdAt": "2026-10-02 09:00:00Z",
+ "createdBy": "jlee",
+ "updatedAt": "2026-10-05 10:00:00Z",
+ "updatedBy": "admin",
+ "version": 3,
+ "description": "Web errors by host",
+ "canWrite": true
+}

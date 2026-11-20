@@ -31,6 +31,7 @@ GLOBAL_TYPES = frozenset(
         "dbLookup",
         "externalTable",
         "federatedProvider",
+        "spl2Connection",
         "streamDefinition",
         "streamGroup",
         "streamForwarder",

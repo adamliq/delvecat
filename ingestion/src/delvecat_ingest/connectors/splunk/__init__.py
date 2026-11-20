@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from ...model import ExtractResult
 from ...transport import EndpointForbidden, EndpointNotFound, SearchTimeout, Transport
-from . import access, data, knowledge, server, usage
+from . import access, data, knowledge, server, spl2, usage
 from .common import Ctx, Options
 
 # An extractor returns its entity count, or (count, message) when it only partly succeeded.
@@ -49,6 +49,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "kvCollections": knowledge.extract_kv_collections,
     "dataModels": knowledge.extract_data_models,
     "workflowActions": knowledge.extract_workflow_actions,
+    "spl2": spl2.extract_spl2,
     "fields": data.extract_fields,
     **usage.USAGE_EXTRACTORS,
 }

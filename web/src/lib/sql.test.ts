@@ -129,4 +129,13 @@ describe("SQL console", () => {
     const fed = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Federated indexes"))!.sql).rows;
     expect(fed).toEqual([["soc", "sec", "remote", "splunk", "index:notable", 1]]);
   });
+
+  it("lists SPL2 modules with their readers and what they read", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const mod = ent("spl2Module", "web_errors", { app: "web", owner: "jlee", permissions: { read: ["power", "user"], write: ["admin"] } });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [mod, idx], edges: [{ from: mod.id, to: idx.id, type: "reads", origin: "config" }] }));
+    const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("SPL2 modules"))!.sql).rows;
+    expect(rows).toEqual([["web", "web_errors", "jlee", "power, user", "index:web"]]);
+  });
 });

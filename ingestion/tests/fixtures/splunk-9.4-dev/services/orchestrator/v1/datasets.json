@@ -1,0 +1,60 @@
+{
+ "results": [
+  {
+   "owner": "nobody",
+   "id": "indexes.web",
+   "namespace": "~indexes",
+   "module": "",
+   "name": "web",
+   "kind": "index",
+   "createdBy": "nobody",
+   "updatedAt": "2026-10-02T09:00:00.000Z",
+   "resourceName": "~indexes.web"
+  },
+  {
+   "owner": "nobody",
+   "id": "indexes.main",
+   "namespace": "~indexes",
+   "module": "",
+   "name": "main",
+   "kind": "index",
+   "createdBy": "nobody",
+   "updatedAt": "2026-10-02T09:00:00.000Z",
+   "resourceName": "~indexes.main"
+  },
+  {
+   "owner": "nobody",
+   "id": "apps.acme_web.lookups.asset_owners",
+   "namespace": "~.apps.acme_web.lookups",
+   "module": "",
+   "name": "asset_owners",
+   "kind": "lookup",
+   "createdBy": "nobody",
+   "updatedAt": "2026-10-02T09:00:00.000Z",
+   "resourceName": "~.apps.acme_web.lookups.asset_owners"
+  },
+  {
+   "owner": "admin",
+   "id": "apps.acme_web.savedsearches.Web - Top Error Pages",
+   "namespace": "~.apps.acme_web.savedsearches",
+   "module": "",
+   "name": "Web - Top Error Pages",
+   "kind": "savedsearch",
+   "createdBy": "admin",
+   "updatedAt": "2026-10-02T09:00:00.000Z",
+   "resourceName": "~.apps.acme_web.savedsearches.Web - Top Error Pages"
+  },
+  {
+   "owner": "admin",
+   "id": "federated.aws.vpc_flow_s3",
+   "namespace": "~.federated.aws",
+   "module": "",
+   "name": "vpc_flow_s3",
+   "kind": "fa_aws_s3",
+   "createdBy": "admin",
+   "updatedAt": "2026-10-02T09:00:00.000Z",
+   "resourceName": "~.federated.aws.vpc_flow_s3"
+  }
+ ],
+ "totalCount": 5
+}

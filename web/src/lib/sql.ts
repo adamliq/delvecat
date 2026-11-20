@@ -48,6 +48,7 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("health", "TEXT", "ok, warning or critical"),
       col("sensitive", "INTEGER", "1 if any sensitive classification applies"),
       col("readable_by_everyone", "INTEGER", "1 if every role can read it"),
+      col("read_roles", "TEXT", "Roles Splunk lets read it (its permissions), comma-separated; * is every role"),
       col("unused", "INTEGER", "1 if no recorded use"),
       col("runs", "INTEGER"), col("searches", "INTEGER"), col("views", "INTEGER"),
       col("alert_fires", "INTEGER", "Alerts and detections: times triggered in the usage window"),
@@ -60,6 +61,7 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
     rows: E.map((e) => [
       e.id, e.type, e.name, e.displayName, e.product, e.instance, e.app, e.owner, e.sharing, e.disabled ?? false,
       effectiveDescription(e), e.annotations?.domain, e.health?.status, isSensitive(e), access(e)?.everyone,
+      e.permissions?.read?.join(", "),
       e.usage?.unused, e.usage?.runs, e.usage?.searches, e.usage?.views,
       e.usage?.alertFires, e.usage?.alertsSuppressed, e.usage?.lastUsed,
       e.updatedAt, e.firstSeenAt, e.version, e.sourceUrl, e.properties, e.annotations?.properties,
@@ -364,6 +366,16 @@ LEFT JOIN entities p ON p.type = 'federatedProvider' AND p.instance = f.instance
      AND p.name = json_extract(f.settings, '$.provider')
 WHERE f.type = 'federatedIndex'
 ORDER BY f.display_name;`,
+  },
+  {
+    title: "SPL2 modules, who can read them and what they read",
+    sql: `SELECT m.app, m.name AS module, m.owner,
+       m.read_roles AS readers,
+       (SELECT group_concat(t.type || ':' || t.name, ', ') FROM edges x JOIN entities t ON t.id = x.to_id
+         WHERE x.from_id = m.id AND x.type = 'reads') AS reads
+FROM entities m
+WHERE m.type = 'spl2Module'
+ORDER BY m.app, m.name;`,
   },
   {
     title: "Detections with no annotated owner",

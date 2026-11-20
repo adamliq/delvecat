@@ -1,0 +1,24 @@
+{
+ "__list__": [
+  {
+   "name": "default_connection",
+   "hostnameip": "https://localhost",
+   "port": 8089,
+   "serviceaccountuser": "Splunk",
+   "created": "2024-04-24T01:12:38Z",
+   "createdby": "",
+   "modified": "",
+   "modifiedby": ""
+  },
+  {
+   "name": "soc_cluster",
+   "hostnameip": "https://soc-sh.acme.example",
+   "port": 8089,
+   "serviceaccountuser": "spl2_svc",
+   "created": "2026-10-02T09:00:00Z",
+   "createdby": "admin",
+   "modified": "",
+   "modifiedby": ""
+  }
+ ]
+}

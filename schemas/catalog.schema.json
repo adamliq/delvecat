@@ -241,7 +241,10 @@
         "dbLookup",
         "externalTable",
         "federatedProvider",
-        "federatedIndex"
+        "federatedIndex",
+        "spl2Connection",
+        "spl2Module",
+        "spl2Dataset"
       ]
     },
     "Sharing": {
