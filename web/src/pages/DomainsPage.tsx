@@ -3,10 +3,31 @@ import { EntityRow } from "../components/EntityBits";
 import { RollupTiles } from "../components/Rollup";
 import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
-import { dataProducts, domainAssets, domains, rollup, subtree, type Domain } from "../lib/domains";
+import { dataProducts, domainAssets, domains, productAssets, rollup, subtree, type Domain, type Rollup } from "../lib/domains";
+import { Meter } from "../components/Meter";
 import { domainPath, productPath, searchPath } from "../lib/routes";
 
 const ASSET_LIMIT = 100;
+
+/** Documentation and health of a set of assets, in one line. */
+function RollupLine({ r }: { r: Rollup }) {
+  if (!r.total) return null;
+  const pct = (n: number) => Math.round((100 * n) / r.total);
+  const issues = [
+    r.critical ? `${r.critical} critical` : "",
+    r.warning ? `${r.warning} with warnings` : "",
+    r.atRisk ? `${r.atRisk} at risk` : "",
+    r.unused ? `${r.unused} unused` : "",
+    r.sensitive ? `${r.sensitive} sensitive` : "",
+  ].filter(Boolean);
+  return (
+    <div className="rollup-line small">
+      <span className="rollup-meter">Described <Meter value={r.total - r.undocumented} max={r.total} label={`${pct(r.total - r.undocumented)}%`} name="Described" /></span>
+      <span className="rollup-meter">Owned <Meter value={r.owned} max={r.total} label={`${pct(r.owned)}%`} name="Owned" /></span>
+      {issues.length > 0 && <span className={r.critical ? "status-label status-critical" : r.warning || r.atRisk ? "status-label status-warning" : "muted"}>{issues.join(" · ")}</span>}
+    </div>
+  );
+}
 
 function DomainTree({ items, parent, depth = 0 }: { items: Domain[]; parent?: string; depth?: number }) {
   const { catalog } = useCatalog();
@@ -25,8 +46,8 @@ function DomainTree({ items, parent, depth = 0 }: { items: Domain[]; parent?: st
               <div className="muted small">
                 {r.total} assets · {products} data product{products === 1 ? "" : "s"}
                 {d.owners?.length ? <> · owned by {d.owners.join(", ")}</> : null}
-                {r.critical + r.warning > 0 && <> · <span className="status-label status-warning">! {r.critical + r.warning} health findings</span></>}
               </div>
+              <RollupLine r={r} />
             </div>
             <DomainTree items={items} parent={d.name} depth={depth + 1} />
           </li>
@@ -66,6 +87,7 @@ export function DomainsPage() {
                   <Link to={productPath(p.name)} className="card-title">{p.name}</Link>
                   <div className="muted small">{p.domain ?? "No domain"} · {p.assets.length} assets{p.owners?.length ? ` · ${p.owners.join(", ")}` : ""}</div>
                   {p.description && <p className="small">{p.description}</p>}
+                  <RollupLine r={rollup(productAssets(catalog, p), riskMap(catalog))} />
                 </div>
               ))}
             </div>
@@ -106,6 +128,7 @@ export function DomainsPage() {
                 <Link to={productPath(p.name)} className="card-title">{p.name}</Link>
                 <div className="muted small">{p.assets.length} assets{p.domain !== name ? ` · ${p.domain}` : ""}</div>
                 {p.description && <p className="small">{p.description}</p>}
+                <RollupLine r={rollup(productAssets(catalog, p), riskMap(catalog))} />
               </div>
             ))}
           </div>

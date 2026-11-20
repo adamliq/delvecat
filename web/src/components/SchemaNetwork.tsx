@@ -19,6 +19,8 @@ interface Node extends SimulationNodeDatum {
   members?: { st: Entity; field: Entity }[];
   inconsistent?: boolean;
   labelled?: boolean;
+  /** Where the label goes, relative to the node: chosen so labels do not overlap. */
+  labelAt?: { dx: number; dy: number; anchor: "start" | "end" | "middle" };
 }
 interface Edge { source: string | Node; target: string | Node; weight: number; shared?: string[] }
 
@@ -106,6 +108,7 @@ export function SchemaNetwork({ catalog, sourcetypes: all, mode, minShared }: {
       n.x = Math.max(n.r + 4, Math.min(W - n.r - 4, n.x ?? W / 2));
       n.y = Math.max(n.r + 4, Math.min(H - n.r - 4, n.y ?? H / 2));
     }
+    placeLabels(nodes);
     return { nodes, edges, hiddenFields };
   }, [catalog, sourcetypes, mode, minShared, slots]);
 
@@ -153,8 +156,8 @@ export function SchemaNetwork({ catalog, sourcetypes: all, mode, minShared }: {
                 <circle r={n.r} className={cls} />
                 {n.inconsistent && <text className="net-glyph" y={3.5} textAnchor="middle">!</text>}
                 <title>{n.kind === "st" ? n.label : `${n.label}: in ${n.members!.length} sourcetypes`}</title>
-                {(n.kind === "st" || n.labelled) && (
-                  <text x={n.r + 4} y={4} className={`net-label${n.kind === "field" ? " net-label-field" : ""}`}>{truncate(n.label, 24)}</text>
+                {(n.kind === "st" || n.labelled) && n.labelAt && (
+                  <text x={n.labelAt.dx} y={n.labelAt.dy} textAnchor={n.labelAt.anchor} className={`net-label${n.kind === "field" ? " net-label-field" : ""}`}>{truncate(n.label, 24)}</text>
                 )}
               </g>
             );
@@ -223,4 +226,32 @@ function FieldDetail({ node }: { node: Node }) {
       </div>
     </>
   );
+}
+
+type Box = [number, number, number, number]; // x1, y1, x2, y2
+
+/** Put each label right, left, below or above its node, whichever first clears the other
+ * labels and nodes (sourcetypes first: their names matter most). */
+export function placeLabels(nodes: { x?: number; y?: number; r: number; kind: string; label: string; labelled?: boolean; labelAt?: { dx: number; dy: number; anchor: "start" | "end" | "middle" } }[]) {
+  const taken: Box[] = nodes.map((n) => [(n.x ?? 0) - n.r, (n.y ?? 0) - n.r, (n.x ?? 0) + n.r, (n.y ?? 0) + n.r]);
+  const order = [...nodes].filter((n) => n.kind === "st" || n.labelled).sort((a, b) => (a.kind === b.kind ? b.r - a.r : a.kind === "st" ? -1 : 1));
+  for (const n of order) {
+    const x = n.x ?? 0, y = n.y ?? 0;
+    const w = Math.min(24, n.label.length) * (n.kind === "field" ? 6.6 : 7.4) + 4;
+    const h = 14;
+    const right = (dy: number) => ({ dx: n.r + 4, dy: dy + 4, anchor: "start" as const, box: [x + n.r + 2, y + dy - h / 2, x + n.r + 4 + w, y + dy + h / 2] as Box });
+    const left = (dy: number) => ({ dx: -n.r - 4, dy: dy + 4, anchor: "end" as const, box: [x - n.r - 4 - w, y + dy - h / 2, x - n.r - 2, y + dy + h / 2] as Box });
+    const options = [
+      right(0), left(0),
+      { dx: 0, dy: n.r + 14, anchor: "middle" as const, box: [x - w / 2, y + n.r + 2, x + w / 2, y + n.r + 2 + h] as Box },
+      { dx: 0, dy: -n.r - 6, anchor: "middle" as const, box: [x - w / 2, y - n.r - 4 - h, x + w / 2, y - n.r - 4] as Box },
+      right(-h), right(h), left(-h), left(h),
+    ];
+    const self = (t: Box) => t[0] === x - n.r && t[1] === y - n.r;
+    const area = (a: Box, b: Box) => Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+    const cost = (o: { box: Box }) => taken.reduce((c, t) => (self(t) ? c : c + area(o.box, t)), 0);
+    const pick = options.reduce((best, o) => (cost(o) < cost(best) ? o : best), options[0]);
+    n.labelAt = { dx: pick.dx, dy: pick.dy, anchor: pick.anchor };
+    taken.push(pick.box);
+  }
 }

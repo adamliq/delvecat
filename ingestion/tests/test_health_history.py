@@ -222,3 +222,48 @@ def test_a_build_without_health_keeps_the_trend_and_the_next_one_compares_nothin
     # No findings to compare with: none is "new" (no first-seen time), none "resolved".
     assert all("since" not in c for c in _findings(after).values())
     assert "resolvedFindings" not in after
+
+
+def test_trend_records_documentation_of_custom_objects():
+    from delvecat_ingest.annotations import AnnotationSet, Entry, apply_annotations
+    from delvecat_ingest.health import documentation_counts
+
+    entities = [
+        {"id": "a:app:search", "type": "app", "name": "search", "properties": {"author": "Splunk"}},
+        {"id": "a:savedSearch:x", "type": "savedSearch", "name": "x", "app": "acme",
+         "description": "d"},
+        {"id": "a:savedSearch:y", "type": "savedSearch", "name": "y", "app": "acme",
+         "annotations": {"owners": ["soc"], "domain": "Security"}},
+        {"id": "a:savedSearch:z", "type": "savedSearch", "name": "z", "app": "search"},
+        {"id": "a:host:h", "type": "host", "name": "h"},
+    ]  # fmt: skip
+    assert documentation_counts(entities) == {
+        "documented": 2,
+        "described": 1,
+        "owned": 1,
+        "inDomain": 1,
+    }
+    b = _bundle()
+    assert {"documented", "described", "owned"} <= set(b["healthHistory"][-1])
+    # Annotations applied afterwards update the latest point.
+    before = b["healthHistory"][-1]["owned"]
+    target = next(e for e in b["entities"] if e["id"] == FIREWALL)
+    apply_annotations(
+        b,
+        AnnotationSet(
+            entries=[
+                Entry(
+                    {
+                        "match": {
+                            "type": "savedSearch",
+                            "app": target["app"],
+                            "name": target["name"],
+                        },
+                        "owners": ["netsec"],
+                    },
+                    "t.yaml:1",
+                )
+            ]
+        ),
+    )
+    assert b["healthHistory"][-1]["owned"] == before + 1  # the build applied no annotations

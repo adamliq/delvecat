@@ -1,9 +1,14 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { EntityType, Product } from "../generated/catalog";
+import type { Entity, EntityType, Product } from "../generated/catalog";
+import { Link } from "react-router-dom";
+import { DataTable } from "../components/DataTable";
 import { EntityRow } from "../components/EntityBits";
+import { effectiveDescription, owners } from "../lib/annotate";
+import { entityPath } from "../lib/routes";
+import { StatusLabel } from "./HealthPage";
 import { useCatalog } from "../lib/CatalogContext";
-import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup } from "../lib/labels";
+import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
 import { type Facet, type Filters, type Sort } from "../lib/search";
 import { exportFileName, resultRows } from "../lib/exportResults";
 import { downloadText, toCsv } from "../lib/health";
@@ -96,6 +101,29 @@ function FacetBox({ facet, counts, selected, onToggle }: {
   );
 }
 
+/** Results as a compact sortable table, to scan many at once. */
+function ResultTable({ results, instances }: { results: Entity[]; instances: Record<string, string> }) {
+  const many = Object.keys(instances).length > 1;
+  return (
+    <DataTable
+      rows={results}
+      rowKey={(e) => e.id}
+      limit={500}
+      className="mini-table result-table"
+      columns={[
+        { label: "Type", value: (e) => typeLabel(e.type) },
+        { label: "Name", value: (e) => e.displayName ?? e.name, render: (e) => <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link> },
+        ...(many ? [{ label: "Instance", value: (e: Entity) => instances[e.instance] ?? e.instance }] : []),
+        { label: "App", value: (e) => e.app ?? "" },
+        { label: "Owner", value: (e) => owners(e).join(", ") || e.owner || "" },
+        { label: "Health", value: (e) => e.health?.status ?? "", render: (e) => (e.health ? <StatusLabel status={e.health.status} /> : <span className="muted">—</span>) },
+        { label: "Updated", value: (e) => e.updatedAt ?? "", render: (e) => (e.updatedAt ? new Date(e.updatedAt).toLocaleDateString() : "—") },
+        { label: "Description", value: (e) => effectiveDescription(e) ?? "", render: (e) => <span className="clamp-2">{effectiveDescription(e) ?? ""}</span> },
+      ]}
+    />
+  );
+}
+
 export function SearchPage() {
   const { search, catalog } = useCatalog();
   instanceNames = Object.fromEntries(catalog.bundle.instances.map((i) => [i.id, i.name]));
@@ -114,7 +142,8 @@ export function SearchPage() {
     return f;
   }, [params]);
 
-  const { results, facets } = useMemo(() => search.query(q, filters, sort), [search, q, filters, sort]);
+  const { results, facets, matches } = useMemo(() => search.query(q, filters, sort), [search, q, filters, sort]);
+  const view = params.get("view") === "table" ? "table" : "list";
   const activeCount = Object.values(filters).reduce((n, v) => n + (v?.length ?? 0), 0);
 
   const update = (fn: (next: URLSearchParams) => void) => {
@@ -176,6 +205,14 @@ export function SearchPage() {
               title="Every result, with annotations, health and structured properties">
               Download CSV
             </button>
+            <div className="seg" role="group" aria-label="View">
+              {(["list", "table"] as const).map((v) => (
+                <button key={v} type="button" className={view === v ? "active" : undefined} aria-pressed={view === v}
+                  onClick={() => update((next) => (v === "list" ? next.delete("view") : next.set("view", v)))}>
+                  {v === "list" ? "List" : "Table"}
+                </button>
+              ))}
+            </div>
             <label className="sort">
               Sort
               <select value={sort} onChange={(e) => update((next) => next.set("sort", e.target.value))}>
@@ -187,10 +224,14 @@ export function SearchPage() {
             </label>
           </div>
         </div>
-        <ul className="entity-list">
-          {results.slice(0, limit).map((e) => <EntityRow key={e.id} entity={e} />)}
-        </ul>
-        {results.length > limit && (
+        {view === "table" ? (
+          <ResultTable results={results} instances={instanceNames} />
+        ) : (
+          <ul className="entity-list">
+            {results.slice(0, limit).map((e) => <EntityRow key={e.id} entity={e} match={matches.get(e.id)} />)}
+          </ul>
+        )}
+        {view === "list" && results.length > limit && (
           <button type="button" className="btn" onClick={() => setLimit(limit + PAGE)}>
             Show {Math.min(PAGE, results.length - limit)} more
           </button>

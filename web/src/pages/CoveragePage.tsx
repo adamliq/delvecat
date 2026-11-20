@@ -7,6 +7,39 @@ import {
   type AttackData, type CellState, type DetectionStatus, type TechniqueCell,
 } from "../lib/coverage";
 import { entityPath } from "../lib/routes";
+import { howToFix } from "../lib/coverageAdvice";
+import { Meter } from "../components/Meter";
+
+/** One row per tactic: how many techniques have a working detection, a broken one, or none,
+ * and which techniques are covered. Compact: the full matrix is one choice away. */
+function TacticSummary({ columns, onShow }: { columns: { tactic: { id: string; name: string }; cells: TechniqueCell[] }[]; onShow: (v: string) => void }) {
+  return (
+    <>
+      <DataTable
+        rows={columns}
+        rowKey={(c) => c.tactic.id}
+        columns={[
+          { label: "Tactic", value: (c) => c.tactic.name },
+          { label: "Covered", value: (c) => c.cells.filter((x) => x.state === "covered").length },
+          { label: "Cannot fire", value: (c) => c.cells.filter((x) => x.state === "weak").length },
+          { label: "Techniques", value: (c) => c.cells.length },
+          { label: "Coverage", value: (c) => c.cells.filter((x) => x.state === "covered").length / Math.max(1, c.cells.length), render: (c) => {
+            const covered = c.cells.filter((x) => x.state === "covered").length;
+            return <Meter value={covered} max={c.cells.length} label={`${Math.round((covered / Math.max(1, c.cells.length)) * 100)}%`} name={`Coverage of ${c.tactic.name}`} />;
+          } },
+          { label: "Techniques with detections", value: (c) => c.cells.filter((x) => x.state !== "none").map((x) => x.id).join(" "), render: (c) => (
+            <span className="chips">{c.cells.filter((x) => x.state !== "none").map((x) => (
+              <a key={x.id} href={`https://attack.mitre.org/techniques/${x.id}/`} target="_blank" rel="noreferrer" className={`chip attack-chip cell-${x.state}`} title={cellTitle(x)}>
+                {CELL_ICON[x.state]} {x.id} {x.name}
+              </a>
+            ))}</span>
+          ) },
+        ]}
+      />
+      <p className="small"><button type="button" className="link-btn" onClick={() => onShow("all")}>Show the full matrix</button> · <button type="button" className="link-btn" onClick={() => onShow("gaps")}>Show only gaps</button></p>
+    </>
+  );
+}
 
 const CELL_ICON: Record<CellState, string> = { covered: "✓", weak: "!", none: "" };
 const CELL_LABEL: Record<CellState, string> = {
@@ -31,7 +64,7 @@ export function CoveragePage() {
   const [attack, setAttack] = useState<AttackData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [params, setParams] = useSearchParams();
-  const show = (params.get("show") as "all" | "gaps" | "detected") || "all";
+  const show = (params.get("show") as "summary" | "all" | "gaps" | "detected") || "summary";
   const highlight = params.get("technique")?.toUpperCase().split(".")[0];
 
   useEffect(() => {
@@ -49,11 +82,12 @@ export function CoveragePage() {
   const emptyTactics = cov.columns.filter((c) => !c.cells.some((x) => x.state === "covered"));
   const setShow = (v: string) => {
     const next = new URLSearchParams(params);
-    next.set("show", v);
+    if (v === "summary") next.delete("show");
+    else next.set("show", v);
     setParams(next, { replace: true });
   };
   const visible = (c: TechniqueCell) =>
-    show === "all" || (show === "gaps" ? c.state !== "covered" : c.state !== "none") || c.id === highlight;
+    show === "all" || show === "summary" || (show === "gaps" ? c.state !== "covered" : c.state !== "none") || c.id === highlight;
 
   // Filtered views drop tactics with nothing to show, so the matrix stays readable.
   const shownColumns = show === "all" ? cov.columns : cov.columns.filter((c) => c.cells.some(visible));
@@ -102,6 +136,9 @@ export function CoveragePage() {
               ) },
               { label: "Techniques", value: (d) => d.techniques.join(", ") },
               { label: "Data models", value: (d) => d.dataModels.join(", ") },
+              { label: "What would fix it", value: (d) => howToFix(catalog, d).join(" "), render: (d) => (
+                <ul className="plain-list small">{howToFix(catalog, d).map((t) => <li key={t}>{t}</li>)}</ul>
+              ) },
             ]}
           />
         </section>
@@ -113,6 +150,7 @@ export function CoveragePage() {
           <label className="sort">
             Show
             <select value={show} onChange={(e) => setShow(e.target.value)}>
+              <option value="summary">Summary by tactic</option>
               <option value="all">All techniques</option>
               <option value="detected">Techniques with detections</option>
               <option value="gaps">Gaps (not covered)</option>
@@ -124,8 +162,9 @@ export function CoveragePage() {
             <li key={s}><span className={`cell-swatch cell-${s}`} aria-hidden>{CELL_ICON[s]}</span>{CELL_LABEL[s]}</li>
           ))}
         </ul>
-        {shownColumns.length === 0 && <p className="muted">Nothing to show for this filter.</p>}
-        <div className="attack-scroll" hidden={shownColumns.length === 0}>
+        {show === "summary" && <TacticSummary columns={cov.columns} onShow={setShow} />}
+        {show !== "summary" && shownColumns.length === 0 && <p className="muted">Nothing to show for this filter.</p>}
+        <div className="attack-scroll" hidden={show === "summary" || shownColumns.length === 0}>
           <div className="attack-matrix" style={{ gridTemplateColumns: `repeat(${shownColumns.length}, minmax(132px, 1fr))` }}>
             {shownColumns.map(({ tactic, cells }) => {
               const covered = cells.filter((c) => c.state === "covered").length;

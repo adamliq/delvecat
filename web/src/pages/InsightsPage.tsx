@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { flag, useUrlState } from "../lib/urlState";
 import { Link } from "react-router-dom";
 import { FieldClassification, KpiTiles, OwnersChart, PropertyDistributions } from "../components/InsightsExtras";
 import { Meter } from "../components/Meter";
@@ -26,8 +27,11 @@ function CoverageCell({ c, metric, name }: { c: Coverage; metric: (typeof METRIC
 
 export function InsightsPage() {
   const { catalog } = useCatalog();
-  const [by, setBy] = useState<GroupBy>("app");
-  const [vendor, setVendor] = useState(false);
+  const [params, update] = useUrlState();
+  const by = (["app", "domain", "type"].includes(params.get("by") ?? "") ? params.get("by") : "app") as GroupBy;
+  const vendor = flag(params, "vendor");
+  const setBy = (v: GroupBy) => update({ by: v === "app" ? undefined : v });
+  const setVendor = (v: boolean) => update({ vendor: v });
   const { overall, groups } = useMemo(() => coverageBy(catalog, by, vendor), [catalog, by, vendor]);
   const usage = USAGE_GROUPS.map((g) => ({ ...g, top: mostUsed(catalog, g.types) })).filter((g) => g.top.length);
 
@@ -52,7 +56,7 @@ export function InsightsPage() {
 
       <section>
         <h2>Targets</h2>
-        <KpiTiles catalog={catalog} includeVendor={vendor} />
+        <KpiTiles catalog={catalog} includeVendor={vendor} open={params.get("target") ?? undefined} onOpen={(k) => update({ target: k })} />
       </section>
 
       <section>

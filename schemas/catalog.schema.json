@@ -77,7 +77,11 @@
           "critical": {"type": "integer", "description": "Objects whose worst finding is critical."},
           "warning": {"type": "integer", "description": "Objects whose worst finding is a warning."},
           "findings": {"type": "integer", "description": "Findings (checks that are not OK)."},
-          "unused": {"type": "integer"}
+          "unused": {"type": "integer"},
+          "documented": {"type": "integer", "description": "Custom objects of documented types (as on the Insights page)."},
+          "described": {"type": "integer"},
+          "owned": {"type": "integer"},
+          "inDomain": {"type": "integer"}
         }
       }
     },

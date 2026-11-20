@@ -1,4 +1,7 @@
 import { Link, useParams } from "react-router-dom";
+import { flag, useUrlState } from "../lib/urlState";
+
+const plural = (n: number, word: string) => `${n.toLocaleString()} ${word}${n === 1 ? "" : "s"}`;
 import type { Entity, GlossaryTerm } from "../generated/catalog";
 import { EntityRow } from "../components/EntityBits";
 import { parseSource } from "../lib/annotate";
@@ -44,6 +47,10 @@ export function GlossaryPage() {
   const { catalog } = useCatalog();
   const glossary = catalog.bundle.glossary ?? [];
   const used = usage(catalog.entities);
+  const [params, update] = useUrlState();
+  const q = params.get("q") ?? "";
+  const sort = params.get("sort") ?? "name";
+  const unusedOnly = flag(params, "unused");
 
   if (term) {
     const def = findTerm(glossary, term);
@@ -88,6 +95,14 @@ export function GlossaryPage() {
   const undefinedTerms = [...used.keys()].filter((k) => !defined.has(k));
   const count = (t: GlossaryTerm) =>
     new Set([t.term, ...(t.synonyms ?? [])].flatMap((n) => used.get(n.toLowerCase()) ?? [])).size;
+  const text = q.trim().toLowerCase();
+  const rows = glossary
+    .map((t) => ({ t, objects: count(t), tf: termFields(catalog, t) }))
+    .filter(({ t, objects, tf }) => (!unusedOnly || (!objects && !tf.fields.length))
+      && (!text || `${t.term} ${(t.synonyms ?? []).join(" ")} ${t.description ?? ""} ${t.owner ?? ""}`.toLowerCase().includes(text)))
+    .sort((a, b) => (sort === "used" ? b.objects + b.tf.fields.length - (a.objects + a.tf.fields.length) : 0)
+      || (sort === "owner" ? (a.t.owner ?? "~").localeCompare(b.t.owner ?? "~") : 0)
+      || a.t.term.localeCompare(b.t.term));
 
   return (
     <div className="stack">
@@ -96,17 +111,47 @@ export function GlossaryPage() {
         <p className="lede">Business terms used to describe Splunk data, maintained in the annotations folder.</p>
       </div>
       {glossary.length === 0 && <p className="muted">No glossary terms are defined in this bundle.</p>}
+      {glossary.length > 0 && (
+        <div className="insights-filters">
+          <input type="search" placeholder="Term, synonym or definition" aria-label="Search terms" value={q} onChange={(e) => update({ q: e.target.value })} />
+          <label className="sort">Sort
+            <select value={sort} onChange={(e) => update({ sort: e.target.value === "name" ? undefined : e.target.value })}>
+              <option value="name">Name</option>
+              <option value="used">Most used</option>
+              <option value="owner">Owner</option>
+            </select>
+          </label>
+          <label className="sort"><input type="checkbox" checked={unusedOnly} onChange={(e) => update({ unused: e.target.checked })} /> Only unused terms</label>
+          <span className="muted small">{rows.length} of {glossary.length}</span>
+        </div>
+      )}
       <dl className="glossary">
-        {glossary.map((t) => (
+        {rows.map(({ t, objects, tf }) => (
           <div key={t.term} className="glossary-item">
             <dt>
-              <Link to={glossaryPath(t.term)}>{t.term}</Link> <span className="muted small">{count(t)} objects{t.fields?.length ? `, ${termFields(catalog, t).fields.length} fields` : ""}{t.owner ? `, owned by ${t.owner}` : ""}</span>
-              {termFields(catalog, t).inconsistent.length > 0 && <> <span className="status-label status-warning">! Inconsistent type: {termFields(catalog, t).inconsistent.join(", ")}</span></>}
+              <Link to={glossaryPath(t.term)}>{t.term}</Link>{" "}
+              <span className="muted small">
+                {plural(objects, "object")}{t.fields?.length ? `, ${plural(tf.fields.length, "field")}` : ""}{t.owner ? `, owned by ${t.owner}` : ""}
+              </span>
+              {!objects && !tf.fields.length && <> <span className="muted-tag">unused</span></>}
+              {tf.inconsistent.length > 0 && <> <span className="status-label status-warning">! Inconsistent type: {tf.inconsistent.join(", ")}</span></>}
             </dt>
-            <dd>{t.description ?? <span className="muted">No definition.</span>}</dd>
+            <dd>
+              {t.description ?? <span className="muted">No definition.</span>}
+              {t.synonyms?.length ? <div className="muted small">Also called: {t.synonyms.join(", ")}</div> : null}
+              {tf.sourcetypes.size > 0 && (
+                <div className="small">From sourcetypes:{" "}
+                  {[...tf.sourcetypes].sort().map((st, i) => {
+                    const e = catalog.entities.find((x) => x.type === "sourcetype" && x.name === st);
+                    return <span key={st}>{i > 0 && ", "}{e ? <Link to={`${entityPath(e.id)}?tab=fields`}>{st}</Link> : st}</span>;
+                  })}
+                </div>
+              )}
+            </dd>
           </div>
         ))}
       </dl>
+      {glossary.length > 0 && !rows.length && <p className="muted">No term matches.</p>}
       {undefinedTerms.length > 0 && (
         <section>
           <h2>Used but not defined</h2>

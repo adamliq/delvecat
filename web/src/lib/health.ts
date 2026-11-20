@@ -1,4 +1,4 @@
-import type { Entity } from "../generated/catalog";
+import type { CatalogBundle, Entity } from "../generated/catalog";
 
 export type HealthStatus = "ok" | "warning" | "critical";
 
@@ -46,4 +46,15 @@ export function downloadText(filename: string, text: string, type = "text/csv") 
   a.download = filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * When the catalog's data was measured: the health report's "as of" time (a replayed
+ * recording keeps its own time), else when the bundle was generated. Ages ("3 days
+ * old", "2 hours ago") are counted from this, so an old catalog does not look stale.
+ */
+export function measuredAt(bundle: Pick<CatalogBundle, "generatedAt" | "ingestionReport">): number {
+  const msg = bundle.ingestionReport?.find((r) => r.connector === "health")?.message;
+  const t = msg ? Date.parse(msg.replace(/^as of /, "")) : NaN;
+  return Number.isNaN(t) ? Date.parse(bundle.generatedAt) : t;
 }

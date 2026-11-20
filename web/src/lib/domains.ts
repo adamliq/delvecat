@@ -49,11 +49,12 @@ export interface Rollup {
   unused: number;
   undocumented: number;
   atRisk: number;
+  owned: number;
 }
 
 /** Health, sensitivity, cleanup and documentation counts for a set of assets. */
 export function rollup(entities: Entity[], risk?: Map<string, unknown>): Rollup {
-  const r: Rollup = { total: entities.length, critical: 0, warning: 0, sensitive: 0, unused: 0, undocumented: 0, atRisk: 0 };
+  const r: Rollup = { total: entities.length, critical: 0, warning: 0, sensitive: 0, unused: 0, undocumented: 0, atRisk: 0, owned: 0 };
   for (const e of entities) {
     if (risk?.has(e.id)) r.atRisk++;
     if (e.health?.status === "critical") r.critical++;
@@ -62,6 +63,7 @@ export function rollup(entities: Entity[], risk?: Map<string, unknown>): Rollup 
     if (gov?.classifications?.some((c) => c.sensitive)) r.sensitive++;
     if (e.usage?.unused && !e.usage.builtin) r.unused++;
     if (!e.annotations?.description && !e.description) r.undocumented++;
+    if (e.annotations?.owners?.length) r.owned++;
   }
   return r;
 }

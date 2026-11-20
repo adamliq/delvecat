@@ -6,7 +6,7 @@ import { effectiveDescription } from "../lib/annotate";
 import { detectionStatus, isDetection } from "../lib/coverage";
 import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
-import { PRODUCT_LABELS, pluralTypeLabel, typeLabel } from "../lib/labels";
+import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
 
 const KIND_LABELS: Record<string, string> = {
@@ -18,6 +18,17 @@ const KIND_LABELS: Record<string, string> = {
 };
 
 const CHANGE_LIMIT = 15;
+
+/** A tiny trend line over builds (no axes: the tile's number is the latest value). */
+function MiniTrend({ values, label }: { values: number[]; label: string }) {
+  const w = 96, h = 22, max = Math.max(1, ...values), step = (w - 4) / (values.length - 1);
+  const pts = values.map((v, i) => `${2 + i * step},${h - 2 - (v / max) * (h - 4)}`).join(" ");
+  return (
+    <svg className="mini-trend" width={w} height={h} role="img" aria-label={`${label}: ${values.join(", ")}`}>
+      <polyline points={pts} />
+    </svg>
+  );
+}
 
 function ChangeList({ ids, label }: { ids: string[]; label: string }) {
   const { catalog } = useCatalog();
@@ -61,11 +72,32 @@ export function Home() {
   const unhealthy = bundle.entities.filter((e) => e.health);
   const unusedCustom = bundle.entities.filter((e) => e.usage?.unused && !e.usage.builtin).length;
   const noIndex = bundle.entities.filter((e) => e.lineage?.implicitIndex).length;
-  const coverage: [string, number][] = [
-    ["have a description", described],
-    ["have an owner", owned],
-    ["are classified", classified],
+  const coverage: [string, number, string][] = [
+    ["have a description", described, searchPath({ documented: "no" })],
+    ["have an owner", owned, "/insights"],
+    ["are classified", classified, "/governance"],
   ];
+  const history = bundle.healthHistory ?? [];
+  const critical = unhealthy.filter((e) => e.health!.status === "critical").length;
+  const glance: { num: string; label: string; to: string; title?: string; tone?: "critical" | "warning"; trend?: number[] }[] = [
+    ...(healthReport ? [
+      { num: `${critical} / ${unhealthy.length - critical}`, label: "objects critical / with warnings", to: "/health", tone: critical ? "critical" as const : unhealthy.length ? "warning" as const : undefined,
+        trend: history.map((h) => h.critical + h.warning), title: "Open the health report" },
+      { num: unusedCustom.toLocaleString(), label: "unused objects in custom apps", to: "/health", title: "Cleanup report on the Health page", trend: history.some((h) => h.unused !== undefined) ? history.map((h) => h.unused ?? 0) : undefined },
+    ] : []),
+    ...(atRisk ? [{ num: atRisk.toLocaleString(), label: "at risk from upstream problems", to: searchPath({ risk: ["critical", "warning"] }), tone: "warning" as const }] : []),
+    ...(detections.length ? [{ num: `${firing} / ${detections.length}`, label: "detections can fire", to: "/coverage", tone: firing < detections.length ? "warning" as const : undefined, title: "ATT&CK and CIM coverage" }] : []),
+    ...(gov && gov.sensitiveStores > 0 ? [{ num: gov.sensitiveStores.toLocaleString(), label: `sensitive data stores${gov.exposedToEveryone ? `, ${gov.exposedToEveryone} readable by every role` : ""}`, to: "/governance", tone: gov.exposedToEveryone ? "warning" as const : undefined }] : []),
+    ...(broken ? [{ num: broken.toLocaleString(), label: "objects with broken references", to: searchPath({ issue: "broken reference" }), tone: "warning" as const, title: "Macros, lookups, indexes or saved searches that are missing or not shared" }] : []),
+    ...(noIndex ? [{ num: noIndex.toLocaleString(), label: "searches without an index", to: searchPath({ issue: "no index specified" }), title: "Results depend on the user's default indexes" }] : []),
+    ...((bundle.structuredProperties?.length ?? 0) > 0 ? [{ num: missingRequired.toLocaleString(), label: "objects missing a required property", to: "/properties", tone: missingRequired ? "warning" as const : undefined }] : []),
+    ...((bundle.domains?.length ?? 0) > 0 ? [{ num: `${bundle.domains!.length} / ${bundle.dataProducts?.length ?? 0}`, label: "domains / data products", to: "/domains" }] : []),
+  ];
+  const typeGroups = (() => {
+    const by = new Map<string, [string, number][]>();
+    for (const [t, n] of byType) by.set(typeGroup(t), [...(by.get(typeGroup(t)) ?? []), [t, n]]);
+    return [...TYPE_GROUPS.map(([g]) => g), "Other"].filter((g) => by.has(g)).map((g) => [g, by.get(g)!] as const);
+  })();
 
   return (
     <div className="stack">
@@ -101,13 +133,26 @@ export function Home() {
       </section>
 
       <section>
+        <h2>At a glance</h2>
+        <div className="tiles glance">
+          {glance.map((t) => (
+            <Link key={t.label} to={t.to} className={`tile${t.tone ? ` tile-${t.tone}` : ""}`} title={t.title}>
+              <span className="tile-num">{t.num}</span>
+              <span className="tile-label">{t.label}</span>
+              {t.trend && t.trend.length > 1 && <MiniTrend values={t.trend} label={`${t.label} over the last ${t.trend.length} builds`} />}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section>
         <h2>Documentation</h2>
         <div className="tiles">
-          {coverage.map(([label, n]) => (
-            <div key={label} className="tile static">
+          {coverage.map(([label, n, to]) => (
+            <Link key={label} to={to} className="tile" title="Show the objects that lack it">
               <span className="tile-num">{Math.round((n / total) * 100)}%</span>
               <span className="tile-label">{label} ({n.toLocaleString()})</span>
-            </div>
+            </Link>
           ))}
         </div>
         <p className="small">
@@ -116,89 +161,21 @@ export function Home() {
         </p>
       </section>
 
-      {detections.length > 0 && (
-        <section>
-          <h2>Security detections</h2>
-          <p>
-            {detections.length} detections, <strong>{firing}</strong> can fire
-            {detections.length - firing > 0 && <>, <strong>{detections.length - firing}</strong> cannot (disabled, broken or without data)</>}.{" "}
-            <Link to="/coverage">See ATT&CK and CIM coverage</Link>
-          </p>
-        </section>
-      )}
-
-      {(bundle.domains?.length ?? 0) > 0 && (
-        <section>
-          <h2>Domains</h2>
-          <p>
-            {bundle.domains!.length} domains and {bundle.dataProducts?.length ?? 0} data products;{" "}
-            {bundle.entities.filter((e) => e.annotations?.domain).length.toLocaleString()} objects assigned to a domain.{" "}
-            <Link to="/domains">Explore domains</Link>
-          </p>
-        </section>
-      )}
-
-      {(bundle.structuredProperties?.length ?? 0) > 0 && (
-        <section>
-          <h2>Properties</h2>
-          <p>
-            {bundle.structuredProperties!.length} structured properties defined
-            {missingRequired > 0 && <>; <strong>{missingRequired}</strong> objects are missing a required value</>}.{" "}
-            <Link to="/properties">Review properties</Link>
-          </p>
-        </section>
-      )}
-
-      {gov && gov.sensitiveStores > 0 && (
-        <section>
-          <h2>Governance</h2>
-          <p>
-            {gov.sensitiveStores} data stores hold sensitive data
-            {gov.exposedToEveryone > 0 && <>, <strong>{gov.exposedToEveryone}</strong> readable by every role</>}.{" "}
-            <Link to="/governance">Who can see sensitive data?</Link>
-          </p>
-        </section>
-      )}
-
-      {healthReport && (
-        <section>
-          <h2>Health</h2>
-          <p>
-            {unhealthy.filter((e) => e.health!.status === "critical").length} critical and{" "}
-            {unhealthy.filter((e) => e.health!.status === "warning").length} warning findings,{" "}
-            {unusedCustom} unused objects in custom apps
-            {atRisk > 0 && <>, <Link to={searchPath({ risk: ["critical", "warning"] })}>{atRisk} at risk from upstream problems</Link></>}.{" "}
-            <Link to="/health">Open the health report</Link>
-          </p>
-        </section>
-      )}
-
-      {(broken > 0 || noIndex > 0) && (
-        <section>
-          <h2>Search health</h2>
-          <ul className="plain-list">
-            {broken > 0 && (
-              <li><Link to={searchPath({ issue: "broken reference" })}>{broken} object{broken === 1 ? "" : "s"} with broken references</Link>{" "}
-                <span className="muted small">(macros, lookups, indexes or saved searches that are missing or not shared)</span></li>
-            )}
-            {noIndex > 0 && (
-              <li><Link to={searchPath({ issue: "no index specified" })}>{noIndex} search{noIndex === 1 ? "" : "es"} without an index</Link>{" "}
-                <span className="muted small">(results depend on the user's default indexes)</span></li>
-            )}
-          </ul>
-        </section>
-      )}
-
       <section>
         <h2>Object types</h2>
-        <div className="tiles">
-          {byType.map(([type, n]) => (
-            <Link key={type} to={searchPath({ type })} className="tile">
-              <span className="tile-num">{n.toLocaleString()}</span>
-              <span className="tile-label">{pluralTypeLabel(type as EntityType)}</span>
-            </Link>
-          ))}
-        </div>
+        {typeGroups.map(([group, types]) => (
+          <div key={group} className="type-group">
+            <h3>{group} <span className="muted small">{types.reduce((n, [, c]) => n + c, 0).toLocaleString()}</span></h3>
+            <div className="tiles tiles-compact">
+              {types.map(([type, n]) => (
+                <Link key={type} to={searchPath({ type })} className="tile">
+                  <span className="tile-num">{n.toLocaleString()}</span>
+                  <span className="tile-label">{pluralTypeLabel(type as EntityType)}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       <section>

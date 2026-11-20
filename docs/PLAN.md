@@ -635,6 +635,14 @@ surfaces; status is always icon + label, never color alone.
   collection `delvecat_acks` (publishers and admins); outside Splunk it stays in
   the browser.
 
+### Page review (done)
+
+Every page reviewed and improved: ages from measurement time, why a search result
+matched, a table view, object page navigation and SPL links, compact ATT&CK summary
+with fixes for detections that cannot fire, worklists and trends for Insights
+targets (the build records documentation counts per build), per-domain roll-ups,
+glossary search, overdue dates, multi-schema compare, and filters kept in the URL.
+
 ### Splunk app, phases 1 and 2 (done)
 
 DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud

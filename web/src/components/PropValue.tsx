@@ -2,7 +2,8 @@ import { createContext, useContext, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
-import { isIsoDate, numberWithUnit, propLabel, REFERENCE_KEYS, relative, valueLabel } from "../lib/propertyFormat";
+import { measuredAt } from "../lib/health";
+import { isIsoDate, numberWithUnit, parseDate, propLabel, REFERENCE_KEYS, relative, valueLabel } from "../lib/propertyFormat";
 
 const isScalar = (v: unknown) => v === null || ["string", "number", "boolean"].includes(typeof v);
 
@@ -20,14 +21,16 @@ function Reference({ type, name }: { type: string; name: string }) {
 
 /** A property value, readable: units from its key, local dates, links to named objects. */
 export function PropValue({ value, name }: { value: unknown; name?: string }): ReactNode {
+  const ctx = useContext(PropContext);
   if (value === null || value === undefined || value === "") return <span className="muted">—</span>;
   if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (typeof value === "number") return (name && numberWithUnit(name, value)) ?? value.toLocaleString();
+  if (typeof value === "number") return (name && (numberWithUnit(name, value) ?? (valueLabel(name, String(value)) !== String(value) ? valueLabel(name, String(value)) : undefined))) || value.toLocaleString();
   if (typeof value === "string") {
     if (isIsoDate(value)) {
+      const t = parseDate(value);
       return (
-        <time dateTime={value} title={value}>
-          {new Date(value).toLocaleString()} <span className="muted">({relative(value)})</span>
+        <time dateTime={new Date(t).toISOString()} title={`${value}; the age is counted from when the catalog was measured`}>
+          {new Date(t).toLocaleString()} <span className="muted">({relative(value, ctx ? measuredAt(ctx.catalog.bundle) : undefined)})</span>
         </time>
       );
     }

@@ -277,7 +277,7 @@ const sections = {
     await v.page.goto(app('#/health'));
     await v.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
     await sleep(1500);
-    await v.page.check('label:has-text("Show acknowledged") input');
+    await v.page.click('label:has-text("Show acknowledged") input'); await sleep(500);
     await sleep(500);
     const vt = await mainText(v.page);
     check('viewer sees who accepted it', /Accepted by publisher: e2e: known/.test(vt));
@@ -295,11 +295,50 @@ const sections = {
     await pub2.page.goto(app('#/health'));
     await pub2.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
     await sleep(1500);
-    await pub2.page.check('label:has-text("Show acknowledged") input');
+    await pub2.page.click('label:has-text("Show acknowledged") input'); await sleep(500);
     await pub2.page.locator('.ack-state button:has-text("Undo")').first().click();
     await sleep(1500);
     check('publisher undoes it: removed from the collection', ((await rest('GET', ACKS)).json || []).length === 0);
     await pub2.close();
+  },
+
+  async pages() {
+    const v = await session('viewer');
+    const go = async (hash, wait) => {
+      await v.page.goto(app(hash));
+      try { await v.page.waitForSelector(wait, { timeout: 30000 }); } catch {}
+      await sleep(1200);
+    };
+    await go('', '.glance');
+    check('home: at-a-glance tiles and types grouped by area', (await v.page.locator('.glance .tile').count()) >= 3 && (await v.page.locator('.type-group h3').count()) >= 3);
+    await go('#/search?q=_internal&view=table', 'table');
+    check('search: table view', (await v.page.locator('main table tbody tr').count()) > 0);
+    await go('#/search?q=_internal', '.entity-row');
+    check('search: matched words highlighted', (await v.page.locator('.entity-row mark').count()) > 0);
+    await v.page.goto(app('#/search?q=_internal&type=index'));
+    await sleep(2000);
+    const idx = v.page.locator('main a[href*="entity/"]').first();
+    if (await idx.count()) { await idx.click(); await sleep(2000); }
+    check('object page: "On this page" menu', (await v.page.locator('.section-nav button').count()) >= 4);
+    await go('#/search?type=savedSearch&q=index', '.entity-row');
+    const ss = v.page.locator('main a[href*="savedSearch"]').first();
+    if (await ss.count()) { await ss.click(); await sleep(2000); }
+    check('object page: SPL highlighted with linked objects', (await v.page.locator('pre.spl .spl-command, pre.spl .spl-field').count()) > 0,
+      `${await v.page.locator('pre.spl a.spl-link').count()} links`);
+    await go('#/coverage', 'h1');
+    const cov = await mainText(v.page);
+    check('coverage: summary by tactic or no detections', /Summary by tactic|no detections/.test(cov) || (await v.page.locator('main table').count()) > 0);
+    await go('#/insights?target=described', '.worklist');
+    check('insights: a target opens its worklist', (await v.page.locator('.worklist').count()) === 1);
+    await go('#/compare?mode=many', 'h1');
+    check('compare: several schemas mode', /Several, or against a data model/.test(await mainText(v.page)));
+    await go('#/glossary?unused=1', 'h1');
+    const noTerms = /No glossary terms/.test(await mainText(v.page));
+    check('glossary: filters kept in the URL', noTerms || await v.page.isChecked('label:has-text("Only unused terms") input').catch(() => false), noTerms ? 'no terms in this catalog' : '');
+    await go('#/health?status=warning', '.tile-btn');
+    check('health: filters read from the URL', (await v.page.locator('select[aria-label="Status"]').inputValue().catch(() => '')) === 'warning');
+    check('viewer pages without script errors', v.errors.length === 0, v.errors.join('; '));
+    await v.close();
   },
 
   async timelimit() {

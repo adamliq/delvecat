@@ -1,10 +1,11 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { DataTable } from "../components/DataTable";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
 import { access, effectiveClassifications, HOW_LABEL, isSensitive, matchesClass, readsClassified, sensitiveAccess } from "../lib/governance";
 import { typeLabel } from "../lib/labels";
+import { owners } from "../lib/annotate";
 import { entityPath } from "../lib/routes";
 
 const STORE_ORDER = ["index", "lookup", "kvCollection", "externalTable", "dataModel", "sourcetype"];
@@ -14,7 +15,7 @@ function Name({ e }: { e?: Entity }) {
   return <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link>;
 }
 
-const PAGE = 100;
+
 const MATRIX_STORES = 40;
 const MATRIX_ROLES = 60;
 const FEW = 8;
@@ -29,11 +30,21 @@ function Few({ ids, render }: { ids: string[]; render: (id: string) => ReactNode
   );
 }
 
+const schedRuns = (e: Entity): number => Number((e.usage?.scheduler as { total?: number } | undefined)?.total ?? 0);
+
+/** Roles allowed to run (read) an object, or its sharing when that says more. */
+function runners(e: Entity): string {
+  const read = (e.permissions as { read?: string[] } | undefined)?.read ?? [];
+  if (read.includes("*")) return "every role";
+  if (read.length) return read.join(", ");
+  return e.sharing === "user" ? `only ${e.owner ?? "its owner"}` : "";
+}
+
 export function GovernancePage() {
   const { catalog } = useCatalog();
   const [params, setParams] = useSearchParams();
   const filter = params.get("classification") ?? "";
-  const [consumerRows, setConsumerRows] = useState(PAGE);
+  const userFilter = params.get("user") ?? "";
   const byId = catalog.byId;
 
   const stores = useMemo(() => catalog.entities.filter((e) => isSensitive(e) && STORE_ORDER.includes(e.type))
@@ -69,7 +80,10 @@ export function GovernancePage() {
   const accessOf = new Map(roles.map((r) => [r.id, new Map(sensitiveAccess(r).map((a) => [a.id, a]))]));
   const reach = (s: Entity) => roles.reduce((n, r) => n + (accessOf.get(r.id)!.has(s.id) ? 1 : 0), 0);
   const matrixStores = reachable.length > MATRIX_STORES ? [...reachable].sort((a, b) => reach(b) - reach(a)).slice(0, MATRIX_STORES) : reachable;
-  const matrixRoles = [...roles].sort((a, b) => accessOf.get(b.id)!.size - accessOf.get(a.id)!.size || a.name.localeCompare(b.name)).slice(0, MATRIX_ROLES)
+  const userRoles = userFilter
+    ? new Set(catalog.edgesFrom(userFilter).filter((x) => x.type === "memberOf").map((x) => x.to))
+    : undefined;
+  const matrixRoles = [...roles].filter((r) => !userRoles || userRoles.has(r.id)).sort((a, b) => accessOf.get(b.id)!.size - accessOf.get(a.id)!.size || a.name.localeCompare(b.name)).slice(0, MATRIX_ROLES)
     .sort((a, b) => a.name.localeCompare(b.name));
   const cell = (role: Entity, store: Entity) => {
     const a = accessOf.get(role.id)?.get(store.id);
@@ -148,6 +162,14 @@ export function GovernancePage() {
           {(matrixStores.length < reachable.length || matrixRoles.length < roles.length) && (
             <p className="muted small">Showing the {matrixStores.length} most-reached data stores and the {matrixRoles.length} roles that reach the most, of {reachable.length} and {roles.length}. Filter by classification above to narrow it.</p>
           )}
+          <label className="sort">
+            Roles of user
+            <select value={userFilter} onChange={(e) => { const next = new URLSearchParams(params); if (e.target.value) next.set("user", e.target.value); else next.delete("user"); setParams(next, { replace: true }); }}>
+              <option value="">Every role</option>
+              {users.map((u) => <option key={u.id} value={u.id}>{u.displayName ?? u.name}</option>)}
+            </select>
+          </label>
+          {userFilter && <p className="small">{catalog.byId.get(userFilter)?.displayName ?? catalog.byId.get(userFilter)?.name} reaches {sensitiveAccess(catalog.byId.get(userFilter)!, catalog).filter((a) => reachableIds.has(a.id)).length} of these data stores through {matrixRoles.length} role{matrixRoles.length === 1 ? "" : "s"} (imported roles included in the access).</p>}
           <p className="muted small">✓ search: the role can search the index (including access inherited from imported roles). ◐ filtered: a search filter limits which events it sees. ✓ read: read permission on a lookup or collection.</p>
           <div className="table-wrap">
             <table className="mini-table matrix">
@@ -165,12 +187,23 @@ export function GovernancePage() {
       {consumers.length > 0 && (
         <section>
           <h2>Searches and dashboards reading sensitive data</h2>
-          <ul className="plain-list">
-            {consumers.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name)).slice(0, consumerRows).map((c) => (
-              <li key={c.id}><span className="muted rel-type">{typeLabel(c.type)}</span> <Name e={c} /> <span className="muted small">{readsClassified(c).join(", ")}</span></li>
-            ))}
-          </ul>
-          {consumers.length > consumerRows && <button type="button" className="btn btn-small" onClick={() => setConsumerRows(consumerRows + PAGE)}>Show {Math.min(PAGE, consumers.length - consumerRows)} more of {consumers.length - consumerRows}</button>}
+          <DataTable
+            rows={consumers}
+            rowKey={(c) => c.id}
+            csvName="delvecat-sensitive-readers.csv"
+            columns={[
+              { label: "Object", value: (c) => c.displayName ?? c.name, render: (c) => <><span className="muted rel-type">{typeLabel(c.type)}</span> <Name e={c} /></> },
+              { label: "Reads", value: (c) => readsClassified(c).join(", ") },
+              { label: "App", value: (c) => c.app ?? "" },
+              { label: "Owner", value: (c) => owners(c).join(", ") || c.owner || "" },
+              { label: "Who can run it", value: (c) => runners(c), render: (c) => runners(c) || <span className="muted">—</span> },
+              { label: "Used", value: (c) => (c.usage?.runs ?? 0) + (c.usage?.views ?? 0) + schedRuns(c), render: (c) => {
+                const u = c.usage;
+                const parts = [u?.runs ? `${u.runs} runs` : "", schedRuns(c) ? `${schedRuns(c)} scheduled runs` : "", u?.views ? `${u.views} views` : ""].filter(Boolean);
+                return parts.join(", ") || <span className="muted">not in the window</span>;
+              } },
+            ]}
+          />
         </section>
       )}
 

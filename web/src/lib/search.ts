@@ -110,8 +110,16 @@ function toDoc(e: Entity): Doc {
   };
 }
 
+/** Why an object matched: the words found and the fields they were found in. */
+export interface Match {
+  terms: string[];
+  fields: string[];
+}
+
 export interface SearchResult {
   results: Entity[];
+  /** Per result id, why it matched (only for a text query). */
+  matches: Map<string, Match>;
   /** For each facet: value → count, computed with every *other* active facet applied. */
   facets: Record<Facet, Map<string, number>>;
 }
@@ -151,20 +159,28 @@ export class EntitySearch {
     }
   }
 
-  private matching(query: string): Entity[] {
+  private matching(query: string): { list: Entity[]; matches: Map<string, Match> } {
     const q = query.trim();
-    if (!q) return this.entities;
+    const matches = new Map<string, Match>();
+    if (!q) return { list: this.entities, matches };
     // A query that is exactly a value an object holds (an IP, a tenant id, a bucket) ranks
     // those objects first: word search splits such values into pieces.
     const exact = (this.exact.get(q.toLowerCase()) ?? []).map((id) => this.byId.get(id)!).filter(Boolean);
-    const words = this.index.search(q).map((r) => this.byId.get(r.id as string)!).filter(Boolean);
-    if (!exact.length) return words;
+    for (const e of exact) matches.set(e.id, { terms: [q], fields: ["values"] });
+    const hits = this.index.search(q);
+    for (const r of hits) {
+      if (matches.has(r.id as string)) continue;
+      const fields = [...new Set(Object.values(r.match).flat())];
+      matches.set(r.id as string, { terms: Object.keys(r.match), fields });
+    }
+    const words = hits.map((r) => this.byId.get(r.id as string)!).filter(Boolean);
+    if (!exact.length) return { list: words, matches };
     const seen = new Set(exact.map((e) => e.id));
-    return [...exact, ...words.filter((e) => !seen.has(e.id))];
+    return { list: [...exact, ...words.filter((e) => !seen.has(e.id))], matches };
   }
 
   query(query: string, filters: Filters = {}, sort: Sort = "relevance"): SearchResult {
-    const base = this.matching(query);
+    const { list: base, matches } = this.matching(query);
     const active = this.facetNames.filter((f) => filters[f]?.length);
     const passes = (e: Entity, skip?: Facet) =>
       active.every((f) => f === skip || this.facets[f](e).some((v) => filters[f]!.includes(v)));
@@ -184,7 +200,7 @@ export class EntitySearch {
     if (effective === "name") results.sort((a, b) => (a.displayName ?? a.name).localeCompare(b.displayName ?? b.name));
     if (effective === "type") results.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
     if (effective === "updated") results.sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
-    return { results, facets };
+    return { results, facets, matches };
   }
 
   /** Backwards-compatible single-value filtering used by simple callers. */
@@ -193,4 +209,69 @@ export class EntitySearch {
     for (const [k, v] of Object.entries(filters)) if (v) f[k as Facet] = [v];
     return this.query(query, f).results;
   }
+}
+
+// --- why it matched -----------------------------------------------------------------------
+
+/** Property values with the key that holds them ("tenantId", "servers"), for match snippets. */
+export function propertyPairs(props: unknown, key = "", out: [string, string][] = [], depth = 0): [string, string][] {
+  if (out.length >= MAX_VALUES || depth > 5 || props === null || props === undefined) return out;
+  if (typeof props === "string") {
+    if (props.length >= 2 && props.length <= 200 && !DATE.test(props)) out.push([key, props]);
+  } else if (Array.isArray(props)) {
+    for (const v of props) propertyPairs(v, key, out, depth + 1);
+  } else if (typeof props === "object") {
+    for (const [k, v] of Object.entries(props as Record<string, unknown>)) {
+      if (!VALUE_SKIP.has(k)) propertyPairs(v, k, out, depth + 1);
+    }
+  }
+  return out;
+}
+
+const FIELD_WORDS: Record<string, string> = {
+  name: "name", displayName: "name", description: "description", app: "app", owner: "owner",
+  tags: "tags, classifications or terms", body: "search text", values: "a property value",
+};
+
+export interface Snippet {
+  /** Where it matched, in words. */
+  where: string;
+  /** The text around the match (a value, or part of the SPL); undefined for name/description. */
+  text?: string;
+  key?: string;
+}
+
+const lower = (s: string) => s.toLowerCase();
+
+/** A short explanation of the match for a result row. */
+export function matchSnippet(e: Entity, m: Match | undefined): Snippet | undefined {
+  if (!m || !m.fields.length) return undefined;
+  const fields = [...new Set(m.fields.map((f) => FIELD_WORDS[f] ?? f))];
+  const terms = m.terms.map(lower);
+  const has = (t: string) => terms.some((w) => lower(t).includes(w));
+  // Name or description matches show in the row already (highlighted).
+  if (m.fields.some((f) => f === "name" || f === "displayName" || f === "description")) return { where: fields.join(", ") };
+  if (m.fields.includes("values")) {
+    const pair = propertyPairs(e.properties ?? {}).find(([, v]) => has(v));
+    if (pair) return { where: fields.join(", "), key: pair[0], text: pair[1] };
+  }
+  if (m.fields.includes("body")) {
+    const p = (e.properties ?? {}) as Record<string, unknown>;
+    const text = [p.search, p.definition, p.expression].find((v): v is string => typeof v === "string" && has(v));
+    if (text) {
+      const at = Math.min(...terms.map((w) => lower(text).indexOf(w)).filter((i) => i >= 0));
+      const start = Math.max(0, at - 40);
+      return { where: fields.join(", "), text: `${start ? "…" : ""}${text.slice(start, at + 60)}${at + 60 < text.length ? "…" : ""}` };
+    }
+  }
+  return { where: fields.join(", ") };
+}
+
+/** Text split into [plain, matched] pieces for highlighting; matching is case-insensitive. */
+export function highlightParts(text: string, terms: string[]): [string, boolean][] {
+  const words = terms.map(lower).filter((w) => w.length > 1).sort((a, b) => b.length - a.length);
+  if (!words.length || !text) return [[text, false]];
+  const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const re = new RegExp(`(${escaped.join("|")})`, "gi");
+  return text.split(re).filter((x) => x !== "").map((x) => [x, words.includes(lower(x))] as [string, boolean]);
 }

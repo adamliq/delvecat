@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { DataTable } from "../components/DataTable";
 import { Meter } from "../components/Meter";
 import { SchemaNetwork, type NetworkMode } from "../components/SchemaNetwork";
 import type { Entity } from "../generated/catalog";
@@ -87,27 +88,27 @@ export function SchemasPage() {
       <section>
         <h2>Sourcetypes <span className="muted">({rows.length} of {all.length})</span></h2>
         {rows.length === 0 ? <p className="muted">No sourcetypes match. Loosen a filter or clear them all.</p> : (
-          <div className="table-wrap">
-            <table className="mini-table">
-              <thead><tr><th>Sourcetype</th><th>Fields</th><th>Data models</th><th>CIM coverage</th><th>Sensitive fields</th><th>Owner</th><th>Health</th></tr></thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.st.id}>
-                    <td>
-                      <Link to={`${entityPath(r.st.id)}?tab=fields`}>{r.st.displayName ?? r.st.name}</Link>
-                      {hits(r).length > 0 && <div className="small">{hits(r).map((h) => <code key={h} className="hit">{h}</code>)}</div>}
-                    </td>
-                    <td className="num">{r.fields.length}</td>
-                    <td>{r.cim.models.map((m: Entity, i: number) => <span key={m.id}>{i > 0 && ", "}<Link to={entityPath(m.id)}>{m.name}</Link></span>)}{!r.cim.models.length && <span className="muted">not mapped</span>}</td>
-                    <td>{r.cim.pct === undefined ? <span className="muted">n/a</span> : <Meter value={r.cim.pct} max={100} label={`${r.cim.pct}%`} name={`CIM coverage of ${r.st.name}`} />}</td>
-                    <td className="num">{r.sensitive}</td>
-                    <td>{r.owners.join(", ") || <span className="muted">—</span>}</td>
-                    <td><StatusLabel status={healthStatus(r.st)} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            rows={rows}
+            rowKey={(r) => r.st.id}
+            csvName="delvecat-schemas.csv"
+            columns={[
+              { label: "Sourcetype", value: (r) => r.st.displayName ?? r.st.name, render: (r) => (
+                <>
+                  <Link to={`${entityPath(r.st.id)}?tab=fields`}>{r.st.displayName ?? r.st.name}</Link>
+                  {hits(r).length > 0 && <div className="small">{hits(r).map((h) => <code key={h} className="hit">{h}</code>)}</div>}
+                </>
+              ) },
+              { label: "Fields", value: (r) => r.fields.length },
+              { label: "Data models", value: (r) => r.cim.models.map((m) => m.name).join(", "), render: (r) => (
+                <>{r.cim.models.map((m: Entity, i: number) => <span key={m.id}>{i > 0 && ", "}<Link to={entityPath(m.id)}>{m.name}</Link></span>)}{!r.cim.models.length && <span className="muted">not mapped</span>}</>
+              ) },
+              { label: "CIM coverage", value: (r) => r.cim.pct ?? -1, render: (r) => (r.cim.pct === undefined ? <span className="muted">n/a</span> : <Meter value={r.cim.pct} max={100} label={`${r.cim.pct}%`} name={`CIM coverage of ${r.st.name}`} />) },
+              { label: "Sensitive fields", value: (r) => r.sensitive },
+              { label: "Owner", value: (r) => r.owners.join(", "), render: (r) => r.owners.join(", ") || <span className="muted">—</span> },
+              { label: "Health", value: (r) => ({ critical: 0, warning: 1, ok: 2 })[healthStatus(r.st)], render: (r) => <StatusLabel status={healthStatus(r.st)} /> },
+            ]}
+          />
         )}
       </section>
 

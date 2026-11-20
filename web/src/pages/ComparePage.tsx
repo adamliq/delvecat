@@ -3,7 +3,8 @@ import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
 import { termsOfField } from "../lib/glossaryFields";
 import { entityPath, glossaryPath } from "../lib/routes";
-import { compareSchemas, fieldType, nullRate, schemaSourcetypes, type CompareStatus } from "../lib/schema";
+import { compareSchemas, dataModelFields, fieldType, nullRate, schemaSourcetypes, type CompareStatus } from "../lib/schema";
+import { CompareMany, MAX_SCHEMAS } from "../components/CompareMany";
 
 const STATUS: Record<CompareStatus, { label: string; icon: string }> = {
   onlyA: { label: "Only in A", icon: "A" },
@@ -41,6 +42,50 @@ export function ComparePage() {
       </div>
     );
   }
+  const many = params.get("mode") === "many";
+  const manyIds = params.getAll("x");
+  const models = catalog.entities.filter((e) => e.type === "dataModel" && dataModelFields(e).names.size > 0);
+  const setMany = (ids: string[]) => {
+    const next = new URLSearchParams(params);
+    next.set("mode", "many");
+    next.delete("x");
+    ids.slice(0, MAX_SCHEMAS).forEach((id) => next.append("x", id));
+    setParams(next, { replace: true });
+  };
+  const modeSwitch = (
+    <div className="seg" role="tablist" aria-label="Compare">
+      <button type="button" role="tab" aria-selected={!many} className={!many ? "active" : undefined}
+        onClick={() => { const next = new URLSearchParams(params); next.delete("mode"); setParams(next, { replace: true }); }}>Two sourcetypes</button>
+      <button type="button" role="tab" aria-selected={many} className={many ? "active" : undefined}
+        onClick={() => setMany(manyIds.length ? manyIds : [a.id, b.id])}>Several, or against a data model</button>
+    </div>
+  );
+  if (many) {
+    const ids = manyIds.length ? manyIds : [a.id, b.id];
+    return (
+      <div className="stack">
+        <div>
+          <h1>Compare schemas</h1>
+          <p className="lede">Up to {MAX_SCHEMAS} sourcetypes and data models side by side: the fields each has, the ones they all share, and the data model fields a sourcetype lacks.</p>
+        </div>
+        {modeSwitch}
+        <label className="sort">Add
+          <select value="" onChange={(e) => e.target.value && setMany([...ids.filter((x) => x !== e.target.value), e.target.value])} disabled={ids.length >= MAX_SCHEMAS}>
+            <option value="">a sourcetype or data model…</option>
+            <optgroup label="Sourcetypes">
+              {options.filter((o) => !ids.includes(o.id)).map((o) => <option key={o.id} value={o.id}>{o.displayName ?? o.name}{catalog.bundle.instances.length > 1 ? ` (${o.instance})` : ""}</option>)}
+            </optgroup>
+            {models.length > 0 && (
+              <optgroup label="Data models">
+                {models.filter((m) => !ids.includes(m.id)).map((m) => <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>)}
+              </optgroup>
+            )}
+          </select>
+        </label>
+        <CompareMany catalog={catalog} ids={ids} onRemove={(id) => setMany(ids.filter((x) => x !== id))} />
+      </div>
+    );
+  }
   const rows = compareSchemas(catalog, a, b);
   const counts = Object.fromEntries(ORDER.map((s) => [s, rows.filter((r) => r.status === s).length])) as Record<CompareStatus, number>;
   const sharedPct = rows.length ? Math.round((100 * (counts.same + counts.differs)) / rows.length) : 0;
@@ -57,6 +102,7 @@ export function ComparePage() {
         <h1>Compare schemas</h1>
         <p className="lede">Which fields two sourcetypes share, and where the same field name holds a different type.</p>
       </div>
+      {modeSwitch}
       <div className="cmp-pick">
         <label><span className="cmp-key cmp-a">A</span> {select("a", a)}</label>
         <button type="button" className="btn btn-small" onClick={() => { const next = new URLSearchParams(params); next.set("a", b.id); next.set("b", a.id); setParams(next, { replace: true }); }}>Swap</button>

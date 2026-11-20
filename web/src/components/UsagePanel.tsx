@@ -1,6 +1,7 @@
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
 import { dailySeries } from "../lib/health";
+import { alertSeries, problemSeries } from "../lib/healthView";
 import { usagePercentile } from "../lib/insights";
 import { pluralTypeLabel } from "../lib/labels";
 import { Meter } from "./Meter";
@@ -24,6 +25,8 @@ export function UsagePanel({ entity }: { entity: Entity }) {
   const h = entity.health;
   const percentile = usagePercentile(catalog, entity);
   const series = dailySeries(entity);
+  const problems = problemSeries(entity);
+  const fires = alertSeries(entity);
   const s = u?.scheduler as Record<string, number | string | null> | undefined;
   const facts: [string, string][] = [];
   if (u?.runs) facts.push(["Runs", `${u.runs.toLocaleString()} by ${u.users ?? "?"} user(s)`]);
@@ -89,6 +92,8 @@ export function UsagePanel({ entity }: { entity: Entity }) {
       {(facts.length > 0 || series) && (
         <dl className="facts">
           {series && (<><dt>Daily events</dt><dd><Sparkline series={series} width={220} label={`Daily events for ${entity.name}`} /></dd></>)}
+          {problems && (<><dt>Skipped or failed runs a day</dt><dd><Sparkline series={problems} width={220} unit="skipped or failed runs" label={`Skipped or failed runs per day for ${entity.name}`} /></dd></>)}
+          {fires && (<><dt>Alerts fired a day</dt><dd><Sparkline series={fires} width={220} unit="alerts fired" label={`Alerts fired per day for ${entity.name}`} /></dd></>)}
           {facts.map(([k, v]) => <div key={k} className="fact-pair"><dt>{k}</dt><dd>{v}</dd></div>)}
           {popularity && <div className="fact-pair"><dt>Popularity</dt><dd>{popularity}</dd></div>}
         </dl>

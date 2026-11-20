@@ -677,6 +677,48 @@ def mark_unused(
 # --- history --------------------------------------------------------------------------
 
 
+# Objects people are expected to document and own (the web's Insights targets use the same).
+DOCUMENTED_TYPES = {
+    "index", "sourcetype", "savedSearch", "correlationSearch", "dashboard", "lookup",
+    "kvCollection", "macro", "dataModel", "eventtype", "soarPlaybook", "dbInput", "dbOutput",
+    "dbConnection", "uebaModel",
+}  # fmt: skip
+
+
+def documentation_counts(entities: list[dict[str, Any]]) -> dict[str, int]:
+    """How many custom objects of documented types there are, and how many are described,
+    owned and in a domain (Splunk and product apps left out, as on the Insights page)."""
+    vendor = {
+        e["name"]
+        for e in entities
+        if e["type"] == "app"
+        and (
+            "splunk" in str((e.get("properties") or {}).get("author", "")).lower()
+            or (e.get("properties") or {}).get("builtin")
+            or e.get("product") not in (None, "splunk")
+        )
+    }
+    out = {"documented": 0, "described": 0, "owned": 0, "inDomain": 0}
+    for e in entities:
+        if e["type"] not in DOCUMENTED_TYPES or e.get("sharing") == "system":
+            continue
+        if (e.get("usage") or {}).get("builtin") or e.get("app") in vendor:
+            continue
+        a = e.get("annotations") or {}
+        out["documented"] += 1
+        out["described"] += bool(a.get("description") or e.get("description"))
+        out["owned"] += bool(a.get("owners"))
+        out["inDomain"] += bool(a.get("domain"))
+    return out
+
+
+def refresh_documentation_point(bundle: dict[str, Any]) -> None:
+    """Update the latest trend point's documentation counts (after annotations change them)."""
+    history = bundle.get("healthHistory")
+    if history and history[-1].get("at") == bundle.get("generatedAt"):
+        history[-1].update(documentation_counts(bundle["entities"]))
+
+
 def _counts(entities: list[dict[str, Any]], at: str) -> dict[str, Any]:
     statuses = [e["health"]["status"] for e in entities if e.get("health")]
     return {
@@ -690,6 +732,7 @@ def _counts(entities: list[dict[str, Any]], at: str) -> dict[str, Any]:
             if c["status"] != "ok"
         ),
         "unused": sum(1 for e in entities if (e.get("usage") or {}).get("unused")),
+        **documentation_counts(entities),
     }
 
 

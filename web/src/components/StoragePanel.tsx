@@ -1,11 +1,12 @@
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
+import { measuredAt } from "../lib/health";
 import { fmtMB, retentionText, storageOf, storeText, tierNames } from "../lib/storage";
 import { Meter } from "./Meter";
 
-const fmtAge = (iso?: string) => {
+const fmtAge = (iso: string | undefined, now: number) => {
   if (!iso) return undefined;
-  const days = (Date.now() - new Date(iso).getTime()) / 86400000;
+  const days = (now - new Date(iso).getTime()) / 86400000;
   return days >= 1 ? `${Math.round(days).toLocaleString()} days` : "less than a day";
 };
 
@@ -22,7 +23,14 @@ export function StoragePanel({ entity }: { entity: Entity }) {
   const smartStore = s?.model === "smartStore";
   const size = obs.currentDBSizeMB as number | undefined;
   const limit = (p.maxGlobalDataSizeMB ?? p.maxTotalDataSizeMB) as number | undefined;
-  const oldest = fmtAge(obs.earliestEvent as string | undefined);
+  // Columns no tier has a value for are left out.
+  const tiers = s?.tiers ?? [];
+  const cols = {
+    size: tiers.some((t) => t.sizeMB != null),
+    limit: tiers.some((t) => t.maxSizeMB || t.maxBuckets),
+    buckets: tiers.some((t) => t.buckets != null),
+  };
+  const oldest = fmtAge(obs.earliestEvent as string | undefined, measuredAt(catalog.bundle));
   return (
     <section>
       <h2>Storage and retention</h2>
@@ -50,9 +58,9 @@ export function StoragePanel({ entity }: { entity: Entity }) {
                 <th>{cloud ? "Splunk Cloud" : "Tier"}</th>
                 <th>{cloud ? "Splunk Enterprise" : "Splunk Cloud"}</th>
                 <th>Location</th>
-                <th>Size</th>
-                <th>Limit</th>
-                <th>Buckets</th>
+                {cols.size && <th>Size</th>}
+                {cols.limit && <th>Limit</th>}
+                {cols.buckets && <th>Buckets</th>}
               </tr>
             </thead>
             <tbody>
@@ -67,9 +75,9 @@ export function StoragePanel({ entity }: { entity: Entity }) {
                     <td>{cloud ? n.cloud : n.enterprise}</td>
                     <td className="muted">{cloud ? n.enterprise : n.cloud}</td>
                     <td><code>{t.path ?? "—"}</code>{detail ? <span className="muted"> {detail}</span> : null}</td>
-                    <td>{t.sizeMB != null ? fmtMB(t.sizeMB) : "—"}</td>
-                    <td>{t.maxSizeMB ? fmtMB(t.maxSizeMB) : t.maxBuckets ? `${t.maxBuckets} bucket${t.maxBuckets === 1 ? "" : "s"}` : "—"}</td>
-                    <td>{t.buckets ?? "—"}</td>
+                    {cols.size && <td>{t.sizeMB != null ? fmtMB(t.sizeMB) : "—"}</td>}
+                    {cols.limit && <td>{t.maxSizeMB ? fmtMB(t.maxSizeMB) : t.maxBuckets ? `${t.maxBuckets} bucket${t.maxBuckets === 1 ? "" : "s"}` : "—"}</td>}
+                    {cols.buckets && <td>{t.buckets ?? "—"}</td>}
                   </tr>
                 );
               })}

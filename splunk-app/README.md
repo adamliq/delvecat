@@ -209,7 +209,28 @@ one. The same from a search:
 - **Findings** (header, with a count): every warning and critical check in one
   list, most severe first (data and scheduler problems, tokens, noisy alerts,
   suppressions, routing to missing indexes, retention by size, acceleration),
-  filterable by severity, finding, area, app and text, with links and CSV.
+  filterable by severity, finding, area, app and text, with links and CSV. Each
+  says how to fix it; new findings are marked and acknowledged ones hidden.
+- **Home** starts with an at-a-glance row (health with its trend, unused, at
+  risk, detections that can fire, sensitive data, broken references...), each a
+  link, and groups object types by area.
+- **Browse** says why each result matched (words highlighted; the property value
+  or the part of the SPL that matched) and names the instance when there are
+  several; *Table* shows results as a sortable table.
+- **Object pages** have an "On this page" menu; SPL is highlighted, with the
+  indexes, sourcetypes, macros, lookups and saved searches it names linked; ages
+  ("6 hours ago") count from when the catalog was measured, not from today.
+- **Coverage** opens on a summary by tactic (the full ATT&CK matrix is one click
+  away) and says what would let each detection that cannot fire work.
+- **Insights**: each target opens a worklist of what is missing (CSV), and
+  descriptions and ownership show their trend over builds. **Domains** and data
+  products show described and owned shares and their problems. **Glossary** can be
+  searched and sorted, shows unused terms and the sourcetypes each term comes
+  from. **Properties** flags dates over a year old and lists who holds each value.
+  **Compare** can put up to six sourcetypes and data models side by side.
+  **Governance** lists sensitive-data readers as a table and filters the role
+  matrix to one user's roles.
+- **Filters stay in the address**, so a filtered view can be shared or bookmarked.
 - **Tables** on Findings, Health, Coverage and Governance sort by any column
   (click its header) and download as CSV.
 - **Browse** groups its type filter by area (Data, Inputs and forwarding,

@@ -144,6 +144,13 @@ export interface CatalogBundle {
      */
     findings?: number;
     unused?: number;
+    /**
+     * Custom objects of documented types (as on the Insights page).
+     */
+    documented?: number;
+    described?: number;
+    owned?: number;
+    inDomain?: number;
   }[];
   /**
    * Findings the previous build had and this one does not: fixed, or the object was removed or disabled. Derived.

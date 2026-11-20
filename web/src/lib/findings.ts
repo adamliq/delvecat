@@ -70,7 +70,7 @@ export interface FindingFilters {
   text?: string;
 }
 
-export function filterFindings(all: Finding[], f: FindingFilters): Finding[] {
+export function filterFindings<T extends Finding>(all: T[], f: FindingFilters): T[] {
   const text = f.text?.trim().toLowerCase();
   return all.filter(
     (x) =>

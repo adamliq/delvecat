@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flag, useUrlState } from "../lib/urlState";
 import { Link } from "react-router-dom";
 import { DataTable } from "../components/DataTable";
 import { AckControl, CheckBars, HealthTrend, NewBadge, RemedyBox, webUrlOf } from "../components/HealthParts";
@@ -7,7 +8,7 @@ import type { Entity, EntityType } from "../generated/catalog";
 import { ackStore, type Ack, type AckState } from "../lib/acks";
 import { useCatalog } from "../lib/CatalogContext";
 import { checkTitle } from "../lib/findings";
-import { dailySeries, downloadText, isBuiltin, isUnused, toCsv } from "../lib/health";
+import { dailySeries, downloadText, isBuiltin, isUnused, measuredAt, toCsv } from "../lib/health";
 import {
   SECTIONS, ago, alertSeries, builtinApps, checkCounts, CLEANUP_TYPES, DEPENDENT_EDGES, filterItems, groupRows, hasPrevious,
   items as allItems, objectRows, ownerOf, problemSeries, reclaimableMB, sizeText, thresholdText, type Filters, type Item,
@@ -108,11 +109,17 @@ function AtRisk() {
 
 function Cleanup() {
   const { catalog } = useCatalog();
-  const [builtin, setBuiltin] = useState(false);
-  const [disabled, setDisabled] = useState(false);
-  const [type, setType] = useState("");
-  const [safeOnly, setSafeOnly] = useState(false);
+  const [params, update] = useUrlState();
+  const builtin = flag(params, "builtin");
+  const disabled = flag(params, "disabled");
+  const type = params.get("ctype") ?? "";
+  const safeOnly = flag(params, "safe");
+  const setBuiltin = (v: boolean) => update({ builtin: v });
+  const setDisabled = (v: boolean) => update({ disabled: v });
+  const setType = (v: string) => update({ ctype: v });
+  const setSafeOnly = (v: boolean) => update({ safe: v });
   const vendorApps = useMemo(() => builtinApps(catalog.entities), [catalog]);
+  const asOf = new Date(measuredAt(catalog.bundle));
   const dependents = useCallback(
     (e: Entity) => catalog.edgesTo(e.id).filter((x) => DEPENDENT_EDGES.has(x.type) && x.from !== e.id).length,
     [catalog],
@@ -169,8 +176,8 @@ function Cleanup() {
           ) },
           { label: "App", value: ({ e }) => e.app ?? "", render: ({ e, builtin: b }) => <>{e.app ?? "—"}{b && <span className="muted small"> (built-in)</span>}</> },
           { label: "Owner", value: ({ e }) => ownerOf(e), render: ({ e }) => ownerOf(e) || <span className="muted">—</span> },
-          { label: "Last used", value: ({ e }) => e.usage?.lastUsed ?? "", render: ({ e }) => (e.usage?.lastUsed ? <span title={new Date(e.usage.lastUsed).toLocaleString()}>{ago(e.usage.lastUsed)}</span> : <span className="muted">not in the window</span>) },
-          { label: "Last changed", value: ({ e }) => e.updatedAt ?? "", render: ({ e }) => (e.updatedAt ? <span title={new Date(e.updatedAt).toLocaleString()}>{ago(e.updatedAt)}</span> : <span className="muted">—</span>) },
+          { label: "Last used", value: ({ e }) => e.usage?.lastUsed ?? "", render: ({ e }) => (e.usage?.lastUsed ? <span title={new Date(e.usage.lastUsed).toLocaleString()}>{ago(e.usage.lastUsed, asOf)}</span> : <span className="muted">not in the window</span>) },
+          { label: "Last changed", value: ({ e }) => e.updatedAt ?? "", render: ({ e }) => (e.updatedAt ? <span title={new Date(e.updatedAt).toLocaleString()}>{ago(e.updatedAt, asOf)}</span> : <span className="muted">—</span>) },
           { label: "Size", value: ({ mb }) => mb ?? -1, render: ({ mb }) => (mb ? sizeText(mb) : <span className="muted">—</span>) },
           { label: "Refers to it", value: ({ deps }) => deps, render: ({ deps }) => (deps === 0 ? <span className="safe-hint" title="No object in the catalog uses, reads or feeds it">nothing (safe to remove)</span> : <>{deps} object{deps === 1 ? "" : "s"}</>) },
           { label: "Why", value: ({ why }) => why },
@@ -189,8 +196,24 @@ export function HealthPage() {
   const store = useMemo(() => ackStore(), []);
   const [acks, setAcks] = useState<Ack[]>([]);
   const [canWrite, setCanWrite] = useState(false);
-  const [filters, setFilters] = useState<Filters>({});
-  const [view, setView] = useState<View>("objects");
+  const [params, update] = useUrlState();
+  const filters: Filters = useMemo(() => ({
+    status: (params.get("status") ?? "") as Filters["status"],
+    section: params.get("area") ?? undefined,
+    check: params.get("check") ?? undefined,
+    owner: params.get("owner") ?? undefined,
+    app: params.get("app") ?? undefined,
+    text: params.get("q") ?? undefined,
+    onlyNew: flag(params, "new"),
+    showHandled: flag(params, "acked"),
+  }), [params]);
+  const view: View = (["owners", "apps"] as View[]).includes(params.get("view") as View) ? (params.get("view") as View) : "objects";
+  const KEYS: Record<keyof Filters, string> = { status: "status", section: "area", check: "check", owner: "owner", app: "app", text: "q", onlyNew: "new", showHandled: "acked" };
+  const toParams = (f: Partial<Filters>) => Object.fromEntries(Object.entries(f).map(([k, v]) => [KEYS[k as keyof Filters], v]));
+  // Replaces the findings filters only (the cleanup report keeps its own).
+  const setFilters = (f: Filters, v: View = view) =>
+    update({ ...Object.fromEntries(Object.values(KEYS).map((k) => [k, undefined])), ...toParams(f), view: v === "objects" ? undefined : v });
+  const setView = (v: View) => update({ view: v === "objects" ? undefined : v });
   const listTop = useRef<HTMLDivElement>(null);
   const prefix = useMemo(() => splunkHomeUrl().replace(/\/app\/launcher\/home$/, ""), []);
 
@@ -223,10 +246,9 @@ export function HealthPage() {
     );
   }
 
-  const set = (patch: Partial<Filters>) => setFilters((f) => ({ ...f, ...patch }));
+  const set = (patch: Partial<Filters>) => update(toParams(patch));
   const focus = (patch: Partial<Filters>, v: View = "objects") => {
-    setFilters({ ...patch });
-    setView(v);
+    setFilters({ ...patch }, v);
     requestAnimationFrame(() => listTop.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
   const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });

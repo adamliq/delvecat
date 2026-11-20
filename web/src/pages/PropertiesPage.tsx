@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
 import type { EntityType } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
-import { pluralTypeLabel } from "../lib/labels";
-import { searchPath } from "../lib/routes";
+import { pluralTypeLabel, typeLabel } from "../lib/labels";
+import { entityPath, searchPath } from "../lib/routes";
+import { measuredAt } from "../lib/health";
+import { relative } from "../lib/propertyFormat";
+
+const OVERDUE_DAYS = 365;
 import { coverage, formatValue, label, propertyDefs, propertyValues, valueStrings, type PropertyDef } from "../lib/structured";
 
 function allowed(d: PropertyDef): { value: string; description?: string }[] {
@@ -16,6 +20,12 @@ export function PropertiesPage() {
   const { catalog } = useCatalog();
   const entities = catalog.bundle.entities;
   const defs = propertyDefs(catalog.bundle);
+  const now = measuredAt(catalog.bundle);
+  // Dates more than a year old (a review, an audit, a certification) are due again.
+  const overdue = (d: PropertyDef) => entities.filter((e) => {
+    const v = propertyValues(e)[d.id];
+    return v !== undefined && valueStrings(v).some((x) => (now - Date.parse(x)) / 86400000 > OVERDUE_DAYS);
+  }).length;
   return (
     <div className="stack">
       <div>
@@ -49,6 +59,12 @@ export function PropertiesPage() {
                 {c.filled.toLocaleString()} of {c.applicable.toLocaleString()} ({c.filled > 0 && pct === 0 ? "<1" : pct}%)
                 {d.required && <span className="muted"> · required</span>}
               </dd>
+              {d.type === "date" && overdue(d) > 0 && (
+                <>
+                  <dt>Overdue</dt>
+                  <dd><span className="status-label status-warning">! {overdue(d)} object{overdue(d) === 1 ? "" : "s"} last set more than a year ago</span></dd>
+                </>
+              )}
               {c.missing > 0 && (
                 <>
                   <dt>Missing</dt>
@@ -63,15 +79,32 @@ export function PropertiesPage() {
             {values.length > 0 && (
               <div className="table-wrap">
                 <table className="mini-table">
-                  <thead><tr><th>Value</th><th>Meaning</th><th>Objects</th></tr></thead>
+                  <thead><tr><th>Value</th><th>{d.type === "date" ? "Age" : "Meaning"}</th><th>Objects</th></tr></thead>
                   <tbody>
-                    {values.map((a) => {
+                    {(d.type === "date" ? [...values].sort((a, b) => a.value.localeCompare(b.value)) : values).map((a) => {
                       const n = counts.get(a.value) ?? 0;
+                      const holders = n > 0 && !d.showInFilters ? entities.filter((e) => {
+                        const v = propertyValues(e)[d.id];
+                        return v !== undefined && valueStrings(v).includes(a.value);
+                      }) : [];
+                      const days = d.type === "date" ? (now - Date.parse(a.value)) / 86400000 : 0;
                       return (
                         <tr key={a.value}>
                           <td>{d.type === "date" ? formatValue(d, a.value) : <code>{a.value}</code>}</td>
-                          <td>{a.description ?? <span className="muted">—</span>}</td>
-                          <td>{n > 0 && d.showInFilters ? <Link to={searchPath({ [`p.${d.id}`]: a.value })}>{n}</Link> : n}</td>
+                          <td>{d.type === "date" ? (
+                            days > OVERDUE_DAYS
+                              ? <span className="status-label status-warning" title="Older than a year: review it again">! {relative(a.value, now)}, overdue</span>
+                              : <span className="muted">{relative(a.value, now)}</span>
+                          ) : a.description ?? <span className="muted">—</span>}</td>
+                          <td>
+                            {n > 0 && d.showInFilters ? <Link to={searchPath({ [`p.${d.id}`]: a.value })}>{n}</Link>
+                              : holders.length ? (
+                                <details className="holders">
+                                  <summary>{n}</summary>
+                                  <ul className="plain-list small">{holders.map((e) => <li key={e.id}><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link></li>)}</ul>
+                                </details>
+                              ) : n}
+                          </td>
                         </tr>
                       );
                     })}

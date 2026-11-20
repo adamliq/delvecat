@@ -20,13 +20,22 @@ import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
 import { PropContext, PropValue } from "../components/PropValue";
+import { SectionNav } from "../components/SectionNav";
+import { SplCode } from "../components/SplCode";
 import { propLabel } from "../lib/propertyFormat";
 import { useCatalog } from "../lib/CatalogContext";
+import { measuredAt } from "../lib/health";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
 import { relationGroups, type RelationGroup } from "../lib/relations";
 import { entityPath, searchPath } from "../lib/routes";
 
 /** Properties shown as code blocks rather than in the property table. */
+const SPL_KEYS = new Set(["search", "definition", "srchFilter"]);
+// Index settings the Storage and retention section already shows.
+const STORAGE_KEYS = new Set([
+  "retentionDays", "maxTotalDataSizeMB", "maxGlobalDataSizeMB", "frozenTimePeriodInSecs", "frozenAction",
+  "homePath", "coldPath", "thawedPath", "coldToFrozenDir", "coldToFrozenScript", "remotePath", "maxDataSize",
+]);
 const CODE: Record<string, string> = {
   search: "SPL",
   definition: "Definition",
@@ -87,8 +96,9 @@ export function EntityPage() {
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
   const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo"]);
+  const shownInStorage = entity.type === "index" && !!props.storage;
   const rest = Object.entries(props).filter(
-    ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)),
+    ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)) && !(shownInStorage && STORAGE_KEYS.has(k)),
   );
   const groups = relationGroups(catalog, entity.id);
   const relCount = groups.reduce((n, g) => n + g.entities.length, 0);
@@ -161,7 +171,8 @@ export function EntityPage() {
 
       {tab === "overview" && (
         <PropContext.Provider value={{ catalog, entity }}>
-        <div className="stack">
+        <SectionNav deps={entity.id} />
+        <div className="stack" data-sections="">
           <dl className="facts">
             <dt>Product</dt>
             <dd><Link to={searchPath({ product: entity.product })}>{PRODUCT_LABELS[entity.product]}</Link></dd>
@@ -216,7 +227,9 @@ export function EntityPage() {
           {code.map(([k, v]) => (
             <section key={k}>
               <h2>{CODE[k]}</h2>
-              <pre className="code">{v as string}</pre>
+              {SPL_KEYS.has(k) && (k !== "definition" || entity.type === "macro" || entity.type === "eventtype")
+                ? <SplCode text={v as string} catalog={catalog} entity={entity} />
+                : <pre className="code">{v as string}</pre>}
             </section>
           ))}
 
@@ -243,7 +256,7 @@ export function EntityPage() {
           {observed !== undefined && (
             <section>
               <h2>Observed</h2>
-              <p className="muted small">Measured when the bundle was generated ({new Date(catalog.bundle.generatedAt).toLocaleString()}).</p>
+              <p className="muted small">Measured {new Date(measuredAt(catalog.bundle)).toLocaleString()}; ages are counted from then.</p>
               <PropValue value={Object.fromEntries(Object.entries((observed ?? {}) as Record<string, unknown>)
             .filter(([k]) => k !== "dailyEvents"))} />
             </section>

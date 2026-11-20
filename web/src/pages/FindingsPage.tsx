@@ -1,8 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { DataTable, type Column } from "../components/DataTable";
 import { useCatalog } from "../lib/CatalogContext";
-import { checkTitle, filterFindings, findings, type Finding } from "../lib/findings";
+import { NewBadge, RemedyBox, webUrlOf } from "../components/HealthParts";
+import { ackLabel, ackStore, type Ack } from "../lib/acks";
+import { checkTitle, filterFindings, findings } from "../lib/findings";
+import { hasPrevious, items as healthItems, type Item } from "../lib/healthView";
+import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
 import { typeGroup, typeLabel } from "../lib/labels";
 import { StatusLabel } from "./HealthPage";
 
@@ -12,7 +16,25 @@ const entityPath = (id: string) => `/entity/${encodeURIComponent(id)}`;
 export function FindingsPage() {
   const { catalog } = useCatalog();
   const [params, setParams] = useSearchParams();
-  const all = useMemo(() => findings(catalog.entities), [catalog]);
+  const store = useMemo(() => ackStore(), []);
+  const [acks, setAcks] = useState<Ack[]>([]);
+  useEffect(() => {
+    let live = true;
+    store.list().then((a) => live && setAcks(a)).catch(() => undefined);
+    return () => { live = false; };
+  }, [store]);
+  const ackMap = useMemo(() => new Map(acks.map((a) => [`${a.entity}\u0000${a.check}`, a])), [acks]);
+  const showHandled = params.get("acked") === "1";
+  // Same order as findings(): most severe first, then by finding and object.
+  const order = useMemo(() => new Map(findings(catalog.entities).map((x, i) => [`${x.entity.id}|${x.check}`, i])), [catalog]);
+  const everything = useMemo(
+    () => healthItems(catalog.entities, catalog.bundle, ackMap).sort((a, b) => (order.get(`${a.entity.id}|${a.check}`) ?? 0) - (order.get(`${b.entity.id}|${b.check}`) ?? 0)),
+    [catalog, ackMap, order],
+  );
+  const all = useMemo(() => everything.filter((x) => showHandled || !x.handled), [everything, showHandled]);
+  const handled = everything.filter((x) => x.handled).length;
+  const instanceName = (id: string) => catalog.bundle.instances.find((i) => i.id === id)?.name ?? id;
+  const prefix = useMemo(() => splunkHomeUrl().replace(/\/app\/launcher\/home$/, ""), []);
   const f = {
     status: params.get("status") ?? "",
     check: params.get("check") ?? "",
@@ -20,7 +42,8 @@ export function FindingsPage() {
     app: params.get("app") ?? "",
     text: params.get("q") ?? "",
   };
-  const shown = useMemo(() => filterFindings(all, f), [all, f.status, f.check, f.area, f.app, f.text]); // eslint-disable-line react-hooks/exhaustive-deps
+  const onlyNew = params.get("new") === "1";
+  const shown = useMemo(() => filterFindings(all, f).filter((x) => !onlyNew || x.isNew), [all, f.status, f.check, f.area, f.app, f.text, onlyNew]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (key: string, value: string) =>
     setParams((p) => {
       const next = new URLSearchParams(p);
@@ -33,11 +56,14 @@ export function FindingsPage() {
   const areas = uniq(all.map((x) => typeGroup(x.entity.type)));
   const apps = uniq(all.map((x) => x.entity.app ?? "").filter(Boolean));
   const critical = all.filter((x) => x.status === "critical").length;
-  const owner = (x: Finding) => x.entity.annotations?.owners?.join(", ") || x.entity.owner || "";
+  const owner = (x: Item) => x.entity.annotations?.owners?.join(", ") || x.entity.owner || "";
 
-  const columns: Column<Finding>[] = [
+  const columns: Column<Item>[] = [
     { label: "Severity", value: (x) => (x.status === "critical" ? 0 : 1), render: (x) => <StatusLabel status={x.status} /> },
-    { label: "Finding", value: (x) => checkTitle(x.check) },
+    { label: "Finding", value: (x) => checkTitle(x.check), render: (x) => (
+      <>{checkTitle(x.check)}{x.isNew && <> <NewBadge /></>}
+        <div><Link className="small" to={`/health?check=${encodeURIComponent(x.check)}`}>on the Health page</Link></div></>
+    ) },
     {
       label: "Object",
       value: (x) => x.entity.displayName ?? x.entity.name,
@@ -48,10 +74,14 @@ export function FindingsPage() {
         </>
       ),
     },
-    { label: "Detail", value: (x) => x.message },
+    { label: "Detail", value: (x) => x.message, render: (x) => (
+      <>{x.message}
+        {x.ack && <div className="muted small">{ackLabel(x.ack)}{x.ack.note ? `: ${x.ack.note}` : ""}</div>}
+        <RemedyBox item={x} webUrl={webUrlOf(catalog.bundle, x.entity)} inSplunk={IN_SPLUNK} prefix={prefix} /></>
+    ) },
     { label: "App", value: (x) => x.entity.app ?? "" },
     { label: "Owner", value: owner },
-    ...(catalog.bundle.instances.length > 1 ? [{ label: "Instance", value: (x: Finding) => x.entity.instance }] : []),
+    ...(catalog.bundle.instances.length > 1 ? [{ label: "Instance", value: (x: Item) => instanceName(x.entity.instance) }] : []),
   ];
 
   return (
@@ -60,7 +90,8 @@ export function FindingsPage() {
         <h1>Findings</h1>
         <p className="lede">
           Everything the catalog flagged, most severe first: data and scheduler problems, tokens, alerts, suppressions,
-          routing, retention and acceleration. Each finding links to its object.
+          routing, retention and acceleration. Each finding links to its object and says how to fix it; accept or snooze
+          findings on the <Link to="/health">Health page</Link>.
         </p>
       </div>
       <div className="tiles">
@@ -71,6 +102,16 @@ export function FindingsPage() {
           <span className="tile-num">{all.length - critical}</span><span className="tile-label">warnings</span>
         </button>
         <div className="tile static"><span className="tile-num">{new Set(all.map((x) => x.entity.id)).size}</span><span className="tile-label">objects affected</span></div>
+        {hasPrevious(catalog.bundle) && (
+          <button type="button" className={`tile${params.get("new") === "1" ? " active" : ""}`} onClick={() => set("new", params.get("new") === "1" ? "" : "1")}>
+            <span className="tile-num">{all.filter((x) => x.isNew).length}</span><span className="tile-label">new since the last build</span>
+          </button>
+        )}
+        {handled > 0 && (
+          <button type="button" className={`tile${showHandled ? " active" : ""}`} onClick={() => set("acked", showHandled ? "" : "1")} title="Accepted or snoozed on the Health page">
+            <span className="tile-num">{handled}</span><span className="tile-label">acknowledged {showHandled ? "(shown)" : "(hidden)"}</span>
+          </button>
+        )}
       </div>
       <div className="lineage-controls findings-filters">
         <label className="sort">Finding

@@ -351,4 +351,7 @@ def apply_annotations(
         report["message"] = " | ".join(notes)
     reports = [r for r in bundle.get("ingestionReport", []) if r["connector"] != "annotations"]
     bundle["ingestionReport"] = [*reports, report]
+    from .health import refresh_documentation_point  # the trend counts owners and domains
+
+    refresh_documentation_point(bundle)
     return report

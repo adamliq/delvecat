@@ -7,6 +7,9 @@
 
 /** Names whose label is not just the words of the key. */
 const LABELS: Record<string, string> = {
+  currentDBSizeMB: "Current size",
+  licenseMBPerDay: "Licence use per day",
+  totalEventCount: "Events",
   retentionDays: "Retention (days)",
   maxTotalDataSizeMB: "Size limit",
   maxGlobalDataSizeMB: "Size limit (SmartStore, cluster)",
@@ -106,7 +109,7 @@ const LABELS: Record<string, string> = {
 const ACRONYMS: Record<string, string> = {
   id: "ID", ids: "IDs", url: "URL", uri: "URI", mb: "MB", gb: "GB", hec: "HEC", spl: "SPL",
   spl2: "SPL2", ssl: "SSL", tls: "TLS", kv: "KV", api: "API", aws: "AWS", es: "ES", ip: "IP",
-  sql: "SQL", dm: "DM", ui: "UI", http: "HTTP", tcp: "TCP", udp: "UDP", csv: "CSV", json: "JSON",
+  sql: "SQL", dm: "DM", db: "DB", ui: "UI", http: "HTTP", tcp: "TCP", udp: "UDP", csv: "CSV", json: "JSON",
 };
 
 /** A Splunk setting name, kept verbatim: UPPER_CASE, dotted, dashed or "::"-scoped. */
@@ -128,13 +131,16 @@ export function propLabel(key: string): string {
   return words.join(" ");
 }
 
-const ISO = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?$/;
+const ISO = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z| ?UTC|[+-]\d{2}:?\d{2})?$/;
 
-export const isIsoDate = (v: unknown): v is string => typeof v === "string" && ISO.test(v) && !Number.isNaN(Date.parse(v));
+/** Milliseconds for an ISO date-time, also Splunk's "2026-11-06 07:45:00 UTC". */
+export const parseDate = (v: string): number => Date.parse(v.replace(/ ?UTC$/, "Z").replace(/^(\d{4}-\d{2}-\d{2}) /, "$1T"));
+
+export const isIsoDate = (v: unknown): v is string => typeof v === "string" && ISO.test(v) && !Number.isNaN(parseDate(v));
 
 /** "3 days ago", "in 5 hours". */
 export function relative(iso: string, now: number = Date.now()): string {
-  const secs = (Date.parse(iso) - now) / 1000;
+  const secs = (parseDate(iso) - now) / 1000;
   const abs = Math.abs(secs);
   const [n, unit] =
     abs < 90 ? [Math.round(abs), "second"]
@@ -159,6 +165,7 @@ export function fmtDuration(secs: number): string {
 
 /** A number with the unit its key implies, or undefined if the key implies none. */
 export function numberWithUnit(key: string, n: number): string | undefined {
+  if (/MBPerDay$/.test(key)) return `${n < 1 ? `${Math.round(n * 1024).toLocaleString()} KB` : fmtSizeMB(n)} a day`;
   if (/(SizeMB|sizeMB|MB)$/.test(key)) return fmtSizeMB(n);
   if (/(Secs|Seconds|InSecs)$/.test(key)) return fmtDuration(n);
   if (/Percent$/.test(key)) return `${n.toLocaleString()}%`;
@@ -195,6 +202,8 @@ const VALUE_LABELS: Record<string, Record<string, string>> = {
   datatype: { event: "Events", metric: "Metrics" },
   model: { classic: "Local buckets", smartStore: "SmartStore" },
   ruleType: { aggregation: "Aggregation", suppression: "Suppression" },
+  // Splunk's alert.severity: 1 debug to 6 critical.
+  alertSeverity: { "1": "1 (debug)", "2": "2 (info)", "3": "3 (low)", "4": "4 (medium)", "5": "5 (high)", "6": "6 (critical)" },
 };
 
 export function valueLabel(key: string | undefined, value: string): string {

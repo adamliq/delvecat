@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription, owners } from "../lib/annotate";
-import { usePropertyDefs, useRisk } from "../lib/CatalogContext";
+import { useCatalog, usePropertyDefs, useRisk } from "../lib/CatalogContext";
+import { propLabel } from "../lib/propertyFormat";
+import { highlightParts, matchSnippet, type Match } from "../lib/search";
 import { PRODUCT_LABELS, typeLabel } from "../lib/labels";
 import { summaryChips } from "../lib/structured";
 import { domainPath, entityPath, glossaryPath, productPath, searchPath } from "../lib/routes";
@@ -34,16 +36,26 @@ export function AnnotationChips({ entity, compact = false }: { entity: Entity; c
   return items.length ? <span className="chips">{items}</span> : null;
 }
 
-export function EntityRow({ entity }: { entity: Entity }) {
+/** Text with the matched words marked. */
+export function Highlight({ text, terms }: { text: string; terms?: string[] }) {
+  if (!terms?.length) return <>{text}</>;
+  return <>{highlightParts(text, terms).map(([t, hit], i) => (hit ? <mark key={i}>{t}</mark> : <span key={i}>{t}</span>))}</>;
+}
+
+export function EntityRow({ entity, match }: { entity: Entity; match?: Match }) {
   const description = effectiveDescription(entity);
   const summary = summaryChips(usePropertyDefs(), entity);
   const risk = useRisk(entity.id);
+  const { catalog } = useCatalog();
+  const instances = catalog.bundle.instances;
+  const instance = instances.length > 1 ? instances.find((i) => i.id === entity.instance)?.name ?? entity.instance : undefined;
+  const snippet = matchSnippet(entity, match);
   return (
     <li className="entity-row">
       <div className="entity-row-head">
         <TypeBadge entity={entity} />
         <Link to={entityPath(entity.id)} className="entity-name">
-          {entity.displayName ?? entity.name}
+          <Highlight text={entity.displayName ?? entity.name} terms={match?.terms} />
         </Link>
         {entity.disabled && <span className="muted-tag">disabled</span>}
         {risk && (
@@ -54,11 +66,18 @@ export function EntityRow({ entity }: { entity: Entity }) {
       </div>
       <div className="entity-row-meta">
         {PRODUCT_LABELS[entity.product]}
+        {instance && <> · {instance}</>}
         {entity.app && <> · app <code>{entity.app}</code></>}
         {owners(entity).length > 0 && <> · owned by {owners(entity).join(", ")}</>}
         {entity.sharing === "user" && <> · private to {entity.owner}</>}
       </div>
-      {description && <p className="entity-row-desc">{description}</p>}
+      {description && <p className="entity-row-desc"><Highlight text={description} terms={match?.terms} /></p>}
+      {snippet?.text && (
+        <p className="match-snippet small">
+          <span className="muted">Matched {snippet.key ? <>{propLabel(snippet.key)}</> : snippet.where}: </span>
+          <code><Highlight text={snippet.text} terms={match?.terms} /></code>
+        </p>
+      )}
       <AnnotationChips entity={entity} compact />
       {summary.length > 0 && (
         <span className="chips">
