@@ -88,7 +88,7 @@ one. The same from a search:
   get (keep it the same between builds, so versions and "first seen" dates
   carry over; the page fills in the current one); `dryrun=true` builds without
   publishing.
-- **Parts**: the page lists the 53 parts of a build, in groups (platform, data,
+- **Parts**: the page lists the 54 parts of a build, in groups (platform, data,
   knowledge objects, usage and health, products), with *Select all* and a box
   per group. Parts marked *search* run Splunk searches; *slow* ones can take a
   while on a large Splunk. Everything but field discovery is selected by
@@ -118,6 +118,11 @@ one. The same from a search:
   container, storage account); inputs of the Microsoft Azure and Microsoft Cloud
   Services add-ons say which Azure service they read (Event Hubs, Storage, Entra
   ID, ...) and from where, never keys or secrets.
+- **Microsoft add-ons**: inputs of the Microsoft Cloud Services, Office 365,
+  Azure and Security add-ons name the Microsoft service they read and the account
+  or tenant they use; *Microsoft add-on accounts and tenants* lists those
+  accounts (tenant id, client id, cloud), never secrets. SQL: "Microsoft add-on
+  inputs, the service they read and their account".
 - **SPL2 (Splunk 10 and later)**: *SPL2 modules, datasets and connections*
   lists SPL2 modules (owner, permissions, source, the datasets they read),
   SPL2-native datastores (Azure Blob / Data Lake Storage, AWS, Snowflake: data

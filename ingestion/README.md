@@ -214,15 +214,33 @@ before its retention period. The public profile drops object-store locations.
   `storageAccount` and `volume`. Splunk Cloud Self Storage gets the same from its
   bucket path. Keys in the volume stanza are never read. The public profile drops
   locations, buckets and accounts.
-- Inputs: inputs of the Splunk Add-on for Microsoft Cloud Services (`mscs_*`) and
-  the Splunk Add-on for Microsoft Azure (`azure_*`, `MS_AAD_*`) record
-  `properties.azure`: the Azure service they read (Event Hubs, Storage Blob or
-  Table, Entra ID, Microsoft Graph, Azure Monitor metrics, Log Analytics,
-  Activity log, Defender for Cloud, cost and billing, resource inventory) and the
-  values of settings that only name things (account label, Event Hub namespace
-  and name, consumer group, container, tables, subscription, tenant and workspace
-  ids). Every other setting stays names only; secrets are never read. The public
-  profile drops subscription, tenant and workspace ids.
+- Inputs: see "Microsoft add-ons" below.
+
+### Microsoft add-ons
+
+For the Splunk Add-ons for Microsoft Cloud Services
+(`Splunk_TA_microsoft-cloudservices`), Microsoft Office 365 (`splunk_ta_o365`),
+Microsoft Azure (`TA-MS-AAD`) and Microsoft Security (`Splunk_TA_MS_Security`):
+
+- Their inputs record `properties.microsoft`: the add-on, the Microsoft service
+  read (Event Hubs, Azure Storage, Log Analytics, Azure Monitor metrics, activity
+  log, cost and usage, Resource Graph and inventory; Office 365 Management
+  Activity, service health, message trace, Teams/SharePoint/OneDrive/mailbox/Viva
+  Engage usage reports; Entra ID sign-ins, audit logs, users, groups, apps,
+  devices, Identity Protection; Defender for Endpoint, Microsoft 365 Defender
+  incidents, Defender for Cloud Apps, Defender for Cloud, Defender Threat
+  Intelligence, Graph security alerts), the account or tenant used (a `uses` edge
+  to it), and the values of settings that only name things (Event Hub namespace
+  and name, consumer group, container, tables, content type, subscription, tenant
+  and workspace ids). Every other setting stays names only.
+- Part `microsoftAccounts` reads their accounts and tenants from the add-ons' own
+  configuration endpoints (`splunk_ta_mscs_azureaccount`,
+  `splunk_ta_o365_tenants`, `TA_MS_AAD_account`,
+  `Splunk_TA_MS_Security_account`) as `addOnAccount`: tenant id, client
+  (application) id, cloud environment, tenant subdomain and data center, auth
+  type. Client secrets, passwords, certificates and tokens are never read. The
+  public profile drops tenant and client ids. Skipped when none of the add-ons is
+  installed.
 
 ### Other inputs
 

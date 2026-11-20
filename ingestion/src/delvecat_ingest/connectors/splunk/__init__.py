@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 from ...model import ExtractResult
 from ...transport import EndpointForbidden, EndpointNotFound, SearchTimeout, Transport
-from . import access, data, data_management, knowledge, server, spl2, usage
+from . import access, data, data_management, knowledge, microsoft, server, spl2, usage
 from .common import Ctx, Options
 
 # An extractor returns its entity count, or (count, message) when it only partly succeeded.
@@ -28,6 +28,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "inputs": data.extract_inputs,
     "otherInputs": data.extract_conf_inputs,
     "modularInputs": data.extract_modular_inputs,
+    "microsoftAccounts": microsoft.extract_microsoft_accounts,
     "forwarders": data.extract_forwarders,
     "federated": data.extract_federated,
     "alertActions": knowledge.extract_alert_actions,

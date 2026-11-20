@@ -250,7 +250,8 @@
         "esAggregationRule",
         "esAutomationRule",
         "esQueue",
-        "dmCatalogObject"
+        "dmCatalogObject",
+        "addOnAccount"
       ]
     },
     "Sharing": {

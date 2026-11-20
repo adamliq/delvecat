@@ -1,0 +1,34 @@
+{
+ "entry": [
+  {
+   "name": "signins",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-MS-AAD/data/inputs/MS_AAD_signins/signins",
+   "acl": {
+    "app": "TA-MS-AAD",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "index": "main",
+    "sourcetype": "azure:aad:signin",
+    "azure_app_account": "aad_reader",
+    "tenant_id": "0f1e2d3c-aaaa-bbbb-cccc-111122223333",
+    "interval": "3600"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

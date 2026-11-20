@@ -1,0 +1,34 @@
+{
+ "entry": [
+  {
+   "name": "prod_app",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/Splunk_TA_microsoft-cloudservices/x/prod_app",
+   "acl": {
+    "app": "Splunk_TA_microsoft-cloudservices",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "admin",
+      "sc_admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "client_id": "11111111-2222-3333-4444-555555555555",
+    "client_secret": "********",
+    "tenant_id": "0f1e2d3c-aaaa-bbbb-cccc-111122223333",
+    "account_class_type": "1",
+    "disabled": false
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

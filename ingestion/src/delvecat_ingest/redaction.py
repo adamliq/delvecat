@@ -246,10 +246,14 @@ def redact_bundle(
                         counts["urls"] += 1
             if profile.users == "pseudonymize" and props.get("serviceAccount"):
                 props["serviceAccount"] = rename("user", str(props["serviceAccount"]))
-        if profile.urls == "drop" and e["type"] == "input" and (az := props.get("azure")):
-            # Azure tenant, subscription and workspace ids identify the customer.
+        if profile.urls == "drop" and e["type"] == "input" and (ms := props.get("microsoft")):
+            # Tenant, subscription and workspace ids identify the customer.
             for k in ("subscription_id", "tenant_id", "workspace_id"):
-                if (az.get("settings") or {}).pop(k, None):
+                if (ms.get("settings") or {}).pop(k, None):
+                    counts["urls"] += 1
+        if profile.urls == "drop" and e["type"] == "addOnAccount":
+            for k in ("tenantId", "clientId", "tenantSubdomain"):
+                if props.pop(k, None):
                     counts["urls"] += 1
         if profile.urls == "drop" and e["type"] == "index":
             # Object-store locations (SmartStore remote path, Splunk Cloud Self Storage

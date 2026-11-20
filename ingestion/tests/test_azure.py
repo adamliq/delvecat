@@ -7,11 +7,11 @@ import json
 from pathlib import Path
 
 from delvecat_ingest.connectors.splunk.data import (
-    azure_input,
     frozen_action,
     index_storage,
     object_store,
 )
+from delvecat_ingest.connectors.splunk.microsoft import microsoft_input
 from delvecat_ingest.inapp import build_here
 from delvecat_ingest.redaction import load_profile, redact_bundle
 from delvecat_ingest.transport import FixtureTransport
@@ -72,7 +72,7 @@ def test_volumes_read_from_indexes_conf():
 
 
 def test_azure_add_on_inputs():
-    eh = azure_input(
+    eh = microsoft_input(
         "mscs_azure_event_hub",
         "Splunk_TA_microsoft-cloudservices",
         {
@@ -84,7 +84,9 @@ def test_azure_add_on_inputs():
         },
     )
     assert eh == {
+        "addOn": "Splunk Add-on for Microsoft Cloud Services",
         "service": "Event Hubs",
+        "account": "prod_app",
         "settings": {
             "account": "prod_app",
             "event_hub_namespace": "acme-eh",
@@ -92,18 +94,16 @@ def test_azure_add_on_inputs():
             "consumer_group": "$Default",
         },
     }
-    assert azure_input("MS_AAD_signins", "TA-MS-AAD", {})["service"] == "Entra ID (Azure AD)"
-    assert azure_input("mscs_storage_blob", None, {"container_name": "logs"}) == {
-        "service": "Storage (Blob)",
-        "settings": {"container_name": "logs"},
-    }
-    assert azure_input("aws_cloudtrail", "Splunk_TA_aws", {}) is None
+    assert microsoft_input("MS_AAD_signins", "TA-MS-AAD", {})["service"] == "Entra ID sign-ins"
+    blob = microsoft_input("mscs_storage_blob", None, {"container_name": "logs"})
+    assert blob["service"] == "Azure Storage (Blob)" and blob["addOn"] is None
+    assert microsoft_input("aws_cloudtrail", "Splunk_TA_aws", {}) is None
 
 
 def test_azure_input_in_the_catalog_and_public_profile():
     bundle = build_here(FixtureTransport(FIXTURE), "acme")
     eh = next(e for e in bundle["entities"] if e["name"] == "mscs_azure_event_hub://prod_signins")
-    az = eh["properties"]["azure"]
+    az = eh["properties"]["microsoft"]
     assert az["service"] == "Event Hubs"
     assert az["settings"]["event_hub_name"] == "aad-signins"
     assert "do-not-store" not in json.dumps(bundle)  # a secret setting's value

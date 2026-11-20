@@ -48,6 +48,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "inputs", label: "Inputs" },
       { id: "otherInputs", label: "Batch, Windows and other inputs (inputs.conf)" },
       { id: "modularInputs", label: "Modular inputs (add-ons)" },
+      { id: "microsoftAccounts", label: "Microsoft add-on accounts and tenants (never secrets)" },
       { id: "forwarders", label: "Forwarders", searches: true },
       { id: "federated", label: "Federated search (providers, federated indexes)" },
       { id: "fields", label: "Discover fields by sampling events", searches: true, slow: true, needs: "inventory" },

@@ -1,0 +1,34 @@
+{
+ "entry": [
+  {
+   "name": "exchange_audit",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/splunk_ta_o365/data/inputs/splunk_ta_o365_management_activity/exchange_audit",
+   "acl": {
+    "app": "splunk_ta_o365",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "index": "main",
+    "sourcetype": "o365:management:activity",
+    "tenant_name": "acme_tenant",
+    "content_type": "Audit.Exchange",
+    "interval": "300"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

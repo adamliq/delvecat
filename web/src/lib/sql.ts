@@ -404,6 +404,21 @@ WHERE d.type = 'correlationSearch' AND x.type = 'uses'
 ORDER BY d.name, r.type;`,
   },
   {
+    title: "Microsoft add-on inputs, the service they read and their account",
+    sql: `SELECT json_extract(i.settings, '$.microsoft.addOn') AS add_on,
+       json_extract(i.settings, '$.microsoft.service') AS service,
+       i.name AS input, i.disabled,
+       json_extract(i.settings, '$.index') AS idx,
+       a.name AS account, json_extract(a.settings, '$.tenantId') AS tenant,
+       json_extract(a.settings, '$.cloudEnvironment') AS cloud
+FROM entities i
+LEFT JOIN edges x ON x.from_id = i.id AND x.type = 'uses'
+LEFT JOIN entities a ON a.id = x.to_id AND a.type = 'addOnAccount'
+WHERE i.type = 'input' AND json_extract(i.settings, '$.microsoft') IS NOT NULL
+  AND (x.to_id IS NULL OR a.id IS NOT NULL)
+ORDER BY add_on, service, input;`,
+  },
+  {
     title: "Detections with no annotated owner",
     sql: `SELECT id, name, app, health
 FROM entities e

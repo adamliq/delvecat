@@ -1,0 +1,32 @@
+{
+ "entry": [
+  {
+   "name": "aad_reader",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/TA-MS-AAD/x/aad_reader",
+   "acl": {
+    "app": "TA-MS-AAD",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "admin",
+      "sc_admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "username": "33333333-4444-5555-6666-777777777777",
+    "password": "real-looking-secret-should-not-appear",
+    "tenant_id": "0f1e2d3c-aaaa-bbbb-cccc-111122223333"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

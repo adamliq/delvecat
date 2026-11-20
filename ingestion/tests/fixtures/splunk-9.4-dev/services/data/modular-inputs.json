@@ -48,9 +48,45 @@
     "title": "Azure Event Hub"
    },
    "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "splunk_ta_o365_management_activity",
+   "acl": {
+    "app": "splunk_ta_o365",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "Office 365 Management Activity"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "MS_AAD_signins",
+   "acl": {
+    "app": "TA-MS-AAD",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "Azure AD Sign-ins"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "microsoft_365_defender_endpoint_incidents",
+   "acl": {
+    "app": "Splunk_TA_MS_Security",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "Microsoft 365 Defender Incidents"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
   }
  ],
  "paging": {
-  "total": 4
+  "total": 7
  }
 }

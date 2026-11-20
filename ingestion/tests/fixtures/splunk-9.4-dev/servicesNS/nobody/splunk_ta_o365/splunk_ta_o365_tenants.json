@@ -1,0 +1,36 @@
+{
+ "entry": [
+  {
+   "name": "acme_tenant",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/splunk_ta_o365/x/acme_tenant",
+   "acl": {
+    "app": "splunk_ta_o365",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "admin",
+      "sc_admin"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "tenant_id": "0f1e2d3c-aaaa-bbbb-cccc-111122223333",
+    "client_id": "22222222-3333-4444-5555-666666666666",
+    "client_secret": "********",
+    "endpoint": "Worldwide",
+    "cloudappsecuritytoken": "********",
+    "tenant_subdomain": "acme",
+    "tenant_data_center": "eu2"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

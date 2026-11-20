@@ -165,4 +165,15 @@ describe("SQL console", () => {
     const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Detections muted"))!.sql).rows;
     expect(rows).toEqual([["Brute Force", "esAutomationRule", "Enrich", 0, null], ["Brute Force", "esSuppression", "Mute", 0, "suppressesWholeDetection"]]);
   });
+
+  it("lists Microsoft add-on inputs with their accounts", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const db = new SQL.Database();
+    const acct = ent("addOnAccount", "acme_tenant", { properties: { tenantId: "t1", cloudEnvironment: "Worldwide" } });
+    const inp = ent("input", "o365://audit", { properties: { index: "o365", microsoft: { addOn: "Office 365", service: "Management Activity", account: "acme_tenant" } } });
+    const other = ent("input", "monitor:///var/log", { properties: { index: "main" } });
+    fillDatabase(db, catalogTables({ ...bundle, entities: [acct, inp, other], edges: [{ from: inp.id, to: acct.id, type: "uses", origin: "config" }] }));
+    const rows = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Microsoft add-on"))!.sql).rows;
+    expect(rows).toEqual([["Office 365", "Management Activity", "o365://audit", 0, "o365", "acme_tenant", "t1", "Worldwide"]]);
+  });
 });

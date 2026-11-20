@@ -10,6 +10,7 @@ from ...model import ExtractResult
 from ...splunk_rest import as_bool, iter_entries
 from ...transport import EndpointForbidden, EndpointNotFound, SearchError
 from .common import NS, Ctx, add_global, add_ko, content, epoch_to_iso, ref, split_list, to_int
+from .microsoft import microsoft_input
 
 ALL_INDEXES = "(index=* OR index=_*)"
 INDEX_PATTERN = re.compile(r"^[A-Za-z0-9_*-]+$")  # index names, with * wildcards
@@ -502,63 +503,6 @@ _STANDARD_INPUT_KEYS = frozenset(
 )
 
 
-# Microsoft Azure add-ons: Splunk Add-on for Microsoft Cloud Services (mscs_*) and
-# Splunk Add-on for Microsoft Azure (azure_*, MS_AAD_*). Which Azure service an input
-# reads, by its kind; first match wins.
-AZURE_APPS = ("Splunk_TA_microsoft-cloudservices", "Splunk_TA_microsoft_azure", "TA-MS-AAD")
-_AZURE_KIND = re.compile(r"^(mscs_|azure_|ms_aad_)", re.I)
-_AZURE_SERVICES = (
-    ("event_hub", "Event Hubs"),
-    ("storage_blob", "Storage (Blob)"),
-    ("storage_table", "Storage (Table)"),
-    ("aad", "Entra ID (Azure AD)"),
-    ("graph", "Microsoft Graph"),
-    ("metric", "Azure Monitor metrics"),
-    ("kql", "Log Analytics (KQL)"),
-    ("log_analytics", "Log Analytics (KQL)"),
-    ("audit", "Activity log"),
-    ("activity", "Activity log"),
-    ("security_center", "Defender for Cloud"),
-    ("defender", "Defender for Cloud"),
-    ("consumption", "Cost and billing"),
-    ("billing", "Cost and billing"),
-    ("resource", "Resource inventory"),
-    ("virtual_machine", "Resource inventory"),
-    ("virtual_network", "Resource inventory"),
-    ("topology", "Resource inventory"),
-)
-# Settings whose values only name things (no keys or secrets): shown as values.
-AZURE_NAMING_SETTINGS = (
-    "account",
-    "azure_app_account",
-    "storage_account",
-    "event_hub_namespace",
-    "event_hub_name",
-    "consumer_group",
-    "container_name",
-    "table_list",
-    "blob_list",
-    "prefix",
-    "environment",
-    "resource_type",
-    "resource_group_list",
-    "namespaces",
-    "subscription_id",
-    "tenant_id",
-    "workspace_id",
-)
-
-
-def azure_input(kind: str, app: str | None, c: dict[str, Any]) -> dict[str, Any] | None:
-    """An Azure add-on input: the Azure service it reads and the names it reads from."""
-    if not (_AZURE_KIND.match(kind) or app in AZURE_APPS):
-        return None
-    low = kind.lower()
-    service = next((label for key, label in _AZURE_SERVICES if key in low), None)
-    names = {k: c[k] for k in AZURE_NAMING_SETTINGS if c.get(k) not in (None, "")}
-    return {"service": service, **({"settings": names} if names else {})}
-
-
 def extract_modular_inputs(ctx: Ctx, out: ExtractResult) -> int:
     """Inputs of the kinds add-ons define (modular inputs: cloud services, APIs, journald,
     ...): one per configured stanza, feeding its index and sourcetype like other inputs.
@@ -600,9 +544,13 @@ def extract_modular_inputs(ctx: Ctx, out: ExtractResult) -> int:
                     "source": c.get("source") or None,
                     "interval": c.get("interval") or None,
                     "settingNames": own or None,
-                    "azure": azure_input(scheme, (e.get("acl") or {}).get("app"), c),
+                    "microsoft": (
+                        ms := microsoft_input(scheme, acl_app := (e.get("acl") or {}).get("app"), c)
+                    ),
                 },
             )
+            if ms and ms.get("account"):
+                out.refs.append(ref(ent["id"], "addOnAccount", ms["account"], "uses", app=acl_app))
             if not ent.get("disabled"):
                 index = c.get("index")
                 target = index if index and index != "default" else "main"
