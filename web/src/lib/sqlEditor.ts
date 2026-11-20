@@ -109,6 +109,8 @@ export function suggestions(sql: string, cursor: number, tables: Table[], max = 
   const [, , word] = wordAt(sql, cursor);
   if (word.length < 1) return [];
   const w = word.toLowerCase();
+  // A complete keyword (DESC, FROM, AND...) needs no completing.
+  if (KEYWORDS.has(w) && word === word.toUpperCase()) return [];
   const before = sql.slice(0, cursor - word.length).toLowerCase();
   const afterTableKeyword = /\b(from|join|into)\s+$/.test(before);
   const used = tablesInQuery(sql, tables);

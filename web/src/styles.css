@@ -547,7 +547,7 @@ button.tile { font: inherit; color: inherit; text-align: left; cursor: pointer; 
 .tok-table { color: var(--tok-table); }
 .tok-column { color: var(--tok-column); }
 .tok-comment { color: var(--tok-comment); font-style: italic; }
-.sql-suggest { position: absolute; z-index: 5; left: 8px; right: 8px; margin: 2px 0 0; padding: 4px 0; list-style: none; max-width: 520px;
+.sql-suggest { position: static; margin: 4px 0 0; padding: 4px 0; list-style: none; max-width: 520px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
 .sql-suggest li { padding: 3px 10px; cursor: pointer; }
 .sql-suggest li.active, .sql-suggest li:hover { background: var(--accent-soft); }

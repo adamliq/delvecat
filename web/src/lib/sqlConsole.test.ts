@@ -29,6 +29,8 @@ describe("editor helpers", () => {
     const sql = "SELECT la FROM entities";
     expect(suggestions(sql, 9, tables)[0]).toMatchObject({ text: "last_used", kind: "column", detail: "entities" });
     expect(wordAt("SELECT typ", 10)).toEqual([7, 10, "typ"]);
+    // A complete upper-case keyword is not completed ("DESC" is not "description").
+    expect(suggestions("SELECT * FROM entities ORDER BY id DESC", 39, tables)).toEqual([]);
   });
   it("explains errors with a position and a close name", () => {
     const sql = "SELECT lastused\nFROM entities";
