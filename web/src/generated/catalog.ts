@@ -127,6 +127,39 @@ export interface CatalogBundle {
   ingestionReport?: ConnectorReport[];
   changes?: ChangeSummary;
   /**
+   * Health counts of this and earlier builds (oldest first), for a trend. Derived.
+   */
+  healthHistory?: {
+    at: string;
+    /**
+     * Objects whose worst finding is critical.
+     */
+    critical: number;
+    /**
+     * Objects whose worst finding is a warning.
+     */
+    warning: number;
+    /**
+     * Findings (checks that are not OK).
+     */
+    findings?: number;
+    unused?: number;
+  }[];
+  /**
+   * Findings the previous build had and this one does not: fixed, or the object was removed or disabled. Derived.
+   */
+  resolvedFindings?: {
+    id: string;
+    type: string;
+    name: string;
+    app?: string;
+    check: string;
+    status: "warning" | "critical";
+    message: string;
+    since?: string;
+    how?: "fixed" | "removed" | "disabled";
+  }[];
+  /**
    * When present, entities and edges live in these files (paths relative to this manifest) and the entities/edges arrays here are empty.
    */
   shards?: Shard[];
@@ -273,9 +306,24 @@ export interface Entity {
      * Splunk relative time the alert counts cover, e.g. -30d.
      */
     alertWindow?: string;
+    /**
+     * Times the alert fired per day: counts from start, one per day.
+     */
+    alertDaily?: {
+      start: string;
+      counts: number[];
+    };
     lastUsed?: string;
     runtimeSecs?: number | null;
+    /**
+     * Scheduler outcomes in the health window; daily has runs and skipped-or-failed runs per day from start.
+     */
     scheduler?: {
+      daily?: {
+        start: string;
+        runs: number[];
+        problems: number[];
+      };
       [k: string]: unknown;
     };
     unused?: boolean;
@@ -292,6 +340,10 @@ export interface Entity {
       check: string;
       status: "ok" | "warning" | "critical";
       message: string;
+      /**
+       * When this finding was first seen: the build time of the earliest catalog that had it.
+       */
+      since?: string;
     }[];
   };
   /**
@@ -415,6 +467,12 @@ export interface ConnectorReport {
    * How long the part took, in seconds.
    */
   durationSecs?: number;
+  /**
+   * Health only: the thresholds the checks used (hours, days, seconds or ratios, as named).
+   */
+  thresholds?: {
+    [k: string]: number;
+  };
   /**
    * Instance the report is about (set when bundles are merged).
    */

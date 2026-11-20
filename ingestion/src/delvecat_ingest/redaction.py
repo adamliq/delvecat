@@ -148,6 +148,18 @@ def _redact_emails(props: dict[str, Any], mode: str) -> int:
     return n
 
 
+def _renamed(type_: str, name: str, profile: Profile, rename: Any) -> str:
+    """The name an object of this type gets under the profile (for lists that name
+    objects outside the entities: removed objects, resolved findings)."""
+    if type_ == "user" and profile.users == "pseudonymize":
+        return str(rename("user", name))
+    if type_ in HOST_TYPES and profile.hosts == "pseudonymize":
+        return str(rename("host", name))
+    if type_ == "source" and profile.sources == "pseudonymize":
+        return str(rename("source", name))
+    return name
+
+
 def redact_bundle(
     bundle: dict[str, Any], profile: Profile, salt: str | None = None
 ) -> dict[str, Any]:
@@ -294,6 +306,10 @@ def redact_bundle(
             ch[k] = [id_map.get(i, i) for i in ch[k]]
         for r in ch["removed"]:
             r["id"] = id_map.get(r["id"], r["id"])
+            r["name"] = _renamed(r["type"], r["name"], profile, rename)
+    for r in bundle.get("resolvedFindings", []):
+        r["id"] = id_map.get(r["id"], r["id"])
+        r["name"] = _renamed(r["type"], r["name"], profile, rename)
 
     def remap_ids(value: Any) -> Any:
         """Ids embedded in derived data (governance, annotations sources stay as-is)."""
@@ -318,6 +334,8 @@ def redact_bundle(
 
     if profile.ips == "mask":
         bundle["entities"] = _mask_ips(bundle["entities"])
+        if "resolvedFindings" in bundle:
+            bundle["resolvedFindings"] = _mask_ips(bundle["resolvedFindings"])
         bundle["instances"] = _mask_ips(bundle["instances"])
 
     # Kept only so `merge` can link instances; they hold raw names, and a redacted bundle

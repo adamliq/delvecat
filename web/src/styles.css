@@ -583,3 +583,52 @@ button.tile { font: inherit; color: inherit; text-align: left; cursor: pointer; 
 .chart-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
 .chart-tip { position: absolute; right: 8px; transform: translateY(-2px); pointer-events: none; background: var(--surface); border: 1px solid var(--border);
   border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.12); white-space: nowrap; }
+
+/* Health page */
+.tile-btn { font: inherit; text-align: left; cursor: pointer; }
+.tile-btn:hover, .tile-btn:focus-visible { border-color: var(--accent); }
+.health-trend { margin: 0; max-width: 720px; }
+.health-trend figcaption { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 4px; }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 0.85rem; }
+.legend-swatch { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
+.sw-critical { background: var(--status-critical); }
+.sw-warning { background: var(--status-warning); }
+.trend-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.trend-line.trend-critical { stroke: var(--status-critical); }
+.trend-line.trend-warning { stroke: var(--status-warning); }
+.trend-dot { stroke: var(--surface); stroke-width: 2; }
+.trend-dot.trend-critical { fill: var(--status-critical); }
+.trend-dot.trend-warning { fill: var(--status-warning); }
+.check-bars { display: grid; gap: 2px; max-width: 760px; }
+.check-bar { display: grid; grid-template-columns: minmax(140px, 240px) 1fr 52px; align-items: center; gap: 10px;
+  font: inherit; color: var(--text); background: transparent; border: 0; border-radius: 4px; padding: 3px 6px; cursor: pointer; text-align: left; }
+.check-bar:hover { background: var(--accent-soft); }
+.check-bar.active { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.check-bar-label { font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.check-bar-track { display: flex; gap: 2px; height: 14px; }
+.check-bar-seg { display: block; height: 100%; min-width: 3px; }
+.check-bar-seg:last-child { border-radius: 0 4px 4px 0; }
+.check-bar-seg.seg-critical { background: var(--status-critical); }
+.check-bar-seg.seg-warning { background: var(--status-warning); }
+.check-bar-num { font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; font-size: 0.85rem; }
+.health-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; scroll-margin-top: 12px; }
+.health-filters input[type="search"] { min-width: 220px; }
+.finding + .finding { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.finding-handled { opacity: 0.65; }
+.remedy, .ack-form { margin-top: 4px; font-size: 0.88rem; }
+.remedy summary, .ack-form summary { cursor: pointer; color: var(--accent); }
+.remedy p { margin: 6px 0; }
+.remedy-spl { display: grid; gap: 6px; margin: 6px 0; }
+.remedy-spl code { display: block; white-space: pre-wrap; word-break: break-word; background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; font-size: 0.82rem; }
+.ack-form form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.ack-state { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-top: 4px; }
+.ack-lapsed .muted { color: var(--status-critical); }
+.badge-new { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.3px; }
+.safe-hint { color: var(--text); }
+.safe-hint::before { content: "✓ "; color: var(--status-good); }
+.stack-tight { display: grid; gap: 2px; }
+.health-filters select, .health-filters input[type="search"] { width: auto; margin: 0; }
+.check-bars-more { justify-self: start; margin: 4px 6px; }
+.ack-form select, .ack-form input[type="text"] { width: auto; margin: 0; padding: 3px 6px; font: inherit; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--text); }
+.ack-form input[type="text"] { min-width: 200px; }
+.health-trend { margin-top: 8px; }

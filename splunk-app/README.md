@@ -221,6 +221,24 @@ one. The same from a search:
   shows the same for the last build and has *Reset to defaults* for the parts
   (it otherwise starts from the last build's selection).
 
+- **Health**: every finding by area (data sources, scheduled searches and
+  alerts, forwarders, HEC, storage and routing, tokens, Enterprise Security),
+  with tiles that filter the list (critical, warnings, new and fixed since the
+  last build, acknowledged, at risk, unused) and a bar per check that filters to
+  it. Each finding says why it matters and what to do, with a ready search
+  (*Open in Splunk search*, *Copy search*). *By owner* and *By app* show who
+  needs to act, with CSV. A trend of critical and warning objects per build, the
+  findings fixed since the last build, when each finding was first seen, and
+  daily skipped/failed runs and alert fires next to searches. Thresholds come
+  from the build. **Accept** a finding (known, not fixing) or **snooze** it for
+  7, 30 or 90 days with a note: catalog publishers and admins can, everyone sees
+  who did and why, and a finding that gets worse shows again. Cleanup lists
+  owner, last used, last changed, size an unused index would free and how many
+  objects refer to it ("safe to remove" when none), and can include disabled
+  objects.
+
+  ![Health](../docs/screenshots/health-overview.png)
+
 - **SQL console**: highlighted editor with table and column suggestions as you
   type (Tab or Enter), *Format*, and errors that say where they are and suggest a
   close name ("Did you mean `last_used`?"); a note when a JSON path in the query is
@@ -261,6 +279,7 @@ generations are deleted, so a page loading meanwhile never mixes two catalogs
 |---|---|---|
 | The app | `admin`, `sc_admin`, `delvecat_user`, `delvecat_publisher` | `admin`, `sc_admin` |
 | `delvecat_catalog` | the same | `admin`, `sc_admin`, `delvecat_publisher` |
+| `delvecat_acks` (accepted and snoozed findings) | the same | `admin`, `sc_admin`, `delvecat_publisher` |
 | `delvecatbuild` command (Build page) | run: `admin`, `sc_admin`, `delvecat_publisher` | `admin`, `sc_admin` |
 
 (`metadata/default.meta`.) The page reads the catalog with the viewer's own
@@ -275,6 +294,9 @@ last build, its progress and result, which the Build page shows.
 Splunk) is the only writing DelveCat does, and it may write only this
 collection: `POST` to its `batch_save` and `DELETE` of its older documents
 (`transport.publish_allowlist`). Every other request is read-only, as before.
+The one other write is from the Health page, by a publisher or admin who
+accepts or snoozes a finding: one document in the app's own `delvecat_acks`
+collection (or its removal on *Undo*). Nothing outside the app is ever written.
 
 Everyone with `delvecat_user` sees the whole catalog: every index, search,
 role and user it describes, including objects their own Splunk permissions

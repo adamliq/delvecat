@@ -65,6 +65,42 @@
     "changes": {
       "$ref": "#/$defs/ChangeSummary"
     },
+    "healthHistory": {
+      "description": "Health counts of this and earlier builds (oldest first), for a trend. Derived.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["at", "critical", "warning"],
+        "properties": {
+          "at": {"type": "string", "format": "date-time"},
+          "critical": {"type": "integer", "description": "Objects whose worst finding is critical."},
+          "warning": {"type": "integer", "description": "Objects whose worst finding is a warning."},
+          "findings": {"type": "integer", "description": "Findings (checks that are not OK)."},
+          "unused": {"type": "integer"}
+        }
+      }
+    },
+    "resolvedFindings": {
+      "description": "Findings the previous build had and this one does not: fixed, or the object was removed or disabled. Derived.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "name", "check", "status", "message"],
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"type": "string"},
+          "name": {"type": "string"},
+          "app": {"type": "string"},
+          "check": {"type": "string"},
+          "status": {"type": "string", "enum": ["warning", "critical"]},
+          "message": {"type": "string"},
+          "since": {"type": "string", "format": "date-time"},
+          "how": {"type": "string", "enum": ["fixed", "removed", "disabled"]}
+        }
+      }
+    },
     "shards": {
       "description": "When present, entities and edges live in these files (paths relative to this manifest) and the entities/edges arrays here are empty.",
       "type": "array",
@@ -492,6 +528,15 @@
               "description": "Splunk relative time the alert counts cover, e.g. -30d.",
               "type": "string"
             },
+            "alertDaily": {
+              "description": "Times the alert fired per day: counts from start, one per day.",
+              "type": "object",
+              "required": ["start", "counts"],
+              "properties": {
+                "start": {"type": "string", "format": "date"},
+                "counts": {"type": "array", "items": {"type": "integer"}}
+              }
+            },
             "lastUsed": {
               "type": "string"
             },
@@ -502,8 +547,20 @@
               ]
             },
             "scheduler": {
+              "description": "Scheduler outcomes in the health window; daily has runs and skipped-or-failed runs per day from start.",
               "type": "object",
-              "additionalProperties": true
+              "additionalProperties": true,
+              "properties": {
+                "daily": {
+                  "type": "object",
+                  "required": ["start", "runs", "problems"],
+                  "properties": {
+                    "start": {"type": "string", "format": "date"},
+                    "runs": {"type": "array", "items": {"type": "integer"}},
+                    "problems": {"type": "array", "items": {"type": "integer"}}
+                  }
+                }
+              }
             },
             "unused": {
               "type": "boolean"
@@ -557,6 +614,11 @@
                   },
                   "message": {
                     "type": "string"
+                  },
+                  "since": {
+                    "description": "When this finding was first seen: the build time of the earliest catalog that had it.",
+                    "type": "string",
+                    "format": "date-time"
                   }
                 }
               }
@@ -759,6 +821,13 @@
         "durationSecs": {
           "description": "How long the part took, in seconds.",
           "type": "number"
+        },
+        "thresholds": {
+          "description": "Health only: the thresholds the checks used (hours, days, seconds or ratios, as named).",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
         },
         "instance": {
           "description": "Instance the report is about (set when bundles are merged).",

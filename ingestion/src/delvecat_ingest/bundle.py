@@ -12,7 +12,14 @@ from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
 from .compat import UTC
 from .fields import define_fields, link_fields
-from .health import apply_usage, evaluate_health, fill_alert_fires, mark_unused
+from .health import (
+    apply_health_history,
+    apply_usage,
+    evaluate_health,
+    fill_alert_fires,
+    mark_unused,
+    thresholds,
+)
 from .lineage import derive, record_unresolved
 from .link import link_hosts
 from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
@@ -271,6 +278,7 @@ def assemble(
                     "unused": unused,
                 },
                 "message": f"as of {result.as_of or generated}",
+                "thresholds": thresholds(),
             }
         )
 
@@ -288,6 +296,10 @@ def assemble(
     }
     if changes is not None:
         bundle["changes"] = changes
+    if any(r["connector"] == "health" for r in reports):
+        apply_health_history(bundle, previous, generated)
+    elif previous and previous.get("healthHistory"):
+        bundle["healthHistory"] = previous["healthHistory"]  # a partial build keeps the trend
     from .quality import apply_quality  # built-in checks; annotations add more later
 
     apply_quality(bundle)

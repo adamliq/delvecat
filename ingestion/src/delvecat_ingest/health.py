@@ -51,6 +51,30 @@ RETENTION_SIZE_RATIO = 0.9  # an index this full freezes data by size, not by ag
 ALERT_NOISY_PER_DAY = 24  # an alert firing more than hourly on average is hard to act on
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
 
+HISTORY_POINTS = 60  # builds kept in the health trend
+
+
+def thresholds() -> dict[str, float]:
+    """The thresholds the checks use, for the health report (the page shows them)."""
+    return {
+        "staleWarningHours": STALE_WARNING_HOURS,
+        "staleCriticalHours": STALE_CRITICAL_HOURS,
+        "volumeLowRatio": VOLUME_LOW_RATIO,
+        "volumeHighRatio": VOLUME_HIGH_RATIO,
+        "delayWarningSecs": DELAY_WARNING_SECS,
+        "delayCriticalSecs": DELAY_CRITICAL_SECS,
+        "skipWarningRatio": SKIP_WARNING_RATIO,
+        "skipCriticalRatio": SKIP_CRITICAL_RATIO,
+        "runtimeWarningSecs": RUNTIME_WARNING_SECS,
+        "forwarderSilentHours": FORWARDER_SILENT_HOURS,
+        "tokenExpiryWarningDays": TOKEN_EXPIRY_WARNING_DAYS,
+        "tokenStaleDays": TOKEN_STALE_DAYS,
+        "summaryUnusedDays": SUMMARY_UNUSED_DAYS,
+        "retentionSizeRatio": RETENTION_SIZE_RATIO,
+        "alertNoisyPerDay": ALERT_NOISY_PER_DAY,
+    }
+
+
 KO_TYPES = (
     "macro",
     "lookup",
@@ -648,3 +672,95 @@ def mark_unused(
             e["usage"].pop("unused", None)
             e["usage"].pop("reason", None)
     return n
+
+
+# --- history --------------------------------------------------------------------------
+
+
+def _counts(entities: list[dict[str, Any]], at: str) -> dict[str, Any]:
+    statuses = [e["health"]["status"] for e in entities if e.get("health")]
+    return {
+        "at": at,
+        "critical": statuses.count("critical"),
+        "warning": statuses.count("warning"),
+        "findings": sum(
+            1
+            for e in entities
+            for c in (e.get("health") or {}).get("checks", [])
+            if c["status"] != "ok"
+        ),
+        "unused": sum(1 for e in entities if (e.get("usage") or {}).get("unused")),
+    }
+
+
+def has_health(bundle: dict[str, Any]) -> bool:
+    """Whether the bundle's build evaluated health."""
+    return any(r.get("connector") == "health" for r in bundle.get("ingestionReport") or [])
+
+
+def apply_health_history(
+    bundle: dict[str, Any], previous: dict[str, Any] | None, generated_at: str
+) -> None:
+    """Compare health with the previous catalog.
+
+    - each finding gets ``since``: when it was first seen (carried from the previous
+      catalog, or this build when it is new);
+    - ``resolvedFindings``: findings the previous catalog had and this one does not;
+    - ``healthHistory``: this build's counts appended to the previous trend.
+
+    Only for builds that evaluated health (call it only then): otherwise every
+    finding would look fixed."""
+    entities = bundle["entities"]
+    if previous is not None and not has_health(previous):
+        # The previous catalog was built without health (a partial build): nothing to
+        # compare findings with. Keep its trend; first-seen times start again next build.
+        history = [h for h in previous.get("healthHistory") or [] if h.get("at") != generated_at]
+        bundle["healthHistory"] = [*history, _counts(entities, generated_at)][-HISTORY_POINTS:]
+        return
+    before: dict[tuple[str, str], dict[str, Any]] = {}
+    old_entities: dict[str, dict[str, Any]] = {}
+    for e in (previous or {}).get("entities", []):
+        old_entities[e["id"]] = e
+        for c in (e.get("health") or {}).get("checks", []):
+            before[(e["id"], c["check"])] = c
+    prev_at = (previous or {}).get("generatedAt")
+    now_keys: set[tuple[str, str]] = set()
+    for e in entities:
+        for c in (e.get("health") or {}).get("checks", []):
+            key = (e["id"], c["check"])
+            now_keys.add(key)
+            old = before.get(key)
+            c["since"] = (old.get("since") or prev_at or generated_at) if old else generated_at
+    if previous is None:
+        bundle["healthHistory"] = [_counts(entities, generated_at)]
+        return
+    current = {e["id"]: e for e in entities}
+    resolved = []
+    for (id_, check), c in sorted(before.items()):
+        if (id_, check) in now_keys or c.get("status") not in ("warning", "critical"):
+            continue
+        old = old_entities[id_]
+        now = current.get(id_)
+        how = "removed" if now is None else "disabled" if now.get("disabled") else "fixed"
+        resolved.append(
+            {
+                "id": id_,
+                "type": old["type"],
+                "name": old["name"],
+                **({"app": old["app"]} if old.get("app") else {}),
+                "check": check,
+                "status": c["status"],
+                "message": c["message"],
+                **({"since": c["since"]} if c.get("since") else {}),
+                "how": how,
+            }
+        )
+    if resolved:
+        bundle["resolvedFindings"] = resolved
+    else:
+        bundle.pop("resolvedFindings", None)
+    history = list(previous.get("healthHistory") or [])
+    if not history and prev_at and any(e.get("health") for e in old_entities.values()):
+        history = [_counts(list(old_entities.values()), prev_at)]  # catalogs from before trends
+    history = [h for h in history if h.get("at") != generated_at]
+    bundle["healthHistory"] = [*history, _counts(entities, generated_at)][-HISTORY_POINTS:]

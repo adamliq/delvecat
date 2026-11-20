@@ -69,6 +69,17 @@ and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
 
+### Health over time
+
+Each build compares health with the previous catalog (`--previous`, or the
+published one when building in Splunk): every finding gets `since` (when it was
+first seen), findings that went away are listed in `resolvedFindings` (fixed,
+object removed or disabled), and `healthHistory` keeps the critical, warning,
+finding and unused counts of the last 60 builds. A build without the usage and
+health part keeps the trend and compares nothing. The health report lists the
+thresholds it used (`thresholds`). Scheduler outcomes and alert fires are also
+kept per day (`usage.scheduler.daily`, `usage.alertDaily`).
+
 ### Modular inputs and identity groups
 
 Inputs that add-ons define (modular inputs: cloud services, APIs, journald...)

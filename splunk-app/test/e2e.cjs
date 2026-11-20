@@ -247,6 +247,61 @@ const sections = {
     await a.close();
   },
 
+  async health() {
+    const ACKS = '/servicesNS/nobody/delvecat/storage/collections/data/delvecat_acks';
+    await rest('DELETE', ACKS); // start clean
+    const p = await pointer();
+    const pub = await session('publisher');
+    await pub.page.goto(app('#/health'));
+    await pub.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    const trend = await pub.page.locator('.health-trend svg').count();
+    check('Health page draws the trend over builds', trend === 1, `catalog ${p?.generation}`);
+    const t = await mainText(pub.page);
+    check('Health page lists every area with findings and the thresholds used', /Thresholds: stale after/.test(t) && /Findings by check/.test(t), t.slice(0, 120));
+    const link = await pub.page.locator('.remedy a:has-text("Open in Splunk search")').first().getAttribute('href').catch(() => null);
+    check('How to fix links to a Splunk search', !!link && /\/app\/search\/search\?q=/.test(link), link || 'no link');
+    const before = await pub.page.locator('.finding').count();
+    await pub.page.locator('.ack-form summary').first().click();
+    await pub.page.locator('.ack-form input[aria-label=Note]').first().fill('e2e: known');
+    await pub.page.locator('.ack-form button:has-text("Save")').first().click();
+    await sleep(1500);
+    const stored = (await rest('GET', ACKS)).json || [];
+    check('publisher accepts a finding: saved in the app\'s KV collection', stored.length === 1 && stored[0].by === 'publisher' && stored[0].note === 'e2e: known',
+      JSON.stringify(stored[0] || {}).slice(0, 120));
+    check('accepted finding is hidden from the list', (await pub.page.locator('.finding').count()) === before - 1);
+    check('publisher pages without script errors', pub.errors.length === 0, pub.errors.join('; '));
+    await pub.close();
+
+    const v = await session('viewer');
+    await v.page.goto(app('#/health'));
+    await v.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    await v.page.check('label:has-text("Show acknowledged") input');
+    await sleep(500);
+    const vt = await mainText(v.page);
+    check('viewer sees who accepted it', /Accepted by publisher: e2e: known/.test(vt));
+    check('viewer cannot acknowledge (no form)', (await v.page.locator('.ack-form').count()) === 0);
+    const viaRest = await fetch(`${MGMT}${ACKS}/batch_save?output_mode=json`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`viewer:${USERS.viewer}`).toString('base64'), 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ _key: 'ack-x', entity: 'x', check: 'y', state: 'accepted', status: 'warning', at: 'now' }]),
+    });
+    check('viewer cannot write acknowledgements through REST', viaRest.status >= 400, `HTTP ${viaRest.status}`);
+    check('viewer pages without script errors', v.errors.length === 0, v.errors.join('; '));
+    await v.close();
+
+    const pub2 = await session('publisher');
+    await pub2.page.goto(app('#/health'));
+    await pub2.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    await pub2.page.check('label:has-text("Show acknowledged") input');
+    await pub2.page.locator('.ack-state button:has-text("Undo")').first().click();
+    await sleep(1500);
+    check('publisher undoes it: removed from the collection', ((await rest('GET', ACKS)).json || []).length === 0);
+    await pub2.close();
+  },
+
   async timelimit() {
     const a = await session('admin');
     const doc = await uiBuild(a.page, {

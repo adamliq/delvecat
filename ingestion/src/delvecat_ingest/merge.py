@@ -29,7 +29,7 @@ from .bundle import apply_versions, ref_from_json, ref_to_json
 from .compat import UTC
 from .fields import link_fields
 from .governance import apply_governance
-from .health import CONSUMER_EDGES, SEVERITY
+from .health import CONSUMER_EDGES, SEVERITY, apply_health_history
 from .health import _merge_usage as merge_usage
 from .link import link_hosts
 from .quality import apply_quality
@@ -265,6 +265,18 @@ def merge_bundles(
         merged["references"] = still_open
     if previous is not None:
         merged["changes"] = apply_versions(entities, generated, previous)
+    if any(r["connector"] == "health" for r in merged["ingestionReport"]):
+        if previous is not None:
+            apply_health_history(merged, previous, generated)
+        else:  # usually one part (the search head) has health: keep its trend
+            parts = [b for _, b in bundles if b.get("healthHistory")]
+            if parts:
+                best = max(parts, key=lambda b: len(b["healthHistory"]))
+                merged["healthHistory"] = best["healthHistory"]
+                if best.get("resolvedFindings"):
+                    merged["resolvedFindings"] = [
+                        {**r, "id": id_map.get(r["id"], r["id"])} for r in best["resolvedFindings"]
+                    ]
 
     apply_governance(merged)
     apply_quality(merged)

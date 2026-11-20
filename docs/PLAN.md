@@ -622,6 +622,19 @@ surfaces; status is always icon + label, never color alone.
 - Example queries, a table browser with column notes, ids linked to entity
   pages, CSV download, and the query kept in the URL for sharing.
 
+### Health over time and triage (done)
+
+- Builds compare health with the previous catalog: first-seen time per finding,
+  findings resolved since (fixed, removed, disabled), and a trend of the last 60
+  builds; daily skipped/failed runs and alert fires; the thresholds used.
+- The Health page covers every check by area, with filters (status, area, check,
+  owner, app, new), advice and an investigation search per check, per-owner and
+  per-app summaries, and a richer cleanup report (size, last used, dependents,
+  disabled objects).
+- Accepting or snoozing a finding is the app's second write, to its own
+  collection `delvecat_acks` (publishers and admins); outside Splunk it stays in
+  the browser.
+
 ### Splunk app, phases 1 and 2 (done)
 
 DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud
@@ -630,7 +643,7 @@ DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud
 built outside Splunk as before and stored with `delvecat-ingest publish` in the
 app's KV store collection (gzip + base64 parts, a pointer switched in one write,
 sha256-checked in the browser). That collection is the only thing DelveCat ever
-writes, through a separate allowlist used only by `publish`. Two packages: Splunk's
+writes (later, also accepted health findings in `delvecat_acks`), through a separate allowlist used only by `publish`. Two packages: Splunk's
 page template (10.4+ and Cloud) and a legacy one with its own template (9.x to
 10.3). AppInspect's Cloud checks pass; tested on Splunk 9.4 and 10.4.
 

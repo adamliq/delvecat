@@ -129,15 +129,37 @@ def extract_dashboard_views(ctx: Ctx, out: ExtractResult) -> int:
     return len(rows)
 
 
+def _day(t: Any) -> str | None:
+    """A search result's ``_time`` (epoch or ISO) as a date."""
+    if not t:
+        return None
+    if str(t).replace(".", "").isdigit():
+        return (epoch_to_iso(t) or "")[:10] or None
+    return str(t)[:10]
+
+
+def _daily(by_day: dict[str, int], days: list[str]) -> dict[str, Any]:
+    return {"start": days[0], "counts": [by_day.get(d, 0) for d in days]}
+
+
+def _days_between(days: set[str]) -> list[str]:
+    """Every date from the first to the last seen (so a quiet day is a 0, not a gap)."""
+    if not days:
+        return []
+    first, last = (datetime.fromisoformat(d) for d in (min(days), max(days)))
+    return [(first + timedelta(days=i)).date().isoformat() for i in range((last - first).days + 1)]
+
+
 def extract_scheduler(ctx: Ctx, out: ExtractResult) -> int:
+    # Per day as well, so the health page can show when runs were skipped or failed.
     rows = ctx.transport.search(
         "health_scheduler",
-        "index=_internal sourcetype=scheduler savedsearch_name=* "
+        "index=_internal sourcetype=scheduler savedsearch_name=* | bin _time span=1d "
         '| stats count(eval(status="success")) as success count(eval(status="skipped")) as '
         'skipped count(eval(status="continued")) as continued count(eval(like(status, "%fail%") '
         'OR status="abandoned")) as failed count as total avg(run_time) as avgRuntime '
         "max(run_time) as maxRuntime min(_time) as first max(_time) as last "
-        "latest(reason) as lastReason by app, savedsearch_name, user",
+        "latest(reason) as lastReason by app, savedsearch_name, user, _time",
         earliest=ctx.options.health_window,
     )
     firsts = [to_int(r.get("first")) for r in rows if to_int(r.get("first"))]
@@ -145,30 +167,65 @@ def extract_scheduler(ctx: Ctx, out: ExtractResult) -> int:
         out.instance_facts.setdefault("properties", {})["schedulerLogSince"] = epoch_to_iso(
             min(firsts)
         )
+    COUNTS = ("total", "success", "skipped", "continued", "failed")
+    merged: dict[tuple[Any, Any, Any], dict[str, Any]] = {}
+    all_days: set[str] = set()
     for r in rows:
+        key = (r.get("app"), r.get("savedsearch_name"), r.get("user"))
+        m = merged.setdefault(
+            key, {**{k: 0 for k in COUNTS}, "runtime": 0.0, "max": None, "last": None, "days": {}}
+        )
+        total = to_int(r.get("total")) or 0
+        for k in COUNTS:
+            m[k] += to_int(r.get(k)) or 0
+        m["runtime"] += (_float(r.get("avgRuntime")) or 0) * total
+        mx = _float(r.get("maxRuntime"))
+        if mx is not None and (m["max"] is None or mx > m["max"]):
+            m["max"] = mx
+        last = _float(r.get("last"))
+        if last is not None and (m["last"] is None or last > m["last"]):
+            m["last"] = last
+            m["reason"] = r.get("lastReason") or m.get("reason")
+        elif not m.get("reason"):
+            m["reason"] = r.get("lastReason")
+        if day := _day(r.get("_time")):
+            all_days.add(day)
+            bad = (to_int(r.get("skipped")) or 0) + (to_int(r.get("failed")) or 0)
+            m["days"][day] = (
+                m["days"].get(day, (0, 0))[0] + total,
+                m["days"].get(day, (0, 0))[1] + bad,
+            )
+    days = _days_between(all_days)
+    for (app, name, user), m in merged.items():
+        scheduler: dict[str, Any] = {
+            "total": m["total"],
+            "success": m["success"],
+            "skipped": m["skipped"],
+            "continued": m["continued"],
+            "failed": m["failed"],
+            "avgRuntimeSecs": round(m["runtime"] / m["total"], 3) if m["total"] else None,
+            "maxRuntimeSecs": m["max"],
+            "lastRun": epoch_to_iso(m["last"]),
+            "lastSkipReason": m.get("reason") or None,
+            "window": ctx.options.health_window,
+        }
+        if days and m["days"]:
+            # Runs and runs that were skipped or failed, per day.
+            scheduler["daily"] = {
+                "start": days[0],
+                "runs": [m["days"].get(d, (0, 0))[0] for d in days],
+                "problems": [m["days"].get(d, (0, 0))[1] for d in days],
+            }
         out.usage.append(
             {
                 "types": ["savedSearch", "correlationSearch", "scheduledView"],
-                "name": r.get("savedsearch_name"),
-                "app": r.get("app"),
-                "owner": r.get("user"),
-                "usage": {
-                    "scheduler": {
-                        "total": to_int(r.get("total")),
-                        "success": to_int(r.get("success")),
-                        "skipped": to_int(r.get("skipped")),
-                        "continued": to_int(r.get("continued")),
-                        "failed": to_int(r.get("failed")),
-                        "avgRuntimeSecs": _float(r.get("avgRuntime")),
-                        "maxRuntimeSecs": _float(r.get("maxRuntime")),
-                        "lastRun": epoch_to_iso(r.get("last")),
-                        "lastSkipReason": r.get("lastReason") or None,
-                        "window": ctx.options.health_window,
-                    }
-                },
+                "name": name,
+                "app": app,
+                "owner": user,
+                "usage": {"scheduler": scheduler},
             }
         )
-    return len(rows)
+    return len(merged)
 
 
 def extract_license(ctx: Ctx, out: ExtractResult) -> int:
@@ -370,31 +427,51 @@ def extract_alert_fires(ctx: Ctx, out: ExtractResult) -> int:
         'supp=if(sourcetype=="scheduler" AND suppressed=="1", 1, 0), '
         'audit=if(action=="alert_fired", 1, 0), '
         "firedAt=if(sched==1 OR audit==1, _time, null()) "
+        "| bin _time span=1d "
         "| stats sum(sched) as schedFired sum(supp) as suppressed sum(audit) as auditFired "
-        "max(firedAt) as last by ssApp, name "
+        "max(firedAt) as last by ssApp, name, _time "
         "| where schedFired>0 OR suppressed>0 OR auditFired>0",
         earliest=ctx.options.usage_window,
     )
+    # One row per alert and day (older recordings: per alert); summed here.
+    alerts: dict[tuple[str, Any], dict[str, Any]] = {}
+    all_days: set[str] = set()
     for r in rows:
         if not r.get("name"):
             continue
+        a = alerts.setdefault(
+            (r["name"], r.get("ssApp")), {"fires": 0, "suppressed": 0, "last": None, "days": {}}
+        )
         fires = max(to_int(r.get("schedFired")) or 0, to_int(r.get("auditFired")) or 0)
+        a["fires"] += fires
+        a["suppressed"] += to_int(r.get("suppressed")) or 0
+        last = _float(r.get("last"))
+        if last is not None and (a["last"] is None or last > a["last"]):
+            a["last"] = last
+        if day := _day(r.get("_time")):
+            all_days.add(day)
+            a["days"][day] = a["days"].get(day, 0) + fires
+    days = _days_between(all_days)
+    for (name, app), a in alerts.items():
+        usage: dict[str, Any] = {
+            "alertFires": a["fires"],
+            "alertsSuppressed": a["suppressed"],
+            "lastFired": epoch_to_iso(a["last"]),
+            "alertWindow": ctx.options.usage_window,
+        }
+        if days and a["days"]:
+            usage["alertDaily"] = _daily(a["days"], days)
         out.usage.append(
             {
                 "types": ["savedSearch", "correlationSearch"],
-                "name": r["name"],
-                "app": r.get("ssApp"),
-                "usage": {
-                    "alertFires": fires,
-                    "alertsSuppressed": to_int(r.get("suppressed")) or 0,
-                    "lastFired": epoch_to_iso(r.get("last")),
-                    "alertWindow": ctx.options.usage_window,
-                },
+                "name": name,
+                "app": app,
+                "usage": usage,
             }
         )
     # Alerts with no record fired zero times in this window (set after matching).
     out.instance_facts.setdefault("properties", {})["alertUsageWindow"] = ctx.options.usage_window
-    return len(rows)
+    return len(alerts)
 
 
 USAGE_EXTRACTORS = {

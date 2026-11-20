@@ -2,8 +2,8 @@ import type { DailySeries } from "../lib/health";
 import { dayLabel } from "../lib/health";
 
 /** Daily event counts: one series, 2px line, hover a day for its value, latest value labelled. */
-export function Sparkline({ series, width = 160, height = 36, label }: {
-  series: DailySeries; width?: number; height?: number; label?: string;
+export function Sparkline({ series, width = 160, height = 36, label, unit = "events" }: {
+  series: DailySeries; width?: number; height?: number; label?: string; unit?: string;
 }) {
   const { counts, start } = series;
   const max = Math.max(1, ...counts);
@@ -21,7 +21,7 @@ export function Sparkline({ series, width = 160, height = 36, label }: {
         <circle cx={pad + (counts.length - 1) * step} cy={y(last)} r={3} className="spark-dot" />
         {counts.map((v, i) => (
           <rect key={i} x={pad + i * step - step / 2} y={0} width={Math.max(step, 6)} height={height} className="spark-hit">
-            <title>{`${dayLabel(start, i)}: ${v.toLocaleString()} events${i === counts.length - 1 ? " (today, still filling)" : ""}`}</title>
+            <title>{`${dayLabel(start, i)}: ${v.toLocaleString()} ${unit}${i === counts.length - 1 ? " (today, still filling)" : ""}`}</title>
           </rect>
         ))}
       </svg>
