@@ -77,6 +77,7 @@ def test_smartstore_has_remote_warm_and_no_cold():
         "tier": "warm",
         "path": "volume:remote_store/$_index_name",
         "remote": True,
+        "volume": "remote_store",  # not in the volumes read: provider unknown
     }
     assert "maxBuckets" not in tiers["hot"]  # "auto"
 
@@ -100,6 +101,7 @@ def test_splunk_cloud_archives():
         "action": "selfStorage",
         "provider": "S3",
         "path": "s3://acme-frozen/web",
+        "bucket": "acme-frozen",
     }
     assert frozen_action({"coldToFrozenScript": "/opt/archive.sh"})["action"] == "archiveScript"
     assert frozen_action({}) == {"action": "delete"}

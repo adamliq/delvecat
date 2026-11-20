@@ -1,0 +1,50 @@
+{
+ "entry": [
+  {
+   "name": "volume:azure_store",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/system/configs/conf-indexes/volume%3Aazure_store",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "path": "azure://splunk-warm/prod",
+    "storageType": "remote",
+    "remote.azure.endpoint": "https://acmesplunk.blob.core.windows.net",
+    "remote.azure.access_key": "fake-azure-key",
+    "remote.azure.tenant_id": ""
+   }
+  },
+  {
+   "name": "volume:hot_ssd",
+   "id": "x",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "path": "/mnt/ssd",
+    "maxVolumeDataSizeMB": "500000"
+   }
+  },
+  {
+   "name": "main",
+   "id": "y",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system"
+   },
+   "content": {
+    "homePath": "$SPLUNK_DB/defaultdb/db"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 3
+ }
+}

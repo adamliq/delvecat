@@ -1,0 +1,39 @@
+{
+ "entry": [
+  {
+   "name": "prod_signins",
+   "id": "https://127.0.0.1:8089/servicesNS/nobody/Splunk_TA_microsoft-cloudservices/data/inputs/mscs_azure_event_hub/prod_signins",
+   "acl": {
+    "app": "Splunk_TA_microsoft-cloudservices",
+    "owner": "nobody",
+    "sharing": "app",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "index": "main",
+    "sourcetype": "mscs:azure:eventhub",
+    "interval": "3600",
+    "account": "prod_app",
+    "event_hub_namespace": "acme-eh.servicebus.windows.net",
+    "event_hub_name": "aad-signins",
+    "consumer_group": "$Default",
+    "tenant_id": "0f1e2d3c-aaaa-bbbb-cccc-111122223333",
+    "client_secret": "do-not-store",
+    "max_batch_size": "300"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "perPage": 0,
+  "total": 1
+ }
+}

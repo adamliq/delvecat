@@ -105,6 +105,11 @@ one. The same from a search:
   inputs add-ons define, feeding their indexes; *SAML and LDAP group mappings*
   lists the identity groups that grant roles (member counts only), and the
   instance card's details say how people log in.
+- **Azure**: SmartStore volumes and Self Storage on Azure Blob Storage (also S3
+  and Google Cloud Storage) are named on an index's storage tiers (provider,
+  container, storage account); inputs of the Microsoft Azure and Microsoft Cloud
+  Services add-ons say which Azure service they read (Event Hubs, Storage, Entra
+  ID, ...) and from where, never keys or secrets.
 - **SPL2 (Splunk 10 and later)**: *SPL2 modules, datasets and connections*
   lists SPL2 modules (owner, permissions, source, the datasets they read),
   SPL2-native datasets, and the connections SPL2 runs against (name, host, port,

@@ -2074,7 +2074,8 @@
     "tstatsHomePath_expanded": "/opt/splunk/var/lib/splunk/infra_metrics/datamodel_summary",
     "waitPeriodInSecsForManifestWrite": 60,
     "warmToColdScript": "",
-    "zstdCompressionStrategy": null
+    "zstdCompressionStrategy": null,
+    "remotePath": "volume:azure_store/$_index_name"
    },
    "id": "https://localhost:8089/servicesNS/nobody/search/data/indexes/infra_metrics",
    "links": {

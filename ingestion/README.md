@@ -152,6 +152,26 @@ vocabularies (hot/warm/cold = Splunk Cloud's searchable storage, DDAS). An index
 at 90% of its size limit gets a `retentionBySize` warning: it freezes data by size
 before its retention period. The public profile drops object-store locations.
 
+### Azure
+
+- Storage: a SmartStore index's warm tier names its object store from the
+  `[volume:...]` stanza its `remotePath` uses (`indexes.conf`): Azure Blob
+  Storage (`azure://<container>/...`, with the storage account from
+  `remote.azure.endpoint`), Amazon S3 (`s3://`) or Google Cloud Storage
+  (`gs://`), as `provider`, `bucket` (the container on Azure),
+  `storageAccount` and `volume`. Splunk Cloud Self Storage gets the same from its
+  bucket path. Keys in the volume stanza are never read. The public profile drops
+  locations, buckets and accounts.
+- Inputs: inputs of the Splunk Add-on for Microsoft Cloud Services (`mscs_*`) and
+  the Splunk Add-on for Microsoft Azure (`azure_*`, `MS_AAD_*`) record
+  `properties.azure`: the Azure service they read (Event Hubs, Storage Blob or
+  Table, Entra ID, Microsoft Graph, Azure Monitor metrics, Log Analytics,
+  Activity log, Defender for Cloud, cost and billing, resource inventory) and the
+  values of settings that only name things (account label, Event Hub namespace
+  and name, consumer group, container, tables, subscription, tenant and workspace
+  ids). Every other setting stays names only; secrets are never read. The public
+  profile drops subscription, tenant and workspace ids.
+
 ### Other inputs
 
 Besides the inputs Splunk lists over REST (monitor, TCP, UDP, scripted,

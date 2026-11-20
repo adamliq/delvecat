@@ -36,9 +36,21 @@
     "title": "checkapp"
    },
    "updated": "2026-11-06T07:30:00+00:00"
+  },
+  {
+   "name": "mscs_azure_event_hub",
+   "acl": {
+    "app": "Splunk_TA_microsoft-cloudservices",
+    "owner": "nobody",
+    "sharing": "app"
+   },
+   "content": {
+    "title": "Azure Event Hub"
+   },
+   "updated": "2026-11-06T07:30:00+00:00"
   }
  ],
  "paging": {
-  "total": 3
+  "total": 4
  }
 }

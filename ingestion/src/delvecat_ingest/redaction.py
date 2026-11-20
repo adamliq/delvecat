@@ -225,15 +225,21 @@ def redact_bundle(
                         counts["urls"] += 1
             if profile.users == "pseudonymize" and props.get("serviceAccount"):
                 props["serviceAccount"] = rename("user", str(props["serviceAccount"]))
+        if profile.urls == "drop" and e["type"] == "input" and (az := props.get("azure")):
+            # Azure tenant, subscription and workspace ids identify the customer.
+            for k in ("subscription_id", "tenant_id", "workspace_id"):
+                if (az.get("settings") or {}).pop(k, None):
+                    counts["urls"] += 1
         if profile.urls == "drop" and e["type"] == "index":
             # Object-store locations (SmartStore remote path, Splunk Cloud Self Storage
             # bucket) name the customer's cloud account.
             if props.pop("remotePath", None):
                 counts["urls"] += 1
             for tier in (props.get("storage") or {}).get("tiers") or []:
-                if "://" in str(tier.get("path") or ""):
-                    tier.pop("path")
-                    counts["urls"] += 1
+                if "://" in str(tier.get("path") or "") or tier.get("remote") or tier.get("bucket"):
+                    for k in ("path", "bucket", "storageAccount"):
+                        if tier.pop(k, None):
+                            counts["urls"] += 1
         if profile.urls == "drop":
             for k in URL_PROPS:
                 if props.pop(k, None) is not None:

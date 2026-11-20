@@ -1,6 +1,6 @@
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
-import { fmtMB, retentionText, storageOf, tierNames } from "../lib/storage";
+import { fmtMB, retentionText, storageOf, storeText, tierNames } from "../lib/storage";
 import { Meter } from "./Meter";
 
 const fmtAge = (iso?: string) => {
@@ -59,7 +59,9 @@ export function StoragePanel({ entity }: { entity: Entity }) {
               {s.tiers.map((t) => {
                 const n = tierNames(t, smartStore);
                 const detail =
-                  t.action === "activeArchive" && t.archiveRetentionDays ? `kept ${t.archiveRetentionDays} days` : t.provider;
+                  t.action === "activeArchive" && t.archiveRetentionDays
+                    ? `kept ${t.archiveRetentionDays} days`
+                    : storeText(t) ?? t.provider;
                 return (
                   <tr key={t.tier}>
                     <td>{cloud ? n.cloud : n.enterprise}</td>

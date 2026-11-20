@@ -79,7 +79,7 @@ Common aspects on every entity: `description`, `owners`, `tags`,
 | Area | Entity types |
 |---|---|
 | Platform | `instance` (role: search head, SHC, indexer cluster, HF, DS, Cloud stack), `app`, `user`, `role`, `authGroup`, `authToken` (metadata only) |
-| Data | `index` (events/metrics; retention, storage tiers hot/warm/cold/frozen/thawed, SmartStore, Splunk Cloud DDAS/DDAA/DDSS), `sourcetype`, `source`, `host`, `field`, `dataModel` (+ datasets, acceleration), `lookup` (CSV / KV store), `kvCollection` |
+| Data | `index` (events/metrics; retention, storage tiers hot/warm/cold/frozen/thawed, SmartStore and Self Storage on Azure Blob/S3/GCS, Splunk Cloud DDAS/DDAA/DDSS), `sourcetype`, `source`, `host`, `field`, `dataModel` (+ datasets, acceleration), `lookup` (CSV / KV store), `kvCollection` |
 | Knowledge objects | `savedSearch` (report / alert / scheduled), `macro`, `searchCommand` (custom commands from apps), `eventtype`, `tag`, `fieldAlias`, `calculatedField`, `fieldExtraction`, `transform` (index-time routing, nullQueue drops, forwarding, INGEST_EVAL, SEDCMD masking), `workflowAction` |
 | Consumption | `dashboard` (Simple XML & Dashboard Studio) with panels, `scheduledView` (dashboard PDF by email), Pivot reports |
 | Ingestion | `input` (monitor, HEC token *name*, scripted, modular, splunktcp, batch, Windows event log/perfmon/registry/AD/host/network/print, PowerShell), `forwarder` |

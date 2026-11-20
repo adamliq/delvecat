@@ -60,7 +60,51 @@ def _dir_stats(d: Any) -> dict[str, Any]:
     return {"buckets": buckets, "sizeMB": round(size, 2)}
 
 
-def index_storage(c: dict[str, Any], dirs: dict[str, Any]) -> dict[str, Any]:
+# Object stores an index can keep data in: SmartStore volumes, Splunk Cloud Self Storage.
+_STORE_SCHEMES = {
+    "s3": "Amazon S3",
+    "gs": "Google Cloud Storage",
+    "azure": "Azure Blob Storage",
+}
+_AZURE_ACCOUNT = re.compile(
+    r"^https?://([^.]+)\.blob\.core\.(?:windows\.net|usgovcloudapi\.net|chinacloudapi\.cn)", re.I
+)
+
+
+def object_store(path: str | None, settings: dict[str, Any] | None = None) -> dict[str, Any]:
+    """s3://bucket/prefix, gs://bucket/..., azure://container/... -> provider, bucket or
+    container, and for Azure the storage account (from remote.azure.endpoint)."""
+    scheme, sep, rest = str(path or "").partition("://")
+    provider = _STORE_SCHEMES.get(scheme.lower()) if sep else None
+    if not provider:
+        return {}
+    out: dict[str, Any] = {"provider": provider, "bucket": rest.split("/", 1)[0] or None}
+    if scheme.lower() == "azure":
+        endpoint = str((settings or {}).get("remote.azure.endpoint") or "")
+        if m := _AZURE_ACCOUNT.match(endpoint):
+            out["storageAccount"] = m.group(1)
+    return out
+
+
+def _volumes(ctx: Ctx) -> dict[str, dict[str, Any]]:
+    """indexes.conf [volume:NAME] stanzas with a remote path (SmartStore), by name."""
+    if "volumes" not in ctx.cache:
+        vols: dict[str, dict[str, Any]] = {}
+        try:
+            for e in iter_entries(ctx.transport, f"{NS}/configs/conf-indexes"):
+                if e["name"].startswith("volume:"):
+                    c = content(e)
+                    if store := object_store(c.get("path"), c):
+                        vols[e["name"][len("volume:") :]] = {"path": c.get("path"), **store}
+        except (EndpointNotFound, EndpointForbidden):
+            pass
+        ctx.cache["volumes"] = vols
+    return ctx.cache["volumes"]
+
+
+def index_storage(
+    c: dict[str, Any], dirs: dict[str, Any], volumes: dict[str, dict[str, Any]] | None = None
+) -> dict[str, Any]:
     """Where an index keeps its data, tier by tier, and what happens to it when it
     freezes. Tiers use Splunk Enterprise's names (hot, warm, cold, frozen, thawed);
     the web app also shows Splunk Cloud's (searchable storage, Active Archive, Self
@@ -80,6 +124,7 @@ def index_storage(c: dict[str, Any], dirs: dict[str, Any]) -> dict[str, Any]:
             # SmartStore: warm buckets live in the remote store, cached locally.
             "path": remote or c.get("homePath") or None,
             "remote": True if remote else None,
+            **_remote_store(remote, volumes or {}),
             "buckets": to_int(home_raw.get("warm_bucket_count")),
             "sizeMB": _mb(home_raw.get("warm_bucket_size")),
             "maxBuckets": to_int(c.get("maxWarmDBCount")),
@@ -108,15 +153,29 @@ def index_storage(c: dict[str, Any], dirs: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _remote_store(remote: str | None, volumes: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """A SmartStore remotePath ("volume:NAME/$_index_name" or a direct URI) -> its store."""
+    if not remote:
+        return {}
+    if remote.startswith("volume:"):
+        name = remote[len("volume:") :].split("/", 1)[0]
+        vol = volumes.get(name) or {}
+        return {k: v for k, v in vol.items() if k != "path"} | ({"volume": name} if name else {})
+    return object_store(remote)
+
+
 def frozen_action(c: dict[str, Any]) -> dict[str, Any]:
     """What happens to data older than the retention period (or over the size limit):
     deleted, archived to a directory or by a script, or, in Splunk Cloud, kept in
     Dynamic Data Active Archive (DDAA) or the customer's own Self Storage (DDSS)."""
     if c.get("archiver.selfStorageProvider") or c.get("archiver.selfStorageBucketPath"):
+        path = c.get("archiver.selfStorageBucketPath") or None
+        store = object_store(path)
         return {
             "action": "selfStorage",
-            "provider": c.get("archiver.selfStorageProvider") or None,
-            "path": c.get("archiver.selfStorageBucketPath") or None,
+            "provider": c.get("archiver.selfStorageProvider") or store.get("provider"),
+            "path": path,
+            "bucket": store.get("bucket"),
         }
     if as_bool(c.get("archiver.enableDataArchive", False)) or c.get("archiver.coldStorageProvider"):
         days = to_int(c.get("archiver.coldStorageRetentionPeriod")) or to_int(
@@ -137,12 +196,13 @@ def frozen_action(c: dict[str, Any]) -> dict[str, Any]:
 def extract_indexes(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     dirs = _bucket_dirs(ctx)
+    volumes = _volumes(ctx)
     for e in iter_entries(ctx.transport, "/services/data/indexes", {"datatype": "all"}):
         if e["name"].startswith("federated:"):
             continue  # a federated index (federated search), catalogued by extract_federated
         c = content(e)
         frozen_secs = to_int(c.get("frozenTimePeriodInSecs"))
-        storage = index_storage(c, dirs.get(e["name"]) or {})
+        storage = index_storage(c, dirs.get(e["name"]) or {}, volumes)
         add_global(
             ctx,
             out,
@@ -442,6 +502,63 @@ _STANDARD_INPUT_KEYS = frozenset(
 )
 
 
+# Microsoft Azure add-ons: Splunk Add-on for Microsoft Cloud Services (mscs_*) and
+# Splunk Add-on for Microsoft Azure (azure_*, MS_AAD_*). Which Azure service an input
+# reads, by its kind; first match wins.
+AZURE_APPS = ("Splunk_TA_microsoft-cloudservices", "Splunk_TA_microsoft_azure", "TA-MS-AAD")
+_AZURE_KIND = re.compile(r"^(mscs_|azure_|ms_aad_)", re.I)
+_AZURE_SERVICES = (
+    ("event_hub", "Event Hubs"),
+    ("storage_blob", "Storage (Blob)"),
+    ("storage_table", "Storage (Table)"),
+    ("aad", "Entra ID (Azure AD)"),
+    ("graph", "Microsoft Graph"),
+    ("metric", "Azure Monitor metrics"),
+    ("kql", "Log Analytics (KQL)"),
+    ("log_analytics", "Log Analytics (KQL)"),
+    ("audit", "Activity log"),
+    ("activity", "Activity log"),
+    ("security_center", "Defender for Cloud"),
+    ("defender", "Defender for Cloud"),
+    ("consumption", "Cost and billing"),
+    ("billing", "Cost and billing"),
+    ("resource", "Resource inventory"),
+    ("virtual_machine", "Resource inventory"),
+    ("virtual_network", "Resource inventory"),
+    ("topology", "Resource inventory"),
+)
+# Settings whose values only name things (no keys or secrets): shown as values.
+AZURE_NAMING_SETTINGS = (
+    "account",
+    "azure_app_account",
+    "storage_account",
+    "event_hub_namespace",
+    "event_hub_name",
+    "consumer_group",
+    "container_name",
+    "table_list",
+    "blob_list",
+    "prefix",
+    "environment",
+    "resource_type",
+    "resource_group_list",
+    "namespaces",
+    "subscription_id",
+    "tenant_id",
+    "workspace_id",
+)
+
+
+def azure_input(kind: str, app: str | None, c: dict[str, Any]) -> dict[str, Any] | None:
+    """An Azure add-on input: the Azure service it reads and the names it reads from."""
+    if not (_AZURE_KIND.match(kind) or app in AZURE_APPS):
+        return None
+    low = kind.lower()
+    service = next((label for key, label in _AZURE_SERVICES if key in low), None)
+    names = {k: c[k] for k in AZURE_NAMING_SETTINGS if c.get(k) not in (None, "")}
+    return {"service": service, **({"settings": names} if names else {})}
+
+
 def extract_modular_inputs(ctx: Ctx, out: ExtractResult) -> int:
     """Inputs of the kinds add-ons define (modular inputs: cloud services, APIs, journald,
     ...): one per configured stanza, feeding its index and sourcetype like other inputs.
@@ -483,6 +600,7 @@ def extract_modular_inputs(ctx: Ctx, out: ExtractResult) -> int:
                     "source": c.get("source") or None,
                     "interval": c.get("interval") or None,
                     "settingNames": own or None,
+                    "azure": azure_input(scheme, (e.get("acl") or {}).get("app"), c),
                 },
             )
             if not ent.get("disabled"):

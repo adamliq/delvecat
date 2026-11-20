@@ -15,6 +15,12 @@ export interface Tier {
   maxBuckets?: number;
   action?: "delete" | "archiveDir" | "archiveScript" | "activeArchive" | "selfStorage";
   provider?: string;
+  /** Bucket (S3, Google Cloud Storage) or container (Azure Blob Storage). */
+  bucket?: string;
+  /** Azure storage account. */
+  storageAccount?: string;
+  /** SmartStore volume the tier is on. */
+  volume?: string;
   archiveRetentionDays?: number;
 }
 
@@ -62,6 +68,18 @@ function frozenNames(t: Tier): { enterprise: string; cloud: string } {
     default:
       return { enterprise: "Frozen: deleted", cloud: "Deleted after searchable retention" };
   }
+}
+
+/** "Azure Blob Storage: account acmesplunk, container splunk-warm (volume azure_store)". */
+export function storeText(t: Tier): string | undefined {
+  if (!t.provider && !t.bucket && !t.volume) return undefined;
+  const container = t.provider === "Azure Blob Storage" ? "container" : "bucket";
+  const parts = [
+    t.storageAccount ? `account ${t.storageAccount}` : undefined,
+    t.bucket ? `${container} ${t.bucket}` : undefined,
+  ].filter(Boolean);
+  const where = [t.provider, parts.join(", ")].filter(Boolean).join(": ");
+  return [where, t.volume ? `(volume ${t.volume})` : undefined].filter(Boolean).join(" ") || undefined;
 }
 
 export const fmtMB = (mb?: number) =>

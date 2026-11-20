@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fmtMB, retentionText, tierNames } from "./storage";
+import { fmtMB, retentionText, storeText, tierNames } from "./storage";
 
 describe("storage terminology", () => {
   it("names tiers in Splunk Enterprise and Splunk Cloud terms", () => {
@@ -14,5 +14,11 @@ describe("storage terminology", () => {
     expect(retentionText({ retentionDays: 90 })).toBe("90 days");
     expect(retentionText({})).toBeUndefined();
     expect(fmtMB(20)).toBe("20 MB");
+  });
+  it("describes object stores", () => {
+    expect(storeText({ tier: "warm", provider: "Azure Blob Storage", bucket: "splunk-warm", storageAccount: "acmesplunk", volume: "azure_store" }))
+      .toBe("Azure Blob Storage: account acmesplunk, container splunk-warm (volume azure_store)");
+    expect(storeText({ tier: "frozen", provider: "Amazon S3", bucket: "acme-frozen" })).toBe("Amazon S3: bucket acme-frozen");
+    expect(storeText({ tier: "cold" })).toBeUndefined();
   });
 });
