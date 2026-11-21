@@ -1,6 +1,6 @@
 # delvecat-ingest
 
-Read-only extractor that turns Splunk metadata into a DelveCat catalog bundle.
+Read-only extractor that turns Splunk metadata into a Licoryx Delvecat catalog bundle.
 
 ```bash
 uv sync
@@ -64,7 +64,7 @@ several instances into one bundle is on the roadmap.
 ## Usage and health
 
 Usage comes from `_audit` and `_internal`, so the service account needs to
-search them. DelveCat's own searches carry the comment ```` ```delvecat-ingest``` ````
+search them. Licoryx Delvecat's own searches carry the comment ```` ```delvecat-ingest``` ````
 and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
 counts, never the searches. A `--record`ing does contain it, so never commit
 recordings taken from production.
@@ -300,7 +300,7 @@ A report made in Pivot (`| pivot <data model> <dataset> ...`) records which
 
 Each Splunk authentication token is an `authToken` object: the user it is for
 (an edge from that user), audience, who issued it and when, expiry, last use and
-whether it is enabled. Splunk never lists a token's value and DelveCat never
+whether it is enabled. Splunk never lists a token's value and Licoryx Delvecat never
 reads one; the client address it was last used from is not kept either. Health
 checks flag tokens that expired (delete them), expire within 14 days, never
 expire, have not been used for 90 days, or belong to a user Splunk no longer has
@@ -390,7 +390,7 @@ sampling, usage and health) is cancelled if it runs longer than
 `--search-timeout` seconds (default 300; 0 for no limit). Its part is reported
 as `failed` with the reason in the bundle's `ingestionReport`, and the build
 goes on with the other parts. With a limit, searches run as ordinary search
-jobs that DelveCat polls and, past the limit, cancels: the one `control` request
+jobs that Licoryx Delvecat polls and, past the limit, cancels: the one `control` request
 it sends, to its own job.
 
 ## Publishing to the Splunk app
@@ -400,7 +400,7 @@ export DELVECAT_PUBLISH_TOKEN=...   # account with the delvecat_publisher role
 uv run delvecat-ingest publish catalog/ --url https://sh.example.com:8089
 ```
 
-Stores the catalog in the DelveCat Splunk app's KV store collection (see
+Stores the catalog in the Licoryx Delvecat Splunk app's KV store collection (see
 [../splunk-app/README.md](../splunk-app/README.md)). This is the only command
 that writes to Splunk, and it can write only that collection. `--dry-run`
 checks access and size; an unchanged catalog is not rewritten.
@@ -432,9 +432,9 @@ setting. Names inside SPL text are not rewritten.
 
 The HTTP client refuses any request that could change Splunk: only `GET` is
 allowed (minus endpoints that act on GET, such as `_reload`), plus `POST` to
-an allow-list of search endpoints (running a search, and cancelling DelveCat's
+an allow-list of search endpoints (running a search, and cancelling Licoryx Delvecat's
 own search job when it exceeds the search time limit). The one exception is `publish`, which may
-also write the DelveCat Splunk app's own catalog collection, and nothing else.
+also write the Licoryx Delvecat Splunk app's own catalog collection, and nothing else.
 Keys that look like credentials are dropped before anything is written.
 Email addresses are collected in one place only: who email alert actions write
 to and from (`alertRecipients` on searches; `defaultRecipients` and `sender` on

@@ -1,4 +1,4 @@
-"""Publishing to the DelveCat Splunk app: the one write DelveCat makes."""
+"""Publishing to the Licoryx Delvecat Splunk app: the one write Licoryx Delvecat makes."""
 
 from __future__ import annotations
 

@@ -607,7 +607,7 @@ def main(argv: list[str] | None = None) -> int:
 
     pb = sub.add_parser(
         "publish",
-        help="store a catalog in the DelveCat Splunk app (its KV store collection only)",
+        help="store a catalog in the Licoryx Delvecat Splunk app (its KV store collection only)",
     )
     pb.add_argument("bundle", help="bundle file, manifest or directory")
     pb.add_argument("--url", required=True, help="Splunk management URL, e.g. https://sh:8089")

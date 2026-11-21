@@ -42,7 +42,7 @@ export function Layout({ children }: { children: ReactNode }) {
     <div className="shell">
       <header className="topbar">
         <Link to="/" className="brand">
-          <span className="logo" aria-hidden>DC</span> DelveCat
+          <span className="logo" aria-hidden>LD</span> Licoryx Delvecat
         </Link>
         <nav className="nav">
           <NavLink to="/search">Browse</NavLink>

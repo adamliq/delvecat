@@ -1,4 +1,4 @@
-"""Building the catalog inside Splunk: what the DelveCat app's ``| delvecatbuild``
+"""Building the catalog inside Splunk: what the Licoryx Delvecat app's ``| delvecatbuild``
 command runs, on the search head, with the session of the person who started it.
 
 It reads the Splunk it runs on (and the products installed there), like

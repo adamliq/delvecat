@@ -1,4 +1,4 @@
-"""Publish a catalog to the DelveCat Splunk app.
+"""Publish a catalog to the Licoryx Delvecat Splunk app.
 
 The app keeps the catalog in its own KV store collection: gzip-compressed JSON,
 base64-encoded and split into parts (a KV store document is limited in size),
@@ -7,7 +7,7 @@ generation first; the pointer then switches to it in one write, and only then
 are older generations deleted. A page loading meanwhile sees either the old or
 the new catalog, never a mix (the sha256 in the pointer checks this).
 
-This is the only write DelveCat makes to Splunk, and only to that collection
+This is the only write Licoryx Delvecat makes to Splunk, and only to that collection
 (see ``transport.publish_allowlist``).
 """
 

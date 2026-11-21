@@ -1,6 +1,6 @@
 # Performance at scale
 
-DelveCat is measured against a synthetic catalog the size of a large Splunk
+Licoryx Delvecat is measured against a synthetic catalog the size of a large Splunk
 estate, built through the real ingestion pipeline (`delvecat-ingest synth`).
 At scale 1.0 it has 88,300 objects and 292,000 relationships: 200 apps, 600
 indexes, 1,500 sourcetypes with about 25 fields each (37,000 fields), 20,000

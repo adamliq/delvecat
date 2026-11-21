@@ -12,7 +12,7 @@ export function parseBundle(text: string): CatalogBundle {
   }
   const b = data as Partial<CatalogBundle>;
   if (!b || typeof b !== "object" || typeof b.schemaVersion !== "string") {
-    throw new BundleError("Not a DelveCat bundle (missing schemaVersion).");
+    throw new BundleError("Not a Licoryx Delvecat bundle (missing schemaVersion).");
   }
   if (!/^0\.1\.\d+$/.test(b.schemaVersion)) {
     throw new BundleError(`Unsupported schema version ${b.schemaVersion}.`);

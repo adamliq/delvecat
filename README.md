@@ -1,4 +1,4 @@
-# DelveCat
+# Licoryx Delvecat
 
 A metadata catalog for the Splunk ecosystem: Splunk Enterprise & Cloud,
 Enterprise Security, SOAR, UEBA, Asset and Risk Intelligence, Stream,
@@ -100,7 +100,7 @@ Get-Help .\scripts\Build-Catalog.ps1 -Full
 
 ### As a Splunk app
 
-`make splunk-app` packages DelveCat as a Splunk app for Splunk Enterprise and
+`make splunk-app` packages Licoryx Delvecat as a Splunk app for Splunk Enterprise and
 Splunk Cloud. The catalog opens inside Splunk Web for a `delvecat_user` role.
 Build it there on demand (the app's *Build* page, or `| delvecatbuild`), or
 publish one built outside with `delvecat-ingest publish`. Either writes only

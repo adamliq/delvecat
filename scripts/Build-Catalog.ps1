@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Build a DelveCat catalog from Splunk (read-only) on Windows or with PowerShell 7.
+    Build a Licoryx Delvecat catalog from Splunk (read-only) on Windows or with PowerShell 7.
 
 .DESCRIPTION
     Wraps the delvecat-ingest command line (run through uv) so a catalog can be
@@ -16,7 +16,7 @@
       * the new catalog is written next to the old one and only replaces it
         when the build succeeds.
 
-    DelveCat never changes Splunk: it reads configuration over the REST API
+    Licoryx Delvecat never changes Splunk: it reads configuration over the REST API
     and runs read-only searches over _internal and _audit.
 
     Requirements: uv (https://docs.astral.sh/uv/) on PATH and this repository
@@ -41,7 +41,7 @@
     field lineage and data quality checks).
 
 .PARAMETER PublishUrl
-    After a successful build, store the catalog in the DelveCat Splunk app on this
+    After a successful build, store the catalog in the Licoryx Delvecat Splunk app on this
     Splunk (management URL). Uses a token of an account with the delvecat_publisher
     role, from DELVECAT_PUBLISH_TOKEN (or -PublishTokenEnv). This writes only the
     app's own catalog collection.
@@ -60,7 +60,7 @@
     .\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -Out D:\catalog -Strict
 
 .EXAMPLE
-    # Build, then publish to the DelveCat app on the search head
+    # Build, then publish to the Licoryx Delvecat app on the search head
     .\scripts\Build-Catalog.ps1 -Config .\catalog.psd1 -PublishUrl https://sh.example.com:8089
 
 .EXAMPLE
@@ -297,13 +297,13 @@ try {
     Move-Item -LiteralPath $staging -Destination $Out
     Write-Summary $Out
     if ($PublishUrl) {
-        Write-Host "Publishing to the DelveCat app on $PublishUrl..."
+        Write-Host "Publishing to the Licoryx Delvecat app on $PublishUrl..."
         $publish = @('publish', $Out, '--url', $PublishUrl, '--token-env', $PublishTokenEnv)
         if ($script:CaBundlePath) { $publish += @('--ca-bundle', $script:CaBundlePath) }
         if ($script:InsecureTls) { $publish += '--insecure' }
         Invoke-Ingest $publish
     }
-    Write-Host "Open it in DelveCat with 'Open folder' (or 'Open file'), or copy it to web\public\catalog and build the app."
+    Write-Host "Open it in Licoryx Delvecat with 'Open folder' (or 'Open file'), or copy it to web\public\catalog and build the app."
 }
 finally {
     foreach ($name in $saved.Keys) { [Environment]::SetEnvironmentVariable($name, $saved[$name], 'Process') }

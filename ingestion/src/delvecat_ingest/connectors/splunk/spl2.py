@@ -19,7 +19,7 @@ from .common import Ctx, app_edge, ref, to_int
 API = "/services/orchestrator/v1"
 PAGE = 200
 MAX_PAGES = 500
-# Dataset kinds that are the classic Splunk objects DelveCat reads elsewhere.
+# Dataset kinds that are the classic Splunk objects Licoryx Delvecat reads elsewhere.
 CLASSIC_KINDS = frozenset({"index", "metricindex", "lookup", "kvcollection", "savedsearch", "job"})
 # SPL2 module namespace "~.apps.<app>[...]" -> the app.
 _APP_NAMESPACE = re.compile(r"^~?\.?apps\.([^.]+)")

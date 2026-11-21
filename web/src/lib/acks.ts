@@ -135,7 +135,7 @@ function headers(json: boolean): Record<string, string> {
 export function splunkStore(fetchFn: Fetch = (u, i) => fetch(u, i)): AckStore {
   let user: Promise<string> | undefined;
   return {
-    where: "in the DelveCat app, for everyone who uses it",
+    where: "in the Licoryx Delvecat app, for everyone who uses it",
     async list() {
       const resp = await fetchFn(splunkdUrl(`${ackPath()}?output_mode=json`), { credentials: "same-origin", cache: "no-store" });
       if (resp.status === 404 || resp.status === 403) return []; // collection missing or not readable

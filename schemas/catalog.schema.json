@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://delvecat.dev/schemas/catalog.schema.json",
   "title": "CatalogBundle",
-  "description": "A DelveCat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.",
+  "description": "A Licoryx Delvecat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -422,7 +422,7 @@
           "minimum": 1
         },
         "firstSeenAt": {
-          "description": "When DelveCat first saw this entity.",
+          "description": "When Licoryx Delvecat first saw this entity.",
           "type": "string",
           "format": "date-time"
         },

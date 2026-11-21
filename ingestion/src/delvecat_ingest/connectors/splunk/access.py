@@ -73,7 +73,7 @@ def extract_users(ctx: Ctx, out: ExtractResult) -> int:
 
 def extract_auth_tokens(ctx: Ctx, out: ExtractResult) -> int:
     """Splunk authentication tokens: who each one is for, when it expires and was last
-    used, enabled or not. Splunk never lists a token's value, and neither does DelveCat;
+    used, enabled or not. Splunk never lists a token's value, and neither does Licoryx Delvecat;
     the client address it was last used from is not kept either."""
     n = 0
     for e in iter_entries(ctx.transport, "/services/authorization/tokens"):

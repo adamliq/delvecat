@@ -1,4 +1,4 @@
-// End-to-end test of the DelveCat Splunk app against a disposable test Splunk.
+// End-to-end test of the Licoryx Delvecat Splunk app against a disposable test Splunk.
 //
 // It builds, cancels and replaces the app's catalog, so never point it at a Splunk
 // that matters. Setup (see splunk-app/README.md, "Testing"): the app installed, the

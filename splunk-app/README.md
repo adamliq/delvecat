@@ -1,6 +1,6 @@
-# DelveCat Splunk app
+# Licoryx Delvecat Splunk app
 
-The DelveCat web app as a Splunk app: the catalog opens inside Splunk Web, for
+The Licoryx Delvecat web app as a Splunk app: the catalog opens inside Splunk Web, for
 the people you choose, with no separate web server. Works on Splunk Enterprise
 and Splunk Cloud.
 
@@ -59,12 +59,12 @@ Cloud. Tested on Splunk 9.4 (legacy) and 10.4.
 
    Until the roles exist, only admins see the app. Someone without
    `delvecat_user` does not see the app at all (Splunk answers "app not found").
-3. **Build or publish a catalog** (next sections). Then open *DelveCat* from
+3. **Build or publish a catalog** (next sections). Then open *Licoryx Delvecat* from
    Splunk's app menu.
 
 ## Build in Splunk
 
-Open *DelveCat > Build* (shown to admins and `delvecat_publisher`), choose the
+Open *Licoryx Delvecat > Build* (shown to admins and `delvecat_publisher`), choose the
 parts to read and the options, and press *Build now*. The page follows the build and shows the new
 catalog when it is done: about 10 seconds on a small Splunk, minutes on a large
 one. The same from a search:
@@ -312,7 +312,7 @@ Building in Splunk also keeps a `build` document there: who started the
 last build, its progress and result, which the Build page shows.
 
 **Writing to Splunk.** Publishing (`delvecat-ingest publish`, or a build in
-Splunk) is the only writing DelveCat does, and it may write only this
+Splunk) is the only writing Licoryx Delvecat does, and it may write only this
 collection: `POST` to its `batch_save` and `DELETE` of its older documents
 (`transport.publish_allowlist`). Every other request is read-only, as before.
 The one other write is from the Health page, by a publisher or admin who
@@ -331,7 +331,7 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 
 ## Notes
 
-- The page has DelveCat's own header (not Splunk's bar); its *Splunk* button
+- The page has Licoryx Delvecat's own header (not Splunk's bar); its *Splunk* button
   goes back to Splunk's home page.
 - **After an upgrade the page looks old (for example, no Build button)?** The
   browser is showing the previous version from its cache. Reload with

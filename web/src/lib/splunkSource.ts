@@ -1,5 +1,5 @@
 /**
- * Loading the catalog inside the DelveCat Splunk app.
+ * Loading the catalog inside the Licoryx Delvecat Splunk app.
  *
  * `delvecat-ingest publish` stores the catalog in the app's KV store collection as
  * gzip-compressed JSON, base64-encoded and split into parts, plus a pointer document
@@ -44,7 +44,7 @@ export function splunkdUrl(path: string, loc: Pick<Location, "pathname"> = globa
   return `${splunkWebPrefix(loc)}/splunkd/__raw${path}`;
 }
 
-/** Splunk's home page (the app launcher), for the way back from DelveCat. */
+/** Splunk's home page (the app launcher), for the way back from Licoryx Delvecat. */
 export function splunkHomeUrl(loc: Pick<Location, "pathname"> = globalThis.location ?? { pathname: "" }): string {
   return `${splunkWebPrefix(loc)}/app/launcher/home`;
 }
@@ -64,7 +64,7 @@ async function getDoc<T>(key: string, fetchFn: Fetch): Promise<T | null> {
   if (resp.status === 404) return null;
   if (resp.status === 401 || resp.status === 403) {
     throw new BundleError(
-      "You do not have access to the DelveCat catalog. Ask a Splunk admin for the delvecat_user role.",
+      "You do not have access to the Licoryx Delvecat catalog. Ask a Splunk admin for the delvecat_user role.",
     );
   }
   if (!resp.ok) throw new BundleError(`Could not read the catalog from Splunk (HTTP ${resp.status}).`);
@@ -93,7 +93,7 @@ class StaleGeneration extends Error {}
 
 async function readGeneration(pointer: Pointer, fetchFn: Fetch): Promise<CatalogBundle> {
   if (pointer.encoding !== "gzip+base64") {
-    throw new BundleError(`Unsupported catalog encoding ${pointer.encoding}. Update the DelveCat app.`);
+    throw new BundleError(`Unsupported catalog encoding ${pointer.encoding}. Update the Licoryx Delvecat app.`);
   }
   const parts = await Promise.all(
     Array.from({ length: pointer.parts }, (_, n) =>

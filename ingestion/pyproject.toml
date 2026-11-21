@@ -1,7 +1,7 @@
 [project]
 name = "delvecat-ingest"
 version = "0.1.0"
-description = "Read-only metadata extraction from Splunk into DelveCat catalog bundles"
+description = "Read-only metadata extraction from Splunk into Licoryx Delvecat catalog bundles"
 readme = "README.md"
 requires-python = ">=3.9"  # Splunk 9.x bundles Python 3.9
 license = "Apache-2.0"

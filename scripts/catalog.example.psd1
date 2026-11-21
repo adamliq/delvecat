@@ -9,7 +9,7 @@
     AnnotationRepo   = 'https://github.com/example/delvecat-annotations'
     AnnotationBranch = 'main'
     RedactProfile    = 'none'             # none | internal | public (public needs DELVECAT_REDACT_SALT)
-    # PublishUrl     = 'https://sh.example.com:8089'  # store it in the DelveCat Splunk app
+    # PublishUrl     = 'https://sh.example.com:8089'  # store it in the Licoryx Delvecat Splunk app
                                                      # (token in DELVECAT_PUBLISH_TOKEN)
 
     Instances = @(

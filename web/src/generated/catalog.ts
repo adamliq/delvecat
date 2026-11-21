@@ -112,7 +112,7 @@ export type EdgeType =
   | "definesField";
 
 /**
- * A DelveCat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.
+ * A Licoryx Delvecat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.
  */
 export interface CatalogBundle {
   schemaVersion: string;
@@ -243,7 +243,7 @@ export interface Entity {
    */
   version?: number;
   /**
-   * When DelveCat first saw this entity.
+   * When Licoryx Delvecat first saw this entity.
    */
   firstSeenAt?: string;
   /**

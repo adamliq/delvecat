@@ -1,5 +1,5 @@
 name: Splunk app
-# Builds the DelveCat Splunk app packages, checks them with Splunk AppInspect
+# Builds the Licoryx Delvecat Splunk app packages, checks them with Splunk AppInspect
 # (Splunk Cloud checks) and attaches them to the run. A tag v<version> matching
 # splunk-app/delvecat/default/app.conf also publishes them as a GitHub release.
 on:
@@ -94,6 +94,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "DelveCat $GITHUB_REF_NAME" \
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Licoryx Delvecat $GITHUB_REF_NAME" \
             --notes "Splunk app packages. delvecat-${{ needs.package.outputs.version }}.tgz: Splunk Enterprise 10.4+ and Splunk Cloud. delvecat-${{ needs.package.outputs.version }}-legacy.tgz: Splunk Enterprise 9.x to 10.3. Each also as .spl (the same archive). Install and set up: splunk-app/README.md." \
             dist/delvecat-*.tgz dist/delvecat-*.spl

@@ -1,4 +1,4 @@
-"""| delvecatbuild: build the DelveCat catalog of this Splunk, on demand, and publish
+"""| delvecatbuild: build the Licoryx Delvecat catalog of this Splunk, on demand, and publish
 it to the app's KV store collection.
 
 It runs on the search head as the person who starts it (their session, no token),

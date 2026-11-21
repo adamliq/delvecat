@@ -1,6 +1,6 @@
-# DelveCat — a metadata catalog for Splunk
+# Licoryx Delvecat — a metadata catalog for Splunk
 
-DelveCat is an OpenMetadata-style data catalog purpose-built for the Splunk
+Licoryx Delvecat is an OpenMetadata-style data catalog purpose-built for the Splunk
 ecosystem. It inventories Splunk objects, traces lineage through SPL and
 across Splunk products, surfaces usage and health signals, and lets people
 document and classify what they find — **without ever writing back to Splunk**.
@@ -14,7 +14,7 @@ document and classify what they find — **without ever writing back to Splunk**
 | R3 | **Splunk Stream, Deployment Server, DB Connect** | Ingestion-side lineage: DB table → DBX input → index; serverclass → app → input → index; stream → index. |
 | R4 | Standalone web app hostable on **GitHub Pages** | No server. Static SPA + pre-built JSON *catalog bundle*. Forking OpenMetadata is ruled out (it needs a Java server, RDBMS, and Elasticsearch). |
 | R5 | Audience: **admins and analysts** | Admin views (inventory, health, cleanup, access) and analyst views (discovery, field docs, "where does this data come from"). |
-| R6 | **No write-back** to Splunk | Ingestion client is read-only by construction; annotations live in the DelveCat repo, not in Splunk. |
+| R6 | **No write-back** to Splunk | Ingestion client is read-only by construction; annotations live in the Licoryx Delvecat repo, not in Splunk. |
 
 ## 2. Architecture
 
@@ -32,7 +32,7 @@ document and classify what they find — **without ever writing back to Splunk**
  └───────────────────────────────────────┬───────────────────────────────────────┘
                                          │
  ┌───────────────────────────────────────▼───────────────────────────────────────┐
- │  DelveCat web (React + TS, static, HashRouter)                                │
+ │  Licoryx Delvecat web (React + TS, static, HashRouter)                                │
  │    client-side search (MiniSearch) · entity pages · lineage graph ·          │
  │    usage & health · "open local bundle" (data never leaves the browser)       │
  └───────────────────────────────────────────────────────────────────────────────┘
@@ -357,7 +357,7 @@ are confirmed against a live instance before their connector ships.
 - Read-only searches over `_audit` (saved search runs, ad-hoc and dashboard
   searches, user activity), `_internal` (scheduler outcomes, web views,
   license usage, parsing warnings) and `tstats` (daily volume per index and
-  sourcetype, ingest delay). Field names verified on Splunk 9.4. DelveCat tags
+  sourcetype, ingest delay). Field names verified on Splunk 9.4. Licoryx Delvecat tags
   its own searches with an SPL comment (```` ```delvecat-ingest``` ````) and
   leaves them out of usage (requires Splunk 8.1+ comment syntax).
 - Ad-hoc search text is analyzed with the same SPL analyzer and macro
@@ -645,12 +645,12 @@ glossary search, overdue dates, multi-schema compare, and filters kept in the UR
 
 ### Splunk app, phases 1 and 2 (done)
 
-DelveCat as a Splunk app for Splunk Enterprise and Splunk Cloud
+Licoryx Delvecat as a Splunk app for Splunk Enterprise and Splunk Cloud
 (`splunk-app/`, `make splunk-app`). The web app is built for Splunk Web
 (`vite build --mode splunk`) and shown to a `delvecat_user` role. The catalog is
 built outside Splunk as before and stored with `delvecat-ingest publish` in the
 app's KV store collection (gzip + base64 parts, a pointer switched in one write,
-sha256-checked in the browser). That collection is the only thing DelveCat ever
+sha256-checked in the browser). That collection is the only thing Licoryx Delvecat ever
 writes (later, also accepted health findings in `delvecat_acks`), through a separate allowlist used only by `publish`. Two packages: Splunk's
 page template (10.4+ and Cloud) and a legacy one with its own template (9.x to
 10.3). AppInspect's Cloud checks pass; tested on Splunk 9.4 and 10.4.

@@ -1,11 +1,11 @@
 """Seed the local dev Splunk (deploy/docker-compose.yml) with representative content.
 
 This script WRITES to Splunk and is only meant for the disposable dev container.
-DelveCat itself never writes to Splunk.
+Licoryx Delvecat itself never writes to Splunk.
 
     SPLUNK_PASSWORD=... uv run --project ingestion python deploy/seed_dev_splunk.py
 
-It also enables token authentication and writes a DelveCat API token to
+It also enables token authentication and writes a Licoryx Delvecat API token to
 deploy/.dev-token (git-ignored) for use as DELVECAT_SPLUNK_TOKEN.
 
 Every object it creates is listed in deploy/seed_manifest.json so the
@@ -349,7 +349,7 @@ def main() -> None:
     client.post("/services/deployment/server/config/_reload")  # seed only
 
     # DB Connect keeps its configuration in .conf files of its app. Real installs also
-    # run a Java service; DelveCat only needs the configuration.
+    # run a Java service; Licoryx Delvecat only needs the configuration.
     post("/services/apps/local", {"name": "splunk_app_db_connect", "template": "barebones",
                                   "label": "Splunk DB Connect (dev stand-in)",
                                   "visible": "true"})
@@ -587,7 +587,7 @@ def main() -> None:
                         content="\n".join(events).encode())
         r.raise_for_status()
 
-    # API token for DelveCat (token auth is off by default in Splunk Enterprise).
+    # API token for Licoryx Delvecat (token auth is off by default in Splunk Enterprise).
     post("/services/admin/token-auth/tokens_auth", {"disabled": "false"})
     r = client.post("/services/authorization/tokens",
                     data={"name": "admin", "audience": "delvecat", "output_mode": "json"})

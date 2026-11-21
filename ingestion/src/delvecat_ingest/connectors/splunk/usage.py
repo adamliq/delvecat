@@ -1,6 +1,6 @@
 """Usage and health measurements from Splunk's own logs (``_audit``, ``_internal``).
 
-Read-only searches; DelveCat's own searches carry a marker comment and are left
+Read-only searches; Licoryx Delvecat's own searches carry a marker comment and are left
 out. Knowledge-object usage is recorded by name (``ExtractResult.usage``) and
 matched to entities after merging; data measurements go straight onto
 indexes and sourcetypes as ``observed`` values.

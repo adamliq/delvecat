@@ -2,7 +2,7 @@
 
 Every transport is read-only. ``HttpTransport`` enforces this with
 :func:`check_read_only` before any request leaves the process. The one
-exception is ``delvecat-ingest publish``, which may write the DelveCat app's own
+exception is ``delvecat-ingest publish``, which may write the Licoryx Delvecat app's own
 catalog collection and nothing else (:func:`publish_allowlist`).
 """
 
@@ -21,7 +21,7 @@ _POST_ALLOWLIST = (
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/jobs/?$"),
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/v2/jobs/?$"),
     re.compile(r"^/services(NS/[^/]+/[^/]+)?/search/parser/?$"),
-    # Cancelling a search job: DelveCat cancels its own searches when they exceed the
+    # Cancelling a search job: Licoryx Delvecat cancels its own searches when they exceed the
     # search time limit. It affects that job only, never configuration.
     re.compile(r"^/services/search/jobs/[A-Za-z0-9_.-]+/control/?$"),
 )
@@ -55,7 +55,7 @@ _GET_DENYLIST = re.compile(r"/(_reload|_new|control|restart|enable|disable|move|
 
 
 def publish_allowlist(app: str, collection: str) -> tuple[re.Pattern[str], ...]:
-    """The one place DelveCat may write: its own app's catalog collection in the KV
+    """The one place Licoryx Delvecat may write: its own app's catalog collection in the KV
     store (``delvecat-ingest publish``). Nothing else in Splunk is ever changed."""
     for name in (app, collection):
         if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
@@ -72,11 +72,11 @@ def check_read_only(
         return
     if method in ("GET", "HEAD"):
         if _GET_DENYLIST.search(path):
-            raise WriteAttemptError(f"DelveCat is read-only; refusing {method} {path}")
+            raise WriteAttemptError(f"Licoryx Delvecat is read-only; refusing {method} {path}")
         return
     if method == "POST" and any(p.match(path) for p in _POST_ALLOWLIST):
         return
-    raise WriteAttemptError(f"DelveCat is read-only; refusing {method} {path}")
+    raise WriteAttemptError(f"Licoryx Delvecat is read-only; refusing {method} {path}")
 
 
 def search_fixture_path(name: str) -> str:
@@ -213,7 +213,7 @@ class HttpTransport:
             query = stripped
         else:
             query = f"search {stripped}"
-        # Tag DelveCat's own searches so usage reports can leave them out (SPL comment).
+        # Tag Licoryx Delvecat's own searches so usage reports can leave them out (SPL comment).
         query = f"{query} {SEARCH_MARKER}"
         if self._search_timeout:
             return self._search_job(name, query, earliest, latest)
