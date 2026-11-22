@@ -341,6 +341,54 @@ const sections = {
     await v.close();
   },
 
+  async testing() {
+    // The test Splunk is the only stack here: it tests its own management port.
+    // The tokens endpoint refuses output_mode in the body: post it in the URL only.
+    const made = await fetch(`${MGMT}/services/authorization/tokens?output_mode=json`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`admin:${USERS.admin}`).toString('base64'), 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ name: 'publisher', audience: 'delvecat-e2e', expires_on: '+1h' }).toString(),
+    });
+    const madeJson = await made.json().catch(() => ({}));
+    const token = madeJson?.entry?.[0]?.content?.token;
+    const tokenId = madeJson?.entry?.[0]?.content?.id;
+    check('test token created', !!token, `HTTP ${made.status}`);
+    const p = await session('publisher');
+    await p.page.goto(app('#/testing'));
+    await p.page.waitForSelector('form.testing-form', { timeout: 60000 });
+    await sleep(1500);
+    const run = async (verify) => {
+      await p.page.fill('form.testing-form input[type=text]', 'https://127.0.0.1:8089');
+      await p.page.fill('form.testing-form input[type=password]', token || '');
+      const box = p.page.locator('label:has-text("Verify the TLS certificate") input');
+      if ((await box.isChecked()) !== verify) await box.click();
+      await p.page.click('button:has-text("Test connection")');
+      await p.page.waitForSelector('section[aria-live] h2', { timeout: 60000 }).catch(() => {});
+      await sleep(500);
+      return mainText(p.page);
+    };
+    let t = await run(false);
+    check('testing: reaches the stack, token accepted, app and catalog found', /Reachable/.test(t) && /Token accepted\s*✓ OK/.test(t) && /App installed\s*✓ OK/.test(t) && /Catalog published\s*✓ OK/.test(t), t.slice(t.indexOf('127.0.0.1:8089'), t.indexOf('127.0.0.1:8089') + 300));
+    check('testing: the token field is cleared after the test', (await p.page.inputValue('form.testing-form input[type=password]')) === '');
+    t = await run(true);
+    check('testing: an untrusted certificate fails the TLS step with advice', /Not reachable/.test(t) && /not trusted/.test(t));
+    check('publisher pages without script errors', p.errors.length === 0, p.errors.join('; '));
+    await p.close();
+    const v = await session('viewer');
+    await v.page.goto(app('#/testing'));
+    await v.page.waitForSelector('form.testing-form', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    check('viewer cannot run connection tests', await v.page.isDisabled('button:has-text("Test connection")') && /Only catalog publishers/.test(await mainText(v.page)));
+    await v.close();
+    const denied = await fetch(`${MGMT}/services/delvecat/connectivity?output_mode=json`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`viewer:${USERS.viewer}`).toString('base64'), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://127.0.0.1:8089' }),
+    });
+    check('viewer is refused by the endpoint too', denied.status === 403, `HTTP ${denied.status}`);
+    if (tokenId) await rest('DELETE', `/services/authorization/tokens/publisher?id=${encodeURIComponent(tokenId)}`);
+  },
+
   async timelimit() {
     const a = await session('admin');
     const doc = await uiBuild(a.page, {

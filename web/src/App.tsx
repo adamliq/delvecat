@@ -11,6 +11,7 @@ import { EntityPage } from "./pages/EntityPage";
 import { GlossaryPage } from "./pages/GlossaryPage";
 import { GovernancePage } from "./pages/GovernancePage";
 import { HealthPage } from "./pages/HealthPage";
+import { TestingPage } from "./pages/TestingPage";
 import { FindingsPage } from "./pages/FindingsPage";
 import { ComparePage } from "./pages/ComparePage";
 import { InsightsPage } from "./pages/InsightsPage";
@@ -64,6 +65,7 @@ function Body() {
       <Route path="/coverage" element={<CoveragePage />} />
       <Route path="/health" element={<HealthPage />} />
       <Route path="/findings" element={<FindingsPage />} />
+      <Route path="/testing" element={<TestingPage />} />
       <Route path="/governance" element={<GovernancePage />} />
       <Route path="/glossary/:term" element={<GlossaryPage />} />
       <Route path="*" element={<Home />} />

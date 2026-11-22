@@ -230,6 +230,21 @@ one. The same from a search:
   **Compare** can put up to six sourcetypes and data models side by side.
   **Governance** lists sensitive-data readers as a table and filters the role
   matrix to one user's roles.
+- **Testing** (menu): *Test connectivity to another stack* that has the app
+  installed. Give its management address (`https://sh.example.com:8089`) and,
+  optionally, an authentication token of an account there. This Splunk then checks,
+  step by step: the name resolves, the port answers, TLS is trusted (or not checked,
+  for a test), the token is accepted, the app is installed and its version matches
+  this one, and a catalog is published there. Each failure says the likely cause
+  (a firewall, Splunk Cloud's search-api allow list, an untrusted certificate, an
+  expired token, a missing role). Only catalog publishers and admins can run it. The
+  requests are GETs to fixed Splunk REST paths; the token is sent once for the test
+  and is neither stored nor logged. It runs in the app's REST endpoint
+  `/services/delvecat/connectivity` (`restmap.conf`), so restart Splunk after
+  installing or upgrading to 0.21.0.
+
+  ![Testing](../docs/screenshots/testing-connectivity.png)
+
 - **Filters stay in the address**, so a filtered view can be shared or bookmarked.
 - **Tables** on Findings, Health, Coverage and Governance sort by any column
   (click its header) and download as CSV.
@@ -315,6 +330,7 @@ last build, its progress and result, which the Build page shows.
 Splunk) is the only writing Licoryx Delvecat does, and it may write only this
 collection: `POST` to its `batch_save` and `DELETE` of its older documents
 (`transport.publish_allowlist`). Every other request is read-only, as before.
+The connection test (Testing page) writes nothing: it only reads the other stack.
 The one other write is from the Health page, by a publisher or admin who
 accepts or snoozes a finding: one document in the app's own `delvecat_acks`
 collection (or its removal on *Undo*). Nothing outside the app is ever written.

@@ -680,3 +680,17 @@ a.spl-link:hover { text-decoration-style: solid; }
 .rollup-meter { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
 .holders summary { cursor: pointer; color: var(--accent); }
 .rollup-line .status-label { white-space: normal; }
+
+/* Testing */
+.testing-form { display: grid; gap: 12px; max-width: 640px; margin-top: 8px; }
+.testing-form > label { display: grid; gap: 4px; }
+.testing-form input[type="text"], .testing-form input[type="password"] { width: 100%; }
+.testing-options { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+/* With eleven menu items, let the search box shrink before the header wraps. */
+.topbar .search-box { flex: 1 1 140px; min-width: 120px; }
+@media (min-width: 900px) { .nav { gap: 12px; } }
+@media (min-width: 1000px) and (max-width: 1400px) {
+  .topbar { gap: 10px; }
+  .nav { gap: 9px; font-size: 0.88rem; }
+  .topbar .search-box { flex: 1 1 90px; min-width: 90px; }
+}
