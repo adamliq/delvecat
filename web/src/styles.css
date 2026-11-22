@@ -691,6 +691,20 @@ a.spl-link:hover { text-decoration-style: solid; }
 @media (min-width: 900px) { .nav { gap: 12px; } }
 @media (min-width: 1000px) and (max-width: 1400px) {
   .topbar { gap: 10px; }
-  .nav { gap: 9px; font-size: 0.88rem; }
+  .nav { gap: 8px; font-size: 0.86rem; }
   .topbar .search-box { flex: 1 1 90px; min-width: 90px; }
 }
+
+/* Help */
+.help-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+.help-toc { position: sticky; top: 72px; display: grid; gap: 8px; }
+.help-toc input { width: 100%; }
+.help-toc li { margin: 2px 0; }
+.help-body { display: grid; gap: 8px; max-width: 860px; }
+.help-section { scroll-margin-top: 72px; }
+.help-section h2 { margin-top: 8px; }
+.help-defs dt { font-weight: 600; margin-top: 10px; }
+.help-defs dd { margin: 2px 0 0; }
+@media (max-width: 760px) { .help-layout { grid-template-columns: 1fr; } .help-toc { position: static; } }
+.help-toc .link-btn { text-align: left; }
+.help-toc input { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }

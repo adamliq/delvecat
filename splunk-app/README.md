@@ -245,6 +245,10 @@ one. The same from a search:
 
   ![Testing](../docs/screenshots/testing-connectivity.png)
 
+- **Help** (menu): what each page does, object pages, health and acknowledging,
+  building and publishing, roles, what is and is never collected, annotations, the
+  SQL console, connection tests, sharing a view, and troubleshooting; searchable.
+
 - **Filters stay in the address**, so a filtered view can be shared or bookmarked.
 - **Tables** on Findings, Health, Coverage and Governance sort by any column
   (click its header) and download as CSV.

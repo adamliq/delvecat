@@ -58,6 +58,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <NavLink to="/insights">Insights</NavLink>
           <NavLink to="/sql">SQL</NavLink>
           <NavLink to="/testing">Testing</NavLink>
+          <NavLink to="/help">Help</NavLink>
         </nav>
         <form className="search-box" onSubmit={submit} role="search">
           <input

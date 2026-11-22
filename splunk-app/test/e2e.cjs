@@ -335,6 +335,10 @@ const sections = {
     await go('#/glossary?unused=1', 'h1');
     const noTerms = /No glossary terms/.test(await mainText(v.page));
     check('glossary: filters kept in the URL', noTerms || await v.page.isChecked('label:has-text("Only unused terms") input').catch(() => false), noTerms ? 'no terms in this catalog' : '');
+    await go('#/help', '.help-section');
+    await v.page.fill('input[aria-label="Search help"]', 'snooze');
+    await sleep(300);
+    check('help: page with searchable topics', (await v.page.locator('.help-section').count()) >= 10 && (await v.page.locator('.help-section:not([hidden])').count()) < 10);
     await go('#/health?status=warning', '.tile-btn');
     check('health: filters read from the URL', (await v.page.locator('select[aria-label="Status"]').inputValue().catch(() => '')) === 'warning');
     check('viewer pages without script errors', v.errors.length === 0, v.errors.join('; '));
