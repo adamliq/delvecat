@@ -391,6 +391,23 @@ sourcetypes (`--max-field-sourcetypes`), searching only the indexes the
 sourcetype was seen in. `--field-indexes web,app_*` narrows it to the
 sourcetypes in those indexes (`*` wildcards), sampled only there.
 
+### Data models
+
+Each data model lists its datasets with their constraint, every field (inherited
+ones included) and, for the fields a dataset defines itself, the type, flags
+(required, multivalue, hidden), display name and comment (`fieldInfo`).
+Calculated fields count as fields; the calculations are listed with the eval
+expression, regular expression or GeoIP input, or the lookup and its input and
+output fields (a lookup calculation also links the model to that lookup).
+Acceleration settings other than Splunk's defaults (`acceleration`: backfill
+time, max summarization time, concurrency, manual rebuilds, shared summaries...),
+`acceleration.allowed`, the tags allow-list and strict fields are kept too.
+
+Searches record which datasets they name (`lineage.dataModelDatasets`):
+`from datamodel=Model.Dataset`, `where nodename=Root.Child` (as
+`Model.Root.Child`), `| datamodel Model Dataset`, `| from datamodel:Model.Dataset`
+and `| pivot Model Dataset`.
+
 ### Lookup fields
 
 Every lookup lists its fields (`properties.fields`): lookup definitions as

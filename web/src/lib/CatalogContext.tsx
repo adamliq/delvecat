@@ -4,6 +4,7 @@ import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalo
 import { riskMap, type Risk } from "./risk";
 import { IN_SPLUNK, fetchSplunkCatalog } from "./splunkSource";
 import { lookupColumns } from "./lookups";
+import { dataModelColumns } from "./dataModels";
 import { schemaFields } from "./schema";
 import { fieldName } from "./fieldLineage";
 import { EntitySearch } from "./search";
@@ -31,8 +32,9 @@ function ready(bundle: CatalogBundle, origin: string): State {
   const stFields = new Map<string, string[]>();
   const search = new EntitySearch(bundle.entities, {
     ...propertyFacets(propertyDefs(bundle)),
-    // Sourcetypes by the fields found on them; lookups and collections by theirs.
+    // Sourcetypes by the fields found on them; lookups, collections and data models by theirs.
     field: (e) => {
+      if (e.type === "dataModel") return dataModelColumns(e);
       if (e.type !== "sourcetype") return lookupColumns(e);
       let names = stFields.get(e.id); // computed once: facets are counted on every query
       if (!names) stFields.set(e.id, (names = sourcetypeFieldNames(catalog, e)));

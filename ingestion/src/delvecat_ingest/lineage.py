@@ -196,6 +196,8 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         ]
         if warnings:
             lineage["warnings"] = warnings
+        if combined.datasets:
+            lineage["dataModelDatasets"] = sorted(combined.datasets)
         if combined.fields is not None and (combined.fields.used or combined.fields.outputs):
             lineage["fields"] = combined.fields.to_json()
         if lineage:

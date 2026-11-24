@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { fieldName } from "../lib/fieldLineage";
+import { dataModelsWithField } from "../lib/dataModels";
 import { columnsSource, columnType, lookupColumns, lookupsWithField } from "../lib/lookups";
 import { entityPath } from "../lib/routes";
 import { DataTable } from "./DataTable";
@@ -76,6 +77,7 @@ export function LookupFieldsTab({ catalog, entity }: { catalog: Catalog; entity:
     type: columnType(entity, name),
     sourcetypes: sourcetypeFieldsNamed(catalog, name, entity.instance),
     lookups: lookupsWithField(catalog, name, entity.instance).filter((l) => l.id !== entity.id && l.id !== columnsSource(entity)),
+    models: dataModelsWithField(catalog, name, entity.instance),
   })), [catalog, entity]);
   const typed = rows.some((r) => r.type);
   return (
@@ -94,6 +96,9 @@ export function LookupFieldsTab({ catalog, entity }: { catalog: Catalog; entity:
               : <span className="muted">—</span>) },
             { label: "Other lookups with it", value: (r) => r.lookups.length, render: (r) => (r.lookups.length
               ? <>{r.lookups.slice(0, 4).map((l, i) => <span key={l.id}>{i > 0 && ", "}<Link to={`${entityPath(l.id)}?tab=fields`}>{l.displayName ?? l.name}</Link></span>)}{r.lookups.length > 4 && <span className="muted"> +{r.lookups.length - 4}</span>}</>
+              : <span className="muted">—</span>) },
+            { label: "Data models with it", value: (r) => r.models.length, render: (r) => (r.models.length
+              ? r.models.map((m, i) => <span key={m.model.id}>{i > 0 && ", "}<Link to={`${entityPath(m.model.id)}?tab=fields`}>{m.model.displayName ?? m.model.name}</Link></span>)
               : <span className="muted">—</span>) },
           ]}
         />

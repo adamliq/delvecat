@@ -40,9 +40,9 @@ const SECTIONS: Section[] = [
     body: (
       <dl className="help-defs">
         <dt><L to="/">Home</L></dt><dd>Instances, at-a-glance tiles, documentation coverage and every object type by area.</dd>
-        <dt><L to="/search">Browse</L></dt><dd>Search and filter everything, including lookups by the fields they hold (<em>Has field</em> filters lookups, collections and sourcetypes by field name). Results say why they matched; <em>Table</em> shows them as a sortable table; <em>Download CSV</em> exports them.</dd>
+        <dt><L to="/search">Browse</L></dt><dd>Search and filter everything, including lookups and data models by the fields they hold (<em>Has field</em> filters lookups, collections, data models and sourcetypes by field name). Results say why they matched; <em>Table</em> shows them as a sortable table; <em>Download CSV</em> exports them.</dd>
         <dt><L to="/domains">Domains</L></dt><dd>Business areas and the data products they deliver, with how well each is documented and its problems.</dd>
-        <dt><L to="/schemas">Schemas</L></dt><dd>Field schemas of sampled sourcetypes, lookups and KV Store collections, their CIM data model coverage, and fields shared across them. <L to="/compare">Compare</L> puts sourcetypes, lookups and data models side by side.</dd>
+        <dt><L to="/schemas">Schemas</L></dt><dd>Field schemas of sampled sourcetypes, lookups and KV Store collections (a data model's own page lists its datasets, field types, calculations and the searches naming each dataset), their CIM data model coverage, and fields shared across them. <L to="/compare">Compare</L> puts sourcetypes, lookups and data models side by side.</dd>
         <dt><L to="/glossary">Glossary</L></dt><dd>Business terms, the objects and fields they describe, and unused terms.</dd>
         <dt><L to="/coverage">Coverage</L></dt><dd>MITRE ATT&amp;CK and CIM coverage of your detections, and what would let detections that cannot fire work.</dd>
         <dt><L to="/findings">Findings</L></dt><dd>Every warning and critical check in one list, with how to fix each.</dd>

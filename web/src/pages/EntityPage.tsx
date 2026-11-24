@@ -20,6 +20,7 @@ import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LookupFieldsTab } from "../components/LookupFieldsTab";
+import { DataModelTab } from "../components/DataModelTab";
 import { lookupColumns } from "../lib/lookups";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
@@ -117,7 +118,7 @@ export function EntityPage() {
 
   const tabs: [Tab, string][] = [
     ["overview", "Overview"],
-    ...(fields ? [["fields", `Fields (${fields.rows.length})`] as [Tab, string]] : []),
+    ...(fields ? [["fields", entity.type === "dataModel" ? `Datasets (${fields.rows.length})` : `Fields (${fields.rows.length})`] as [Tab, string]] : []),
     ...(entity.quality
       ? [["quality", entity.quality.failed ? `Data quality ✕ ${entity.quality.failed}` : "Data quality"] as [Tab, string]]
       : []),
@@ -285,6 +286,7 @@ export function EntityPage() {
 
       {tab === "fields" && (entity.type === "sourcetype" ? <SchemaTab catalog={catalog} entity={entity} />
         : (entity.type === "lookup" || entity.type === "kvCollection") && lookupColumns(entity).length ? <LookupFieldsTab catalog={catalog} entity={entity} />
+        : entity.type === "dataModel" ? <DataModelTab catalog={catalog} entity={entity} />
         : fields && <FieldsTab table={fields} />)}
 
       {tab === "fieldsUsed" && <SearchFieldsTab catalog={catalog} entity={entity} />}

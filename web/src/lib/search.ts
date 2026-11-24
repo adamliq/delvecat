@@ -1,7 +1,11 @@
 import MiniSearch from "minisearch";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription } from "./annotate";
+import { dataModelColumns } from "./dataModels";
 import { lookupColumns } from "./lookups";
+
+/** Field names an object holds: a lookup's or collection's, or a data model's. */
+const columnsOf = (e: Entity): string[] => (e.type === "dataModel" ? dataModelColumns(e) : lookupColumns(e));
 
 /** Facets offered on the search page; each maps an entity to zero or more values. */
 export const FACETS = {
@@ -51,7 +55,7 @@ interface Doc {
   tags: string;
   body: string;
   values: string;
-  /** Field names of a lookup or KV Store collection. */
+  /** Field names of a lookup, KV Store collection or data model. */
   columns: string;
 }
 
@@ -110,7 +114,7 @@ function toDoc(e: Entity): Doc {
     tags: [...(a.tags ?? []), ...(a.classifications ?? []), ...(a.glossaryTerms ?? [])].join(" "),
     body,
     values: [...new Set(propertyValues(p))].join(" "),
-    columns: lookupColumns(e).join(" "),
+    columns: columnsOf(e).join(" "),
   };
 }
 
@@ -256,7 +260,7 @@ export function matchSnippet(e: Entity, m: Match | undefined): Snippet | undefin
   // Name or description matches show in the row already (highlighted).
   if (m.fields.some((f) => f === "name" || f === "displayName" || f === "description")) return { where: fields.join(", ") };
   if (m.fields.includes("columns")) {
-    const hit = lookupColumns(e).filter((c) => has(c));
+    const hit = columnsOf(e).filter((c) => has(c));
     if (hit.length) return { where: hit.length > 1 ? "fields" : "field", text: hit.slice(0, 5).join(", ") };
   }
   if (m.fields.includes("values")) {

@@ -278,6 +278,10 @@ export interface Entity {
     unresolved?: string[];
     warnings?: string[];
     fields?: FieldLineage;
+    /**
+     * Data model datasets the search names, as Model.Dataset or Model.Root.Child (from tstats nodename=).
+     */
+    dataModelDatasets?: string[];
   };
   /**
    * Data quality check results (derived; never changes the catalog version).

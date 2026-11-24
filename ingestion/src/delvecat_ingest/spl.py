@@ -37,6 +37,8 @@ class SplAnalysis:
     warnings: list[str] = field(default_factory=list)
     fields: FieldAnalysis | None = None  # field-level lineage
     commands: set[str] = field(default_factory=set)  # every command run after a pipe
+    # Data model datasets searched, as Model.Dataset (or Model.Parent.Child).
+    datasets: set[str] = field(default_factory=set)
 
     def merge(self, other: SplAnalysis) -> None:
         if other.fields is not None:
@@ -48,6 +50,7 @@ class SplAnalysis:
                 self.fields.merge(other.fields)
         self.refs |= other.refs
         self.commands |= other.commands
+        self.datasets |= other.datasets
         for m in other.unresolved_macros:
             if m not in self.unresolved_macros:
                 self.unresolved_macros.append(m)
@@ -389,7 +392,8 @@ def _options(args: str) -> dict[str, str]:
     return opts
 
 
-_DATAMODEL_ARG = re.compile(r"datamodel\s*[=:]\s*\"?([\w-]+)", re.I)
+_DATAMODEL_MODES = {"search", "flat", "acceleration_search", "summariesonly"}
+_DATAMODEL_ARG = re.compile(r"datamodel\s*[=:]\s*\"?([\w.-]+)", re.I)
 _FROM_ARG = re.compile(r"^\s*(datamodel|lookup|inputlookup|savedsearch)\s*:\s*\"?([^\s\"|]+)", re.I)
 
 
@@ -402,25 +406,43 @@ def _command(name: str, args: str, out: SplAnalysis) -> None:
             return
         out.refs.add((edge, target, value, False))
 
+    def model(path: str | None, dataset: str | None = None) -> None:
+        """A data model read, with the dataset when the search names one."""
+        if not path:
+            return
+        path = path.strip("\"'")
+        if dataset and "$" not in dataset and "." not in path:
+            path = f"{path}.{dataset.strip(chr(34))}"
+        ref("reads", "dataModel", path.split(".")[0])
+        if "." in path and "$" not in path:
+            out.datasets.add(path)
+
     if name == "search":
         _search_terms(args, out)
     elif name in ("tstats", "mstats", "metadata", "metasearch", "eventcount", "dbinspect"):
         _search_terms(re.sub(r"(?i)\b(from|by|groupby)\b.*?(?=\bwhere\b|$)", " ", args), out)
         for m in _DATAMODEL_ARG.finditer(args):
-            ref("reads", "dataModel", m.group(1).split(".")[0])
+            model(m.group(1).rstrip("."))
+            # where nodename=Root.Child: a dataset below the one in from datamodel=
+            node = _options(args).get("nodename")
+            if node and "$" not in node:
+                out.datasets.add(f"{m.group(1).split('.')[0]}.{node}")
         if name == "metadata" or name == "eventcount":
             for k, v in _options(args).items():
                 if k == "index":
                     ref("reads", "index", v)
     elif name in ("datamodel", "pivot"):
         pos = _positional(args)
-        ref("reads", "dataModel", pos[0] if pos else None)
+        second = pos[1] if len(pos) > 1 else None
+        if second and second.lower() in _DATAMODEL_MODES:
+            second = None  # | datamodel Model search: no dataset named
+        model(pos[0] if pos else None, second)
     elif name == "from":
         m = _FROM_ARG.match(args)
         if m:
             kind, value = m.group(1).lower(), m.group(2)
             if kind == "datamodel":
-                ref("reads", "dataModel", value.split(".")[0])
+                model(value)
             elif kind in ("lookup", "inputlookup"):
                 ref("reads", "lookup", value)
             else:

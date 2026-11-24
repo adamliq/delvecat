@@ -806,6 +806,62 @@ def _json_field(value: Any) -> Any:
     return value
 
 
+# Acceleration settings worth showing (datamodels.conf acceleration.*), as Splunk names them.
+_ACCEL_KEYS = {
+    "backfill_time": "backfillTime",
+    "max_time": "maxTime",
+    "max_concurrent": "maxConcurrent",
+    "manual_rebuilds": "manualRebuilds",
+    "allow_skew": "allowSkew",
+    "allow_old_summaries": "allowOldSummaries",
+    "poll_buckets_until_maxtime": "pollBucketsUntilMaxTime",
+    "schedule_priority": "schedulePriority",
+    "source_guid": "sourceGuid",
+    "workload_pool": "workloadPool",
+}
+
+
+_ACCEL_DEFAULTS = {"max_time": "3600", "max_concurrent": "3"}  # Splunk's own defaults
+
+
+def _dm_field(f: dict[str, Any], calculation: str | None = None) -> dict[str, Any]:
+    """A data model field: type and flags, only what is set."""
+    out: dict[str, Any] = {"name": f.get("fieldName"), "type": f.get("type") or None}
+    for k in ("required", "multivalue", "hidden"):
+        if f.get(k) is True:
+            out[k] = True
+    if f.get("displayName") and f.get("displayName") != f.get("fieldName"):
+        out["displayName"] = f["displayName"]
+    if f.get("comment"):
+        out["comment"] = f["comment"]
+    if calculation:
+        out["calculation"] = calculation
+    return {k: v for k, v in out.items() if v is not None}
+
+
+def _dm_calculation(c: dict[str, Any]) -> dict[str, Any]:
+    kind = str(c.get("calculationType") or "")
+    out: dict[str, Any] = {
+        "type": kind.lower() or None,
+        "expression": c.get("expression") or None,
+        "inputField": c.get("inputField") or None,
+        "lookup": c.get("lookupName") or None,
+        "outputs": [o.get("fieldName") for o in c.get("outputFields") or [] if o.get("fieldName")],
+    }
+    if kind == "Lookup":
+        out["lookupInputs"] = {
+            str(i.get("inputField")): str(i.get("lookupField"))
+            for i in c.get("lookupInputs") or []
+            if i.get("inputField")
+        } or None
+        out["lookupOutputs"] = {
+            str(o.get("fieldName")): str(o.get("lookupOutputFieldName"))
+            for o in c.get("outputFields") or []
+            if o.get("fieldName") and o.get("lookupOutputFieldName")
+        } or None
+    return {k: v for k, v in out.items() if v not in (None, [])}
+
+
 def extract_data_models(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     for e in iter_entries(ctx.transport, f"{NS}/datamodel/model"):
@@ -813,21 +869,55 @@ def extract_data_models(ctx: Ctx, out: ExtractResult) -> int:
         model = _json_field(c.get("eai:data")) or _json_field(c.get("description")) or {}
         accel = _json_field(c.get("acceleration")) or {}
         datasets = []
+        lookups: set[str] = set()
         for obj in model.get("objects", []) if isinstance(model, dict) else []:
             constraints = [x.get("search") for x in obj.get("constraints", []) if x.get("search")]
+            path = obj.get("lineage") or obj.get("objectName")
+            # Splunk lists inherited fields too, each with the dataset that owns it.
+            names: list[str] = []
+            own: list[dict[str, Any]] = []
+            for f in obj.get("fields", []):
+                if f.get("fieldName"):
+                    names.append(f["fieldName"])
+                    if f.get("owner") in (path, None):
+                        own.append(_dm_field(f))
+            calculations = []
+            for calc in obj.get("calculations", []):
+                kind = str(calc.get("calculationType") or "").lower() or None
+                for f in calc.get("outputFields") or []:
+                    if f.get("fieldName") and f["fieldName"] not in names:
+                        names.append(f["fieldName"])
+                    if f.get("fieldName") and calc.get("owner") in (path, None):
+                        own.append(_dm_field(f, kind))
+                if calc.get("owner") in (path, None):
+                    calculations.append(_dm_calculation(calc))
+                if calc.get("lookupName"):
+                    lookups.add(str(calc["lookupName"]))
             datasets.append(
                 {
-                    "name": obj.get("objectName"),
-                    "displayName": obj.get("displayName"),
-                    "parent": obj.get("parentName"),
-                    "fields": [
-                        f.get("fieldName") for f in obj.get("fields", []) if f.get("fieldName")
-                    ],
-                    "constraint": " ".join(constraints) or None,
+                    k: v
+                    for k, v in {
+                        "name": obj.get("objectName"),
+                        "displayName": obj.get("displayName"),
+                        "parent": obj.get("parentName"),
+                        "path": path if path != obj.get("objectName") else None,
+                        "comment": obj.get("comment") or None,
+                        "fields": names,
+                        "fieldInfo": own or None,
+                        "calculations": calculations or None,
+                        "constraint": " ".join(constraints) or None,
+                    }.items()
+                    if v is not None or k in ("fields", "constraint", "parent")
                 }
             )
         desc = model.get("description") if isinstance(model, dict) else None
-        add_ko(
+        settings = {
+            name: accel[key]
+            for key, name in _ACCEL_KEYS.items()
+            if accel.get(key) not in (None, "", "0", 0, False, "default")
+            and str(accel.get(key)) != _ACCEL_DEFAULTS.get(key)
+        }
+        ent = add_ko(
             ctx,
             out,
             "dataModel",
@@ -840,8 +930,20 @@ def extract_data_models(ctx: Ctx, out: ExtractResult) -> int:
                 "accelerated": as_bool(accel.get("enabled", False)),
                 "accelerationEarliest": accel.get("earliest_time"),
                 "accelerationCron": accel.get("cron_schedule"),
+                "acceleration": settings or None,
+                "accelerationAllowed": (
+                    as_bool(c["acceleration.allowed"])
+                    if c.get("acceleration.allowed") is not None
+                    else None
+                ),
+                # Only events with these tags are summarised (datamodels.conf tags_whitelist).
+                "tagsAllowlist": split_list(c.get("tags_whitelist")) or None,
+                "strictFields": as_bool(c["strict_fields"]) if c.get("strict_fields") else None,
             },
         )
+        app, _, _ = acl(e)
+        for name in sorted(lookups):
+            out.refs.append(ref(ent["id"], "lookup", name, "uses", app=app))
         n += 1
     return n
 

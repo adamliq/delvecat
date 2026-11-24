@@ -472,6 +472,13 @@
             },
             "fields": {
               "$ref": "#/$defs/FieldLineage"
+            },
+            "dataModelDatasets": {
+              "description": "Data model datasets the search names, as Model.Dataset or Model.Root.Child (from tstats nodename=).",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         },
