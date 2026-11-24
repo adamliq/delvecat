@@ -206,6 +206,14 @@ export interface Instance {
   kind: "splunkEnterprise" | "splunkCloud" | "soar" | "uba" | "deploymentServer";
   version?: string;
   webUrl?: string;
+  /**
+   * Set when this instance came into the catalog by Import (from a file or another stack): a build on this stack keeps it.
+   */
+  imported?: {
+    from?: string;
+    at?: string;
+    by?: string;
+  };
   roles?: string[];
   /**
    * Instance-level facts (e.g. server roles, Cloud IP allow-list counts). Never contains credentials.

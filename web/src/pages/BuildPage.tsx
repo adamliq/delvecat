@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { PartsPicker } from "../components/PartsPicker";
+import { TransferPanel } from "../components/TransferPanel";
 import { CoverageReport } from "../components/CoverageReport";
 import {
   ALL_PARTS,
@@ -17,7 +18,7 @@ import {
   readBuildStatus,
   startBuild,
 } from "../lib/splunkBuild";
-import { readPointer, type Pointer } from "../lib/splunkSource";
+import { IN_SPLUNK, readPointer, type Pointer } from "../lib/splunkSource";
 
 const POLL_MS = 2000;
 const SPLUNK_KINDS = new Set(["splunkEnterprise", "splunkCloud"]);
@@ -185,6 +186,8 @@ export function BuildPage() {
         ) : null}
       </section>
 
+      <TransferPanel bundle={bundle} canImport={!!allowed} inSplunk={IN_SPLUNK} onImported={() => { void refresh(); reload(); }} />
+
       {allowed === false && (
         <p className="notice">
           Building needs the <code>delvecat_publisher</code> role (or admin). Ask a Splunk admin, or have the
@@ -294,9 +297,9 @@ export function BuildPage() {
           )}
           {others.length > 0 && (
             <p className="notice">
-              The current catalog also has {others.map((i) => i.name).join(", ")}. A build here replaces it with
-              this Splunk only. To keep several instances, build them outside Splunk and publish the merged
-              catalog.
+              The current catalog also has {others.map((i) => i.name).join(", ")}, imported from other stacks
+              or merged outside Splunk. A build here replaces only this Splunk&apos;s part and keeps them (import
+              them again to refresh them).
             </p>
           )}
           <div className="actions">

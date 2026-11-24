@@ -245,6 +245,20 @@ one. The same from a search:
 
   ![Testing](../docs/screenshots/testing-connectivity.png)
 
+- **Export and import** (Build page): move a catalog between stacks, for example
+  to see the Enterprise Security search head's objects on the ad hoc search head.
+  *Download this catalog* saves it as `.json.gz`. *Import* (publishers and admins)
+  takes such a file, or reads the catalog straight from another stack that has the
+  app (its management address and a token of an account with `delvecat_user`
+  there; read-only, the token is used once and not stored). *Combine* keeps this
+  stack's catalog and adds the other stack's; importing the same stack again
+  replaces its earlier copy, so a regular import keeps it current. *Replace*
+  publishes the imported catalog alone. Imported instances are marked, and a build
+  here keeps them, replacing only this stack's own part (`| delvecatbuild
+  keepimported=false` builds this stack alone). Runs in the app's endpoint
+  `/services/delvecat/transfer`; restart Splunk after installing or upgrading to
+  0.23.0 (Splunk keeps REST handlers loaded).
+
 - **Help** (menu): what each page does, object pages, health and acknowledging,
   building and publishing, roles, what is and is never collected, annotations, the
   SQL console, connection tests, sharing a view, and troubleshooting; searchable.
@@ -335,6 +349,8 @@ Splunk) is the only writing Licoryx Delvecat does, and it may write only this
 collection: `POST` to its `batch_save` and `DELETE` of its older documents
 (`transport.publish_allowlist`). Every other request is read-only, as before.
 The connection test (Testing page) writes nothing: it only reads the other stack.
+An import reads the other stack the same way and writes only this stack's catalog
+collection, as a build does.
 The one other write is from the Health page, by a publisher or admin who
 accepts or snoozes a finding: one document in the app's own `delvecat_acks`
 collection (or its removal on *Undo*). Nothing outside the app is ever written.

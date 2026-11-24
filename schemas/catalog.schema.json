@@ -339,6 +339,16 @@
           "format": "uri",
           "pattern": "^https?://"
         },
+        "imported": {
+          "description": "Set when this instance came into the catalog by Import (from a file or another stack): a build on this stack keeps it.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "from": {"type": "string"},
+            "at": {"type": "string", "format": "date-time"},
+            "by": {"type": "string"}
+          }
+        },
         "roles": {
           "type": "array",
           "items": {

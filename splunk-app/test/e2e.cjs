@@ -397,6 +397,75 @@ const sections = {
     if (tokenId) await rest('DELETE', `/services/authorization/tokens/publisher?id=${encodeURIComponent(tokenId)}`);
   },
 
+  async transfer() {
+    // A second "stack": the recorded test fixtures, built as instance es-e2e, imported as a file.
+    const fs = require('fs');
+    const path = require('path');
+    const { execSync } = require('child_process');
+    const dir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'delvecat-e2e-'));
+    const file = path.join(dir, 'es.json');
+    execSync(`uv run delvecat-ingest build --fixtures tests/fixtures/splunk-9.4-dev --instance es-e2e --instance-name "ES e2e" --out ${file}`,
+      { cwd: path.join(__dirname, '../../ingestion'), stdio: 'ignore' });
+    const before = await pointer();
+    const p = await session('publisher');
+    await p.page.goto(app('#/build'));
+    await p.page.waitForSelector('.transfer', { timeout: 60000 });
+    await sleep(1500);
+    const [download] = await Promise.all([
+      p.page.waitForEvent('download', { timeout: 60000 }),
+      p.page.click('button:has-text("Download this catalog")'),
+    ]);
+    const saved = path.join(dir, download.suggestedFilename());
+    await download.saveAs(saved);
+    const exported = JSON.parse(require('zlib').gunzipSync(fs.readFileSync(saved)).toString());
+    check('export downloads the published catalog', exported.entities.length === before.entities && /\.json\.gz$/.test(saved), `${exported.entities.length} objects, ${path.basename(saved)}`);
+    await p.page.click('.transfer button[role=tab]:has-text("From a file")');
+    await p.page.setInputFiles('.transfer input[type=file]', file);
+    await p.page.click('.transfer button:has-text("Import")');
+    await p.page.waitForSelector('.transfer [role=status], .transfer [role=alert]', { timeout: 300000 });
+    let t = await p.page.locator('.transfer').innerText();
+    let ptr = await pointer();
+    check('import a file: combined with this stack', /Imported from file/.test(t) && (ptr.instances || []).includes('es-e2e') && (ptr.instances || []).length >= 2, `${ptr.instances}`);
+    check('pointer names the importer', ptr.publishedBy === 'publisher' && /^file /.test(ptr.importedFrom || ''));
+    // A build keeps the imported instance, replacing only this stack's part.
+    const prev = (await buildDoc())?.sid;
+    await oneshot('| delvecatbuild searchtimeout=120', 'admin'); // admin, as the other sections: a narrower view is refused as "much smaller"
+    const doc = await waitBuild(prev);
+    ptr = await pointer();
+    const own = doc?.instance;
+    check('a build keeps imported instances and replaces only its own part', doc?.state === 'done' && (ptr.instances || []).includes('es-e2e')
+      && (ptr.instances || []).every((i) => i === 'es-e2e' || i === own), `${ptr.instances}; kept ${doc?.keptInstances}`);
+    await p.page.reload();
+    await p.page.waitForSelector('.transfer', { timeout: 60000 });
+    await sleep(1500);
+    // Directly from a stack: this test Splunk itself, with a token (its own instance is replaced by itself).
+    const madeResp = await fetch(`${MGMT}/services/authorization/tokens?output_mode=json`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`admin:${USERS.admin}`).toString('base64'), 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ name: 'publisher', audience: 'delvecat-e2e', expires_on: '+1h' }).toString(),
+    });
+    const made = (await madeResp.json().catch(() => ({})))?.entry?.[0]?.content || {};
+    await p.page.click('.transfer button[role=tab]:has-text("From another stack")');
+    await p.page.fill('.transfer input[type=text]', 'https://127.0.0.1:8089');
+    await p.page.fill('.transfer input[type=password]', made.token || '');
+    await p.page.click('.transfer label:has-text("Verify the TLS certificate") input');
+    await p.page.click('.transfer button:has-text("Import")');
+    await sleep(1000);
+    await p.page.waitForSelector('.transfer [role=status], .transfer [role=alert]', { timeout: 300000 });
+    t = await p.page.locator('.transfer').innerText();
+    ptr = await pointer();
+    check('import from another stack: read it and combined', /Imported from stack 127\.0\.0\.1:8089/.test(t) && (ptr.instances || []).includes('es-e2e'), t.slice(-200).replace(/\s+/g, ' '));
+    check('publisher pages without script errors', p.errors.length === 0, p.errors.join('; '));
+    await p.close();
+    // Back to this stack only, for the other sections.
+    const prev2 = (await buildDoc())?.sid;
+    await oneshot('| delvecatbuild keepimported=false replacesmaller=true searchtimeout=120', 'admin');
+    await waitBuild(prev2);
+    check('keepimported=false builds this stack alone', !((await pointer()).instances || []).includes('es-e2e'));
+    if (made.id) await rest('DELETE', `/services/authorization/tokens/publisher?id=${encodeURIComponent(made.id)}`);
+    fs.rmSync(dir, { recursive: true, force: true });
+  },
+
   async timelimit() {
     const a = await session('admin');
     const doc = await uiBuild(a.page, {

@@ -26,6 +26,7 @@ from splunklib.searchcommands import (  # noqa: E402
 )
 
 from delvecat_ingest.inapp import PARTS, build_here, resolve_parts  # noqa: E402
+from delvecat_ingest.transfer import combine, imported_instances, without_instances  # noqa: E402
 from delvecat_ingest.publish import (  # noqa: E402
     PublishError,
     publish_bundle,
@@ -77,6 +78,8 @@ class DelveCatBuild(GeneratingCommand):
     fieldindexes = Option(
         require=False, validate=validators.Match("fieldindexes", r"^[A-Za-z0-9_*, -]*$")
     )
+    # Keep instances imported from other stacks (replace only this stack's own part).
+    keepimported = Option(require=False, validate=validators.Boolean(), default=True)
     # Seconds a single search may run before it is cancelled; 0 for no limit.
     searchtimeout = Option(
         require=False, validate=validators.Integer(minimum=0, maximum=86400), default=300
@@ -149,8 +152,18 @@ class DelveCatBuild(GeneratingCommand):
                 parts=parts,
                 field_indexes=self.fieldindexes,
             )
+            # Instances imported from other stacks (Export and import) stay: this build
+            # replaces only this stack's own part of the catalog.
+            own = {i["id"] for i in bundle["instances"]}
+            imported = (
+                imported_instances(previous, own)
+                if previous and self.keepimported and not previous.get("redaction")
+                and not bundle.get("redaction")
+                else set()
+            )
             # Fields left out (fields=false) are not "seeing less": compare everything else.
-            before = _objects(previous) if previous else 0
+            mine = without_instances(previous, imported) if previous and imported else previous
+            before = _objects(mine) if mine else 0
             after = _objects(bundle)
             if before and after < before * SMALLER and not self.replacesmaller:
                 # Usually a selection of parts, or someone who sees less of Splunk than
@@ -168,6 +181,12 @@ class DelveCatBuild(GeneratingCommand):
                     f"the current one {before:,}: {why}. Nothing was published. "
                     "Replace it anyway with replacesmaller=true."
                 )
+            if imported:
+                progress("adding the instances imported from other stacks")
+                # Only the imported instances of the previous catalog: this stack's own
+                # earlier builds (under another instance id too) are replaced.
+                others = {i["id"] for i in previous["instances"]} - imported
+                bundle, _ = combine(without_instances(previous, others), bundle)
             progress("publishing")
             pointer = publish_bundle(
                 bundle,
@@ -189,7 +208,8 @@ class DelveCatBuild(GeneratingCommand):
                 generation=pointer["generation"],
                 entities=pointer["entities"],
                 edges=pointer["edges"],
-                instance=bundle["instances"][0]["id"],
+                instance=sorted(own)[0],
+                keptInstances=sorted(imported),
                 problems=[
                     {
                         "connector": r["connector"],

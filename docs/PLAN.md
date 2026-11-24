@@ -643,6 +643,13 @@ with fixes for detections that cannot fire, worklists and trends for Insights
 targets (the build records documentation counts per build), per-domain roll-ups,
 glossary search, overdue dates, multi-schema compare, and filters kept in the URL.
 
+### Export and import between stacks (done)
+
+Download a stack's catalog, or import one (a file, or read from another stack's app)
+and combine it with this stack's or replace it. Imported instances are marked; builds
+keep them and replace only their own stack's part, so an ES search head's catalog can
+live on the ad hoc search head and stay current with a regular import.
+
 ### Testing: connectivity to another stack (done)
 
 A Testing page runs, through the app's own REST endpoint (a browser cannot reach

@@ -107,6 +107,26 @@ const SECTIONS: Section[] = [
     ),
   },
   {
+    id: "transfer",
+    title: "Moving a catalog between stacks",
+    keywords: "export import download upload combine replace es enterprise security ad hoc search head another stack",
+    body: (
+      <>
+        <p>
+          On the Build page, <em>Export and import</em>: <em>Download this catalog</em> saves it as a <code>.json.gz</code>
+          file. <em>Import</em> (catalog publishers and admins) takes such a file, or reads the catalog straight from
+          another stack that has the app, with its management address and a token of an account with
+          <code> delvecat_user</code> there (read-only; the token is used once and not stored).
+        </p>
+        <ul>
+          <li><strong>Combine</strong> keeps this stack&apos;s catalog and adds the other one, e.g. the ES search head&apos;s objects on the ad hoc search head. Importing the same stack again replaces its earlier copy.</li>
+          <li><strong>Replace</strong> publishes the imported catalog alone.</li>
+          <li>A build here keeps imported stacks and replaces only this stack&apos;s own part; import again to refresh them.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
     id: "roles",
     title: "Roles and who sees what",
     keywords: "permissions access delvecat_user delvecat_publisher admin sc_admin",
@@ -116,7 +136,7 @@ const SECTIONS: Section[] = [
           <thead><tr><th>Role</th><th>Can</th></tr></thead>
           <tbody>
             <tr><td><code>delvecat_user</code></td><td>Open the app and read the catalog.</td></tr>
-            <tr><td><code>delvecat_publisher</code></td><td>Also build and publish the catalog, accept or snooze findings, and run connection tests.</td></tr>
+            <tr><td><code>delvecat_publisher</code></td><td>Also build, import and publish the catalog, accept or snooze findings, and run connection tests.</td></tr>
             <tr><td><code>admin</code>, <code>sc_admin</code></td><td>Everything.</td></tr>
           </tbody>
         </table>

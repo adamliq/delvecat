@@ -708,3 +708,6 @@ a.spl-link:hover { text-decoration-style: solid; }
 @media (max-width: 760px) { .help-layout { grid-template-columns: 1fr; } .help-toc { position: static; } }
 .help-toc .link-btn { text-align: left; }
 .help-toc input { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; }
+.testing-form > label.sort { display: inline-flex; gap: 6px; align-items: center; }
+.testing-form > .seg { width: fit-content; }
+.transfer-mode { display: grid; gap: 4px; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin: 0; }
