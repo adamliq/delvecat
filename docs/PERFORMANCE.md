@@ -31,6 +31,25 @@ this work (with the loading fix below, without which nothing loaded at all).
 
 Catalog size on disk: 105 MB → 82 MB (7.7 MB → 6 MB gzipped).
 
+### A troubled estate (Health, Findings)
+
+The synthetic catalog is healthy (36 findings). `ingestion/tools/stress_catalog.py`
+gives it the problems of a large estate in trouble: 16,800 findings, 12,300 unused
+objects, daily series on every problem search and data source, a 60-build trend and
+3,000 resolved findings. Before 0.22.1 the Health page took 31 s and built 188,000
+elements, enough to crash a browser tab in Splunk Web.
+
+| Page | Before | After |
+|---|---:|---:|
+| Health | 31.4 s, 188,000 elements | **1.3 s**, 5,200 elements |
+| Findings | (500 rows with every remedy built) | **1.1 s**, 1,800 elements |
+| Governance | 4.4 s, 41,000 elements | **1.5 s**, 16,500 elements |
+
+Fixes: tables show a first page (100 rows; 25 per Health area) with *Show more*,
+instead of up to 500 rows each; "How to fix" and "Acknowledge" build their contents
+when opened, not for every finding up front; sparklines have one hover area instead
+of one per day.
+
 ## Ingestion (scale 1.0)
 
 | Step | Before | After |

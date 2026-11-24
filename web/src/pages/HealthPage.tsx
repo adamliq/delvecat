@@ -92,6 +92,7 @@ function AtRisk() {
         rows={rows}
         rowKey={(r) => r.entity.id}
         empty={<p className="muted">Nothing depends on an object with a problem.</p>}
+        limit={50}
         columns={[
           { label: "Object", value: ({ entity: e }) => e.displayName ?? e.name, render: ({ entity: e }) => <ObjectCell e={e} /> },
           { label: "Risk", value: ({ risk }) => (risk.severity === "critical" ? 0 : 1), render: ({ risk }) => <StatusLabel status={risk.severity} /> },
@@ -169,6 +170,7 @@ function Cleanup() {
       <DataTable
         rows={rows}
         rowKey={(r) => r.e.id}
+        limit={50}
         empty={<p className="muted">Nothing unused{builtin ? "" : " in custom apps"}.</p>}
         columns={[
           { label: "Object", value: ({ e }) => e.displayName ?? e.name, render: ({ e }) => (
@@ -356,6 +358,7 @@ export function HealthPage() {
           <DataTable
             rows={s.rows}
             rowKey={(r) => r.entity.id}
+            limit={25}
             empty={<p className="muted">{active ? "Nothing matches the filters." : s.empty}</p>}
             columns={[
               { label: "Object", value: (r) => r.entity.displayName ?? r.entity.name, render: (r) => <ObjectCell e={r.entity} /> },
@@ -412,6 +415,7 @@ export function HealthPage() {
           <DataTable
             rows={resolved}
             rowKey={(r) => `${r.id}|${r.check}`}
+        limit={50}
             empty={<p className="muted">Nothing was fixed since the last build.</p>}
             columns={[
               { label: "Object", value: (r) => r.name, render: (r) => (

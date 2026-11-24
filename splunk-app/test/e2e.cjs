@@ -259,6 +259,8 @@ const sections = {
     check('Health page draws the trend over builds', trend === 1, `catalog ${p?.generation}`);
     const t = await mainText(pub.page);
     check('Health page lists every area with findings and the thresholds used', /Thresholds: stale after/.test(t) && /Findings by check/.test(t), t.slice(0, 120));
+    await pub.page.locator('.remedy summary').first().click(); // its contents are built when opened
+    await sleep(300);
     const link = await pub.page.locator('.remedy a:has-text("Open in Splunk search")').first().getAttribute('href').catch(() => null);
     check('How to fix links to a Splunk search', !!link && /\/app\/search\/search\?q=/.test(link), link || 'no link');
     const before = await pub.page.locator('.finding').count();
@@ -269,7 +271,9 @@ const sections = {
     const stored = (await rest('GET', ACKS)).json || [];
     check('publisher accepts a finding: saved in the app\'s KV collection', stored.length === 1 && stored[0].by === 'publisher' && stored[0].note === 'e2e: known',
       JSON.stringify(stored[0] || {}).slice(0, 120));
-    check('accepted finding is hidden from the list', (await pub.page.locator('.finding').count()) === before - 1);
+    // Each area shows a page of findings that refills from the next, so count the tile.
+    const ackTile = await pub.page.locator('.tile-btn:has-text("acknowledged") .tile-num').innerText().catch(() => '');
+    check('accepted finding is hidden from the list', ackTile.trim() === '1' && (await pub.page.locator('.finding').count()) <= before, `acknowledged tile: ${ackTile}`);
     check('publisher pages without script errors', pub.errors.length === 0, pub.errors.join('; '));
     await pub.close();
 

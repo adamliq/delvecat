@@ -48,7 +48,7 @@ export function DataTable<T>({
   columns,
   rowKey,
   csvName,
-  limit = 500,
+  limit = 100,
   initialSort,
   className = "mini-table",
   empty,
@@ -64,6 +64,8 @@ export function DataTable<T>({
   className?: string;
   empty?: ReactNode;
 }) {
+  // Large tables show a page at a time: rendering thousands of rows can exhaust the browser.
+  const [shown, setShown] = useState(limit);
   const [sort, setSort] = useState<{ column: number; dir: Dir } | null>(
     initialSort ? { column: initialSort.column, dir: initialSort.dir ?? "ascending" } : null,
   );
@@ -107,7 +109,7 @@ export function DataTable<T>({
             </tr>
           </thead>
           <tbody>
-            {sorted.slice(0, limit).map((r) => (
+            {sorted.slice(0, shown).map((r) => (
               <tr key={rowKey(r)}>
                 {columns.map((c) => <td key={c.label} className={c.className}>{c.render ? c.render(r) : String(c.value(r) ?? "—")}</td>)}
               </tr>
@@ -115,7 +117,14 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-      {rows.length > limit && <p className="muted small">Showing {limit.toLocaleString()} of {rows.length.toLocaleString()}{csvName ? "; the CSV has them all" : ""}.</p>}
+      {rows.length > shown && (
+        <p className="muted small table-more">
+          Showing {shown.toLocaleString()} of {rows.length.toLocaleString()}{csvName ? "; the CSV has them all" : ""}.{" "}
+          <button type="button" className="btn btn-small" onClick={() => setShown(shown + limit)}>
+            Show {Math.min(limit, rows.length - shown).toLocaleString()} more
+          </button>
+        </p>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LazyDetails } from "./LazyDetails";
 import type { CatalogBundle, Entity } from "../generated/catalog";
 import { ackLabel, type Ack, type AckState } from "../lib/acks";
 import { checkTitle } from "../lib/findings";
@@ -107,11 +108,19 @@ export function CheckBars({ counts, selected, onSelect }: { counts: CheckCount[]
   );
 }
 
-/** Why it matters, what to do, and a search to look into it. */
+/** Why it matters, what to do, and a search to look into it (built when opened). */
 export function RemedyBox({ item, webUrl, inSplunk, prefix }: { item: Item; webUrl?: string; inSplunk: boolean; prefix: string }) {
-  const r = remedy(item.check);
+  if (!remedy(item.check)) return null;
+  return (
+    <LazyDetails className="remedy" summary="How to fix">
+      {() => <RemedyBody item={item} webUrl={webUrl} inSplunk={inSplunk} prefix={prefix} />}
+    </LazyDetails>
+  );
+}
+
+function RemedyBody({ item, webUrl, inSplunk, prefix }: { item: Item; webUrl?: string; inSplunk: boolean; prefix: string }) {
+  const r = remedy(item.check)!;
   const [copied, setCopied] = useState(false);
-  if (!r) return null;
   const spl = r.spl?.(item.entity);
   const link = spl ? searchLink(spl, webUrl, inSplunk, prefix) : undefined;
   const copy = async () => {
@@ -125,8 +134,7 @@ export function RemedyBox({ item, webUrl, inSplunk, prefix }: { item: Item; webU
     }
   };
   return (
-    <details className="remedy">
-      <summary>How to fix</summary>
+    <>
       <p><strong>Why it matters.</strong> {r.why}</p>
       <p><strong>What to do.</strong> {r.fix}</p>
       {spl && (
@@ -138,7 +146,7 @@ export function RemedyBox({ item, webUrl, inSplunk, prefix }: { item: Item; webU
           </div>
         </div>
       )}
-    </details>
+    </>
   );
 }
 
@@ -177,8 +185,7 @@ export function AckControl({ item, canWrite, onSave, onRemove }: {
   }
   if (!canWrite) return null;
   return (
-    <details className="ack-form">
-      <summary>Acknowledge</summary>
+    <LazyDetails className="ack-form" summary="Acknowledge">{() => (
       <form onSubmit={(e) => {
         e.preventDefault();
         const days = choice === "accept" ? undefined : Number(choice);
@@ -192,7 +199,7 @@ export function AckControl({ item, canWrite, onSave, onRemove }: {
         <button type="submit" className="btn btn-small" disabled={busy}>Save</button>
         {error && <div className="error small">{error}</div>}
       </form>
-    </details>
+    )}</LazyDetails>
   );
 }
 

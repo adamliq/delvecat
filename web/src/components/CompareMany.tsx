@@ -64,7 +64,7 @@ export function CompareMany({ catalog, ids, onRemove }: { catalog: Catalog; ids:
         rows={rows}
         rowKey={(r) => r.name}
         csvName="delvecat-compare.csv"
-        limit={500}
+        limit={200}
         columns={[
           { label: "Field", value: (r) => r.name, render: (r) => <><code>{r.name}</code>{r.differs && <> <span className="status-label status-warning" title="Typed differently across sourcetypes">! type</span></>}</> },
           { label: "In", value: (r) => r.present, render: (r) => `${r.present} of ${cols.length}` },

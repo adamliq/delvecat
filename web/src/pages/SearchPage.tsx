@@ -108,7 +108,7 @@ function ResultTable({ results, instances }: { results: Entity[]; instances: Rec
     <DataTable
       rows={results}
       rowKey={(e) => e.id}
-      limit={500}
+      limit={100}
       className="mini-table result-table"
       columns={[
         { label: "Type", value: (e) => typeLabel(e.type) },

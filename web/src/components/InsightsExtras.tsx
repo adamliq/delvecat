@@ -103,7 +103,7 @@ function Worklist({ catalog, includeVendor, title, lacks }: { catalog: Catalog; 
         rows={rows}
         rowKey={(e) => e.id}
         csvName="delvecat-worklist.csv"
-        limit={200}
+        limit={100}
         columns={[
           { label: "Object", value: (e) => e.displayName ?? e.name, render: (e) => <><span className="muted rel-type">{typeLabel(e.type)}</span> <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link></> },
           { label: "App", value: (e) => e.app ?? "" },
