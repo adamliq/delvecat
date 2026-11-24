@@ -603,7 +603,7 @@ const sections = {
 
   async schedule() {
     const name = encodeURIComponent('Licoryx Delvecat - scheduled build');
-    const report = async () => (await rest('GET', `/servicesNS/nobody/delvecat/saved/searches/${name}?output_mode=json`)).json?.entry?.[0]?.content;
+    const report = async () => (await rest('GET', `/servicesNS/nobody/delvecat/saved/searches/${name}`)).json?.entry?.[0]?.content;
     const shipped = await report();
     check('the app ships the scheduled build report, off', shipped && (shipped.disabled === true || shipped.disabled === '1'));
     const a = await session('admin');
