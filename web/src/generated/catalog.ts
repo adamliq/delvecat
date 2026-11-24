@@ -291,6 +291,10 @@ export interface Entity {
      */
     dataModelDatasets?: string[];
     /**
+     * Analysed from Splunk's own parse of the search (search/parser, macros expanded), because Licoryx Delvecat's analyser could not follow it.
+     */
+    parsedBySplunk?: boolean;
+    /**
      * Search commands the search runs after a pipe (built-in and custom), by name.
      */
     commands?: string[];
@@ -512,6 +516,16 @@ export interface ConnectorReport {
 }
 export interface ChangeSummary {
   previousGeneratedAt: string;
+  /**
+   * For modified objects (up to 2000): what changed, key by key (properties.<name> one level down), values cut to 300 characters.
+   */
+  details?: {
+    [k: string]: {
+      key: string;
+      before?: unknown;
+      after?: unknown;
+    }[];
+  };
   added: string[];
   removed: RemovedEntity[];
   modified: string[];

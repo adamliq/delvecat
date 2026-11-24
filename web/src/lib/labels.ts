@@ -95,3 +95,6 @@ const GROUP_OF = new Map(TYPE_GROUPS.flatMap(([g, types]) => types.map((t) => [t
 
 /** The area a type belongs to ("Other" for one not listed). */
 export const typeGroup = (type: string): string => GROUP_OF.get(type) ?? "Other";
+
+/** Objects named by their SPL (ad-hoc searches): their titles are shown as code. */
+export const splTitleClass = (e: { type: string }): string | undefined => (e.type === "adhocSearch" ? "spl-title" : undefined);

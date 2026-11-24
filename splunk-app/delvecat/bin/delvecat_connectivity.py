@@ -51,7 +51,11 @@ def _roles(rest_uri, session_key):
 
 
 def _reply(status, body):
-    return {"status": status, "payload": json.dumps(body), "headers": {"Content-Type": "application/json"}}
+    return {
+        "status": status,
+        "payload": json.dumps(body),
+        "headers": {"Content-Type": "application/json"},
+    }
 
 
 class ConnectivityHandler(PersistentServerConnectionApplication):
@@ -68,11 +72,19 @@ class ConnectivityHandler(PersistentServerConnectionApplication):
         session = request.get("session") or {}
         server = request.get("server") or {}
         try:
-            roles = _roles(server.get("rest_uri", "https://127.0.0.1:8089"), session.get("authtoken", ""))
+            roles = _roles(
+                server.get("rest_uri", "https://127.0.0.1:8089"), session.get("authtoken", "")
+            )
         except Exception:  # noqa: BLE001 - answer without details
             return _reply(403, {"error": "Could not check your roles."})
         if not roles & ALLOWED_ROLES:
-            return _reply(403, {"error": "Only catalog publishers (delvecat_publisher) and admins can test connections."})
+            return _reply(
+                403,
+                {
+                    "error": "Only catalog publishers (delvecat_publisher) and admins "
+                    "can test connections."
+                },
+            )
         try:
             body = json.loads(request.get("payload") or "{}")
         except ValueError:

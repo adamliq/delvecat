@@ -141,7 +141,10 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         combined = SplAnalysis()
         # Keep warnings recorded during extraction (e.g. unparseable dashboard XML).
         combined.warnings.extend((e.get("lineage") or {}).get("warnings", []))
+        # Splunk's own parse of searches the analyser could not follow (parser_assist).
+        parsed = e.pop("_parsedSpl", None) or {}
         for spl, fragment, label in sources:
+            spl = parsed.get(spl, spl)
             a = analyze(spl, macros.resolver(app, owner), fragment=fragment)
             add_command_refs(a, commands)
             combined.merge(a)
@@ -203,6 +206,8 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         ]
         if warnings:
             lineage["warnings"] = warnings
+        if parsed:
+            lineage["parsedBySplunk"] = True
         if combined.datasets:
             lineage["dataModelDatasets"] = sorted(combined.datasets)
         if combined.commands and not all(fragment for _, fragment, _ in sources):

@@ -152,7 +152,7 @@ export function InsightsPage() {
                   <ol className="rank-list">
                     {g.top.map(({ entity, score }) => (
                       <li key={entity.id} className="rank-row" title={`${typeLabel(entity.type)} ${entity.displayName ?? entity.name}: ${score.toLocaleString()} ${g.measure}`}>
-                        <Link to={entityPath(entity.id)} className="rank-name">{entity.displayName ?? entity.name}</Link>
+                        <Link to={entityPath(entity.id)} className={`rank-name${entity.type === "adhocSearch" ? " spl-title" : ""}`}>{entity.displayName ?? entity.name}</Link>
                         <span className="rank-bar-track">
                           <span className="rank-bar" style={{ width: `calc((100% - 4em) * ${Math.max(0.02, score / max)})` }} />
                           <span className="rank-value">{score.toLocaleString()}</span>

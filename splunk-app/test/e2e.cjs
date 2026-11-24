@@ -601,6 +601,32 @@ const sections = {
     await a.close();
   },
 
+  async schedule() {
+    const name = encodeURIComponent('Licoryx Delvecat - scheduled build');
+    const report = async () => (await rest('GET', `/servicesNS/nobody/delvecat/saved/searches/${name}?output_mode=json`)).json?.entry?.[0]?.content;
+    const shipped = await report();
+    check('the app ships the scheduled build report, off', shipped && (shipped.disabled === true || shipped.disabled === '1'));
+    const a = await session('admin');
+    await a.page.goto(app('#/build'));
+    await a.page.waitForSelector('.schedule-form', { timeout: 30000 });
+    await a.page.selectOption('.schedule-form select >> nth=0', 'weekly');
+    await a.page.selectOption('.schedule-form select >> nth=1', '1');
+    await a.page.fill('input[aria-label="Hour"]', '3');
+    await a.page.fill('input[aria-label="Minute"]', '30');
+    await a.page.click('.schedule-form button[type=submit]');
+    await a.page.waitForSelector('.schedule p.ok', { timeout: 20000 });
+    const on = await report();
+    check('Turn on schedules the report weekly with the chosen parts', on && !(on.disabled === true || on.disabled === '1') && on.cron_schedule === '30 3 * * 1' && /\| delvecatbuild parts=/.test(on.search),
+      `${on?.cron_schedule} ${String(on?.search).slice(0, 60)}`);
+    check('the page says when it runs', /every Monday at 03:30/.test(await a.page.locator('.schedule').innerText()));
+    await a.page.click('.schedule button:has-text("Turn off")');
+    await a.page.waitForFunction(() => /Scheduled builds are off/.test(document.querySelector('.schedule')?.textContent ?? ''), null, { timeout: 20000 });
+    const off = await report();
+    check('Turn off disables it again', off && (off.disabled === true || off.disabled === '1'));
+    check('schedule page errors', a.errors.length === 0, a.errors.join('; '));
+    await a.close();
+  },
+
   async dryrun() {
     const before = (await pointer())?.generation;
     const r = await oneshot('| delvecatbuild dryrun=true');

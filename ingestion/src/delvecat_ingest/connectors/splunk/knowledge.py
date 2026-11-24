@@ -748,7 +748,12 @@ def _read_headers(ctx: Ctx, wanted: list[tuple[dict[str, Any], str]]) -> dict[in
         for f in as_completed(futures, timeout=max(0.0, deadline - time.monotonic())):
             out[id(futures[f])] = f.result()
     except FuturesTimeout:
-        pass  # the rest are left without fields; the report says how many were read
+        # Out of time: cancel the header searches still running in Splunk, where the
+        # transport can; the files not read are left without fields.
+        if getattr(ctx.transport, "can_cancel", lambda: False)():
+            ctx.transport.cancel_searches()
+            pool.shutdown(wait=True, cancel_futures=True)
+            ctx.transport.resume_searches()
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return out

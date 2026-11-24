@@ -8,7 +8,7 @@ import { effectiveDescription, owners } from "../lib/annotate";
 import { entityPath } from "../lib/routes";
 import { StatusLabel } from "./HealthPage";
 import { useCatalog } from "../lib/CatalogContext";
-import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
+import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, splTitleClass, typeGroup, typeLabel } from "../lib/labels";
 import { isBuiltinSetting, SETTING_TYPES, type Facet, type Filters, type Sort } from "../lib/search";
 import { exportFileName, resultRows } from "../lib/exportResults";
 import { downloadText, toCsv } from "../lib/health";
@@ -116,7 +116,7 @@ function ResultTable({ results, instances }: { results: Entity[]; instances: Rec
       className="mini-table result-table"
       columns={[
         { label: "Type", value: (e) => typeLabel(e.type) },
-        { label: "Name", value: (e) => e.displayName ?? e.name, render: (e) => <Link to={entityPath(e.id)} state={{ from: window.location.hash.replace(/^#/, "") || "/" }}>{e.displayName ?? e.name}</Link> },
+        { label: "Name", value: (e) => e.displayName ?? e.name, render: (e) => <Link to={entityPath(e.id)} state={{ from: window.location.hash.replace(/^#/, "") || "/" }} className={splTitleClass(e)}>{e.displayName ?? e.name}</Link> },
         ...(many ? [{ label: "Instance", value: (e: Entity) => instances[e.instance] ?? e.instance }] : []),
         { label: "App", value: (e) => e.app ?? "" },
         { label: "Owner", value: (e) => owners(e).join(", ") || e.owner || "" },
@@ -149,7 +149,11 @@ export function SearchPage() {
   // Built-in time ranges, chart types and settings stay out unless asked for: a type or
   // origin filter, or "show built-in settings".
   const showSettings = params.has("settings") || Boolean(filters.origin?.length) || (filters.type ?? []).some((t) => SETTING_TYPES.has(t));
-  const hiddenSettings = useMemo(() => (showSettings ? 0 : catalog.entities.filter(isBuiltinSetting).length), [catalog, showSettings]);
+  // How many of the objects matching this search and these filters are hidden.
+  const hiddenSettings = useMemo(
+    () => (showSettings ? 0 : search.query(q, filters, sort).results.filter(isBuiltinSetting).length),
+    [search, q, filters, sort, showSettings],
+  );
   const { results, facets, matches } = useMemo(
     () => search.query(q, filters, sort, showSettings ? undefined : isBuiltinSetting),
     [search, q, filters, sort, showSettings],
@@ -198,7 +202,7 @@ export function SearchPage() {
           <p className="muted small">
             {params.has("settings")
               ? <>Showing built-in time ranges, chart types and settings. <button type="button" className="link-btn" onClick={() => update((n) => n.delete("settings"))}>Hide them</button></>
-              : <>{hiddenSettings.toLocaleString()} built-in time ranges, chart types and settings are not shown. <button type="button" className="link-btn" onClick={() => update((n) => n.set("settings", "1"))}>Show them</button></>}
+              : <>{hiddenSettings.toLocaleString()} matching built-in time range{hiddenSettings === 1 ? "" : "s"}, chart types and settings are not shown. <button type="button" className="link-btn" onClick={() => update((n) => n.set("settings", "1"))}>Show them</button></>}
           </p>
         )}
         {activeCount > 0 && (

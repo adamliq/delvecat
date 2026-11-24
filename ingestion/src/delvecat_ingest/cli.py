@@ -26,6 +26,7 @@ from .connectors.splunk import Options, data
 from .governance import apply_governance
 from .merge import MergeError, merge_bundles
 from .model import ExtractResult, merge_facts
+from .parser_assist import parser_assist
 from .redaction import load_profile, redact_bundle
 from .transport import FixtureTransport, HttpTransport, RecordingTransport, Transport
 
@@ -114,6 +115,7 @@ def _build(args: argparse.Namespace) -> int:
         adhoc_objects=args.adhoc_objects,
         adhoc_splunk_apps=args.adhoc_splunk_apps,
         lookup_headers=args.lookup_headers,
+        parser_assist=args.parser_assist,
     )
     only = set(args.only.split(",")) if args.only else None
     if only and (unknown := only - set(splunk.EXTRACTORS)):
@@ -124,6 +126,11 @@ def _build(args: argparse.Namespace) -> int:
         if splunk_source
         else ExtractResult()
     )
+    if splunk_source and args.parser_assist:
+        result.reports.append(
+            {"connector": "splunk.parserAssist", "status": "ok",
+             "counts": parser_assist(transport, result.entities, args.parser_assist)}
+        )  # fmt: skip
     # --only narrows the run to the named platform extractors unless products are asked for.
     chosen = args.products or ("none" if only else "all")
     products = PRODUCTS if chosen == "all" else set(filter(None, chosen.split(",")))
@@ -464,6 +471,15 @@ def main(argv: list[str] | None = None) -> int:
         help="sample events per sourcetype to discover fields (slower)",
     )
     inv.add_argument("--max-field-sourcetypes", type=int, default=100)
+    inv.add_argument(
+        "--parser-assist",
+        type=int,
+        default=200,
+        metavar="N",
+        help="send up to N searches the SPL analyser cannot follow (parse errors, macros it "
+        "cannot see) to Splunk's search/parser, which parses without running them "
+        "(default 200; 0 for none)",
+    )
     inv.add_argument(
         "--lookup-headers",
         type=int,

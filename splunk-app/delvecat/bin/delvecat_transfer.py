@@ -20,9 +20,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "lib"))
 sys.path.insert(0, HERE)
 
+from delvecat_connectivity import ALLOWED_ROLES, _reply, _roles  # noqa: E402
 from splunk.persistconn.application import PersistentServerConnectionApplication  # noqa: E402
 
-from delvecat_connectivity import _reply, _roles, ALLOWED_ROLES  # noqa: E402
 from delvecat_ingest.connectivity import parse_target  # noqa: E402
 from delvecat_ingest.publish import data_path  # noqa: E402
 from delvecat_ingest.transfer import (  # noqa: E402
@@ -69,7 +69,13 @@ class TransferHandler(PersistentServerConnectionApplication):
         except Exception:  # noqa: BLE001
             return _reply(403, {"error": "Could not check your roles."})
         if not roles & ALLOWED_ROLES:
-            return _reply(403, {"error": "Only catalog publishers (delvecat_publisher) and admins can import catalogs."})
+            return _reply(
+                403,
+                {
+                    "error": "Only catalog publishers (delvecat_publisher) and admins "
+                    "can import catalogs."
+                },
+            )
         try:
             body = json.loads(request.get("payload") or "{}")
         except ValueError:
@@ -81,9 +87,20 @@ class TransferHandler(PersistentServerConnectionApplication):
             except EndpointNotFound:
                 status = None
             if (status or {}).get("state") == "running":
-                return _reply(409, {"error": "A build is running on this stack: import when it has finished."})
+                return _reply(
+                    409, {"error": "A build is running on this stack: import when it has finished."}
+                )
             if body.get("action") == "remove":
-                return _reply(200, remove_instance(local, str(body.get("instance") or ""), session.get("user") or "", APP, COLLECTION))
+                return _reply(
+                    200,
+                    remove_instance(
+                        local,
+                        str(body.get("instance") or ""),
+                        session.get("user") or "",
+                        APP,
+                        COLLECTION,
+                    ),
+                )
             source = body.get("source")
             if source == "file":
                 bundle = parse_catalog(decode_upload(str(body.get("data") or "")))
@@ -91,7 +108,7 @@ class TransferHandler(PersistentServerConnectionApplication):
             elif source == "stack":
                 target = parse_target(str(body.get("url") or ""))
                 remote = HttpTransport(
-                    "https://%s:%d" % (target.host, target.port),
+                    f"https://{target.host}:{target.port}",
                     str(body.get("token") or ""),
                     verify=body.get("verify", True) is not False,
                     trust_env=False,
@@ -102,9 +119,19 @@ class TransferHandler(PersistentServerConnectionApplication):
                 origin = "stack " + str(target)
             else:
                 return _reply(400, {"error": "source must be file or stack."})
-            summary = import_catalog(local, bundle, str(body.get("mode") or "combine"), session.get("user") or "", origin, APP, COLLECTION)
+            summary = import_catalog(
+                local,
+                bundle,
+                str(body.get("mode") or "combine"),
+                session.get("user") or "",
+                origin,
+                APP,
+                COLLECTION,
+            )
         except (TransferError, ValueError) as exc:
             return _reply(400, {"error": str(exc)})
         except Exception as exc:  # noqa: BLE001 - errors name hosts and paths, never the token
-            return _reply(502, {"error": "The import failed: %s: %s" % (type(exc).__name__, str(exc)[:300])})
+            return _reply(
+                502, {"error": f"The import failed: {type(exc).__name__}: {str(exc)[:300]}"}
+            )
         return _reply(200, summary)

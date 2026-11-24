@@ -411,6 +411,21 @@ Searches record which datasets they name (`lineage.dataModelDatasets`):
 `Model.Root.Child`), `| datamodel Model Dataset`, `| from datamodel:Model.Dataset`
 and `| pivot Model Dataset`.
 
+### Searches Splunk parses for us
+
+Searches the SPL analyser cannot follow (it fails to parse them, or they use
+macros the catalog cannot see) are sent, up to `--parser-assist` of them (default
+200; `0` for none), to Splunk's `search/parser` in the search's own app. Splunk
+parses them there without running them and expands their macros; lineage is
+then derived from Splunk's version (`lineage.parsedBySplunk`).
+
+### What changed between builds
+
+`changes.details` lists, for each modified object (up to 2,000), what changed
+key by key (`properties.<name>` one level down) with the value before and after,
+cut to 300 characters. Redacted catalogs leave the details out: they can hold
+anything redaction rewrites elsewhere.
+
 ### Commands
 
 Every search records the commands it runs after a pipe (`lineage.commands`), built-in

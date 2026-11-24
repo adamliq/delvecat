@@ -198,8 +198,12 @@ one. The same from a search:
   stops it (it is an ordinary search job, also in *Activity > Jobs*).
 - **Replaces** the whole catalog with this Splunk's: a catalog of several
   instances published from outside is replaced (the page warns first).
-- **On a schedule**: save `| delvecatbuild` as a scheduled report if you want
-  one. It runs as the report's owner.
+- **On a schedule**: the Build page's **Schedule** panel turns on the app's own
+  report "Licoryx Delvecat - scheduled build" (shipped off), daily, weekly or on a
+  cron expression of your choice, with the parts and options selected on the
+  page. It is owned by `nobody`, so Splunk runs it as its system user, and it
+  publishes like a build started from the page (not if the catalog would be much
+  smaller). Turn off sets it back to disabled.
 - **Not in Splunk**: annotations from a repository, the public redaction
   profile (it needs a secret salt), other instances. Use the command line for
   those.
@@ -349,6 +353,7 @@ generations are deleted, so a page loading meanwhile never mixes two catalogs
 | `delvecat_catalog` | the same | `admin`, `sc_admin`, `delvecat_publisher` |
 | `delvecat_acks` (accepted and snoozed findings) | the same | `admin`, `sc_admin`, `delvecat_publisher` |
 | `delvecatbuild` command (Build page) | run: `admin`, `sc_admin`, `delvecat_publisher` | `admin`, `sc_admin` |
+| "Licoryx Delvecat - scheduled build" report | `admin`, `sc_admin`, `delvecat_publisher` | the same (the Schedule panel) |
 
 (`metadata/default.meta`.) The page reads the catalog with the viewer's own
 Splunk session, so these permissions decide who sees it. The catalog is

@@ -21,3 +21,9 @@ export = none
 [searchbnf/delvecatbuild-command]
 access = read : [ admin, sc_admin, delvecat_publisher ], write : [ admin, sc_admin ]
 export = none
+
+# The scheduled build (off until set up on the Build page): publishers may change it.
+[savedsearches/Licoryx%20Delvecat%20-%20scheduled%20build]
+access = read : [ admin, sc_admin, delvecat_publisher ], write : [ admin, sc_admin, delvecat_publisher ]
+export = none
+owner = nobody

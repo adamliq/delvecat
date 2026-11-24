@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { useCatalogState } from "../lib/CatalogContext";
 import { PartsPicker } from "../components/PartsPicker";
 import { TransferPanel } from "../components/TransferPanel";
+import { SchedulePanel } from "../components/SchedulePanel";
 import { CoverageReport } from "../components/CoverageReport";
 import {
   ALL_PARTS,
+  buildSearch,
   type BuildOptions,
   invalidIndexes,
   DEFAULT_PARTS,
@@ -314,6 +316,8 @@ export function BuildPage() {
           </div>
         </section>
       )}
+
+      {allowed && IN_SPLUNK && <SchedulePanel search={buildSearch(opts)} />}
 
       {error && <p className="error">{error}</p>}
 

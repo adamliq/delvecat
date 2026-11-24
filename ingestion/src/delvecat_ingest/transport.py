@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import time
 from pathlib import Path
 from typing import Any, Protocol
@@ -79,6 +80,12 @@ def check_read_only(
     raise WriteAttemptError(f"Licoryx Delvecat is read-only; refusing {method} {path}")
 
 
+def parser_fixture_path(app: str, spl: str) -> str:
+    import hashlib
+
+    return "__parser__/" + hashlib.sha1(f"{app}\0{spl}".encode()).hexdigest()[:16]
+
+
 def search_fixture_path(name: str) -> str:
     """Fixture path for a named search; characters invalid on Windows are percent-encoded."""
     from urllib.parse import quote
@@ -142,6 +149,13 @@ class FixtureTransport:
     ) -> list[dict[str, Any]]:
         return FixtureTransport.search(self, name, spl, earliest, latest)
 
+    def parse_spl(self, app: str, spl: str) -> dict[str, Any] | None:
+        """A recorded search/parser answer for this SPL, if there is one."""
+        try:
+            return self._load(parser_fixture_path(app, spl), "search parser")
+        except (EndpointNotFound, EndpointForbidden):
+            return None
+
 
 def search_in_app(
     transport: Any, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
@@ -179,6 +193,8 @@ class HttpTransport:
         # None or 0: searches run as one blocking request with no limit (oneshot).
         self._search_timeout = search_timeout
         self._poll = poll
+        # Set to stop this transport's running search jobs (they are cancelled in Splunk).
+        self._cancel = threading.Event()
         self._allowed_writes = allowed_writes
         self._client = httpx.Client(
             base_url=base_url.rstrip("/"),
@@ -233,6 +249,38 @@ class HttpTransport:
 
         jobs = f"/servicesNS/-/{quote(app, safe='')}/search/jobs"
         return self._search(name, spl, earliest, latest, jobs)
+
+    def parse_spl(self, app: str, spl: str) -> dict[str, Any] | None:
+        """Splunk's own parse of a search, in an app's context (its macros expanded).
+        Read-only: the search is parsed, not run. None if Splunk cannot parse it."""
+        from urllib.parse import quote
+
+        stripped = spl.lstrip()
+        explicit = stripped.startswith("|") or stripped.lower().startswith("search ")
+        query = stripped if explicit else f"search {stripped}"
+        resp = self.request(
+            "POST",
+            f"/servicesNS/-/{quote(app, safe='')}/search/parser",
+            data={"q": query, "parse_only": "true", "output_mode": "json"},
+        )
+        if resp.status_code >= 400:
+            return None
+        try:
+            body = resp.json()
+        except ValueError:
+            return None
+        return body if isinstance(body, dict) and body.get("commands") else None
+
+    def can_cancel(self) -> bool:
+        """Searches run as jobs (with a time limit) can be cancelled; oneshot ones cannot."""
+        return bool(self._search_timeout)
+
+    def cancel_searches(self) -> None:
+        """Cancel the search jobs running now, and any started before resume_searches()."""
+        self._cancel.set()
+
+    def resume_searches(self) -> None:
+        self._cancel.clear()
 
     def _search(
         self, name: str, spl: str, earliest: str, latest: str, jobs: str
@@ -303,6 +351,9 @@ class HttpTransport:
                 if fatal:
                     raise SearchError(f"search {name}: {'; '.join(fatal)}")
                 break
+            if self._cancel.is_set():
+                self.request("POST", f"{job}/control", data={"action": "cancel"})
+                raise SearchTimeout(f"search {name} was cancelled")
             if time.monotonic() >= deadline:
                 self.request("POST", f"{job}/control", data={"action": "cancel"})
                 raise SearchTimeout(
@@ -372,6 +423,22 @@ class RecordingTransport:
         rows = self.inner.search(name, spl, earliest, latest)
         self._write(search_fixture_path(name), {"spl": spl, "earliest": earliest, "results": rows})
         return rows
+
+    def can_cancel(self) -> bool:
+        return bool(getattr(self.inner, "can_cancel", lambda: False)())
+
+    def parse_spl(self, app: str, spl: str) -> dict[str, Any] | None:
+        fn = getattr(self.inner, "parse_spl", None)
+        body = fn(app, spl) if fn else None
+        if body is not None:
+            self._write(parser_fixture_path(app, spl), body)
+        return body
+
+    def cancel_searches(self) -> None:
+        self.inner.cancel_searches()  # type: ignore[attr-defined]
+
+    def resume_searches(self) -> None:
+        self.inner.resume_searches()  # type: ignore[attr-defined]
 
     def search_in_app(
         self, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"

@@ -322,6 +322,9 @@ def redact_bundle(
         edge["from"] = id_map.get(edge["from"], edge["from"])
         edge["to"] = id_map.get(edge["to"], edge["to"])
     if ch := bundle.get("changes"):
+        # Before/after values can hold anything redaction rewrites elsewhere (names,
+        # hosts, URLs, addresses): a redacted catalog lists what changed, not how.
+        ch.pop("details", None)
         for k in ("added", "modified"):
             ch[k] = [id_map.get(i, i) for i in ch[k]]
         for r in ch["removed"]:

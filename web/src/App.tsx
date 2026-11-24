@@ -12,6 +12,7 @@ import { GlossaryPage } from "./pages/GlossaryPage";
 import { GovernancePage } from "./pages/GovernancePage";
 import { HealthPage } from "./pages/HealthPage";
 import { CommandPage } from "./pages/CommandPage";
+import { ChangesPage } from "./pages/ChangesPage";
 import { TestingPage } from "./pages/TestingPage";
 import { HelpPage } from "./pages/HelpPage";
 import { FindingsPage } from "./pages/FindingsPage";
@@ -71,6 +72,7 @@ function Body() {
       <Route path="/help" element={<HelpPage />} />
       <Route path="/governance" element={<GovernancePage />} />
       <Route path="/commands/:name" element={<CommandPage />} />
+      <Route path="/changes" element={<ChangesPage />} />
       <Route path="/glossary/:term" element={<GlossaryPage />} />
       <Route path="*" element={<Home />} />
     </Routes>

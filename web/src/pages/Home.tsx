@@ -238,7 +238,7 @@ export function Home() {
 
       {changes && (
         <section>
-          <h2>Changes since {new Date(changes.previousGeneratedAt).toLocaleString()}</h2>
+          <h2>Changes since {new Date(changes.previousGeneratedAt).toLocaleString()} <Link className="small" to="/changes">what changed</Link></h2>
           {changes.added.length + changes.modified.length + changes.removed.length === 0 ? (
             <p className="muted">No changes.</p>
           ) : (

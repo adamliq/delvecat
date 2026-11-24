@@ -3,7 +3,7 @@ import { DataTable } from "../components/DataTable";
 import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
 import { commandsOf, customRisk, RISKY_COMMANDS } from "../lib/commands";
-import { typeLabel } from "../lib/labels";
+import { splTitleClass, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
 
 /** One command, built-in or custom: what it is, whether it is risky, and every search that
@@ -40,7 +40,7 @@ export function CommandPage() {
           rowKey={(s) => s.id}
           csvName={`delvecat-command-${name}.csv`}
           columns={[
-            { label: "Search", value: (s) => s.displayName ?? s.name, render: (s) => <Link to={entityPath(s.id)}>{s.displayName ?? s.name}</Link> },
+            { label: "Search", value: (s) => s.displayName ?? s.name, render: (s) => <Link to={entityPath(s.id)} className={splTitleClass(s)}>{s.displayName ?? s.name}</Link> },
             { label: "Type", value: (s) => typeLabel(s.type) },
             { label: "App", value: (s) => s.app ?? "" },
             ...(multi ? [{ label: "Stack", value: (s: Entity) => stackName(s.instance) }] : []),

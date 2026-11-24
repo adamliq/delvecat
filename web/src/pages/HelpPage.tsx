@@ -48,6 +48,7 @@ const SECTIONS: Section[] = [
         <dt><L to="/findings">Findings</L></dt><dd>Every warning and critical check in one list, with how to fix each.</dd>
         <dt><L to="/health">Health</L></dt><dd>Findings by area, the trend over builds, who needs to act, what was fixed, and the cleanup report of unused objects. Accept or snooze findings here.</dd>
         <dt><L to="/governance">Governance</L></dt><dd>Where sensitive data lives, how it spreads through lineage, and which roles, users and groups can reach it.</dd>
+        <dt><L to="/changes">Changes</L></dt><dd>What changed in Splunk since the previous build: added, removed and modified objects, with each changed setting before and after.</dd>
         <dt><L to="/insights">Insights</L></dt><dd>Documentation and ownership targets with worklists, distributions, what is used most, and every command searches run (risky ones marked; each command has a page listing the searches that run it).</dd>
         <dt><L to="/sql">SQL</L></dt><dd>Query the catalog with SQLite in your browser (read-only), with examples, history and charts.</dd>
         <dt><L to="/testing">Testing</L></dt><dd>Check that this Splunk can reach another stack that has the app installed.</dd>
@@ -99,7 +100,7 @@ const SECTIONS: Section[] = [
       <>
         <p>The catalog is a snapshot: it changes only when someone builds it again.</p>
         <ul>
-          <li><strong>In Splunk</strong>: the <em>Build</em> button (catalog publishers and admins) reads this Splunk with your permissions and publishes the result. Choose the parts to read, field discovery and a search time limit. A build that would replace the catalog with a much smaller one asks first. To refresh it regularly, save <code>| delvecatbuild</code> as a scheduled report.</li>
+          <li><strong>In Splunk</strong>: the <em>Build</em> button (catalog publishers and admins) reads this Splunk with your permissions and publishes the result. Choose the parts to read, field discovery and a search time limit. A build that would replace the catalog with a much smaller one asks first. To refresh it regularly, turn on the <em>Schedule</em> on the Build page (daily, weekly or a cron expression); it builds with the parts and options chosen there.</li>
           <li><strong>Outside Splunk</strong>: <code>delvecat-ingest build</code> (or <code>scripts/Build-Catalog.ps1</code>) then <code>delvecat-ingest publish</code>. Use it to combine several instances (indexers, Deployment Server, SOAR, UBA), apply annotations from a repository, or redact a catalog for public use.</li>
           <li>Outside Splunk you can also open a catalog with <em>Open file</em> or <em>Open folder</em>.</li>
         </ul>

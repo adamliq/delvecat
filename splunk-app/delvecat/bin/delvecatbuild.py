@@ -26,13 +26,13 @@ from splunklib.searchcommands import (  # noqa: E402
 )
 
 from delvecat_ingest.inapp import PARTS, build_here, resolve_parts  # noqa: E402
-from delvecat_ingest.transfer import combine, imported_instances, without_instances  # noqa: E402
 from delvecat_ingest.publish import (  # noqa: E402
     PublishError,
     publish_bundle,
     read_published,
     save_doc,
 )
+from delvecat_ingest.transfer import combine, imported_instances, without_instances  # noqa: E402
 from delvecat_ingest.transport import EndpointNotFound, HttpTransport, publish_allowlist  # noqa: E402
 
 APP = "delvecat"
@@ -157,7 +157,9 @@ class DelveCatBuild(GeneratingCommand):
             own = {i["id"] for i in bundle["instances"]}
             imported = (
                 imported_instances(previous, own)
-                if previous and self.keepimported and not previous.get("redaction")
+                if previous
+                and self.keepimported
+                and not previous.get("redaction")
                 and not bundle.get("redaction")
                 else set()
             )

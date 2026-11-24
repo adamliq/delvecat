@@ -488,6 +488,10 @@
                 "type": "string"
               }
             },
+            "parsedBySplunk": {
+              "description": "Analysed from Splunk's own parse of the search (search/parser, macros expanded), because Licoryx Delvecat's analyser could not follow it.",
+              "type": "boolean"
+            },
             "commands": {
               "description": "Search commands the search runs after a pipe (built-in and custom), by name.",
               "type": "array",
@@ -885,6 +889,22 @@
         "previousGeneratedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "details": {
+          "description": "For modified objects (up to 2000): what changed, key by key (properties.<name> one level down), values cut to 300 characters.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["key"],
+              "properties": {
+                "key": {"type": "string"},
+                "before": {},
+                "after": {}
+              }
+            }
+          }
         },
         "added": {
           "type": "array",

@@ -38,6 +38,8 @@ class Options:
     # of at most this many (field names only; 0 for none).
     lookup_headers: int = 300
     lookup_header_seconds: float = 120  # overall time for reading them
+    # Searches the analyser cannot follow sent to Splunk's search/parser (0: none).
+    parser_assist: int = 200
     # The most-run ad-hoc searches kept as catalog objects (with their SPL); 0 for none.
     adhoc_objects: int = 1000
     # Ad-hoc searches Splunk's own apps run (Monitoring Console, instrumentation...) are

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from delvecat_ingest.bundle import apply_versions
@@ -133,3 +134,30 @@ def test_splunk_apps_searches_count_but_are_not_objects_unless_asked():
     out = ExtractResult()
     extract_adhoc_searches(Ctx(Rows(rows), "acme", Options(adhoc_splunk_apps=True)), out)
     assert len([e for e in out.entities if e["type"] == "adhocSearch"]) == 2
+
+
+def test_modified_objects_record_what_changed():
+    from delvecat_ingest.bundle import property_diff
+
+    props = {"search": "index=a", "cron": "0 * * * *", "observed": {"n": 1}}
+    old = {"id": "x", "type": "savedSearch", "name": "s", "owner": "ann", "version": 1,
+           "properties": props}  # fmt: skip
+    new = {"id": "x", "type": "savedSearch", "name": "s", "owner": "bob", "version": 2,
+           "properties": {"search": "index=b " + "x" * 400, "observed": {"n": 2}}}  # fmt: skip
+    rows = {r["key"]: r for r in property_diff(old, new)}
+    assert set(rows) == {"owner", "properties.search", "properties.cron"}
+    assert rows["owner"] == {"key": "owner", "before": "ann", "after": "bob"}
+    assert rows["properties.cron"]["after"] is None
+    assert len(rows["properties.search"]["after"]) == 300
+
+    bundle, _ = _adhoc([row(WEB)])
+    previous = json.loads(json.dumps(bundle))
+    target = next(e for e in previous["entities"] if e["type"] == "macro")
+    target.setdefault("properties", {})["definition"] = "index=old"
+    target.pop("contentHash", None)
+    changes = apply_versions(bundle["entities"], "2026-11-24T00:00:00Z", previous)
+    assert target["id"] in changes["modified"]
+    assert changes["details"][target["id"]][0]["before"] == "index=old"
+    bundle["changes"] = changes
+    redact_bundle(bundle, load_profile("internal"))
+    assert "details" not in bundle["changes"]

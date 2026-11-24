@@ -54,7 +54,7 @@ export function EntityRow({ entity, match }: { entity: Entity; match?: Match }) 
     <li className="entity-row">
       <div className="entity-row-head">
         <TypeBadge entity={entity} />
-        <Link to={entityPath(entity.id)} state={{ from: `${window.location.hash.replace(/^#/, "") || "/"}` }} className="entity-name">
+        <Link to={entityPath(entity.id)} state={{ from: `${window.location.hash.replace(/^#/, "") || "/"}` }} className={`entity-name${entity.type === "adhocSearch" ? " spl-title" : ""}`}>
           <Highlight text={entity.displayName ?? entity.name} terms={match?.terms} />
         </Link>
         {entity.disabled && <span className="muted-tag">disabled</span>}

@@ -22,6 +22,7 @@ import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LookupFieldsTab } from "../components/LookupFieldsTab";
 import { DataModelTab } from "../components/DataModelTab";
 import { CommandList } from "../components/CommandList";
+import { DiffTable, type DiffRow } from "./ChangesPage";
 import { lookupColumns } from "../lib/lookups";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
@@ -153,7 +154,7 @@ export function EntityPage() {
             {instance?.name ?? entity.instance}
           </Link>
         )}
-        <h1 className="entity-title">{entity.displayName ?? entity.name}</h1>
+        <h1 className={`entity-title${entity.type === "adhocSearch" ? " spl-title" : ""}`}>{entity.displayName ?? entity.name}</h1>
         {entity.displayName && entity.displayName !== entity.name && (
           <div className="muted"><code>{entity.name}</code></div>
         )}
@@ -243,6 +244,18 @@ export function EntityPage() {
               </ul>
             </section>
           ) : null}
+
+          {(() => {
+            const ch = catalog.bundle.changes;
+            const rows = (ch?.details as Record<string, DiffRow[]> | undefined)?.[entity.id];
+            return rows?.length ? (
+              <section>
+                <h2>Changed in the last build</h2>
+                <p className="muted small">Since the build of {new Date(ch!.previousGeneratedAt).toLocaleString()}. <Link to="/changes">All changes</Link></p>
+                <DiffTable rows={rows} />
+              </section>
+            ) : null;
+          })()}
 
           {code.map(([k, v]) => (
             <section key={k}>

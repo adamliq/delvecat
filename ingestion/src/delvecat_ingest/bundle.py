@@ -139,6 +139,41 @@ def content_hash(entity: dict[str, Any]) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
+MAX_DIFFS = 2000  # modified objects whose changes are listed
+MAX_DIFF_KEYS = 25
+MAX_DIFF_VALUE = 300
+
+
+def _short(value: Any) -> Any:
+    """A value small enough to show: scalars as they are, the rest as JSON text, cut."""
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    text = (
+        value if isinstance(value, str) else json.dumps(value, sort_keys=True, ensure_ascii=False)
+    )
+    return text if len(text) <= MAX_DIFF_VALUE else text[: MAX_DIFF_VALUE - 1] + "…"
+
+
+def property_diff(old: dict[str, Any], new: dict[str, Any]) -> list[dict[str, Any]]:
+    """What changed between two versions of an object, key by key (properties one level
+    down), leaving out run-to-run measurements and bookkeeping."""
+    skip = {*_VERSION_FIELDS, "updatedAt", "properties"}
+
+    def flat(e: dict[str, Any]) -> dict[str, Any]:
+        out = {k: v for k, v in e.items() if k not in skip}
+        for k, v in (e.get("properties") or {}).items():
+            if k != "observed":
+                out[f"properties.{k}"] = v
+        return out
+
+    a, b = flat(old), flat(new)
+    rows = []
+    for key in sorted(set(a) | set(b)):
+        if a.get(key) != b.get(key):
+            rows.append({"key": key, "before": _short(a.get(key)), "after": _short(b.get(key))})
+    return rows[:MAX_DIFF_KEYS]
+
+
 def apply_versions(
     entities: list[dict[str, Any]], generated_at: str, previous: dict[str, Any] | None
 ) -> dict[str, Any] | None:
@@ -172,8 +207,13 @@ def apply_versions(
     added = [i for i in added if i not in churn]
     modified = [i for i in modified if i not in churn]
     removed = [r for r in removed if r["type"] not in CHURN_TYPES]
+    by_id = {e["id"]: e for e in entities}
+    details = {
+        i: d for i in sorted(modified)[:MAX_DIFFS] if (d := property_diff(prev[i], by_id[i]))
+    }
     return {
         "previousGeneratedAt": previous["generatedAt"],
+        **({"details": details} if details else {}),
         "added": sorted(added),
         "removed": sorted(removed, key=lambda r: r["id"]),
         "modified": sorted(modified),

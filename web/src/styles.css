@@ -789,3 +789,16 @@ a.spl-link:hover { text-decoration-style: solid; }
 .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .result-table td:nth-child(2) { min-width: 180px; max-width: 360px; overflow-wrap: anywhere; }
 .chip-warn { border-color: var(--warn); }
+
+/* Ad-hoc searches are named by their SPL: show it as code, so a leading | reads as a pipe. */
+.spl-title { font-family: var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 0.92em; font-weight: 500; }
+h1.spl-title { font-size: 1.35rem; overflow-wrap: anywhere; }
+
+.diff-table td { vertical-align: top; overflow-wrap: anywhere; }
+.diff-before { color: var(--muted-text, inherit); text-decoration: line-through; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); }
+
+.schedule-form { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; }
+.schedule-form label { display: flex; flex-direction: column; gap: 4px; }
+.time-inputs { display: inline-flex; align-items: center; gap: 4px; }
+.time-inputs input { width: 4.5em; }
+.schedule-actions { display: flex; gap: 8px; }

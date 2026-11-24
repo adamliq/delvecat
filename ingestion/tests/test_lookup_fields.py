@@ -136,3 +136,61 @@ def test_header_reads_stop_at_the_time_limit():
     files = _files(Slow(), lookup_header_seconds=0.2)
     assert time.monotonic() - started < 1.0  # did not wait for the slow search
     assert "fields" not in files["web_status_codes.csv"]["properties"]
+
+
+def test_header_searches_still_running_at_the_limit_are_cancelled():
+    import threading
+    import time
+
+    class Cancellable(Spy):
+        def __init__(self):
+            super().__init__()
+            self.cancel = threading.Event()
+            self.cancelled = 0
+
+        def can_cancel(self):
+            return True
+
+        def cancel_searches(self):
+            self.cancel.set()
+
+        def resume_searches(self):
+            self.cancel.clear()
+
+        def search_in_app(self, app, name, spl, earliest="-24h", latest="now"):
+            if self.cancel.wait(timeout=5):  # a long search, until cancelled
+                self.cancelled += 1
+                raise SearchError(f"search {name} was cancelled")
+            return []
+
+    t = Cancellable()
+    started = time.monotonic()
+    files = _files(t, lookup_header_seconds=0.2)
+    assert t.cancelled == 1 and not t.cancel.is_set()  # cancelled, then searches resume
+    assert time.monotonic() - started < 2
+    assert "fields" not in files["web_status_codes.csv"]["properties"]
+
+
+def test_http_transport_cancels_running_jobs():
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append((request.method, request.url.path))
+        if request.method == "POST" and request.url.path.endswith("/search/jobs"):
+            t.cancel_searches()  # cancelled while the job runs
+            return httpx.Response(201, json={"sid": "abc"})
+        if request.url.path.endswith("/control"):
+            return httpx.Response(200, json={})
+        return httpx.Response(200, json={"entry": [{"content": {"isDone": False}}]})
+
+    t = HttpTransport(
+        "https://splunk:8089", "tok", http_transport=httpx.MockTransport(handler),
+        search_timeout=60, poll=0.01,
+    )  # fmt: skip
+    import pytest
+
+    with pytest.raises(SearchError, match="cancelled"):
+        t.search("h", "| makeresults")
+    assert ("POST", "/services/search/jobs/abc/control") in calls
+    t.resume_searches()
+    assert t.can_cancel()

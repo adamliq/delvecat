@@ -19,6 +19,8 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check .
       - run: uv run ruff format --check .
+      - name: Lint the Splunk app's own scripts
+        run: uv run ruff check ../splunk-app/delvecat/bin/*.py && uv run ruff format --check ../splunk-app/delvecat/bin/*.py
       - run: uv run pytest -q
       - name: Build demo catalog (four instances, merged)
         working-directory: .

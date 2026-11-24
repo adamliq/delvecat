@@ -16,6 +16,7 @@ from .connectors import db_connect, deployment_server, enterprise_security, splu
 from .connectors.splunk import Options, data
 from .governance import apply_governance
 from .model import ExtractResult, merge_facts
+from .parser_assist import parser_assist
 from .redaction import load_profile, redact_bundle
 
 PRODUCTS: dict[str, Callable[[Any, str], Any]] = {
@@ -93,6 +94,12 @@ def build_here(
         if name in chosen:
             say(f"products.{name}")
             result.extend(extract(transport, instance_id))
+    if platform and options.parser_assist:
+        say("asking Splunk to parse searches the analyser cannot follow")
+        result.reports.append(
+            {"connector": "splunk.parserAssist", "status": "ok",
+             "counts": parser_assist(transport, result.entities, options.parser_assist)}
+        )  # fmt: skip
 
     instance: dict[str, Any] = {
         "id": instance_id,
