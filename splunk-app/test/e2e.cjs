@@ -601,6 +601,32 @@ const sections = {
     await a.close();
   },
 
+  async nav() {
+    const a = await session('admin');
+    await a.page.goto(app('#/'));
+    await a.page.waitForSelector('.menu-button', { timeout: 30000 });
+    const menus = await a.page.locator('.topbar .nav .menu-button').allInnerTexts();
+    check('menu bar groups pages into menus', ['Explore', 'Quality and risk', 'Analyse'].every((m) => menus.some((t) => t.startsWith(m))), menus.join(' | '));
+    await a.page.click('.menu-button:has-text("Quality and risk")');
+    check('Quality and risk lists Changes', (await a.page.locator('.menu-panel a:has-text("Changes")').count()) === 1);
+    await a.page.keyboard.press('Escape');
+    check('admin sees the Admin menu', (await a.page.locator('.open-buttons .menu-button:has-text("Admin")').count()) === 1);
+    await a.page.keyboard.press('Control+k');
+    await a.page.waitForSelector('.palette', { timeout: 5000 });
+    await a.page.keyboard.type('governance');
+    await a.page.keyboard.press('Enter');
+    await a.page.waitForTimeout(800);
+    check('Ctrl+K opens a page by name', /#\/governance/.test(a.page.url()), a.page.url());
+    check('the header says when the catalog was built', /Built .*ago|Built just now/.test(await a.page.locator('.freshness').innerText().catch(() => '')));
+    check('menu bar page errors', a.errors.length === 0, a.errors.join('; '));
+    await a.close();
+    const v = await session('viewer');
+    await v.page.goto(app('#/'));
+    await v.page.waitForSelector('.menu-button', { timeout: 30000 });
+    check('viewer sees no Admin menu', (await v.page.locator('.open-buttons .menu-button:has-text("Admin")').count()) === 0);
+    await v.close();
+  },
+
   async schedule() {
     const name = encodeURIComponent('Licoryx Delvecat - scheduled build');
     const report = async () => (await rest('GET', `/servicesNS/nobody/delvecat/saved/searches/${name}`)).json?.entry?.[0]?.content;

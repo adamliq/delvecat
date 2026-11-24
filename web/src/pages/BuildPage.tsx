@@ -39,7 +39,7 @@ function seconds(from?: string, to?: string) {
 const sameParts = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
 
 export function BuildPage() {
-  const { state, reload } = useCatalogState();
+  const { full: state, reload } = useCatalogState();
   const bundle = state.status === "ready" ? state.catalog.bundle : null;
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [pointer, setPointer] = useState<Pointer | null>(null);

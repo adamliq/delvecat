@@ -36,8 +36,16 @@ const SECTIONS: Section[] = [
   {
     id: "pages",
     title: "The pages",
-    keywords: "menu navigation browse domains schemas glossary coverage findings health governance insights sql testing",
+    keywords: "menu navigation browse domains schemas glossary coverage findings health governance insights sql testing palette keyboard shortcut stack",
     body: (
+      <>
+      <p>
+        The menu bar groups the pages into <strong>Explore</strong>, <strong>Quality and risk</strong> and <strong>Analyse</strong>.
+        Press <kbd>/</kbd> to jump to the search box (it suggests objects as you type) and <kbd>Ctrl</kbd> <kbd>K</kbd> (<kbd>⌘</kbd> <kbd>K</kbd> on a Mac)
+        to go to any page or object by name. <em>Built … ago</em> links to what changed, with a dot when a build has
+        been published since you last looked. With several stacks, the stack picker limits every page to one of them.
+        In Splunk, <em>Admin</em> (catalog publishers and admins) holds Build and Testing; elsewhere, <em>Load catalog</em> opens a file or folder.
+      </p>
       <dl className="help-defs">
         <dt><L to="/">Home</L></dt><dd>Instances, at-a-glance tiles, documentation coverage and every object type by area.</dd>
         <dt><L to="/search">Browse</L></dt><dd>Search and filter everything, including lookups and data models by the fields they hold (<em>Has field</em> filters lookups, collections, data models and sourcetypes by field name; <em>Runs command</em> filters searches by the commands they run; built-in time ranges, chart types and settings are left out unless you ask for them). Results say why they matched; <em>Table</em> shows them as a sortable table; <em>Download CSV</em> exports them.</dd>
@@ -54,6 +62,7 @@ const SECTIONS: Section[] = [
         <dt><L to="/testing">Testing</L></dt><dd>Check that this Splunk can reach another stack that has the app installed.</dd>
         <dt><L to="/properties">Properties</L></dt><dd>Structured properties your team defines (retention tier, compliance scope...) and how much of the catalog has them.</dd>
       </dl>
+      </>
     ),
   },
   {

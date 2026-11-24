@@ -17,7 +17,13 @@ type State =
   | { status: "ready"; catalog: Catalog; search: EntitySearch; origin: string };
 
 interface Ctx {
+  /** The catalog as the pages see it: limited to one stack when a scope is chosen. */
   state: State;
+  /** The whole catalog, whatever the scope (Build page, export). */
+  full: State;
+  /** The stack every page is limited to, or "" for all of them. */
+  scope: string;
+  setScope: (instance: string) => void;
   openFiles: (files: File[]) => Promise<void>;
   /** Load the catalog again (after a build in the Splunk app). */
   reload: () => Promise<void>;
@@ -49,6 +55,20 @@ function ready(bundle: CatalogBundle, origin: string): State {
     },
   });
   return { status: "ready", catalog, search, origin };
+}
+
+const SCOPE_KEY = "delvecat.scope";
+
+/** The catalog limited to one stack: its instance, objects, and the relationships between them. */
+export function scopedBundle(b: CatalogBundle, instance: string): CatalogBundle {
+  const entities = b.entities.filter((e) => e.instance === instance);
+  const ids = new Set(entities.map((e) => e.id));
+  return {
+    ...b,
+    instances: b.instances.filter((i) => i.id === instance),
+    entities,
+    edges: b.edges.filter((x) => ids.has(x.from) && ids.has(x.to)),
+  };
 }
 
 export function CatalogProvider({ children }: { children: ReactNode }) {
@@ -92,7 +112,26 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const value = useMemo(() => ({ state, openFiles, reload: load }), [state, openFiles, load]);
+  // Limit every page to one stack (catalogs of several stacks); remembered per browser.
+  const [scope, setScopeState] = useState<string>(() => {
+    try { return localStorage.getItem(SCOPE_KEY) ?? ""; } catch { return ""; }
+  });
+  const setScope = useCallback((instance: string) => {
+    setScopeState(instance);
+    try { if (instance) localStorage.setItem(SCOPE_KEY, instance); else localStorage.removeItem(SCOPE_KEY); } catch { /* private mode */ }
+  }, []);
+  const scoped = useMemo<State>(() => {
+    if (state.status !== "ready" || !scope) return state;
+    const b = state.catalog.bundle;
+    if (b.instances.length < 2 || !b.instances.some((i) => i.id === scope)) return state;
+    return ready(scopedBundle(b, scope), state.origin);
+  }, [state, scope]);
+  const effectiveScope = scoped === state ? "" : scope;
+
+  const value = useMemo(
+    () => ({ state: scoped, full: state, scope: effectiveScope, setScope, openFiles, reload: load }),
+    [scoped, state, effectiveScope, setScope, openFiles, load],
+  );
   return <CatalogCtx.Provider value={value}>{children}</CatalogCtx.Provider>;
 }
 
