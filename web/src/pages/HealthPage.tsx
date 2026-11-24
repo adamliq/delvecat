@@ -67,8 +67,10 @@ const csvRows = (list: Item[]) => list.map((x) => [
 
 function AtRisk() {
   const { catalog } = useCatalog();
+  const [urlParams] = useUrlState();
+  const stack = urlParams.get("instance") ?? "";
   const rows = [...riskMap(catalog)].map(([id, risk]) => ({ entity: catalog.byId.get(id)!, risk }))
-    .filter((r) => r.entity)
+    .filter((r) => r.entity && (!stack || r.entity.instance === stack))
     .sort((a, b) => (a.risk.severity === b.risk.severity ? 0 : a.risk.severity === "critical" ? -1 : 1)
       || a.entity.type.localeCompare(b.entity.type) || a.entity.name.localeCompare(b.entity.name));
   const exportCsv = () => downloadText("delvecat-at-risk.csv", toCsv([
@@ -134,7 +136,8 @@ function Cleanup() {
       : [];
     return [...unused, ...off].map((r) => ({ ...r, deps: dependents(r.e), mb: reclaimableMB(r.e) }));
   }, [catalog, disabled, vendorApps, dependents]);
-  const shown = candidates.filter((r) => builtin || !r.builtin);
+  const stack = params.get("instance") ?? "";
+  const shown = candidates.filter((r) => (builtin || !r.builtin) && (!stack || r.e.instance === stack));
   const rows = shown
     .filter((r) => (!type || r.e.type === type) && (!safeOnly || r.deps === 0))
     .sort((a, b) => a.e.type.localeCompare(b.e.type) || a.e.name.localeCompare(b.e.name));
@@ -205,12 +208,13 @@ export function HealthPage() {
     check: params.get("check") ?? undefined,
     owner: params.get("owner") ?? undefined,
     app: params.get("app") ?? undefined,
+    instance: params.get("instance") ?? undefined,
     text: params.get("q") ?? undefined,
     onlyNew: flag(params, "new"),
     showHandled: flag(params, "acked"),
   }), [params]);
   const view: View = (["owners", "apps"] as View[]).includes(params.get("view") as View) ? (params.get("view") as View) : "objects";
-  const KEYS: Record<keyof Filters, string> = { status: "status", section: "area", check: "check", owner: "owner", app: "app", text: "q", onlyNew: "new", showHandled: "acked" };
+  const KEYS: Record<keyof Filters, string> = { status: "status", section: "area", check: "check", owner: "owner", app: "app", instance: "instance", text: "q", onlyNew: "new", showHandled: "acked" };
   const toParams = (f: Partial<Filters>) => Object.fromEntries(Object.entries(f).map(([k, v]) => [KEYS[k as keyof Filters], v]));
   // Replaces the findings filters only (the cleanup report keeps its own).
   const setFilters = (f: Filters, v: View = view) =>
@@ -227,14 +231,19 @@ export function HealthPage() {
   }, [store]);
 
   const ackMap = useMemo(() => new Map(acks.map((a) => [`${a.entity}\u0000${a.check}`, a])), [acks]);
-  const all = useMemo(() => allItems(catalog.entities, bundle, ackMap), [catalog, bundle, ackMap]);
+  // With a stack chosen, everything on the page (tiles included) is about that stack.
+  const stack = params.get("instance") ?? "";
+  const all = useMemo(
+    () => allItems(stack ? catalog.entities.filter((e) => e.instance === stack) : catalog.entities, bundle, ackMap),
+    [catalog, bundle, ackMap, stack],
+  );
   const open = useMemo(() => all.filter((x) => !x.handled), [all]);
   const list = useMemo(() => filterItems(all, filters), [all, filters]);
   const counts = useMemo(() => checkCounts(filterItems(all, { ...filters, check: undefined })), [all, filters]);
   const compare = hasPrevious(bundle);
   const resolved = bundle.resolvedFindings ?? [];
-  const unusedCustom = catalog.entities.filter((e) => isUnused(e) && !isBuiltin(e)).length;
-  const atRisk = useMemo(() => riskMap(catalog).size, [catalog]);
+  const unusedCustom = catalog.entities.filter((e) => isUnused(e) && !isBuiltin(e) && (!stack || e.instance === stack)).length;
+  const atRisk = useMemo(() => [...riskMap(catalog).keys()].filter((id) => !stack || catalog.byId.get(id)?.instance === stack).length, [catalog, stack]);
 
   const owners = useMemo(() => [...new Set(all.map((x) => ownerOf(x.entity)).filter(Boolean))].sort(), [all]);
   const apps = useMemo(() => [...new Set(all.map((x) => x.entity.app ?? "").filter(Boolean))].sort(), [all]);
@@ -322,6 +331,12 @@ export function HealthPage() {
           <option value="">Every area</option>
           {SECTIONS.filter((s) => all.some((x) => x.section === s.id)).map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
         </select>
+        {bundle.instances.length > 1 && (
+          <select aria-label="Stack" value={filters.instance ?? ""} onChange={(e) => set({ instance: e.target.value })}>
+            <option value="">Every stack</option>
+            {bundle.instances.map((i) => <option key={i.id} value={i.id}>{i.name ?? i.id}</option>)}
+          </select>
+        )}
         <select aria-label="Owner" value={filters.owner ?? ""} onChange={(e) => set({ owner: e.target.value })}>
           <option value="">Any owner</option>
           {owners.map((o) => <option key={o} value={o}>{o}</option>)}

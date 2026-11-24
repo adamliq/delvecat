@@ -11,8 +11,9 @@ import { domainPath, entityPath, searchPath } from "../lib/routes";
 
 const pct = ([ok, of]: [number, number]) => (of ? Math.round((100 * ok) / of) : undefined);
 
-function groupLink(by: GroupBy, group: string) {
+function groupLink(by: GroupBy, group: string, instanceName?: (id: string) => string) {
   if (group.startsWith("(")) return <span className="muted">{group}</span>;
+  if (by === "instance") return <Link to={searchPath({ instance: group })}>{instanceName?.(group) ?? group}</Link>;
   if (by === "domain") return <Link to={domainPath(group)}>{group}</Link>;
   if (by === "type") return <Link to={searchPath({ type: group })}>{pluralTypeLabel(group as EntityType)}</Link>;
   return <Link to={searchPath({ app: group })}>{group}</Link>;
@@ -28,7 +29,7 @@ function CoverageCell({ c, metric, name }: { c: Coverage; metric: (typeof METRIC
 export function InsightsPage() {
   const { catalog } = useCatalog();
   const [params, update] = useUrlState();
-  const by = (["app", "domain", "type"].includes(params.get("by") ?? "") ? params.get("by") : "app") as GroupBy;
+  const by = (["app", "domain", "type", "instance"].includes(params.get("by") ?? "") ? params.get("by") : "app") as GroupBy;
   const vendor = flag(params, "vendor");
   const setBy = (v: GroupBy) => update({ by: v === "app" ? undefined : v });
   const setVendor = (v: boolean) => update({ vendor: v });
@@ -49,6 +50,7 @@ export function InsightsPage() {
             <option value="app">App</option>
             <option value="domain">Domain</option>
             <option value="type">Type</option>
+            {catalog.bundle.instances.length > 1 && <option value="instance">Stack</option>}
           </select>
         </label>
         <label className="sort"><input type="checkbox" checked={vendor} onChange={(e) => setVendor(e.target.checked)} /> Include Splunk and product apps</label>
@@ -93,12 +95,12 @@ export function InsightsPage() {
         <div className="table-wrap">
           <table className="mini-table coverage-table">
             <thead>
-              <tr><th>{by === "app" ? "App" : by === "domain" ? "Domain" : "Type"}</th><th>Objects</th>{METRICS.map((m) => <th key={m.key}>{m.label}</th>)}</tr>
+              <tr><th>{by === "app" ? "App" : by === "domain" ? "Domain" : by === "instance" ? "Stack" : "Type"}</th><th>Objects</th>{METRICS.map((m) => <th key={m.key}>{m.label}</th>)}</tr>
             </thead>
             <tbody>
               {groups.map((g) => (
                 <tr key={g.group}>
-                  <td>{groupLink(by, g.group)}</td>
+                  <td>{groupLink(by, g.group, (id) => catalog.bundle.instances.find((i) => i.id === id)?.name ?? id)}</td>
                   <td className="num">{g.total.toLocaleString()}</td>
                   {METRICS.map((m) => <td key={m.key}><CoverageCell c={g} metric={m} name={g.group} /></td>)}
                 </tr>

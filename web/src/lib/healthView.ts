@@ -207,6 +207,8 @@ export interface Filters {
   check?: string;
   owner?: string;
   app?: string;
+  /** Instance (stack) id. */
+  instance?: string;
   text?: string;
   onlyNew?: boolean;
   showHandled?: boolean;
@@ -253,6 +255,7 @@ export function filterItems(all: Item[], f: Filters): Item[] {
       (!f.check || x.check === f.check) &&
       (!f.owner || ownerOf(x.entity) === f.owner) &&
       (!f.app || (x.entity.app ?? "") === f.app) &&
+      (!f.instance || x.entity.instance === f.instance) &&
       (!f.onlyNew || x.isNew) &&
       (!text ||
         `${x.entity.displayName ?? x.entity.name} ${x.entity.app ?? ""} ${x.message} ${checkTitle(x.check)}`.toLowerCase().includes(text)),

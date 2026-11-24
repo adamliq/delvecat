@@ -145,3 +145,20 @@ def test_imports_are_marked_so_builds_keep_only_them(adhoc, es):
     # A build on this stack (new instance id or not) keeps es, never its own old copy.
     assert imported_instances(back, {"adhoc-renamed"}) == {"es"}
     assert imported_instances(back, {"es"}) == set()
+
+
+def test_remove_an_imported_stack(adhoc, es):
+    from delvecat_ingest.transfer import remove_instance
+
+    kv = FakeKV()
+    publish_bundle(adhoc, transport(kv), log=lambda _m: None)
+    import_catalog(transport(kv), es, "combine", "alice", "file es.json.gz")
+    out = remove_instance(transport(kv), "es", "bob")
+    assert out["removed"] == "es" and [i["id"] for i in out["instances"]] == ["adhoc"]
+    assert {i["id"] for i in read_back(kv)["instances"]} == {"adhoc"}
+    assert kv.docs["current"]["removedInstance"] == "es"
+    # Only imported stacks can be removed, and never the last one.
+    with pytest.raises(TransferError, match="built here"):
+        remove_instance(transport(kv), "adhoc", "bob")
+    with pytest.raises(TransferError, match="No instance"):
+        remove_instance(transport(kv), "nope", "bob")

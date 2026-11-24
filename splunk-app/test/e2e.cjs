@@ -457,6 +457,26 @@ const sections = {
     check('import from another stack: read it and combined', /Imported from stack 127\.0\.0\.1:8089/.test(t) && (ptr.instances || []).includes('es-e2e'), t.slice(-200).replace(/\s+/g, ' '));
     check('publisher pages without script errors', p.errors.length === 0, p.errors.join('; '));
     await p.close();
+    // The Build page lists imported stacks; Remove publishes the catalog without one.
+    const r = await session('publisher');
+    await r.page.goto(app('#/build'));
+    await r.page.waitForSelector('.imported-list', { timeout: 60000 }).catch(() => {});
+    await sleep(1000);
+    const listed = await r.page.locator('.imported-list').innerText().catch(() => '');
+    check('Build page lists imported stacks with source and age', /ES e2e/.test(listed) && /from /.test(listed), listed.slice(0, 120));
+    await r.page.goto(app('#/health?instance=es-e2e'));
+    await r.page.waitForSelector('.tile-btn', { timeout: 60000 }).catch(() => {});
+    await sleep(800);
+    check('Health filters by stack', (await r.page.locator('select[aria-label="Stack"]').inputValue().catch(() => '')) === 'es-e2e');
+    await r.page.goto(app('#/build'));
+    await r.page.waitForSelector('.imported-list', { timeout: 60000 }).catch(() => {});
+    await sleep(800);
+    r.page.once('dialog', (d) => d.accept());
+    await r.page.locator('.imported-list li', { hasText: 'ES e2e' }).locator('button:has-text("Remove")').click();
+    await sleep(4000);
+    check('Remove takes an imported stack out of the catalog', !((await pointer()).instances || []).includes('es-e2e'));
+    check('publisher pages without script errors', r.errors.length === 0, r.errors.join('; '));
+    await r.close();
     // Back to this stack only, for the other sections.
     const prev2 = (await buildDoc())?.sid;
     await oneshot('| delvecatbuild keepimported=false replacesmaller=true searchtimeout=120', 'admin');

@@ -168,8 +168,14 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
   const instances: Table = {
     name: "instances",
     doc: "Splunk instances the bundle was built from.",
-    columns: [col("id"), col("name"), col("kind"), col("version"), col("product")],
-    rows: bundle.instances.map((i) => [i.id, i.name, i.kind, i.version, i.product].map(cell)),
+    columns: [
+      col("id"), col("name"), col("kind"), col("version"), col("product"),
+      col("web_url", "TEXT", "Splunk Web address"),
+      col("imported_from", "TEXT", "Set when the stack was imported: the file or stack it came from"),
+      col("imported_at", "TEXT", "When it was imported (ISO time)"),
+      col("imported_by", "TEXT", "Who imported it"),
+    ],
+    rows: bundle.instances.map((i) => [i.id, i.name, i.kind, i.version, i.product, i.webUrl, i.imported?.from, i.imported?.at, i.imported?.by].map(cell)),
   };
 
   const domains: Table = {

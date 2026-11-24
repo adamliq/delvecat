@@ -137,6 +137,11 @@ export function EntityPage() {
     <div className="stack">
       <div>
         <TypeBadge entity={entity} />
+        {catalog.bundle.instances.length > 1 && (
+          <Link to={searchPath({ instance: entity.instance })} className="instance-badge" title="The stack (instance) this object is on">
+            {instance?.name ?? entity.instance}
+          </Link>
+        )}
         <h1 className="entity-title">{entity.displayName ?? entity.name}</h1>
         {entity.displayName && entity.displayName !== entity.name && (
           <div className="muted"><code>{entity.name}</code></div>

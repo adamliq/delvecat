@@ -47,7 +47,7 @@ export interface Coverage {
   counts: Record<Metric, [number, number]>;
 }
 
-export type GroupBy = "app" | "domain" | "type";
+export type GroupBy = "app" | "domain" | "type" | "instance";
 
 /** Documentation, ownership, domain and required-property coverage per group. */
 export function coverageBy(catalog: Catalog, by: GroupBy, includeVendor: boolean): { overall: Coverage; groups: Coverage[] } {
@@ -59,7 +59,7 @@ export function coverageBy(catalog: Catalog, by: GroupBy, includeVendor: boolean
   const groups = new Map<string, Coverage>();
   const overall = empty("All");
   for (const e of objects) {
-    const key = by === "app" ? (e.app ?? "(no app)") : by === "domain" ? (e.annotations?.domain ?? "(no domain)") : e.type;
+    const key = by === "app" ? (e.app ?? "(no app)") : by === "domain" ? (e.annotations?.domain ?? "(no domain)") : by === "instance" ? e.instance : e.type;
     const g = groups.get(key) ?? empty(key);
     groups.set(key, g);
     const needsProps = required.some((d) => applies(d, e));

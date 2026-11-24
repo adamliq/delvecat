@@ -19,6 +19,13 @@ const KIND_LABELS: Record<string, string> = {
 
 const CHANGE_LIMIT = 15;
 
+/** "3 days ago" from now (when a stack was built or imported). */
+function agoText(iso: string): string {
+  const days = Math.floor((Date.now() - Date.parse(iso)) / 86400000);
+  if (Number.isNaN(days)) return "";
+  return days <= 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`;
+}
+
 /** A tiny trend line over builds (no axes: the tile's number is the latest value). */
 function MiniTrend({ values, label }: { values: number[]; label: string }) {
   const w = 96, h = 22, max = Math.max(1, ...values), step = (w - 4) / (values.length - 1);
@@ -93,6 +100,15 @@ export function Home() {
     ...((bundle.structuredProperties?.length ?? 0) > 0 ? [{ num: missingRequired.toLocaleString(), label: "objects missing a required property", to: "/properties", tone: missingRequired ? "warning" as const : undefined }] : []),
     ...((bundle.domains?.length ?? 0) > 0 ? [{ num: `${bundle.domains!.length} / ${bundle.dataProducts?.length ?? 0}`, label: "domains / data products", to: "/domains" }] : []),
   ];
+  // Objects and findings per instance (stack), for the instance cards.
+  const perInstance = new Map<string, { objects: number; critical: number; warning: number }>();
+  for (const e of bundle.entities) {
+    const c = perInstance.get(e.instance) ?? { objects: 0, critical: 0, warning: 0 };
+    c.objects++;
+    if (e.health?.status === "critical") c.critical++;
+    else if (e.health?.status === "warning") c.warning++;
+    perInstance.set(e.instance, c);
+  }
   const typeGroups = (() => {
     const by = new Map<string, [string, number][]>();
     for (const [t, n] of byType) by.set(typeGroup(t), [...(by.get(typeGroup(t)) ?? []), [t, n]]);
@@ -119,6 +135,19 @@ export function Home() {
                 {KIND_LABELS[i.kind] ?? i.kind}
                 {i.version && <> · {i.version}</>}
               </div>
+              <p className="small stack-counts">
+                <Link to={searchPath({ instance: i.id })}>{(perInstance.get(i.id)?.objects ?? 0).toLocaleString()} objects</Link>
+                {healthReport && (perInstance.get(i.id)?.critical || perInstance.get(i.id)?.warning) ? (
+                  <> · <Link to={`/health?instance=${encodeURIComponent(i.id)}`} className={perInstance.get(i.id)!.critical ? "status-label status-critical" : "status-label status-warning"}>
+                    {perInstance.get(i.id)!.critical ? `${perInstance.get(i.id)!.critical} critical, ` : ""}{perInstance.get(i.id)!.warning} with warnings
+                  </Link></>
+                ) : null}
+              </p>
+              <p className="small muted">
+                {i.imported
+                  ? <>Imported {i.imported.at ? agoText(i.imported.at) : ""}{i.imported.by ? ` by ${i.imported.by}` : ""}{i.imported.from ? ` from ${i.imported.from.replace(/^(stack|file) /, "")}` : ""}</>
+                  : <>Built here {agoText(bundle.generatedAt)}</>}
+              </p>
               {i.roles?.length ? <p className="small">Roles: {i.roles.join(", ")}</p> : null}
               <HecSummary hec={(i.properties as Record<string, unknown> | undefined)?.httpEventCollector} />
               {i.properties && Object.keys(i.properties).length > 0 && (

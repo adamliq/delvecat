@@ -255,7 +255,14 @@ one. The same from a search:
   replaces its earlier copy, so a regular import keeps it current. *Replace*
   publishes the imported catalog alone. Imported instances are marked, and a build
   here keeps them, replacing only this stack's own part (`| delvecatbuild
-  keepimported=false` builds this stack alone). Runs in the app's endpoint
+  keepimported=false` builds this stack alone). The Build page lists imported stacks
+  with where they came from and when, flags any not refreshed for over 7 days, and
+  *Remove* publishes the catalog without one.
+- **Several stacks in one catalog**: Home has a card per stack (objects, findings,
+  built here or imported, when and by whom); Health and Findings filter by stack
+  (Health's tiles, at-risk and cleanup follow the filter); Insights groups by stack;
+  object pages show their stack next to the type; the SQL `instances` table has each
+  stack's web address and import details. Runs in the app's endpoint
   `/services/delvecat/transfer`; restart Splunk after installing or upgrading to
   0.23.0 (Splunk keeps REST handlers loaded).
 

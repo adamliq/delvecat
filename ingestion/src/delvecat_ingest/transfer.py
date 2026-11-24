@@ -191,3 +191,40 @@ def imported_instances(bundle: dict[str, Any] | None, own: set[str]) -> set[str]
         for i in (bundle or {}).get("instances", [])
         if i.get("imported") and i["id"] not in own
     }
+
+
+def remove_instance(
+    local: Any,
+    instance_id: str,
+    user: str,
+    app: str = "delvecat",
+    collection: str = "delvecat_catalog",
+) -> dict[str, Any]:
+    """Publish this stack's catalog without an imported instance."""
+    try:
+        current = read_published(local, app, collection)
+    except PublishError as exc:
+        raise TransferError(str(exc)) from None
+    if not current:
+        raise TransferError("No catalog is published here.")
+    inst = next((i for i in current["instances"] if i["id"] == instance_id), None)
+    if inst is None:
+        raise TransferError(f"No instance {instance_id} in this catalog.")
+    if not inst.get("imported"):
+        raise TransferError(
+            f"{inst.get('name') or instance_id} was built here, not imported: build again instead."
+        )
+    rest = without_instances(current, {instance_id})
+    if not rest["instances"]:
+        raise TransferError("That is the only instance in the catalog: nothing would be left.")
+    pointer = publish_bundle(
+        rest, local, app, collection,
+        extra={"publishedBy": user, "removedInstance": instance_id}, log=lambda _m: None,
+    )  # fmt: skip
+    return {
+        "removed": instance_id,
+        "before": len(current["entities"]),
+        "after": len(rest["entities"]),
+        "instances": [{"id": i["id"], "name": i.get("name") or i["id"]} for i in rest["instances"]],
+        "generation": pointer.get("generation"),
+    }

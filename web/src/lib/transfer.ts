@@ -78,10 +78,20 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(bin);
 }
 
-export async function importCatalog(
-  body: { source: "file"; data: string; filename?: string; mode: ImportMode } | { source: "stack"; url: string; token: string; verify: boolean; mode: ImportMode },
-  fetchFn: Fetch = (u, i) => fetch(u, i),
-): Promise<ImportSummary> {
+/** Stacks imported this long ago are flagged: they change only when imported again. */
+export const STALE_IMPORT_DAYS = 7;
+
+export function importAgeDays(at: string | undefined, now = Date.now()): number | undefined {
+  const t = at ? Date.parse(at) : NaN;
+  return Number.isNaN(t) ? undefined : Math.floor((now - t) / 86400000);
+}
+
+/** Publish this stack's catalog without an imported stack. */
+export async function removeImported(instance: string, fetchFn: Fetch = (u, i) => fetch(u, i)): Promise<{ removed: string; before: number; after: number }> {
+  return post({ action: "remove", instance }, fetchFn) as Promise<{ removed: string; before: number; after: number }>;
+}
+
+async function post(body: unknown, fetchFn: Fetch): Promise<unknown> {
   const headers: Record<string, string> = { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" };
   const key = formKey();
   if (key) headers["X-Splunk-Form-Key"] = key;
@@ -98,6 +108,13 @@ export async function importCatalog(
     // an error page
   }
   if (resp.status === 404) throw new Error("The import endpoint is not available: update the app on this Splunk (0.23.0 or later), then restart Splunk.");
-  if (!resp.ok) throw new Error((data as { error?: string })?.error ?? `The import failed (HTTP ${resp.status}).`);
-  return data as ImportSummary;
+  if (!resp.ok) throw new Error((data as { error?: string })?.error ?? `The request failed (HTTP ${resp.status}).`);
+  return data;
+}
+
+export async function importCatalog(
+  body: { source: "file"; data: string; filename?: string; mode: ImportMode } | { source: "stack"; url: string; token: string; verify: boolean; mode: ImportMode },
+  fetchFn: Fetch = (u, i) => fetch(u, i),
+): Promise<ImportSummary> {
+  return post(body, fetchFn) as Promise<ImportSummary>;
 }

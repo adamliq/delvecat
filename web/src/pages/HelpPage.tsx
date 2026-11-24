@@ -121,7 +121,8 @@ const SECTIONS: Section[] = [
         <ul>
           <li><strong>Combine</strong> keeps this stack&apos;s catalog and adds the other one, e.g. the ES search head&apos;s objects on the ad hoc search head. Importing the same stack again replaces its earlier copy.</li>
           <li><strong>Replace</strong> publishes the imported catalog alone.</li>
-          <li>A build here keeps imported stacks and replaces only this stack&apos;s own part; import again to refresh them.</li>
+          <li>A build here keeps imported stacks and replaces only this stack&apos;s own part; import again to refresh them. The Build page lists them, flags any not refreshed for over a week, and can remove one.</li>
+          <li>With several stacks, Health and Findings filter by stack, Insights groups by stack, and each object page shows its stack.</li>
         </ul>
       </>
     ),

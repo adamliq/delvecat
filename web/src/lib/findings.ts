@@ -67,6 +67,8 @@ export interface FindingFilters {
   check?: string;
   area?: string;
   app?: string;
+  /** Instance (stack) id. */
+  instance?: string;
   text?: string;
 }
 
@@ -78,6 +80,7 @@ export function filterFindings<T extends Finding>(all: T[], f: FindingFilters): 
       (!f.check || x.check === f.check) &&
       (!f.area || typeGroup(x.entity.type) === f.area) &&
       (!f.app || (x.entity.app ?? "") === f.app) &&
+      (!f.instance || x.entity.instance === f.instance) &&
       (!text ||
         [x.message, x.entity.name, x.entity.displayName, x.entity.owner, ...(x.entity.annotations?.owners ?? [])]
           .filter(Boolean)

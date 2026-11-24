@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { CatalogBundle } from "../generated/catalog";
-import { bytesToBase64, exportCatalog, importCatalog, type ImportMode, type ImportSummary } from "../lib/transfer";
+import { bytesToBase64, exportCatalog, importAgeDays, importCatalog, removeImported, STALE_IMPORT_DAYS, type ImportMode, type ImportSummary } from "../lib/transfer";
 
 /** Export this stack's catalog, or import another stack's (a file, or read directly). */
 export function TransferPanel({ bundle, canImport, inSplunk, onImported }: {
@@ -18,6 +18,21 @@ export function TransferPanel({ bundle, canImport, inSplunk, onImported }: {
   const [busy, setBusy] = useState<"export" | "import" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<ImportSummary | null>(null);
+
+  const imported = (bundle?.instances ?? []).filter((i) => i.imported);
+  const doRemove = async (id: string, name: string) => {
+    if (!window.confirm(`Remove ${name} from this stack's catalog? Import it again to bring it back.`)) return;
+    setBusy("import");
+    setError(null);
+    try {
+      await removeImported(id);
+      onImported();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const doExport = async () => {
     if (!bundle) return;
@@ -60,6 +75,33 @@ export function TransferPanel({ bundle, canImport, inSplunk, onImported }: {
         hoc search head. <em>Combine</em> keeps this stack&apos;s catalog and adds the other one; importing the same
         stack again replaces its earlier copy, so a regular import keeps it current.
       </p>
+
+      {imported.length > 0 && (
+        <>
+          <h3>Imported stacks</h3>
+          <ul className="plain-list imported-list">
+            {imported.map((i) => {
+              const days = importAgeDays(i.imported?.at);
+              const stale = days !== undefined && days > STALE_IMPORT_DAYS;
+              return (
+                <li key={i.id}>
+                  <strong>{i.name ?? i.id}</strong>{" "}
+                  <span className="muted small">
+                    from {i.imported?.from?.replace(/^(stack|file) /, "") ?? "?"}
+                    {days !== undefined && <>, {days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`}</>}
+                    {i.imported?.by && <> by {i.imported.by}</>}
+                  </span>
+                  {stale && <> <span className="status-label status-warning" title={`Imported stacks change only when imported again; this one is over ${STALE_IMPORT_DAYS} days old`}>! Not refreshed for {days} days</span></>}
+                  {inSplunk && canImport && (
+                    <> <button type="button" className="link-btn small" disabled={busy !== null} onClick={() => void doRemove(i.id, i.name ?? i.id)}>Remove</button></>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="muted small">They change only when imported again: import them regularly (below) to keep them current.</p>
+        </>
+      )}
 
       <h3>Export</h3>
       <p>

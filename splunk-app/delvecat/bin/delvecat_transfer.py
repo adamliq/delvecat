@@ -4,6 +4,8 @@ POST a JSON body:
   {"source": "file", "data": "<base64 of the .json or .json.gz>", "mode": "combine"}
   {"source": "stack", "url": "https://host:8089", "token": "...", "verify": true,
    "mode": "combine"}
+{"action": "remove", "instance": "<id>"} publishes the catalog without an imported
+instance.
 mode "combine" keeps this stack's instances and takes the imported ones (an instance in
 both is replaced); "replace" publishes the imported catalog alone. Only catalog
 publishers and admins may call it. The other stack is only read; the token is used
@@ -29,6 +31,7 @@ from delvecat_ingest.transfer import (  # noqa: E402
     fetch_remote,
     import_catalog,
     parse_catalog,
+    remove_instance,
 )
 from delvecat_ingest.transport import EndpointNotFound, HttpTransport, publish_allowlist  # noqa: E402
 
@@ -79,6 +82,8 @@ class TransferHandler(PersistentServerConnectionApplication):
                 status = None
             if (status or {}).get("state") == "running":
                 return _reply(409, {"error": "A build is running on this stack: import when it has finished."})
+            if body.get("action") == "remove":
+                return _reply(200, remove_instance(local, str(body.get("instance") or ""), session.get("user") or "", APP, COLLECTION))
             source = body.get("source")
             if source == "file":
                 bundle = parse_catalog(decode_upload(str(body.get("data") or "")))

@@ -40,10 +40,11 @@ export function FindingsPage() {
     check: params.get("check") ?? "",
     area: params.get("area") ?? "",
     app: params.get("app") ?? "",
+    instance: params.get("instance") ?? "",
     text: params.get("q") ?? "",
   };
   const onlyNew = params.get("new") === "1";
-  const shown = useMemo(() => filterFindings(all, f).filter((x) => !onlyNew || x.isNew), [all, f.status, f.check, f.area, f.app, f.text, onlyNew]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shown = useMemo(() => filterFindings(all, f).filter((x) => !onlyNew || x.isNew), [all, f.status, f.check, f.area, f.app, f.instance, f.text, onlyNew]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (key: string, value: string) =>
     setParams((p) => {
       const next = new URLSearchParams(p);
@@ -132,6 +133,14 @@ export function FindingsPage() {
             {apps.map((a) => <option key={a} value={a}>{a}</option>)}
           </select>
         </label>
+        {catalog.bundle.instances.length > 1 && (
+          <label className="sort">Stack
+            <select value={f.instance} onChange={(e) => set("instance", e.target.value)}>
+              <option value="">All</option>
+              {catalog.bundle.instances.map((i) => <option key={i.id} value={i.id}>{i.name ?? i.id}</option>)}
+            </select>
+          </label>
+        )}
         <label className="sort">Contains
           <input type="search" value={f.text} placeholder="text, object or owner" onChange={(e) => set("q", e.target.value)} />
         </label>
