@@ -81,11 +81,14 @@ class MacroLibrary:
         return resolve
 
 
+SEARCH_TYPES = ("savedSearch", "correlationSearch", "adhocSearch", "dashboard", "workflowAction")
+
+
 def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
     """(spl, is_fragment, label) for every search held by an entity."""
     p = e.get("properties") or {}
     t = e["type"]
-    if t in ("savedSearch", "correlationSearch"):
+    if t in ("savedSearch", "correlationSearch", "adhocSearch"):
         return [(p.get("search") or "", False, "search")]
     if t == "workflowAction" and p.get("search"):
         return [(p["search"], False, "search")]
@@ -145,6 +148,8 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         for edge_type, target_type, name, pattern in sorted(federated_refs(combined.refs)):
             if e["type"] == "macro" and target_type == "macro" and name == e["name"]:
                 continue
+            if e["type"] == "adhocSearch" and pattern and name.strip("_") in ("*", ""):
+                continue  # "index=*" typed at the search bar says nothing about which index
             refs.append(
                 Ref(
                     e["id"],
@@ -171,6 +176,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         lineage: dict[str, Any] = {}
         if combined.implicit_index and e["type"] in (
             "savedSearch",
+            "adhocSearch",
             "correlationSearch",
             "dashboard",
             "workflowAction",
@@ -183,7 +189,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
         warnings = [
             w
             for w in combined.warnings
-            if e["type"] in ("savedSearch", "correlationSearch", "dashboard", "workflowAction")
+            if e["type"] in SEARCH_TYPES
             or "not shared" in w
             or "too deep" in w
             or "could not parse" in w

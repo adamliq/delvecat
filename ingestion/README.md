@@ -65,8 +65,16 @@ several instances into one bundle is on the roadmap.
 
 Usage comes from `_audit` and `_internal`, so the service account needs to
 search them. Licoryx Delvecat's own searches carry the comment ```` ```delvecat-ingest``` ````
-and are excluded. Ad-hoc search text is only analyzed in memory; bundles hold
-counts, never the searches. A `--record`ing does contain it, so never commit
+and are excluded. Every ad-hoc search is analyzed for the objects it uses, and the
+most-run ones (`--adhoc-objects`, default 1000; `0` for none) become **Ad-hoc
+Search** objects (`adhocSearch`): the SPL, runs, number of people who ran it,
+last run, where it was run from (search bar, REST API...), and `reads` edges to
+the indexes, sourcetypes, lookups and macros it uses. Dashboard panel searches
+are counted on their dashboards instead. Who ran a search is not kept. The same
+text in the same app is one object across builds; they are left out of "changes
+since the last build", since they come and go with what people type. The
+`public` redaction profile drops the SPL (`adhocSearches: drop`); the objects,
+counts and edges stay. A `--record`ing contains every search, so never commit
 recordings taken from production.
 
 ### Health over time

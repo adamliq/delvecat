@@ -33,6 +33,7 @@ CONSUMER_TYPES = frozenset(
     {
         "savedSearch",
         "correlationSearch",
+        "adhocSearch",
         "dashboard",
         "dbOutput",
         "uebaDataSource",

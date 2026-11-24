@@ -26,6 +26,7 @@ from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
 from .resolve import Resolver
 
 # Bookkeeping and human annotations never count as a change to the Splunk object.
+CHURN_TYPES = frozenset({"adhocSearch"})
 _VERSION_FIELDS = (
     "version",
     "firstSeenAt",
@@ -162,6 +163,11 @@ def apply_versions(
     removed = [
         {"id": i, "type": o["type"], "name": o["name"]} for i, o in prev.items() if i not in ids
     ]
+    # Ad-hoc searches come and go with what people type: not changes to the deployment.
+    churn = {e["id"] for e in entities if e["type"] in CHURN_TYPES}
+    added = [i for i in added if i not in churn]
+    modified = [i for i in modified if i not in churn]
+    removed = [r for r in removed if r["type"] not in CHURN_TYPES]
     return {
         "previousGeneratedAt": previous["generatedAt"],
         "added": sorted(added),

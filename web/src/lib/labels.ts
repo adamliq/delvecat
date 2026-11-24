@@ -32,6 +32,7 @@ const SPECIAL: Partial<Record<EntityType, string>> = {
   responseTemplate: "Response Plan",
   kvCollection: "KV Store Collection",
   correlationSearch: "Detection",
+  adhocSearch: "Ad-hoc Search",
   adaptiveResponseAction: "Alert Action",
   threatIntelSource: "Threat Intel Source",
   assetIdentitySource: "Asset / Identity Source",
@@ -74,7 +75,7 @@ export function pluralTypeLabel(type: EntityType): string {
 export const TYPE_GROUPS: [string, string[]][] = [
   ["Data", ["index", "sourcetype", "source", "host", "field", "dataModel", "lookup", "automaticLookup", "kvCollection", "federatedIndex", "federatedProvider", "accelerationSummary"]],
   ["Inputs and forwarding", ["input", "forwarder", "outputGroup", "addOnAccount", "serverClass", "deploymentApp", "deploymentClient", "streamForwarder", "streamGroup", "streamDefinition"]],
-  ["Searches, alerts and dashboards", ["savedSearch", "dashboard", "scheduledView", "adaptiveResponseAction"]],
+  ["Searches, alerts and dashboards", ["savedSearch", "adhocSearch", "dashboard", "scheduledView", "adaptiveResponseAction"]],
   ["Knowledge objects", ["macro", "eventtype", "tag", "fieldAlias", "calculatedField", "fieldExtraction", "transform", "workflowAction", "searchCommand"]],
   ["Platform and access", ["instance", "app", "user", "role", "authGroup", "authToken"]],
   ["Enterprise Security", ["correlationSearch", "findingType", "riskRule", "threatIntelSource", "assetIdentitySource", "analyticStory", "responseTemplate", "esReviewStatus", "esSuppression", "esAggregationRule", "esAutomationRule", "esQueue"]],

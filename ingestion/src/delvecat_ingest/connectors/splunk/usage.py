@@ -8,6 +8,8 @@ indexes and sourcetypes as ``observed`` values.
 
 from __future__ import annotations
 
+import hashlib
+import re
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any
@@ -60,8 +62,8 @@ def extract_saved_search_runs(ctx: Ctx, out: ExtractResult) -> int:
 
 
 def extract_adhoc_searches(ctx: Ctx, out: ExtractResult) -> int:
-    """Distinct ad-hoc and dashboard searches; analyzed later for the objects they use.
-    The search text is only used for that analysis and is never stored in the bundle."""
+    """Distinct ad-hoc and dashboard searches: analyzed for the objects they use, and the
+    most-run ad-hoc ones (not dashboard panels) become catalog objects of their own."""
     rows = ctx.transport.search(
         "usage_adhoc_searches",
         "index=_audit action=search info=completed "
@@ -70,18 +72,72 @@ def extract_adhoc_searches(ctx: Ctx, out: ExtractResult) -> int:
         f"by app, provenance, search | sort 0 - runs | head {ctx.options.max_adhoc_searches}",
         earliest=ctx.options.usage_window,
     )
+    objects: dict[tuple[str, str], dict[str, Any]] = {}
     for r in rows:
         prov = r.get("provenance") or ""
-        out.adhoc_searches.append(
-            {
-                "app": r.get("app"),
-                "search": _unquote_search(r.get("search")),
-                "runs": to_int(r.get("runs")) or 0,
-                "lastUsed": epoch_to_iso(r.get("last")),
-                "dashboard": prov.split(":", 2)[2] if prov.startswith("UI:Dashboard:") else None,
-            }
+        row = {
+            "app": r.get("app"),
+            "search": _unquote_search(r.get("search")),
+            "runs": to_int(r.get("runs")) or 0,
+            "lastUsed": epoch_to_iso(r.get("last")),
+            "dashboard": prov.split(":", 2)[2] if prov.startswith("UI:Dashboard:") else None,
+        }
+        out.adhoc_searches.append(row)
+        if row["dashboard"] or not _is_adhoc_object(row["search"], prov):
+            continue  # dashboard panels are part of their dashboards
+        key = (row["app"] or "search", row["search"])
+        o = objects.setdefault(key, {"runs": 0, "users": 0, "lastUsed": None, "from": set()})
+        o["runs"] += row["runs"]
+        o["users"] = max(o["users"], to_int(r.get("users")) or 0)  # people may overlap
+        o["lastUsed"] = max(filter(None, (o["lastUsed"], row["lastUsed"])), default=None)
+        o["from"].add(_provenance_label(prov))
+    top = sorted(objects.items(), key=lambda kv: -kv[1]["runs"])[: ctx.options.adhoc_objects]
+    for (app, spl), o in top:
+        add_global(
+            ctx,
+            out,
+            "adhocSearch",
+            adhoc_name(app, spl),
+            app=app,
+            displayName=adhoc_title(spl),
+            properties={
+                "search": spl[:ADHOC_MAX_CHARS],
+                "truncated": len(spl) > ADHOC_MAX_CHARS or None,
+                "runFrom": sorted(o["from"]),
+                "usageWindow": ctx.options.usage_window,
+            },
+            usage={"runs": o["runs"], "users": o["users"], "lastUsed": o["lastUsed"]},
         )
     return len(rows)
+
+
+ADHOC_MAX_CHARS = 10000
+
+
+def adhoc_name(app: str, spl: str) -> str:
+    """A stable name for an ad-hoc search: the same text in the same app, the same object."""
+    digest = hashlib.sha1(f"{app}\0{' '.join(spl.split())}".encode()).hexdigest()
+    return f"adhoc-{digest[:12]}"
+
+
+def adhoc_title(spl: str, width: int = 90) -> str:
+    one = " ".join(spl.split())
+    return one if len(one) <= width else one[: width - 1].rstrip() + "…"
+
+
+def _provenance_label(prov: str) -> str:
+    """Where a search was run from, as _audit records it (UI:Search, rest, ...)."""
+    if prov.startswith("UI:"):
+        return prov.split(":", 2)[1] or "UI"
+    return "REST API" if prov in ("", "N/A") or prov.startswith("rest") else prov
+
+
+# Searches Splunk runs for itself, and this app's own build command.
+_SYSTEM_SEARCH = re.compile(r"^\s*\|?\s*(summarize|delvecatbuild)\b", re.IGNORECASE)
+
+
+def _is_adhoc_object(spl: str, prov: str) -> bool:
+    return bool(spl.strip()) and prov != "summary_director" and not _SYSTEM_SEARCH.match(spl)
 
 
 def extract_user_activity(ctx: Ctx, out: ExtractResult) -> int:

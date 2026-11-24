@@ -111,6 +111,7 @@ def _build(args: argparse.Namespace) -> int:
         usage=not args.no_usage,
         usage_window=args.usage_window,
         health_window=args.health_window,
+        adhoc_objects=args.adhoc_objects,
     )
     only = set(args.only.split(",")) if args.only else None
     if only and (unknown := only - set(splunk.EXTRACTORS)):
@@ -472,6 +473,14 @@ def main(argv: list[str] | None = None) -> int:
         "--no-usage",
         action="store_true",
         help="skip usage and health searches over _audit and _internal",
+    )
+    use.add_argument(
+        "--adhoc-objects",
+        type=int,
+        default=1000,
+        metavar="N",
+        help="keep the N most-run ad-hoc searches as catalog objects, with their SPL "
+        "(default 1000; 0 for none)",
     )
     use.add_argument(
         "--usage-window",

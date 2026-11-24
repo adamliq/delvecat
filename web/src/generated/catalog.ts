@@ -17,6 +17,7 @@ export type EntityType =
   | "automaticLookup"
   | "kvCollection"
   | "savedSearch"
+  | "adhocSearch"
   | "macro"
   | "searchCommand"
   | "eventtype"

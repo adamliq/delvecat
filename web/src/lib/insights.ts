@@ -93,6 +93,7 @@ export const USAGE_GROUPS: { label: string; types: EntityType[]; measure: string
   { label: "Indexes", types: ["index"], measure: "searches referencing it" },
   { label: "Sourcetypes", types: ["sourcetype"], measure: "searches referencing it" },
   { label: "Searches and detections", types: ["savedSearch", "correlationSearch"], measure: "runs" },
+  { label: "Ad-hoc searches", types: ["adhocSearch"], measure: "runs" },
   { label: "Dashboards", types: ["dashboard"], measure: "views" },
   { label: "Lookups and macros", types: ["lookup", "macro", "kvCollection"], measure: "searches referencing it" },
   { label: "Custom search commands", types: ["searchCommand"], measure: "searches running it" },

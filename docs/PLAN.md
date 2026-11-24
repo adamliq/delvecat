@@ -362,8 +362,10 @@ are confirmed against a live instance before their connector ships.
   leaves them out of usage (requires Splunk 8.1+ comment syntax).
 - Ad-hoc search text is analyzed with the same SPL analyzer and macro
   library as lineage, so indexes, macros, lookups and data models used only
-  interactively count as used. The text itself is never stored in a bundle
-  (recordings of production instances would contain it: do not commit them).
+  interactively count as used. The most-run ones (default 1000) are kept as
+  `adhocSearch` objects with their SPL and counts, never who ran them; the
+  `public` redaction profile drops the SPL (recordings of production instances
+  contain every search: do not commit them).
 - `entity.usage` (runs, views, ad-hoc references, last use, scheduler
   results) and `entity.health` (`ok` / `warning` / `critical` checks) are
   derived and never change catalog versions. Health is judged as of the

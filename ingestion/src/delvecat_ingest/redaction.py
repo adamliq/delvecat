@@ -12,6 +12,8 @@ Profiles say what to do with each kind of personal or infrastructure detail:
   (``drop`` / ``keep``); curated annotation links are kept
 - ``emails``: addresses email alert actions send to and from (``keep`` /
   ``domain``: only the part after ``@`` / ``drop``); ``$tokens$`` are kept
+- ``adhocSearches``: the SPL of ad-hoc searches people ran (``keep`` / ``drop``: the
+  objects stay, with their counts and the objects they read, but not what was typed)
 
 Pseudonyms are keyed hashes (HMAC-SHA256). With a stable secret salt
 (``DELVECAT_REDACT_SALT``) the same user gets the same pseudonym in every build;
@@ -53,6 +55,7 @@ class Profile:
     ips: str = "keep"
     urls: str = "keep"
     emails: str = "keep"
+    adhocSearches: str = "keep"  # noqa: N815
 
 
 PROFILES = {
@@ -67,6 +70,7 @@ PROFILES = {
         ips="mask",
         urls="drop",
         emails="drop",
+        adhocSearches="drop",
     ),
 }
 ALLOWED = {
@@ -77,6 +81,7 @@ ALLOWED = {
     "ips": {"keep", "mask"},
     "urls": {"keep", "drop"},
     "emails": {"keep", "domain", "drop"},
+    "adhocSearches": {"keep", "drop"},
 }
 
 
@@ -168,7 +173,15 @@ def redact_bundle(
     stable = bool(salt)
     pseudo = _Pseudonyms((salt or secrets.token_hex(16)).encode())
     entities = bundle["entities"]
-    counts = {"users": 0, "hosts": 0, "sources": 0, "realNames": 0, "urls": 0, "emails": 0}
+    counts = {
+        "users": 0,
+        "hosts": 0,
+        "sources": 0,
+        "realNames": 0,
+        "urls": 0,
+        "emails": 0,
+        "adhocSearches": 0,
+    }
 
     users = {e["name"] for e in entities if e["type"] == "user"} | {
         e["owner"] for e in entities if e.get("owner") and e["owner"] != "nobody"
@@ -291,6 +304,13 @@ def redact_bundle(
                     props.pop(k, None)
             if e["type"] == "deploymentClient":
                 props.pop("dns", None)
+        if e["type"] == "adhocSearch" and profile.adhocSearches == "drop":
+            # What people typed can hold names, addresses and values from their data.
+            props.pop("search", None)
+            props.pop("truncated", None)
+            e["displayName"] = f"Ad-hoc search in {e.get('app') or 'search'}"
+            (e.get("lineage") or {}).pop("fields", None)
+            counts["adhocSearches"] += 1
         if profile.ips == "mask":
             props.pop("ip", None)
         if profile.emails != "keep":

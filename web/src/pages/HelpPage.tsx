@@ -161,7 +161,7 @@ const SECTIONS: Section[] = [
         </p>
         <p><strong>Never collected:</strong> passwords, token values, HEC token values, client secrets, certificates and keys,
           <code>pass4SymmKey</code>, LDAP bind credentials and member names, connection credentials, and the values of add-on
-          and modular input settings (their names only). Ad-hoc search text is analysed in memory and only counts are kept.</p>
+          and modular input settings (their names only). The most-run ad-hoc searches (up to 1,000, typed at the search bar or sent over the REST API) are kept as Ad-hoc Search objects with their SPL, run and user counts, and the objects they read; who ran them is not kept. Building with the public redaction profile drops the SPL.</p>
         <p>The <em>internal</em> redaction profile drops real names; the <em>public</em> one also pseudonymises users and hosts and drops URLs, IP addresses and customer identifiers.</p>
       </>
     ),

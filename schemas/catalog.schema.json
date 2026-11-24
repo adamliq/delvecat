@@ -232,6 +232,7 @@
         "automaticLookup",
         "kvCollection",
         "savedSearch",
+        "adhocSearch",
         "macro",
         "searchCommand",
         "eventtype",

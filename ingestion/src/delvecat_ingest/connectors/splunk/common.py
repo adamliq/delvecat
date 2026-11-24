@@ -34,6 +34,8 @@ class Options:
     health_window: str = "-7d"  # scheduler, parsing warnings
     volume_days: int = 14
     max_adhoc_searches: int = 5000
+    # The most-run ad-hoc searches kept as catalog objects (with their SPL); 0 for none.
+    adhoc_objects: int = 1000
     # Called with each step's name before it runs (the Splunk app shows build progress).
     progress: Callable[[str], None] | None = None
 
