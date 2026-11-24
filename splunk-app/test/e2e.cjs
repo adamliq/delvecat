@@ -339,6 +339,16 @@ const sections = {
     await go('#/glossary?unused=1', 'h1');
     const noTerms = /No glossary terms/.test(await mainText(v.page));
     check('glossary: filters kept in the URL', noTerms || await v.page.isChecked('label:has-text("Only unused terms") input').catch(() => false), noTerms ? 'no terms in this catalog' : '');
+    await go('#/search?q=_internal', '.entity-row');
+    await v.page.locator('.entity-row a.entity-name').first().click();
+    await sleep(1500);
+    check('object opened from a search has Back to results and copy buttons', (await v.page.locator('.back-link a').count()) === 1 && (await v.page.locator('button:has-text("Copy id")').count()) === 1);
+    await go('', '.recent-list');
+    check('Home lists recently viewed objects', (await v.page.locator('.recent-list li').count()) >= 1);
+    await v.page.selectOption('select[aria-label=Theme]', 'dark');
+    await sleep(300);
+    check('theme can be chosen', (await v.page.evaluate(() => document.documentElement.dataset.theme)) === 'dark');
+    await v.page.selectOption('select[aria-label=Theme]', 'auto');
     await go('#/help', '.help-section');
     await v.page.fill('input[aria-label="Search help"]', 'snooze');
     await sleep(300);

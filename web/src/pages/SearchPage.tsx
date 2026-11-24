@@ -112,7 +112,7 @@ function ResultTable({ results, instances }: { results: Entity[]; instances: Rec
       className="mini-table result-table"
       columns={[
         { label: "Type", value: (e) => typeLabel(e.type) },
-        { label: "Name", value: (e) => e.displayName ?? e.name, render: (e) => <Link to={entityPath(e.id)}>{e.displayName ?? e.name}</Link> },
+        { label: "Name", value: (e) => e.displayName ?? e.name, render: (e) => <Link to={entityPath(e.id)} state={{ from: window.location.hash.replace(/^#/, "") || "/" }}>{e.displayName ?? e.name}</Link> },
         ...(many ? [{ label: "Instance", value: (e: Entity) => instances[e.instance] ?? e.instance }] : []),
         { label: "App", value: (e) => e.app ?? "" },
         { label: "Owner", value: (e) => owners(e).join(", ") || e.owner || "" },

@@ -1,4 +1,5 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { downloadText, toCsv } from "../lib/health";
 
 export interface Column<T> {
@@ -42,6 +43,8 @@ export function sortRows<T>(rows: T[], col: Column<T> | undefined, dir: Dir): T[
     .map(([r]) => r);
 }
 
+const PRINT_MAX = 2000;
+
 /** A table whose columns sort on click and whose rows download as CSV. */
 export function DataTable<T>({
   rows,
@@ -66,6 +69,12 @@ export function DataTable<T>({
 }) {
   // Large tables show a page at a time: rendering thousands of rows can exhaust the browser.
   const [shown, setShown] = useState(limit);
+  // Printing shows every row (up to a sane cap), then the page goes back to its page size.
+  useEffect(() => {
+    const before = () => flushSync(() => setShown((n) => Math.max(n, Math.min(rows.length, PRINT_MAX))));
+    window.addEventListener("beforeprint", before);
+    return () => window.removeEventListener("beforeprint", before);
+  }, [rows.length]);
   const [sort, setSort] = useState<{ column: number; dir: Dir } | null>(
     initialSort ? { column: initialSort.column, dir: initialSort.dir ?? "ascending" } : null,
   );
@@ -85,7 +94,7 @@ export function DataTable<T>({
     );
   if (!rows.length && empty) return <>{empty}</>;
   return (
-    <div className="data-table">
+    <div className={`data-table${Math.min(shown, rows.length) > 25 ? " data-table-scroll" : ""}`}>
       {csvName && (
         <div className="data-table-bar">
           <span className="muted small">{rows.length.toLocaleString()} row{rows.length === 1 ? "" : "s"}</span>

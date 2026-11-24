@@ -8,6 +8,7 @@ import { riskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
+import { recentIds } from "../lib/recent";
 
 const KIND_LABELS: Record<string, string> = {
   splunkEnterprise: "Splunk Enterprise",
@@ -100,6 +101,7 @@ export function Home() {
     ...((bundle.structuredProperties?.length ?? 0) > 0 ? [{ num: missingRequired.toLocaleString(), label: "objects missing a required property", to: "/properties", tone: missingRequired ? "warning" as const : undefined }] : []),
     ...((bundle.domains?.length ?? 0) > 0 ? [{ num: `${bundle.domains!.length} / ${bundle.dataProducts?.length ?? 0}`, label: "domains / data products", to: "/domains" }] : []),
   ];
+  const recent = recentIds().map((id) => catalog.byId.get(id)).filter((e): e is NonNullable<typeof e> => !!e).slice(0, 10);
   // Objects and findings per instance (stack), for the instance cards.
   const perInstance = new Map<string, { objects: number; critical: number; warning: number }>();
   for (const e of bundle.entities) {
@@ -173,6 +175,22 @@ export function Home() {
           ))}
         </div>
       </section>
+
+      {recent.length > 0 && (
+        <section>
+          <h2>Recently viewed</h2>
+          <ul className="chips recent-list">
+            {recent.map((e) => (
+              <li key={e.id}>
+                <Link to={entityPath(e.id)} className="chip" title={e.id}>
+                  <span className="chip-kind">{typeLabel(e.type)}</span>{e.displayName ?? e.name}
+                  {bundle.instances.length > 1 && <span className="muted small"> · {bundle.instances.find((i) => i.id === e.instance)?.name ?? e.instance}</span>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section>
         <h2>Documentation</h2>

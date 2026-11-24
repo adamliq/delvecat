@@ -270,6 +270,13 @@ one. The same from a search:
   building and publishing, roles, what is and is never collected, annotations, the
   SQL console, connection tests, sharing a view, and troubleshooting; searchable.
 
+- **Small things**: a theme choice at the bottom of every page (automatic follows
+  your Splunk theme, or light, or dark); *Recently viewed* objects on Home and
+  *Back to results* on an object opened from a search; *Copy id* and *Copy link* on
+  object pages and *Copy* on SPL; long tables keep their header row in view;
+  *Print report* on Health and Findings prints (or saves as PDF) every row with each
+  finding's advice, without the menus.
+
 - **Filters stay in the address**, so a filtered view can be shared or bookmarked.
 - **Tables** on Findings, Health, Coverage and Governance sort by any column
   (click its header) and download as CSV.

@@ -5,8 +5,22 @@ import { findings } from "../lib/findings";
 import { searchPath } from "../lib/routes";
 import { canBuild } from "../lib/splunkBuild";
 import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
+import { applyTheme, chooseTheme, savedTheme, type ThemeChoice } from "../lib/theme";
 
 export function Layout({ children }: { children: ReactNode }) {
+  const header = useRef<HTMLElement>(null);
+  const [theme, setTheme] = useState<ThemeChoice>(savedTheme);
+  useEffect(() => { void applyTheme(); }, []);
+  // The header's height, for what sticks below it ("On this page", table headers).
+  useEffect(() => {
+    const el = header.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const set = () => document.documentElement.style.setProperty("--header-h", `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const { state, openFiles } = useCatalogState();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -40,7 +54,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="shell">
-      <header className="topbar">
+      <header className="topbar" ref={header}>
         <Link to="/" className="brand">
           <span className="logo" aria-hidden>LD</span> Licoryx Delvecat
         </Link>
@@ -98,6 +112,14 @@ export function Layout({ children }: { children: ReactNode }) {
       </header>
       <main className="content">{children}</main>
       <footer className="footer">
+        <label className="theme-pick">
+          Theme{" "}
+          <select value={theme} aria-label="Theme" onChange={(e) => { const t = e.target.value as ThemeChoice; setTheme(t); chooseTheme(t); }}>
+            <option value="auto">{IN_SPLUNK ? "Automatic (as Splunk)" : "Automatic (as the system)"}</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
         {state.status === "ready" && (
           <>
             Bundle generated {new Date(state.catalog.bundle.generatedAt).toLocaleString()} · source{" "}

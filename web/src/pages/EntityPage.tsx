@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { CopyButton } from "../components/CopyButton";
+import { rememberViewed } from "../lib/recent";
 import type { Entity } from "../generated/catalog";
 import { AnnotationsTab } from "../components/AnnotationsTab";
 import { DataSources } from "../components/DataSources";
@@ -82,6 +84,10 @@ export function EntityPage() {
   const { catalog } = useCatalog();
   const entity = catalog.byId.get(id);
 
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
+  useEffect(() => { if (entity) rememberViewed(entity.id); }, [entity]);
+
   if (!entity) {
     return (
       <div className="stack">
@@ -136,6 +142,7 @@ export function EntityPage() {
   return (
     <div className="stack">
       <div>
+        {from && <p className="small back-link"><Link to={from}>← Back to results</Link></p>}
         <TypeBadge entity={entity} />
         {catalog.bundle.instances.length > 1 && (
           <Link to={searchPath({ instance: entity.instance })} className="instance-badge" title="The stack (instance) this object is on">
@@ -146,7 +153,11 @@ export function EntityPage() {
         {entity.displayName && entity.displayName !== entity.name && (
           <div className="muted"><code>{entity.name}</code></div>
         )}
-        <p className="fqn"><code>{entity.id}</code></p>
+        <p className="fqn">
+          <code>{entity.id}</code>{" "}
+          <CopyButton text={entity.id} label="Copy id" className="link-btn small" />{" "}
+          <CopyButton text={window.location.href} label="Copy link" className="link-btn small" />
+        </p>
         {a?.description ? (
           <p className="lede">{a.description}</p>
         ) : entity.description ? (

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CopyButton } from "./CopyButton";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { entityPath } from "../lib/routes";
@@ -13,6 +14,8 @@ export function SplCode({ text, catalog, entity }: { text: string; catalog: Cata
     return catalog.entities.find((e) => same(e) && e.name === name);
   };
   return (
+    <div className="code-block">
+    <CopyButton text={text} label="Copy" className="btn btn-small code-copy" />
     <pre className="code spl">
       {splTokens(text).map((t, i) => {
         const target = t.ref ? find(t.ref.type, t.ref.name) : undefined;
@@ -24,5 +27,6 @@ export function SplCode({ text, catalog, entity }: { text: string; catalog: Cata
         );
       })}
     </pre>
+    </div>
   );
 }

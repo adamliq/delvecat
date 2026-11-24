@@ -221,6 +221,19 @@ const SECTIONS: Section[] = [
     ),
   },
   {
+    id: "handy",
+    title: "Handy things",
+    keywords: "theme dark light print pdf copy recent back keyboard",
+    body: (
+      <ul>
+        <li><strong>Theme</strong>: at the bottom of every page. Automatic follows your Splunk theme (or your system outside Splunk).</li>
+        <li><strong>Recently viewed</strong> objects are on Home; an object opened from a search has <em>Back to results</em>.</li>
+        <li><strong>Copy</strong>: object pages copy their id or link; SPL has a <em>Copy</em> button.</li>
+        <li><strong>Print report</strong> on Health and Findings prints, or saves as PDF, every row with each finding&apos;s advice.</li>
+      </ul>
+    ),
+  },
+  {
     id: "troubleshooting",
     title: "Troubleshooting",
     keywords: "error problem missing empty not found access denied stale",

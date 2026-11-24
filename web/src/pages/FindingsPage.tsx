@@ -88,7 +88,10 @@ export function FindingsPage() {
   return (
     <div className="stack">
       <div>
-        <h1>Findings</h1>
+        <div className="title-row">
+          <h1>Findings</h1>
+          <button type="button" className="btn btn-small" onClick={() => window.print()} title="Print or save as PDF: the findings shown, with how to fix each">Print report</button>
+        </div>
         <p className="lede">
           Everything the catalog flagged, most severe first: data and scheduler problems, tokens, alerts, suppressions,
           routing, retention and acceleration. Each finding links to its object and says how to fix it; accept or snooze

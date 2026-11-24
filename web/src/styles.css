@@ -26,6 +26,21 @@
     color-scheme: dark;
   }
 }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] {
+    --bg: #0f1115;
+    --surface: #171a20;
+    --text: #e6e8ec;
+    --muted: #9aa3b2;
+    --border: #2a2f38;
+    --accent: #7aa2ff;
+    --accent-soft: #1d2a48;
+    --code-bg: #1d2129;
+    --danger: #ff8a80;
+    --warn: #e3b341;
+    color-scheme: dark;
+  }
+
 
 * { box-sizing: border-box; }
 body {
@@ -44,7 +59,7 @@ h2 { font-size: 1.1rem; margin: 0 0 0.6rem; }
 .topbar {
   display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
   padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 1;
+  position: sticky; top: 0; z-index: 10;
 }
 .brand { font-weight: 700; color: var(--text); display: flex; gap: 8px; align-items: center; }
 .brand:hover { text-decoration: none; }
@@ -322,6 +337,14 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
     --viz-baseline: #3a404b;
   }
 }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] {
+    --viz-series-1: #3987e5;
+    --viz-track: #1c3557;
+    --viz-grid: #262b33;
+    --viz-baseline: #3a404b;
+  }
+
 
 /* Lineage badges: icon + legend + tooltip, never color alone. */
 .lineage-node-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -404,6 +427,9 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 /* Compare: tall segmented bar (28px, 4px corners, 2px surface gaps), A/B categorical, same/differs status */
 :root { --viz-a: #2a78d6; --viz-b: #6250d6; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --viz-a: #3987e5; --viz-b: #9085e9; } }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] { --viz-a: #3987e5; --viz-b: #9085e9; }
+
 .cmp-pick { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
 .cmp-pick label { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 240px; }
 .cmp-pick select { min-width: 0; }
@@ -429,6 +455,9 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 /* Schema network (3 categorical slots, all-pairs validated; others neutral) */
 :root { --viz-slot-1: #2a78d6; --viz-slot-2: #eb6834; --viz-slot-3: #1baf7a; --viz-neutral: #9aa1ab; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --viz-slot-1: #3987e5; --viz-slot-2: #d95926; --viz-slot-3: #199e70; --viz-neutral: #6b7380; } }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] { --viz-slot-1: #3987e5; --viz-slot-2: #d95926; --viz-slot-3: #199e70; --viz-neutral: #6b7380; }
+
 .schema-filters input[type="search"] { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font: inherit; min-width: min(100%, 260px); }
 .schema-filters input[type="range"] { width: 110px; }
 .hit { margin-right: 4px; background: var(--accent-soft); border-radius: 3px; padding: 0 3px; }
@@ -539,6 +568,9 @@ button.tile { font: inherit; color: inherit; text-align: left; cursor: pointer; 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) { --tok-keyword: #93b4ff; --tok-function: #c4a5ff; --tok-string: #f0b46a; --tok-number: #6fd3a8; --tok-table: #67d4e6; --tok-column: #d1d5db; --tok-comment: #8b93a1; }
 }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] { --tok-keyword: #93b4ff; --tok-function: #c4a5ff; --tok-string: #f0b46a; --tok-number: #6fd3a8; --tok-table: #67d4e6; --tok-column: #d1d5db; --tok-comment: #8b93a1; }
+
 .sql-editor-wrap { position: relative; }
 .sql-editor-box { position: relative; }
 .sql-highlight, .sql-editor-box .sql-editor {
@@ -646,6 +678,9 @@ button.tile { font: inherit; color: inherit; text-align: left; cursor: pointer; 
 /* Search */
 mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) mark { background: #6b5310; } }
+/* The same, when dark is chosen on the page (not only by the system). */
+:root[data-theme="dark"] mark { background: #6b5310; }
+
 .match-snippet { margin: 2px 0 0; overflow-wrap: anywhere; }
 .match-snippet code { font-size: 0.82rem; }
 .clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -664,9 +699,9 @@ mark { background: #fde68a; color: inherit; border-radius: 2px; padding: 0 1px; 
 .tiles-compact .tile-label { font-size: 0.85rem; }
 
 /* Object page */
-.section-nav { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline;
+.section-nav { position: sticky; top: var(--header-h, 60px); z-index: 1; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline;
   padding: 6px 0; background: var(--bg); border-bottom: 1px solid var(--border); }
-[data-sections] section > h2 { scroll-margin-top: 48px; }
+[data-sections] section > h2 { scroll-margin-top: calc(var(--header-h, 60px) + 48px); }
 .code.spl { white-space: pre-wrap; word-break: break-word; }
 .spl-command { color: var(--tok-keyword); font-weight: 600; }
 .spl-keyword { color: var(--tok-function); }
@@ -725,3 +760,31 @@ a.spl-link:hover { text-decoration-style: solid; }
 .instance-badge:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 .stack-counts { margin: 6px 0 2px; }
 .imported-list li { margin: 4px 0; }
+
+.theme-pick { float: right; display: inline-flex; gap: 6px; align-items: center; }
+.theme-pick select { width: auto; padding: 2px 6px; font-size: 0.85rem; }
+.recent-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.back-link { margin: 0 0 4px; }
+.code-block { position: relative; }
+.code-copy { position: absolute; top: 6px; right: 6px; opacity: 0.85; }
+.code-block pre.code { padding-right: 70px; }
+
+/* Long tables scroll inside themselves, so their header row stays in view. */
+.data-table-scroll .table-wrap { max-height: 70vh; overflow: auto; }
+.data-table-scroll thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); box-shadow: inset 0 -1px 0 var(--border); }
+
+/* Printed reports (Health, Findings...): content only, every row and panel. */
+@media print {
+  .topbar, .footer, .section-nav, .health-filters, .findings-filters, .lineage-controls, .ack-form,
+  .data-table-bar button, .table-more button, .btn, .seg, .print-hide, .help-toc { display: none !important; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .content { max-width: none; padding: 0; }
+  .data-table-scroll .table-wrap { max-height: none; overflow: visible; }
+  .data-table-scroll thead th { position: static; }
+  section { break-inside: auto; }
+  tr, .finding { break-inside: avoid; }
+  a { color: #000; text-decoration: none; }
+  .tile, .card, .kpi { border-color: #999; }
+}
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.result-table td:nth-child(2) { min-width: 180px; max-width: 360px; overflow-wrap: anywhere; }

@@ -296,7 +296,10 @@ export function HealthPage() {
   return (
     <div className="stack">
       <div>
-        <h1>Health</h1>
+        <div className="title-row">
+          <h1>Health</h1>
+          <button type="button" className="btn btn-small" onClick={() => window.print()} title="Print or save as PDF: every finding on this page, with how to fix it">Print report</button>
+        </div>
         <p className="lede">Data freshness, volume, ingestion and scheduler problems, tokens, storage, and objects nobody uses.</p>
         <p className="muted small">{asOf(report.message)} Thresholds: {thresholdText(report.thresholds)}.</p>
       </div>
