@@ -65,6 +65,13 @@
     "changes": {
       "$ref": "#/$defs/ChangeSummary"
     },
+    "changeHistory": {
+      "description": "Changes of earlier builds (up to 9), newest first; details trimmed to 300 objects each. Left out of redacted catalogs.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ChangeSummary"
+      }
+    },
     "healthHistory": {
       "description": "Health counts of this and earlier builds (oldest first), for a trend. Derived.",
       "type": "array",
@@ -488,6 +495,13 @@
                 "type": "string"
               }
             },
+            "noData": {
+              "description": "Sourcetypes the search names that have no data seen and no definition: noted, not counted as broken references.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "parsedBySplunk": {
               "description": "Analysed from Splunk's own parse of the search (search/parser, macros expanded), because Licoryx Delvecat's analyser could not follow it.",
               "type": "boolean"
@@ -887,6 +901,11 @@
       ],
       "properties": {
         "previousGeneratedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generatedAt": {
+          "description": "In changeHistory: when the build these changes led to was made.",
           "type": "string",
           "format": "date-time"
         },

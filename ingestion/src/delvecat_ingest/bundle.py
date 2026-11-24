@@ -20,7 +20,7 @@ from .health import (
     mark_unused,
     thresholds,
 )
-from .lineage import derive, record_unresolved
+from .lineage import derive, record_unresolved, runtime_lookups
 from .link import link_hosts
 from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
 from .resolve import Resolver
@@ -174,6 +174,23 @@ def property_diff(old: dict[str, Any], new: dict[str, Any]) -> list[dict[str, An
     return rows[:MAX_DIFF_KEYS]
 
 
+HISTORY_BUILDS = 9  # earlier builds whose changes are kept besides the latest
+HISTORY_DIFFS = 300  # modified objects whose details are kept for each earlier build
+
+
+def change_history(previous: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """The changes of earlier builds, newest first: the previous catalog's own changes
+    (marked with when it was built) followed by its history, trimmed."""
+    if not previous or not previous.get("changes"):
+        return []
+    last = dict(previous["changes"])
+    last["generatedAt"] = previous.get("generatedAt")
+    details = last.get("details") or {}
+    if len(details) > HISTORY_DIFFS:
+        last["details"] = {k: details[k] for k in sorted(details)[:HISTORY_DIFFS]}
+    return [last, *(previous.get("changeHistory") or [])][:HISTORY_BUILDS]
+
+
 def apply_versions(
     entities: list[dict[str, Any]], generated_at: str, previous: dict[str, Any] | None
 ) -> dict[str, Any] | None:
@@ -239,6 +256,9 @@ def assemble(
     result.edges.extend(define_fields(entities))
     all_refs = [*result.refs, *spl_refs]
     resolved, unresolved = Resolver(entities).resolve(all_refs)
+    created, runtime_edges, unresolved = runtime_lookups(entities, unresolved)
+    entities.extend(created)
+    result.edges.extend(runtime_edges)
     broken = record_unresolved({e["id"]: e for e in entities}, unresolved)
     open_refs = cross_instance_refs(all_refs, unresolved)
 
@@ -347,6 +367,8 @@ def assemble(
     }
     if changes is not None:
         bundle["changes"] = changes
+        if history := change_history(previous):
+            bundle["changeHistory"] = history
     if any(r["connector"] == "health" for r in reports):
         apply_health_history(bundle, previous, generated)
     elif previous and previous.get("healthHistory"):

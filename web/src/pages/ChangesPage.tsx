@@ -7,7 +7,8 @@ import { pluralTypeLabel, typeLabel } from "../lib/labels";
 import { entityPath } from "../lib/routes";
 import { useUrlState } from "../lib/urlState";
 
-export type DiffRow = { key: string; before?: unknown; after?: unknown };
+import { buildChanges, type DiffRow } from "../lib/changes";
+export type { DiffRow };
 
 const show = (v: unknown) => (v === null || v === undefined ? <span className="muted">—</span> : typeof v === "string" ? v : JSON.stringify(v));
 const keyLabel = (k: string) => k.replace(/^properties\./, "");
@@ -36,10 +37,12 @@ export function DiffTable({ rows }: { rows: DiffRow[] }) {
  * (with what changed) and removed objects, by type. */
 export function ChangesPage() {
   const { catalog } = useCatalog();
-  const changes = catalog.bundle.changes;
+  const builds = buildChanges(catalog);
   const [params, setParams] = useUrlState();
   const type = params.get("type") ?? "";
   const setType = (v: string) => setParams({ type: v || null });
+  const pick = Math.min(Math.max(0, Number(params.get("build") ?? 0) || 0), Math.max(0, builds.length - 1));
+  const changes = builds[pick];
   if (!changes) {
     return (
       <div className="stack">
@@ -48,7 +51,7 @@ export function ChangesPage() {
       </div>
     );
   }
-  const details = (changes.details ?? {}) as Record<string, DiffRow[]>;
+  const details = changes.details;
   const get = (id: string) => catalog.byId.get(id);
   const added = changes.added.map(get).filter((e): e is Entity => !!e);
   const modified = changes.modified.map(get).filter((e): e is Entity => !!e);
@@ -61,8 +64,20 @@ export function ChangesPage() {
     <div className="stack">
       <div>
         <h1>Changes</h1>
-        <p className="lede">What changed in Splunk between the build of {new Date(changes.previousGeneratedAt).toLocaleString()} and this one ({new Date(catalog.bundle.generatedAt).toLocaleString()}).</p>
+        <p className="lede">What changed in Splunk between the build of {new Date(changes.previousGeneratedAt).toLocaleString()} and the one of {new Date(changes.generatedAt).toLocaleString()}.</p>
       </div>
+      {builds.length > 1 && (
+        <label className="sort">Build
+          <select value={pick} onChange={(e) => setParams({ build: e.target.value === "0" ? null : e.target.value })}>
+            {builds.map((b, i) => (
+              <option key={b.generatedAt} value={i}>
+                {new Date(b.generatedAt).toLocaleString()}{i === 0 ? " (latest)" : ""} · {b.added.length} added, {b.modified.length} modified, {b.removed.length} removed
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {pick > 0 && <p className="muted small">Objects added or modified then may have changed or gone since; links open them as they are now.</p>}
       <div className="tiles">
         <div className="tile static"><span className="tile-num">{added.length}</span><span className="tile-label">added</span></div>
         <div className="tile static"><span className="tile-num">{modified.length}</span><span className="tile-label">modified</span></div>

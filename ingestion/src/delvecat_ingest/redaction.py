@@ -330,6 +330,8 @@ def redact_bundle(
         for r in ch["removed"]:
             r["id"] = id_map.get(r["id"], r["id"])
             r["name"] = _renamed(r["type"], r["name"], profile, rename)
+    # Earlier builds' changes hold ids and values from before redaction: left out.
+    bundle.pop("changeHistory", None)
     for r in bundle.get("resolvedFindings", []):
         r["id"] = id_map.get(r["id"], r["id"])
         r["name"] = _renamed(r["type"], r["name"], profile, rename)

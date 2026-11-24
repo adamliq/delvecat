@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
-from .model import Ref, Target
+from .model import Ref, Target, fqn
 from .spl import SplAnalysis, analyze
 
 # Object types an SPL reference may point at; the resolver only matches visible ones.
@@ -255,6 +255,60 @@ def _tables_for_dbxquery(entities: list[dict[str, Any]], refs: list[Ref]) -> Non
             )
 
 
+def _creates_lookup(r: Ref, by_id: dict[str, dict[str, Any]]) -> bool:
+    return (
+        r.origin == "spl"
+        and r.edge_type == "writes"
+        and r.target.type == "lookup"
+        and not r.target.pattern
+        and r.known in by_id
+        and "$" not in r.target.name
+    )
+
+
+def runtime_lookups(
+    entities: list[dict[str, Any]], unresolved: list[Ref]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[Ref]]:
+    """Lookups a search creates when it runs (``outputlookup`` to a file that does not
+    exist yet): they become lookup objects of kind ``runtime``, created by those searches,
+    and the searches that read them are linked to them instead of reporting a broken
+    reference. Returns (new lookups, edges, the references still unresolved)."""
+    by_id = {e["id"]: e for e in entities}
+    writers: dict[tuple[str, str], list[str]] = {}
+    for r in unresolved:
+        if _creates_lookup(r, by_id):
+            key = (by_id[r.known]["instance"], r.target.name)
+            writers.setdefault(key, []).append(r.known)
+    if not writers:
+        return [], [], unresolved
+    lookups: dict[tuple[str, str], dict[str, Any]] = {}
+    for (instance, name), ids in writers.items():
+        first = by_id[sorted(ids)[0]]
+        lookups[(instance, name)] = {
+            "id": fqn(instance, "lookup", name, app=first.get("app") or "search"),
+            "type": "lookup",
+            "name": name,
+            "product": "splunk",
+            "instance": instance,
+            "app": first.get("app"),
+            "description": "Created when a search runs (outputlookup); not a lookup file yet.",
+            "properties": {"kind": "runtime", "createdBy": sorted(set(ids))},
+        }
+    edges: list[dict[str, Any]] = []
+    remaining: list[Ref] = []
+    for r in unresolved:
+        e = by_id.get(r.known)
+        lk = (
+            lookups.get((e["instance"], r.target.name)) if e and r.target.type == "lookup" else None
+        )
+        if lk is None:
+            remaining.append(r)
+            continue
+        edge_type = r.edge_type
+        edges.append({"from": r.known, "to": lk["id"], "type": edge_type, "origin": "spl"})
+    return list(lookups.values()), edges, remaining
+
+
 def record_unresolved(entities_by_id: dict[str, dict[str, Any]], unresolved: list[Ref]) -> int:
     """Attach SPL references the resolver could not match to their entity."""
     n = 0
@@ -269,6 +323,12 @@ def record_unresolved(entities_by_id: dict[str, dict[str, Any]], unresolved: lis
             continue
         label = f"{ref.target.type}:{ref.target.name}"
         lin = e.setdefault("lineage", {})
+        if ref.target.type == "sourcetype":
+            # A sourcetype with no data seen (and no definition): worth knowing, not broken.
+            lin.setdefault("noData", [])
+            if ref.target.name not in lin["noData"]:
+                lin["noData"].append(ref.target.name)
+            continue
         lin.setdefault("unresolved", [])
         if label not in lin["unresolved"]:
             lin["unresolved"].append(label)

@@ -136,6 +136,10 @@ export interface CatalogBundle {
   ingestionReport?: ConnectorReport[];
   changes?: ChangeSummary;
   /**
+   * Changes of earlier builds (up to 9), newest first; details trimmed to 300 objects each. Left out of redacted catalogs.
+   */
+  changeHistory?: ChangeSummary[];
+  /**
    * Health counts of this and earlier builds (oldest first), for a trend. Derived.
    */
   healthHistory?: {
@@ -290,6 +294,10 @@ export interface Entity {
      * Data model datasets the search names, as Model.Dataset or Model.Root.Child (from tstats nodename=).
      */
     dataModelDatasets?: string[];
+    /**
+     * Sourcetypes the search names that have no data seen and no definition: noted, not counted as broken references.
+     */
+    noData?: string[];
     /**
      * Analysed from Splunk's own parse of the search (search/parser, macros expanded), because Licoryx Delvecat's analyser could not follow it.
      */
@@ -516,6 +524,10 @@ export interface ConnectorReport {
 }
 export interface ChangeSummary {
   previousGeneratedAt: string;
+  /**
+   * In changeHistory: when the build these changes led to was made.
+   */
+  generatedAt?: string;
   /**
    * For modified objects (up to 2000): what changed, key by key (properties.<name> one level down), values cut to 300 characters.
    */

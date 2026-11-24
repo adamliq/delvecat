@@ -424,7 +424,18 @@ then derived from Splunk's version (`lineage.parsedBySplunk`).
 `changes.details` lists, for each modified object (up to 2,000), what changed
 key by key (`properties.<name>` one level down) with the value before and after,
 cut to 300 characters. Redacted catalogs leave the details out: they can hold
-anything redaction rewrites elsewhere.
+anything redaction rewrites elsewhere. `changeHistory` keeps the changes of the
+nine builds before (details trimmed to 300 objects each), newest first, so the
+Changes page can show earlier builds and each object its own history; redacted
+catalogs leave it out.
+
+### Lookups searches create, and sourcetypes with no data
+
+A search may read a lookup another search creates when it runs (`outputlookup` to a
+file that does not exist yet). Such a lookup becomes a lookup object of kind
+`runtime` (`createdBy` names the searches), linked to the searches that write and
+read it, instead of a broken reference. A search naming a sourcetype with no data
+seen and no definition records it under `lineage.noData`, not as broken.
 
 ### Commands
 

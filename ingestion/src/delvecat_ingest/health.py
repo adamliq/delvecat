@@ -683,7 +683,7 @@ def mark_unused(
                     if menus
                     else "Not viewed in the usage window"
                 )
-        elif t in KO_TYPES and audit:
+        elif t in KO_TYPES and audit and (e.get("properties") or {}).get("kind") != "runtime":
             if not consumers.get(e["id"]) and not u.get("adhocSearches"):
                 reason = "Nothing in the catalog uses it and no search referenced it"
         elif t == "index" and audit:

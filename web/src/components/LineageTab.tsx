@@ -130,6 +130,11 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
           ) : null}
         </section>
       ) : null}
+      {l?.noData?.length ? (
+        <p className="muted small">
+          No data seen for sourcetype{l.noData.length === 1 ? "" : "s"} {l.noData.map((st, i) => <span key={st}>{i > 0 && ", "}<code>{st}</code></span>)}: this search finds nothing there today.
+        </p>
+      ) : null}
 
       <section>
         <div className="results-bar">

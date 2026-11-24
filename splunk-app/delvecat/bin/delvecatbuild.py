@@ -87,6 +87,10 @@ class DelveCatBuild(GeneratingCommand):
 
     def generate(self):
         info = self._metadata.searchinfo
+        # Run by the scheduler (the app's scheduled build report): it runs as Splunk's
+        # system user, so say "scheduled build" rather than that account's name.
+        scheduled = str(info.sid or "").startswith("scheduler_")
+        who = "scheduled build" if scheduled else info.username
         host = urlparse(info.splunkd_uri).hostname or ""
         transport = HttpTransport(
             info.splunkd_uri,
@@ -108,7 +112,7 @@ class DelveCatBuild(GeneratingCommand):
             "_key": "build",
             "state": "running",
             "sid": info.sid,
-            "user": info.username,
+            "user": who,
             "startedAt": _now(),
             "updatedAt": _now(),
             "step": "starting",
@@ -175,8 +179,13 @@ class DelveCatBuild(GeneratingCommand):
                 why = (
                     "only some parts were selected, and the catalog holds only what they read"
                     if some
-                    else "you may see less of this Splunk than "
-                    + (published_by or "whoever built it")
+                    else (
+                        "the scheduled build runs as Splunk's system user and saw less "
+                        "than " + (published_by or "the last build")
+                        if scheduled
+                        else "you may see less of this Splunk than "
+                        + (published_by or "whoever built it")
+                    )
                 )
                 filtered = [
                     e["name"]
@@ -210,7 +219,11 @@ class DelveCatBuild(GeneratingCommand):
                 COLLECTION,
                 dry_run=bool(self.dryrun),
                 force=True,
-                extra={"publishedBy": info.username, "builtBy": "delvecatbuild", "sid": info.sid},
+                extra={
+                    "publishedBy": who,
+                    "builtBy": "scheduled build" if scheduled else "delvecatbuild",
+                    "sid": info.sid,
+                },
                 log=lambda m: None,
             )
             problems = [r for r in bundle["ingestionReport"] if r["status"] not in ("ok",)]

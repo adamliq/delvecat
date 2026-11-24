@@ -203,7 +203,7 @@ one. The same from a search:
   cron expression of your choice, with the parts and options selected on the
   page. It is owned by `nobody`, so Splunk runs it as its system user, and it
   publishes like a build started from the page (not if the catalog would be much
-  smaller). Turn off sets it back to disabled.
+  smaller), as "scheduled build". Turn off sets it back to disabled.
 - **Not in Splunk**: annotations from a repository, the public redaction
   profile (it needs a secret salt), other instances. Use the command line for
   those.

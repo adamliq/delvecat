@@ -22,7 +22,9 @@ import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LookupFieldsTab } from "../components/LookupFieldsTab";
 import { DataModelTab } from "../components/DataModelTab";
 import { CommandList } from "../components/CommandList";
-import { DiffTable, type DiffRow } from "./ChangesPage";
+import { DiffTable } from "./ChangesPage";
+import { LazyDetails } from "../components/LazyDetails";
+import { objectHistory } from "../lib/changes";
 import { lookupColumns } from "../lib/lookups";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
@@ -106,7 +108,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy"]);
   const shownInStorage = entity.type === "index" && !!props.storage;
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)) && !(shownInStorage && STORAGE_KEYS.has(k)),
@@ -246,15 +248,34 @@ export function EntityPage() {
           ) : null}
 
           {(() => {
-            const ch = catalog.bundle.changes;
-            const rows = (ch?.details as Record<string, DiffRow[]> | undefined)?.[entity.id];
-            return rows?.length ? (
+            const history = objectHistory(catalog, entity.id);
+            if (!history.length) return null;
+            const [latest, ...earlier] = history;
+            const isLatest = latest.generatedAt === catalog.bundle.generatedAt;
+            return (
               <section>
-                <h2>Changed in the last build</h2>
-                <p className="muted small">Since the build of {new Date(ch!.previousGeneratedAt).toLocaleString()}. <Link to="/changes">All changes</Link></p>
-                <DiffTable rows={rows} />
+                <h2>{isLatest ? "Changed in the last build" : "Change history"}</h2>
+                {isLatest && latest.rows.length > 0 && <DiffTable rows={latest.rows} />}
+                {isLatest && latest.kind === "added" && <p className="small">New in the last build.</p>}
+                {(isLatest ? earlier : history).length > 0 && (
+                  <>
+                    <p className="small">{isLatest ? "Earlier: " : ""}{(isLatest ? earlier : history).length} change{(isLatest ? earlier : history).length === 1 ? "" : "s"} in the builds kept.</p>
+                    <ul className="plain-list small">
+                      {(isLatest ? earlier : history).map((h) => (
+                        <li key={h.generatedAt}>
+                          {h.rows.length ? (
+                            <LazyDetails summary={<>{new Date(h.generatedAt).toLocaleString()} · {h.kind} · {h.rows.map((r) => r.key.replace(/^properties\./, "")).slice(0, 4).join(", ")}</>}>
+                              {() => <DiffTable rows={h.rows} />}
+                            </LazyDetails>
+                          ) : <>{new Date(h.generatedAt).toLocaleString()} · {h.kind}</>}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                <p className="muted small"><Link to="/changes">All changes</Link></p>
               </section>
-            ) : null;
+            );
           })()}
 
           {code.map(([k, v]) => (
@@ -266,6 +287,18 @@ export function EntityPage() {
             </section>
           ))}
           <CommandList catalog={catalog} entity={entity} />
+          {Array.isArray(props.createdBy) && (
+            <section>
+              <h2>Created by</h2>
+              <p className="muted small">This lookup does not exist as a file yet: these searches create it with <code>outputlookup</code> when they run.</p>
+              <ul className="plain-list">
+                {(props.createdBy as string[]).map((id) => {
+                  const s = catalog.byId.get(id);
+                  return <li key={id}>{s ? <Link to={entityPath(id)}>{s.displayName ?? s.name}</Link> : <code>{id}</code>}</li>;
+                })}
+              </ul>
+            </section>
+          )}
 
           {!!props.pivot && <PivotSource entity={entity} pivot={props.pivot as { dataModel: string; dataset: string }} />}
           <EmailRecipients recipients={props.alertRecipients} />
