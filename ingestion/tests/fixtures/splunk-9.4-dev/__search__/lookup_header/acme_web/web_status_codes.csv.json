@@ -1,0 +1,15 @@
+{
+ "spl": "| inputlookup \"web_status_codes.csv\" max=20 | fieldsummary | fields field",
+ "earliest": "0",
+ "results": [
+  {
+   "field": "status"
+  },
+  {
+   "field": "meaning"
+  },
+  {
+   "field": "category"
+  }
+ ]
+}

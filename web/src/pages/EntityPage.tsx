@@ -19,6 +19,8 @@ import { isDetection } from "../lib/coverage";
 import { AnnotationChips, TypeBadge } from "../components/EntityBits";
 import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
+import { LookupFieldsTab } from "../components/LookupFieldsTab";
+import { lookupColumns } from "../lib/lookups";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
 import { PropContext, PropValue } from "../components/PropValue";
@@ -281,7 +283,9 @@ export function EntityPage() {
         </PropContext.Provider>
       )}
 
-      {tab === "fields" && (entity.type === "sourcetype" ? <SchemaTab catalog={catalog} entity={entity} /> : fields && <FieldsTab table={fields} />)}
+      {tab === "fields" && (entity.type === "sourcetype" ? <SchemaTab catalog={catalog} entity={entity} />
+        : (entity.type === "lookup" || entity.type === "kvCollection") && lookupColumns(entity).length ? <LookupFieldsTab catalog={catalog} entity={entity} />
+        : fields && <FieldsTab table={fields} />)}
 
       {tab === "fieldsUsed" && <SearchFieldsTab catalog={catalog} entity={entity} />}
 

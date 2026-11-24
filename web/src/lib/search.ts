@@ -1,6 +1,7 @@
 import MiniSearch from "minisearch";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription } from "./annotate";
+import { lookupColumns } from "./lookups";
 
 /** Facets offered on the search page; each maps an entity to zero or more values. */
 export const FACETS = {
@@ -50,6 +51,8 @@ interface Doc {
   tags: string;
   body: string;
   values: string;
+  /** Field names of a lookup or KV Store collection. */
+  columns: string;
 }
 
 // Property keys already indexed (as body) or not worth searching.
@@ -107,6 +110,7 @@ function toDoc(e: Entity): Doc {
     tags: [...(a.tags ?? []), ...(a.classifications ?? []), ...(a.glossaryTerms ?? [])].join(" "),
     body,
     values: [...new Set(propertyValues(p))].join(" "),
+    columns: lookupColumns(e).join(" "),
   };
 }
 
@@ -138,12 +142,12 @@ export class EntitySearch {
     this.facetNames = Object.keys(this.facets);
     this.byId = new Map(entities.map((e) => [e.id, e]));
     this.index = new MiniSearch<Doc>({
-      fields: ["name", "displayName", "description", "app", "owner", "tags", "body", "values"],
+      fields: ["name", "displayName", "description", "app", "owner", "tags", "body", "values", "columns"],
       storeFields: ["id"],
       // SPL and Splunk names use _, -, :, ., / and backticks as separators.
       tokenize: (text) => text.split(/[\s_\-:./`|=,()[\]"'*@]+/).filter(Boolean),
       searchOptions: {
-        boost: { name: 4, displayName: 3, tags: 2, description: 1.5, values: 0.5 },
+        boost: { name: 4, displayName: 3, tags: 2, columns: 2, description: 1.5, values: 0.5 },
         prefix: true,
         fuzzy: (term) => (term.length > 4 ? 0.2 : false),
         combineWith: "AND",
@@ -230,7 +234,7 @@ export function propertyPairs(props: unknown, key = "", out: [string, string][] 
 
 const FIELD_WORDS: Record<string, string> = {
   name: "name", displayName: "name", description: "description", app: "app", owner: "owner",
-  tags: "tags, classifications or terms", body: "search text", values: "a property value",
+  tags: "tags, classifications or terms", body: "search text", values: "a property value", columns: "field",
 };
 
 export interface Snippet {
@@ -251,6 +255,10 @@ export function matchSnippet(e: Entity, m: Match | undefined): Snippet | undefin
   const has = (t: string) => terms.some((w) => lower(t).includes(w));
   // Name or description matches show in the row already (highlighted).
   if (m.fields.some((f) => f === "name" || f === "displayName" || f === "description")) return { where: fields.join(", ") };
+  if (m.fields.includes("columns")) {
+    const hit = lookupColumns(e).filter((c) => has(c));
+    if (hit.length) return { where: hit.length > 1 ? "fields" : "field", text: hit.slice(0, 5).join(", ") };
+  }
   if (m.fields.includes("values")) {
     const pair = propertyPairs(e.properties ?? {}).find(([, v]) => has(v));
     if (pair) return { where: fields.join(", "), key: pair[0], text: pair[1] };

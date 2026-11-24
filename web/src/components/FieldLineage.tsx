@@ -1,4 +1,5 @@
 import { ColumnLineage } from "./ColumnLineage";
+import { lookupsWithField } from "../lib/lookups";
 import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
@@ -99,6 +100,8 @@ export function FieldPanel({ catalog, entity }: { catalog: Catalog; entity: Enti
   const impact = fieldImpact(catalog, entity);
   const sampled = (entity.properties as { definedIn?: string } | undefined)?.definedIn !== "configuration";
   const st = catalog.byId.get(`${entity.instance}:sourcetype:${sourcetypeOf(entity)}`);
+  // Lookups with a field of this name: where enrichment for it can come from, or go to.
+  const lookups = lookupsWithField(catalog, fieldName(entity), entity.instance);
   return (
     <>
       <section>
@@ -112,6 +115,9 @@ export function FieldPanel({ catalog, entity }: { catalog: Catalog; entity: Enti
           </dd>
           {sources.length > 0 && (
             <><dt>Derived from</dt><dd>{sources.map((f, i) => <span key={f.id}>{i > 0 && ", "}<Link to={entityPath(f.id)}><code>{fieldName(f)}</code></Link></span>)}</dd></>
+          )}
+          {lookups.length > 0 && (
+            <><dt>In lookups</dt><dd>{lookups.map((l, i) => <span key={l.id}>{i > 0 && ", "}<Link to={`${entityPath(l.id)}?tab=fields`}>{l.displayName ?? l.name}</Link>{l.type === "kvCollection" && <span className="muted small"> (KV Store)</span>}</span>)}</dd></>
           )}
         </dl>
       </section>

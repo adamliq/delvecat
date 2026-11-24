@@ -137,6 +137,22 @@ class FixtureTransport:
     ) -> list[dict[str, Any]]:
         return self._load(search_fixture_path(name), f"search {name}").get("results", [])
 
+    def search_in_app(
+        self, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
+    ) -> list[dict[str, Any]]:
+        return FixtureTransport.search(self, name, spl, earliest, latest)
+
+
+def search_in_app(
+    transport: Any, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
+) -> list[dict[str, Any]]:
+    """Run a search in an app's context (what an app-private lookup needs), where the
+    transport can; otherwise in the default context."""
+    fn = getattr(transport, "search_in_app", None)
+    if fn is None:
+        return transport.search(name, spl, earliest, latest)
+    return fn(app, name, spl, earliest, latest)
+
 
 class HttpTransport:
     """Read-only HTTP client for the Splunk management port (8089) or the ACS API."""
@@ -208,6 +224,19 @@ class HttpTransport:
     def search(
         self, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
     ) -> list[dict[str, Any]]:
+        return self._search(name, spl, earliest, latest, "/services/search/jobs")
+
+    def search_in_app(
+        self, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
+    ) -> list[dict[str, Any]]:
+        from urllib.parse import quote
+
+        jobs = f"/servicesNS/-/{quote(app, safe='')}/search/jobs"
+        return self._search(name, spl, earliest, latest, jobs)
+
+    def _search(
+        self, name: str, spl: str, earliest: str, latest: str, jobs: str
+    ) -> list[dict[str, Any]]:
         stripped = spl.lstrip()
         if stripped.startswith("|") or stripped.lower().startswith("search "):
             query = stripped
@@ -216,10 +245,10 @@ class HttpTransport:
         # Tag Licoryx Delvecat's own searches so usage reports can leave them out (SPL comment).
         query = f"{query} {SEARCH_MARKER}"
         if self._search_timeout:
-            return self._search_job(name, query, earliest, latest)
+            return self._search_job(name, query, earliest, latest, jobs)
         resp = self.request(
             "POST",
-            "/services/search/jobs",
+            jobs,
             data={
                 "search": query,
                 "exec_mode": "oneshot",
@@ -240,11 +269,13 @@ class HttpTransport:
             raise SearchError(f"search {name}: {'; '.join(fatal)}")
         return body.get("results", [])
 
-    def _search_job(self, name: str, query: str, earliest: str, latest: str) -> list[dict]:
+    def _search_job(
+        self, name: str, query: str, earliest: str, latest: str, jobs: str = "/services/search/jobs"
+    ) -> list[dict]:
         """Run a search as a job, cancelling it past the search time limit."""
         resp = self.request(
             "POST",
-            "/services/search/jobs",
+            jobs,
             data={
                 "search": query,
                 "exec_mode": "normal",
@@ -339,5 +370,12 @@ class RecordingTransport:
         self, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
     ) -> list[dict[str, Any]]:
         rows = self.inner.search(name, spl, earliest, latest)
+        self._write(search_fixture_path(name), {"spl": spl, "earliest": earliest, "results": rows})
+        return rows
+
+    def search_in_app(
+        self, app: str, name: str, spl: str, earliest: str = "-24h", latest: str = "now"
+    ) -> list[dict[str, Any]]:
+        rows = search_in_app(self.inner, app, name, spl, earliest, latest)
         self._write(search_fixture_path(name), {"spl": spl, "earliest": earliest, "results": rows})
         return rows

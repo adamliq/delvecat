@@ -391,6 +391,20 @@ sourcetypes (`--max-field-sourcetypes`), searching only the indexes the
 sourcetype was seen in. `--field-indexes web,app_*` narrows it to the
 sourcetypes in those indexes (`*` wildcards), sampled only there.
 
+### Lookup fields
+
+Every lookup lists its fields (`properties.fields`): lookup definitions as
+Splunk reports them (`fields_list`), KV Store collections from their field
+types, and lookup table files from the definition that reads them. A CSV file no
+definition describes gets its fields from its header row: a read-only
+`| inputlookup "<file>" max=20 | fieldsummary | fields field`, run in the file's
+own app, for at most `--lookup-headers` files (default 300; `0` for none).
+Only field names come back, never values; files shared privately with one user
+are skipped. A definition without a field list takes its file's or
+collection's (`fieldsFrom` names where they came from), and an automatic lookup
+with no `OUTPUT` list adds every lookup field other than the ones it matches on
+to the sourcetype.
+
 ## Search time limit
 
 Every search a build runs (inventory, hosts, sources, forwarders, field

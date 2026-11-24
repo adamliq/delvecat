@@ -11,7 +11,7 @@ from typing import Any
 from . import SCHEMA_VERSION, __version__
 from .attribute import attribute_products
 from .compat import UTC
-from .fields import define_fields, link_fields
+from .fields import define_fields, fill_lookup_fields, link_fields
 from .health import (
     apply_health_history,
     apply_usage,
@@ -191,6 +191,7 @@ def assemble(
     attribute_products(entities)
     spl_refs = derive(entities)
     result.edges.extend(link_hosts(entities))
+    fill_lookup_fields(entities)
     result.edges.extend(define_fields(entities))
     all_refs = [*result.refs, *spl_refs]
     resolved, unresolved = Resolver(entities).resolve(all_refs)

@@ -2,9 +2,14 @@ import type { Entity } from "../generated/catalog";
 import type { Catalog } from "./catalog";
 import { CIM_FIELDS } from "./cimReference";
 import { fieldName } from "./fieldLineage";
+import { lookupFieldEntities, schemaLookups } from "./lookups";
 
-/** Fields of a sourcetype (sampled or defined in props.conf), by name. */
+/** Fields of a sourcetype (sampled or defined in props.conf), by name; for a lookup or KV
+ * Store collection, its fields as field-like objects. */
 export function schemaFields(catalog: Catalog, st: Entity): Entity[] {
+  if (st.type === "lookup" || st.type === "kvCollection") {
+    return lookupFieldEntities(st).sort((a, b) => fieldName(a).localeCompare(fieldName(b)));
+  }
   return catalog.edgesFrom(st.id)
     .filter((x) => x.type === "contains")
     .map((x) => catalog.byId.get(x.to))
@@ -91,12 +96,12 @@ export function similarity(a: Set<string>, b: Set<string>): { shared: string[]; 
   return { shared, score: union ? shared.length / union : 0 };
 }
 
-/** Sourcetypes with the most similar field names, best first. */
+/** Sourcetypes and lookups with the most similar field names, best first. */
 export function similarSchemas(catalog: Catalog, st: Entity, limit = 6) {
   const mine = names(catalog, st);
   if (!mine.size) return [];
-  return catalog.entities
-    .filter((o) => o.type === "sourcetype" && o.id !== st.id)
+  return [...catalog.entities.filter((o) => o.type === "sourcetype"), ...schemaLookups(catalog)]
+    .filter((o) => o.id !== st.id)
     .map((o) => ({ entity: o, ...similarity(mine, names(catalog, o)) }))
     .filter((r) => r.shared.length)
     .sort((a, b) => b.score - a.score || b.shared.length - a.shared.length)
@@ -112,7 +117,7 @@ export interface CompareRow {
   status: CompareStatus;
 }
 
-/** Field-by-field comparison of two sourcetypes. */
+/** Field-by-field comparison of two sourcetypes or lookups. */
 export function compareSchemas(catalog: Catalog, a: Entity, b: Entity): CompareRow[] {
   const fa = new Map(schemaFields(catalog, a).map((f) => [fieldName(f), f]));
   const fb = new Map(schemaFields(catalog, b).map((f) => [fieldName(f), f]));
@@ -129,3 +134,6 @@ export function compareSchemas(catalog: Catalog, a: Entity, b: Entity): CompareR
 export const schemaSourcetypes = (catalog: Catalog) =>
   catalog.entities.filter((e) => e.type === "sourcetype" && schemaFields(catalog, e).length > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+/** Everything with a schema: sourcetypes with fields, then lookups and KV Store collections. */
+export const schemaObjects = (catalog: Catalog) => [...schemaSourcetypes(catalog), ...schemaLookups(catalog)];

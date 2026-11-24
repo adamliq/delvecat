@@ -208,8 +208,13 @@ const sections = {
     check('build with field discovery in _internal finishes', doc?.state === 'done',
       `${doc?.entities} objects; options ${JSON.stringify({ fieldIndexes: doc?.options?.fieldIndexes, t: doc?.options?.searchTimeout, n: doc?.options?.parts?.length })}`);
     const jobs = (await rest('GET', '/services/search/jobs?count=300')).json?.entry || [];
-    const samples = jobs.map((e) => e.content.search || '').filter((s) => s.includes('fieldsummary'));
+    const searches = jobs.map((e) => ({ spl: e.content.search || '', app: e.acl?.app }));
+    const samples = searches.map((j) => j.spl).filter((s) => s.includes('fieldsummary') && !s.includes('inputlookup'));
     check('every field sample searched only _internal', samples.length > 0 && samples.every((s) => s.includes('(index="_internal")') && !s.includes('index=*')), `${samples.length} sample searches`);
+    // Lookup files no definition describes: their header is read in the file's own app.
+    const headers = searches.filter((j) => /^\| inputlookup "[^"]+" max=20 \| fieldsummary \| fields field/.test(j.spl));
+    check('lookup headers read in each file\'s app, field names only', headers.length > 0 && headers.some((j) => j.app && j.app !== 'search'),
+      headers.map((j) => `${j.app}: ${j.spl.slice(15, 45)}`).slice(0, 3).join('; '));
     await a.page.goto(app('#/schemas'));
     await sleep(3000);
     check('Schemas page lists sourcetypes with discovered fields', /splunkd/.test(await mainText(a.page)));

@@ -12,6 +12,8 @@ import { effectiveClassifications } from "../lib/governance";
 import { healthStatus } from "../lib/health";
 import { entityPath } from "../lib/routes";
 import { cimCoverage, schemaFields, schemaSourcetypes } from "../lib/schema";
+import { columnsSource, lookupColumns, schemaLookups } from "../lib/lookups";
+import { typeLabel } from "../lib/labels";
 import { StatusLabel } from "./HealthPage";
 
 export function SchemasPage() {
@@ -48,18 +50,33 @@ export function SchemasPage() {
     (r.cim.pct ?? 0) >= minCim &&
     (!q || r.st.name.toLowerCase().includes(q) || r.fields.some((f) => fieldName(f).toLowerCase().includes(q)) || [...r.terms].some((t) => t.includes(q)));
   const rows = all.filter(matches);
+  const lookups = useMemo(() => schemaLookups(catalog).map((e) => {
+    const p = (e.properties ?? {}) as { kind?: string };
+    return {
+      e,
+      columns: lookupColumns(e),
+      kind: e.type === "kvCollection" ? "KV Store collection" : p.kind === "file" ? "file"
+        : `${({ csv: "CSV", kvstore: "KV Store", external: "external", geo: "geo" } as Record<string, string>)[p.kind ?? ""] ?? "lookup"} definition`,
+      users: new Set(catalog.edgesTo(e.id).filter((x) => ["reads", "writes", "uses"].includes(x.type)).map((x) => x.from)).size,
+      owners: owners(e),
+    };
+  }), [catalog]);
+  const lookupRows = lookups.filter((r) =>
+    (!owner || r.owners.includes(owner)) &&
+    (!q || r.e.name.toLowerCase().includes(q) || r.columns.some((c) => c.toLowerCase().includes(q))));
+  const lookupHits = (r: (typeof lookups)[number]) => (q ? r.columns.filter((n) => n.toLowerCase().includes(q)).slice(0, 4) : []);
   const hits = (r: (typeof all)[number]) => (q ? r.fields.map(fieldName).filter((n) => n.toLowerCase().includes(q)).slice(0, 4) : []);
 
   return (
     <div className="stack">
       <div>
         <h1>Schemas</h1>
-        <p className="lede">Field schemas of every sampled sourcetype: how they map to data models, what they share, and where the same field differs.</p>
+        <p className="lede">Field schemas of every sampled sourcetype, lookup and KV Store collection: how they map to data models, what they share, and where the same field differs.</p>
       </div>
 
       <div className="insights-filters schema-filters">
         <form role="search" onSubmit={(e) => { e.preventDefault(); set("q", qInput); }}>
-          <input type="search" value={qInput} placeholder="Sourcetype, field or glossary term" aria-label="Search sourcetypes, fields and glossary terms"
+          <input type="search" value={qInput} placeholder="Sourcetype, lookup, field or glossary term" aria-label="Search sourcetypes, lookups, fields and glossary terms"
             onChange={(e) => { setQInput(e.target.value); set("q", e.target.value); }} />
         </form>
         {allModels.length > 0 && (
@@ -111,6 +128,32 @@ export function SchemasPage() {
           />
         )}
       </section>
+
+      {lookups.length > 0 && (
+        <section>
+          <h2>Lookups and KV Store collections <span className="muted">({lookupRows.length} of {lookups.length})</span></h2>
+          {lookupRows.length === 0 ? <p className="muted">No lookups match.</p> : (
+            <DataTable
+              rows={lookupRows}
+              rowKey={(r) => r.e.id}
+              csvName="delvecat-lookup-schemas.csv"
+              columns={[
+                { label: "Lookup", value: (r) => r.e.displayName ?? r.e.name, render: (r) => (
+                  <>
+                    <Link to={`${entityPath(r.e.id)}?tab=fields`}>{r.e.displayName ?? r.e.name}</Link>
+                    {lookupHits(r).length > 0 && <div className="small">{lookupHits(r).map((h) => <code key={h} className="hit">{h}</code>)}</div>}
+                  </>
+                ) },
+                { label: "Kind", value: (r) => r.kind, render: (r) => <span title={typeLabel(r.e.type)}>{r.kind}{columnsSource(r.e) === "header" && <span className="muted small"> · fields from its header row</span>}</span> },
+                { label: "Fields", value: (r) => r.columns.length, render: (r) => <span title={r.columns.join(", ")}>{r.columns.length}</span> },
+                { label: "App", value: (r) => r.e.app ?? "" },
+                { label: "Used by", value: (r) => r.users, render: (r) => (r.users ? `${r.users} object${r.users === 1 ? "" : "s"}` : <span className="muted">nothing in the catalog</span>) },
+                { label: "Owner", value: (r) => r.owners.join(", "), render: (r) => r.owners.join(", ") || <span className="muted">—</span> },
+              ]}
+            />
+          )}
+        </section>
+      )}
 
       <section>
         <div className="results-bar">

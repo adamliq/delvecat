@@ -112,6 +112,7 @@ def _build(args: argparse.Namespace) -> int:
         usage_window=args.usage_window,
         health_window=args.health_window,
         adhoc_objects=args.adhoc_objects,
+        lookup_headers=args.lookup_headers,
     )
     only = set(args.only.split(",")) if args.only else None
     if only and (unknown := only - set(splunk.EXTRACTORS)):
@@ -462,6 +463,14 @@ def main(argv: list[str] | None = None) -> int:
         help="sample events per sourcetype to discover fields (slower)",
     )
     inv.add_argument("--max-field-sourcetypes", type=int, default=100)
+    inv.add_argument(
+        "--lookup-headers",
+        type=int,
+        default=300,
+        metavar="N",
+        help="read the field names of at most N lookup table files no lookup definition "
+        "describes (default 300; 0 for none)",
+    )
     inv.add_argument(
         "--field-indexes",
         metavar="INDEX,INDEX",

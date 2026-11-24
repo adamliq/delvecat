@@ -17,6 +17,9 @@ input fields).
 reads, directly or through the indexes it reads. Fields of data models,
 lookups and other searches' results are not linked: there are no field
 entities for them.
+
+``fill_lookup_fields`` shares field lists between a lookup definition and the
+file or KV Store collection behind it, so each lists the lookup's fields.
 """
 
 from __future__ import annotations
@@ -50,8 +53,59 @@ def _expression_fields(expr: str) -> list[str]:
     return out
 
 
+def lookup_columns(e: dict[str, Any]) -> list[str]:
+    """The fields of a lookup (definition or file) or KV Store collection."""
+    f = (e.get("properties") or {}).get("fields")
+    if isinstance(f, dict):
+        return list(f)
+    return [str(x) for x in f] if isinstance(f, list) else []
+
+
+def _is_file(e: dict[str, Any]) -> bool:
+    return (e.get("properties") or {}).get("kind") == "file"
+
+
+def fill_lookup_fields(entities: list[dict[str, Any]]) -> int:
+    """Give lookup definitions without a field list the fields of their file or KV Store
+    collection, and files those of the definition that reads them. Returns how many."""
+    files = {
+        (e["instance"], e["name"].split("/")[-1]): e
+        for e in entities
+        if e["type"] == "lookup" and _is_file(e)
+    }
+    collections = {
+        (e["instance"], e["name"].split("/")[-1]): e
+        for e in entities
+        if e["type"] == "kvCollection"
+    }
+    n = 0
+    for d in entities:
+        p = d.get("properties") or {}
+        if d["type"] != "lookup" or p.get("kind") == "file":
+            continue
+        source = files.get((d["instance"], str(p.get("filename")))) or collections.get(
+            (d["instance"], str(p.get("collection")))
+        )
+        if not source:
+            continue
+        if not lookup_columns(d) and (cols := lookup_columns(source)):
+            p["fields"], p["fieldsFrom"] = cols, source["id"]
+            n += 1
+        sp = source.setdefault("properties", {})
+        if (
+            source["type"] == "lookup"
+            and not lookup_columns(source)
+            and (cols := lookup_columns(d))
+        ):
+            sp["fields"], sp["fieldsFrom"] = cols, d["id"]
+            n += 1
+    return n
+
+
 def _definitions(
-    e: dict[str, Any], transforms: dict[tuple[str, str], dict[str, Any]]
+    e: dict[str, Any],
+    transforms: dict[tuple[str, str], dict[str, Any]],
+    lookups: dict[tuple[str, str], dict[str, Any]] | None = None,
 ) -> tuple[list[str], list[str]]:
     """(fields defined, fields read) by a props.conf knowledge object."""
     p = e.get("properties") or {}
@@ -87,6 +141,10 @@ def _definitions(
     if t == "automaticLookup":
         outputs = [v or k for k, v in (p.get("outputFields") or {}).items()]
         inputs = [v or k for k, v in (p.get("inputFields") or {}).items()]
+        if not outputs and (lk := (lookups or {}).get((e["instance"], str(p.get("lookup"))))):
+            # No OUTPUT list: every lookup field other than the ones matched on is added.
+            keys = set(p.get("inputFields") or {})
+            outputs = [c for c in lookup_columns(lk) if c not in keys and not c.startswith("_")]
         return outputs, inputs
     return [], []
 
@@ -96,6 +154,11 @@ def define_fields(entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
     by_id = {e["id"]: e for e in entities}
     transforms = {
         (e["instance"], e["name"].split("/")[-1]): e for e in entities if e["type"] == "transform"
+    }
+    lookups = {
+        (e["instance"], e["name"].split("/")[-1]): e
+        for e in entities
+        if e["type"] == "lookup" and (e.get("properties") or {}).get("kind") != "file"
     }
     edges: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
@@ -132,7 +195,7 @@ def define_fields(entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
         st = _sourcetype((e.get("properties") or {}).get("stanza"))
         if not st:
             continue
-        defined, read = _definitions(e, transforms)
+        defined, read = _definitions(e, transforms, lookups)
         for name in dict.fromkeys(defined):
             fid = field_id(e["instance"], st, name, create=True)
             if fid:

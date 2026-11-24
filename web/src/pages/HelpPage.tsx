@@ -40,9 +40,9 @@ const SECTIONS: Section[] = [
     body: (
       <dl className="help-defs">
         <dt><L to="/">Home</L></dt><dd>Instances, at-a-glance tiles, documentation coverage and every object type by area.</dd>
-        <dt><L to="/search">Browse</L></dt><dd>Search and filter everything. Results say why they matched; <em>Table</em> shows them as a sortable table; <em>Download CSV</em> exports them.</dd>
+        <dt><L to="/search">Browse</L></dt><dd>Search and filter everything, including lookups by the fields they hold (<em>Has field</em> filters lookups, collections and sourcetypes by field name). Results say why they matched; <em>Table</em> shows them as a sortable table; <em>Download CSV</em> exports them.</dd>
         <dt><L to="/domains">Domains</L></dt><dd>Business areas and the data products they deliver, with how well each is documented and its problems.</dd>
-        <dt><L to="/schemas">Schemas</L></dt><dd>Field schemas of sampled sourcetypes, their CIM data model coverage, and fields shared across them. <L to="/compare">Compare</L> puts sourcetypes and data models side by side.</dd>
+        <dt><L to="/schemas">Schemas</L></dt><dd>Field schemas of sampled sourcetypes, lookups and KV Store collections, their CIM data model coverage, and fields shared across them. <L to="/compare">Compare</L> puts sourcetypes, lookups and data models side by side.</dd>
         <dt><L to="/glossary">Glossary</L></dt><dd>Business terms, the objects and fields they describe, and unused terms.</dd>
         <dt><L to="/coverage">Coverage</L></dt><dd>MITRE ATT&amp;CK and CIM coverage of your detections, and what would let detections that cannot fire work.</dd>
         <dt><L to="/findings">Findings</L></dt><dd>Every warning and critical check in one list, with how to fix each.</dd>
@@ -161,7 +161,7 @@ const SECTIONS: Section[] = [
         </p>
         <p><strong>Never collected:</strong> passwords, token values, HEC token values, client secrets, certificates and keys,
           <code>pass4SymmKey</code>, LDAP bind credentials and member names, connection credentials, and the values of add-on
-          and modular input settings (their names only). The most-run ad-hoc searches (up to 1,000, typed at the search bar or sent over the REST API) are kept as Ad-hoc Search objects with their SPL, run and user counts, and the objects they read; who ran them is not kept. Building with the public redaction profile drops the SPL.</p>
+          and modular input settings (their names only). The most-run ad-hoc searches (up to 1,000, typed at the search bar or sent over the REST API) are kept as Ad-hoc Search objects with their SPL, run and user counts, and the objects they read; who ran them is not kept. Building with the public redaction profile drops the SPL. For lookup files no definition describes, only the field names of the header row are read, never values.</p>
         <p>The <em>internal</em> redaction profile drops real names; the <em>public</em> one also pseudonymises users and hosts and drops URLs, IP addresses and customer identifiers.</p>
       </>
     ),

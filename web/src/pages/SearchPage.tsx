@@ -39,6 +39,7 @@ const FACET_TITLES: Record<string, string> = {
   health: "Health",
   sensitivity: "Sensitivity",
   usage: "Usage",
+  field: "Has field",
 };
 
 let instanceNames: Record<string, string> = {};

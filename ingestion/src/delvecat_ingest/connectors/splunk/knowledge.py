@@ -10,7 +10,7 @@ from typing import Any
 from ...dashboards import parse_dashboard
 from ...model import ExtractResult, fqn
 from ...splunk_rest import as_bool, iter_entries
-from ...transport import EndpointForbidden, EndpointNotFound
+from ...transport import EndpointForbidden, EndpointNotFound, SearchError, search_in_app
 from . import security
 from .common import (
     NS,
@@ -679,12 +679,61 @@ def extract_index_time_rules(ctx: Ctx, out: ExtractResult) -> int:
 # --- lookups and KV store ------------------------------------------------------------
 
 
+_CSV_FILE = re.compile(r"\.csv(\.gz)?$", re.IGNORECASE)
+
+
 def extract_lookup_files(ctx: Ctx, out: ExtractResult) -> int:
-    n = 0
-    for e in iter_entries(ctx.transport, f"{NS}/data/lookup-table-files"):
-        add_ko(ctx, out, "lookup", e, properties={"kind": "file"})
-        n += 1
-    return n
+    files = list(iter_entries(ctx.transport, f"{NS}/data/lookup-table-files"))
+    # Files a definition already lists the fields of (Splunk reads them from the header).
+    try:
+        described = {
+            content(d).get("filename")
+            for d in iter_entries(ctx.transport, f"{NS}/data/transforms/lookups")
+            if content(d).get("fields_list")
+        }
+    except (EndpointNotFound, EndpointForbidden):
+        described = set()
+    budget = ctx.options.lookup_headers
+    for e in files:
+        app, _, sharing = acl(e)
+        fields = None
+        if (
+            budget > 0
+            and _CSV_FILE.search(e["name"])
+            and e["name"] not in described
+            and sharing != "user"  # personal files need their owner's context
+        ):
+            budget -= 1
+            fields = lookup_header(ctx, app or "search", e["name"])
+        add_ko(
+            ctx,
+            out,
+            "lookup",
+            e,
+            properties={
+                "kind": "file",
+                "fields": fields or None,
+                "fieldsFrom": "header" if fields else None,
+            },
+        )
+    return len(files)
+
+
+def lookup_header(ctx: Ctx, app: str, filename: str) -> list[str]:
+    """The column names of a lookup table file, read in its app's context. Splunk reads a
+    few rows to list the fields; only the names come back."""
+    name = filename.replace('"', "")
+    try:
+        rows = search_in_app(
+            ctx.transport,
+            app,
+            f"lookup_header/{app}/{name}",
+            f'| inputlookup "{name}" max=20 | fieldsummary | fields field',
+            earliest="0",
+        )
+    except (SearchError, EndpointNotFound, EndpointForbidden):
+        return []
+    return [str(r["field"]) for r in rows if r.get("field")]
 
 
 def extract_lookup_definitions(ctx: Ctx, out: ExtractResult) -> int:

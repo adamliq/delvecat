@@ -214,6 +214,49 @@
    },
    "name": "geo_us_states.kmz",
    "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:data": "/opt/splunk/etc/apps/acme_web/lookups/web_status_codes.csv",
+    "eai:userName": "nobody"
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv",
+   "links": {
+    "_reload": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv/_reload",
+    "alternate": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv",
+    "edit": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv",
+    "list": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv",
+    "move": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv/move",
+    "remove": "/servicesNS/nobody/acme_web/data/lookup-table-files/web_status_codes.csv"
+   },
+   "name": "web_status_codes.csv",
+   "updated": "2026-11-06T07:33:04+00:00"
   }
  ],
  "generator": {
@@ -223,7 +266,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 5
+  "total": 6
  },
  "updated": "2026-11-06T07:34:37+00:00"
 }

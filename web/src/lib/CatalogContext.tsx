@@ -1,8 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { CatalogBundle } from "../generated/catalog";
+import type { CatalogBundle, Entity } from "../generated/catalog";
 import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
 import { riskMap, type Risk } from "./risk";
 import { IN_SPLUNK, fetchSplunkCatalog } from "./splunkSource";
+import { lookupColumns } from "./lookups";
+import { schemaFields } from "./schema";
+import { fieldName } from "./fieldLineage";
 import { EntitySearch } from "./search";
 import { propertyDefs, propertyFacets } from "./structured";
 
@@ -20,11 +23,21 @@ interface Ctx {
 
 export const CatalogCtx = createContext<Ctx | null>(null);
 
+const sourcetypeFieldNames = (catalog: Catalog, st: Entity) => schemaFields(catalog, st).map(fieldName);
+
 function ready(bundle: CatalogBundle, origin: string): State {
   const catalog = new Catalog(bundle);
   const risk = riskMap(catalog);
+  const stFields = new Map<string, string[]>();
   const search = new EntitySearch(bundle.entities, {
     ...propertyFacets(propertyDefs(bundle)),
+    // Sourcetypes by the fields found on them; lookups and collections by theirs.
+    field: (e) => {
+      if (e.type !== "sourcetype") return lookupColumns(e);
+      let names = stFields.get(e.id); // computed once: facets are counted on every query
+      if (!names) stFields.set(e.id, (names = sourcetypeFieldNames(catalog, e)));
+      return names;
+    },
     risk: (e) => {
       const r = risk.get(e.id);
       return r ? [r.severity] : [];

@@ -7,7 +7,8 @@ import { fieldName } from "../lib/fieldLineage";
 import { termsOfField } from "../lib/glossaryFields";
 import { effectiveClassifications } from "../lib/governance";
 import { entityPath, glossaryPath } from "../lib/routes";
-import { cimCoverage, fieldType, nullRate, schemaFields, similarSchemas } from "../lib/schema";
+import { cimCoverage, fieldType, nullRate, schemaFields } from "../lib/schema";
+import { SimilarSchemas } from "./SimilarSchemas";
 import { Meter } from "./Meter";
 
 type Filter = "all" | "number" | "string" | "cim" | "sensitive";
@@ -19,7 +20,6 @@ export function SchemaTab({ catalog, entity }: { catalog: Catalog; entity: Entit
   const [filter, setFilter] = useState<Filter>("all");
   const fields = schemaFields(catalog, entity);
   const cim = cimCoverage(catalog, entity);
-  const similar = similarSchemas(catalog, entity);
   const readers = (f: Entity) => catalog.edgesTo(f.id).filter((x) => x.type === "readsField").length;
   const maxReaders = Math.max(1, ...fields.map(readers));
   const maxDistinct = Math.max(1, ...fields.map((f) => Number(((f.properties as { observed?: { distinctCount?: number } })?.observed ?? {}).distinctCount ?? 0)));
@@ -97,24 +97,7 @@ export function SchemaTab({ catalog, entity }: { catalog: Catalog; entity: Entit
         </div>
       </section>
 
-      <section>
-        <h2>Most similar schemas</h2>
-        {similar.length === 0 ? <p className="muted">No other sourcetype shares a field name with this one.</p> : (
-          <div className="similar-grid">
-            {similar.map((r) => (
-              <div key={r.entity.id} className="similar-card">
-                <div className="similar-top">
-                  <Link to={`${entityPath(r.entity.id)}?tab=fields`}>{r.entity.displayName ?? r.entity.name}</Link>
-                  <span className="muted small">{Math.round(r.score * 100)}% overlap</span>
-                </div>
-                <Meter value={Math.round(r.score * 100)} max={100} label={`${r.shared.length} shared`} name={`Field overlap with ${r.entity.name}`} />
-                <p className="small similar-shared">{r.shared.map((n, i) => <span key={n}>{i > 0 && ", "}<code>{n}</code></span>)}</p>
-                <Link className="btn btn-small" to={`/compare?a=${encodeURIComponent(entity.id)}&b=${encodeURIComponent(r.entity.id)}`}>Compare schemas</Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      <SimilarSchemas catalog={catalog} entity={entity} />
     </div>
   );
 }

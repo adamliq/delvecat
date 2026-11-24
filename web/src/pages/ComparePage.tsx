@@ -3,8 +3,9 @@ import type { Entity } from "../generated/catalog";
 import { useCatalog } from "../lib/CatalogContext";
 import { termsOfField } from "../lib/glossaryFields";
 import { entityPath, glossaryPath } from "../lib/routes";
-import { compareSchemas, dataModelFields, fieldType, nullRate, schemaSourcetypes, type CompareStatus } from "../lib/schema";
+import { compareSchemas, dataModelFields, fieldType, nullRate, schemaObjects, type CompareStatus } from "../lib/schema";
 import { CompareMany, MAX_SCHEMAS } from "../components/CompareMany";
+import { typeLabel } from "../lib/labels";
 
 const STATUS: Record<CompareStatus, { label: string; icon: string }> = {
   onlyA: { label: "Only in A", icon: "A" },
@@ -15,12 +16,18 @@ const STATUS: Record<CompareStatus, { label: string; icon: string }> = {
 const ORDER: CompareStatus[] = ["onlyA", "same", "differs", "onlyB"];
 
 const pct = (n?: number) => (n === undefined ? "—" : `${Math.round(n * 1000) / 10}%`);
-const typeOf = (f?: Entity) => (f ? (fieldType(f) === "unknown" ? "config" : fieldType(f)) : undefined);
+const typeOf = (f?: Entity) => (f ? (fieldType(f) === "unknown" ? ((f.properties as { lookup?: unknown } | undefined)?.lookup ? "lookup field" : "config") : fieldType(f)) : undefined);
 
 export function ComparePage() {
   const { catalog } = useCatalog();
   const [params, setParams] = useSearchParams();
-  const options = schemaSourcetypes(catalog);
+  const options = schemaObjects(catalog);
+  const optionLabel = (o: Entity) =>
+    `${o.displayName ?? o.name}${o.type !== "sourcetype" ? ` (${typeLabel(o.type).toLowerCase()})` : ""}${catalog.bundle.instances.length > 1 ? ` (${o.instance})` : ""}`;
+  const optionGroups = (list: Entity[]) =>
+    ([["Sourcetypes", list.filter((o) => o.type === "sourcetype")], ["Lookups and KV Store collections", list.filter((o) => o.type !== "sourcetype")]] as [string, Entity[]][])
+      .filter(([, xs]) => xs.length > 0)
+      .map(([g, xs]) => <optgroup key={g} label={g}>{xs.map((o) => <option key={o.id} value={o.id}>{optionLabel(o)}</option>)}</optgroup>);
   const pick = (k: "a" | "b", fallback: number) => catalog.byId.get(params.get(k) ?? "") ?? options[fallback];
   const a = pick("a", 0);
   const b = pick("b", Math.min(1, options.length - 1));
@@ -38,7 +45,7 @@ export function ComparePage() {
     return (
       <div className="stack">
         <h1>Compare schemas</h1>
-        <p className="muted">Comparing needs at least two sourcetypes with fields. Build the bundle with <code>--fields</code> to sample them.</p>
+        <p className="muted">Comparing needs at least two sourcetypes or lookups with fields. Build the bundle with <code>--fields</code> to sample sourcetype fields.</p>
       </div>
     );
   }
@@ -55,7 +62,7 @@ export function ComparePage() {
   const modeSwitch = (
     <div className="seg" role="tablist" aria-label="Compare">
       <button type="button" role="tab" aria-selected={!many} className={!many ? "active" : undefined}
-        onClick={() => { const next = new URLSearchParams(params); next.delete("mode"); setParams(next, { replace: true }); }}>Two sourcetypes</button>
+        onClick={() => { const next = new URLSearchParams(params); next.delete("mode"); setParams(next, { replace: true }); }}>Two schemas</button>
       <button type="button" role="tab" aria-selected={many} className={many ? "active" : undefined}
         onClick={() => setMany(manyIds.length ? manyIds : [a.id, b.id])}>Several, or against a data model</button>
     </div>
@@ -66,15 +73,13 @@ export function ComparePage() {
       <div className="stack">
         <div>
           <h1>Compare schemas</h1>
-          <p className="lede">Up to {MAX_SCHEMAS} sourcetypes and data models side by side: the fields each has, the ones they all share, and the data model fields a sourcetype lacks.</p>
+          <p className="lede">Up to {MAX_SCHEMAS} sourcetypes, lookups and data models side by side: the fields each has, the ones they all share, and the data model fields a sourcetype lacks.</p>
         </div>
         {modeSwitch}
         <label className="sort">Add
           <select value="" onChange={(e) => e.target.value && setMany([...ids.filter((x) => x !== e.target.value), e.target.value])} disabled={ids.length >= MAX_SCHEMAS}>
-            <option value="">a sourcetype or data model…</option>
-            <optgroup label="Sourcetypes">
-              {options.filter((o) => !ids.includes(o.id)).map((o) => <option key={o.id} value={o.id}>{o.displayName ?? o.name}{catalog.bundle.instances.length > 1 ? ` (${o.instance})` : ""}</option>)}
-            </optgroup>
+            <option value="">a sourcetype, lookup or data model…</option>
+            {optionGroups(options.filter((o) => !ids.includes(o.id)))}
             {models.length > 0 && (
               <optgroup label="Data models">
                 {models.filter((m) => !ids.includes(m.id)).map((m) => <option key={m.id} value={m.id}>{m.displayName ?? m.name}</option>)}
@@ -92,7 +97,7 @@ export function ComparePage() {
   const shown = filter ? rows.filter((r) => r.status === filter) : rows;
   const select = (k: "a" | "b", value: Entity) => (
     <select value={value.id} onChange={(e) => set(k, e.target.value)} aria-label={k === "a" ? "Schema A" : "Schema B"}>
-      {options.map((o) => <option key={o.id} value={o.id}>{o.displayName ?? o.name}{catalog.bundle.instances.length > 1 ? ` (${o.instance})` : ""}</option>)}
+      {optionGroups(options)}
     </select>
   );
 
@@ -100,7 +105,7 @@ export function ComparePage() {
     <div className="stack">
       <div>
         <h1>Compare schemas</h1>
-        <p className="lede">Which fields two sourcetypes share, and where the same field name holds a different type.</p>
+        <p className="lede">Which fields two sourcetypes or lookups share, and where the same field name holds a different type.</p>
       </div>
       {modeSwitch}
       <div className="cmp-pick">
