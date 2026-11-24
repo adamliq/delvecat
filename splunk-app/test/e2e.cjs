@@ -119,7 +119,7 @@ const sections = {
     await a.page.click('text=Build the catalog of this Splunk');
     await a.page.waitForSelector('fieldset.parts', { timeout: 20000 });
     const all = await a.page.locator('.parts-all').innerText();
-    check('Build page opens from the empty state, default 55 of 56 parts', /55 of 56/.test(all), all.trim());
+    check('Build page opens from the empty state, default 64 of 65 parts', /64 of 65/.test(all), all.trim());
     await a.close();
   },
 
@@ -127,7 +127,7 @@ const sections = {
     const a = await session('admin');
     // The page starts from the previous build's parts (by design); with none, the default.
     const prevParts = (await buildDoc())?.options?.parts;
-    const expected = prevParts ? prevParts.length : 55;
+    const expected = prevParts ? prevParts.length : 64;
     const t0 = Date.now();
     const doc = await uiBuild(a.page);
     check('default build from the page finishes and publishes', doc?.state === 'done' && !doc.dryRun,
@@ -230,7 +230,7 @@ const sections = {
         await p.click('input[aria-label="Select all parts"]'); // none
         await p.click('input[aria-label="Select all of Platform"]');
         const n = await p.locator('.parts-all').innerText();
-        check('picker: Select all clears, a group selects its 6 parts', /6 of 56/.test(n), n.trim());
+        check('picker: Select all clears, a group selects its 6 parts', /6 of 65/.test(n), n.trim());
         check('picker warns about a partial catalog', (await mainText(p)).includes('Only the selected parts are read'));
       },
     });
@@ -248,7 +248,7 @@ const sections = {
         if (!(await p.isChecked('input[aria-label="Select all parts"]'))) await p.click('input[aria-label="Select all parts"]');
       },
     });
-    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 56, `${doc?.entities} objects`);
+    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 65, `${doc?.entities} objects`);
     await a.close();
   },
 

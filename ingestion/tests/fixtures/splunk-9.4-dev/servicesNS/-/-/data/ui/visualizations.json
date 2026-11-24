@@ -1,0 +1,209 @@
+{
+ "updated": "2026-11-24T12:35:56+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "bar",
+   "id": "https://localhost:8089/servicesNS/nobody/system/data/ui/visualizations/bar",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/visualizations/bar",
+    "list": "/servicesNS/nobody/system/data/ui/visualizations/bar",
+    "_reload": "/servicesNS/nobody/system/data/ui/visualizations/bar/_reload"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "allow_user_selection": true,
+    "core.charting_type": "bar",
+    "core.height_attribute": "display.visualizations.chartHeight",
+    "core.icon": "chart-bar",
+    "core.order": "4",
+    "core.preview_image": "bar.png",
+    "core.recommend_for": "top, rare",
+    "core.type": "visualizations",
+    "core.viz_type": "charting",
+    "data_sources": "primary",
+    "data_sources.primary.params.count": "$display.visualizations.charting.data.count:JSCHART_RESULTS_LIMIT:10000$",
+    "data_sources.primary.params.offset": "0",
+    "data_sources.primary.params.output_mode": "json_cols",
+    "data_sources.primary.params.show_metadata": "true",
+    "default_height": "300",
+    "default_width": "300",
+    "description": "Compare values or fields.",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "label": "Bar Chart",
+    "max_height": "10000",
+    "min_height": "100",
+    "min_width": "100",
+    "search_fragment": "| stats count by comparison_category",
+    "supports_drilldown": "True",
+    "supports_export": "True",
+    "supports_trellis": "True",
+    "trellis_default_height": "400"
+   }
+  },
+  {
+   "name": "line",
+   "id": "https://localhost:8089/servicesNS/nobody/system/data/ui/visualizations/line",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/visualizations/line",
+    "list": "/servicesNS/nobody/system/data/ui/visualizations/line",
+    "_reload": "/servicesNS/nobody/system/data/ui/visualizations/line/_reload"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "allow_user_selection": true,
+    "core.charting_type": "line",
+    "core.height_attribute": "display.visualizations.chartHeight",
+    "core.icon": "chart-line",
+    "core.order": "1",
+    "core.preview_image": "line.png",
+    "core.recommend_for": "timechart, predict",
+    "core.type": "visualizations",
+    "core.viz_type": "charting",
+    "data_sources": "primary,annotation",
+    "data_sources.annotation.params.count": "1000",
+    "data_sources.annotation.params.output_mode": "json_cols",
+    "data_sources.primary.params.count": "$display.visualizations.charting.data.count:JSCHART_RESULTS_LIMIT:10000$",
+    "data_sources.primary.params.offset": "0",
+    "data_sources.primary.params.output_mode": "json_cols",
+    "data_sources.primary.params.show_metadata": "true",
+    "default_height": "300",
+    "default_width": "300",
+    "description": "Track values and trends over time.",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "label": "Line Chart",
+    "max_height": "10000",
+    "min_height": "100",
+    "min_width": "100",
+    "search_fragment": "| timechart count [by comparison_category]",
+    "supports_drilldown": "True",
+    "supports_export": "True",
+    "supports_trellis": "True",
+    "trellis_default_height": "400"
+   }
+  },
+  {
+   "name": "status_sankey",
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/ui/visualizations/status_sankey",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/visualizations/bar",
+    "list": "/servicesNS/nobody/system/data/ui/visualizations/bar",
+    "_reload": "/servicesNS/nobody/system/data/ui/visualizations/bar/_reload"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "allow_user_selection": true,
+    "core.charting_type": "bar",
+    "core.height_attribute": "display.visualizations.chartHeight",
+    "core.icon": "chart-bar",
+    "core.order": "4",
+    "core.preview_image": "bar.png",
+    "core.recommend_for": "top, rare",
+    "core.type": "visualizations",
+    "core.viz_type": "charting",
+    "data_sources": "primary",
+    "data_sources.primary.params.count": "$display.visualizations.charting.data.count:JSCHART_RESULTS_LIMIT:10000$",
+    "data_sources.primary.params.offset": "0",
+    "data_sources.primary.params.output_mode": "json_cols",
+    "data_sources.primary.params.show_metadata": "true",
+    "default_height": "300",
+    "default_width": "300",
+    "description": "Requests flowing from page to status",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:userName": "nobody",
+    "label": "Status sankey",
+    "max_height": "10000",
+    "min_height": "100",
+    "min_width": "100",
+    "search_fragment": "| stats count by comparison_category",
+    "supports_drilldown": "True",
+    "supports_export": "True",
+    "supports_trellis": "True",
+    "trellis_default_height": "400"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 3,
+  "perPage": 30
+ },
+ "messages": []
+}

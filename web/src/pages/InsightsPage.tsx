@@ -1,3 +1,6 @@
+import { DataTable } from "../components/DataTable";
+import { commandInventory } from "../lib/commands";
+import type { Catalog } from "../lib/catalog";
 import { useMemo } from "react";
 import { flag, useUrlState } from "../lib/urlState";
 import { Link } from "react-router-dom";
@@ -24,6 +27,30 @@ function CoverageCell({ c, metric, name }: { c: Coverage; metric: (typeof METRIC
   const p = pct([ok, of]);
   if (p === undefined) return <span className="muted">n/a</span>;
   return <Meter value={p} max={100} label={`${p}%`} name={`${metric.label}, ${name}: ${ok} of ${of}`} />;
+}
+
+function CommandInventory({ catalog }: { catalog: Catalog }) {
+  const rows = commandInventory(catalog);
+  if (!rows.length) return null;
+  return (
+    <section>
+      <h2>Commands</h2>
+      <p className="muted small">Every command the catalog's searches run (saved searches, detections, dashboards, ad-hoc searches), built-in and custom. ! marks commands that delete data, run programs or a search per result, or send data out.</p>
+      <DataTable
+        rows={rows}
+        rowKey={(r) => r.name}
+        csvName="delvecat-commands.csv"
+        limit={50}
+        columns={[
+          { label: "Command", value: (r) => r.name, render: (r) => <><Link to={searchPath({ command: r.name })}><code>{r.name}</code></Link>{r.risk && <> <span className="status-label status-warning" title={r.risk}>! risky</span></>}</> },
+          { label: "Kind", value: (r) => (r.custom ? "custom" : "built-in"), render: (r) => (r.custom ? <Link to={entityPath(r.custom.id)}>custom ({r.custom.app})</Link> : "built-in") },
+          { label: "Searches running it", value: (r) => r.searches },
+          { label: "Enabled", value: (r) => r.enabled },
+          { label: "Why risky", value: (r) => r.risk ?? "", render: (r) => r.risk ?? <span className="muted">—</span> },
+        ]}
+      />
+    </section>
+  );
 }
 
 export function InsightsPage() {
@@ -138,6 +165,8 @@ export function InsightsPage() {
           </div>
         )}
       </section>
+
+      <CommandInventory catalog={catalog} />
     </div>
   );
 }

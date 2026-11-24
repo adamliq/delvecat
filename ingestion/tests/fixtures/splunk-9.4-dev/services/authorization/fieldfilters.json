@@ -1,0 +1,49 @@
+{
+ "entry": [
+  {
+   "name": "web_client_ip",
+   "id": "https://localhost:8089/services/authorization/fieldfilters/web_client_ip",
+   "updated": "2026-11-06T07:33:04+00:00",
+   "links": {
+    "alternate": "/services/authorization/fieldfilters/web_client_ip"
+   },
+   "author": "admin",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "can_write": true,
+    "modifiable": true,
+    "removable": true
+   },
+   "content": {
+    "action": "\"clientip\"=sha256()",
+    "index": "web",
+    "limit": "sourcetype::access_combined",
+    "description": "Hash shopper IP addresses for everyone but the web team",
+    "roleExemptions": "web_admin",
+    "disabled": false,
+    "eai:acl": null
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 1,
+  "perPage": 30
+ },
+ "messages": [],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ },
+ "updated": "2026-11-06T07:34:37+00:00"
+}

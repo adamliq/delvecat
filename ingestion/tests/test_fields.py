@@ -141,7 +141,7 @@ def test_link_fields_through_indexes_and_sourcetypes():
 def test_no_field_lineage_without_fields():
     entities = [ent("savedSearch", "TA/s", properties={"search": "index=fw | head 10"})]
     derive(entities)
-    assert "lineage" not in entities[0]
+    assert entities[0]["lineage"] == {"commands": ["head"]}  # no field lineage
 
 
 def test_reading_a_classified_field_reads_that_classification():

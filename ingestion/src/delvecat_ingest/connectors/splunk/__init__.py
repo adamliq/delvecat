@@ -11,6 +11,7 @@ from . import (
     access,
     data,
     data_management,
+    extras,
     knowledge,
     microsoft,
     outputs,
@@ -65,6 +66,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "workflowActions": knowledge.extract_workflow_actions,
     "spl2": spl2.extract_spl2,
     "dataManagementCatalog": data_management.extract_catalog_objects,
+    **extras.EXTRA_EXTRACTORS,
     "fields": data.extract_fields,
     **usage.USAGE_EXTRACTORS,
 }

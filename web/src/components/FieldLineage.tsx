@@ -104,6 +104,10 @@ export function FieldPanel({ catalog, entity }: { catalog: Catalog; entity: Enti
   // Lookups with a field of this name: where enrichment for it can come from, or go to.
   const lookups = lookupsWithField(catalog, fieldName(entity), entity.instance);
   const models = dataModelsWithField(catalog, fieldName(entity), entity.instance);
+  const name_ = fieldName(entity);
+  const filters = catalog.entities.filter((f) => f.type === "fieldFilter" && f.instance === entity.instance
+    && String((f.properties as { field?: unknown } | undefined)?.field ?? "") === name_);
+  const definition = catalog.entities.find((f) => f.type === "fieldDefinition" && f.instance === entity.instance && f.name === name_);
   return (
     <>
       <section>
@@ -117,6 +121,19 @@ export function FieldPanel({ catalog, entity }: { catalog: Catalog; entity: Enti
           </dd>
           {sources.length > 0 && (
             <><dt>Derived from</dt><dd>{sources.map((f, i) => <span key={f.id}>{i > 0 && ", "}<Link to={entityPath(f.id)}><code>{fieldName(f)}</code></Link></span>)}</dd></>
+          )}
+          {filters.length > 0 && (
+            <><dt>Field filters</dt><dd>{filters.map((f, i) => {
+              const p = (f.properties ?? {}) as { action?: string; hash?: string; indexes?: string[] };
+              const what = p.action === "remove" ? "removed" : p.action === "hash" ? `hashed (${p.hash})` : p.action === "replace" ? "replaced" : p.action === "sed" ? "masked with sed" : p.action;
+              return <span key={f.id}>{i > 0 && ", "}<Link to={entityPath(f.id)}>{f.name}</Link> <span className="muted small">({what}{p.indexes?.length ? ` in ${p.indexes.join(", ")}` : ""})</span></span>;
+            })}</dd></>
+          )}
+          {definition && (
+            <><dt>fields.conf</dt><dd><Link to={entityPath(definition.id)}>{(() => {
+              const p = (definition.properties ?? {}) as { indexed?: boolean; tokenizer?: string };
+              return [p.indexed ? "indexed field" : p.indexed === false ? "search-time field" : "settings", p.tokenizer && `tokenizer ${p.tokenizer}`].filter(Boolean).join(", ");
+            })()}</Link></dd></>
           )}
           {models.length > 0 && (
             <><dt>In data models</dt><dd>{models.map((m, i) => <span key={m.model.id}>{i > 0 && ", "}<Link to={`${entityPath(m.model.id)}?tab=fields`}>{m.model.displayName ?? m.model.name}</Link> <span className="muted small">({m.datasets.slice(0, 3).join(", ")}{m.datasets.length > 3 ? "…" : ""})</span></span>)}</dd></>

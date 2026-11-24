@@ -1,0 +1,59 @@
+{
+ "updated": "2026-11-24T12:35:55+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "acme:legacy",
+   "id": "https://localhost:8089/servicesNS/nobody/TA-acme-firewall/data/props/sourcetype-rename/acme%3Alegacy",
+   "updated": "2026-11-24T12:33:13+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy",
+    "list": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy",
+    "_reload": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy/_reload",
+    "edit": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy",
+    "remove": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy",
+    "move": "/servicesNS/nobody/search/data/props/sourcetype-rename/acme%3Alegacy/move"
+   },
+   "author": "admin",
+   "acl": {
+    "app": "TA-acme-firewall",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": true,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "admin",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": true,
+    "sharing": "global"
+   },
+   "content": {
+    "attribute": "rename",
+    "eai:acl": null,
+    "stanza": "acme:legacy",
+    "type": "rename",
+    "value": "acme:fw",
+    "eai:appName": "TA-acme-firewall"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 1,
+  "perPage": 30
+ },
+ "messages": []
+}

@@ -20,6 +20,10 @@ GLOBAL_TYPES = frozenset(
         "tag",
         "forwarder",
         "field",
+        "fieldFilter",
+        "fieldDefinition",
+        "multikvTable",
+        "segmenter",
         # Product objects whose names are unique within their product on an instance.
         "serverClass",
         "deploymentApp",

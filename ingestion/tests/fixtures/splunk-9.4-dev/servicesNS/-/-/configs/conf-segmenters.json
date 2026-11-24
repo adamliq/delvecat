@@ -1,0 +1,141 @@
+{
+ "updated": "2026-11-24T12:35:56+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "full",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-segmenters/full",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/configs/conf-segmenters/full",
+    "list": "/servicesNS/nobody/system/configs/conf-segmenters/full",
+    "_reload": "/servicesNS/nobody/system/configs/conf-segmenters/full/_reload",
+    "edit": "/servicesNS/nobody/system/configs/conf-segmenters/full",
+    "disable": "/servicesNS/nobody/system/configs/conf-segmenters/full/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "MAJOR": "[ ] < > ( ) { } | ! ; , ' \" * \\n \\r \\s \\t & ? + %21 %26 %2526 %3B %7C %20 %2B %3D -- %2520 %5D %5B %3A %0A %2C %28 %29",
+    "MINOR": "/ : = @ . - $ # % \\\\ _",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody"
+   }
+  },
+  {
+   "name": "inner",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-segmenters/inner",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/configs/conf-segmenters/inner",
+    "list": "/servicesNS/nobody/system/configs/conf-segmenters/inner",
+    "_reload": "/servicesNS/nobody/system/configs/conf-segmenters/inner/_reload",
+    "edit": "/servicesNS/nobody/system/configs/conf-segmenters/inner",
+    "disable": "/servicesNS/nobody/system/configs/conf-segmenters/inner/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "MAJOR": "[ ] < > ( ) { } | ! ; , ' \" * \\n \\r \\s \\t / : = @ . ? - & $ # + % _ \\\\ %21 %26 %2526 %3B %7C %20 %2B %3D -- %2520",
+    "MINOR": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody"
+   }
+  },
+  {
+   "name": "outer",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-segmenters/outer",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/configs/conf-segmenters/outer",
+    "list": "/servicesNS/nobody/system/configs/conf-segmenters/outer",
+    "_reload": "/servicesNS/nobody/system/configs/conf-segmenters/outer/_reload",
+    "edit": "/servicesNS/nobody/system/configs/conf-segmenters/outer",
+    "disable": "/servicesNS/nobody/system/configs/conf-segmenters/outer/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "MAJOR": "[ ] < > ( ) { } | ! ; , ' \" * \\n \\r \\s \\t & ? + %21 %26 %2526 %3B %7C %20 %2B %3D -- %2520",
+    "MINOR": "",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 3,
+  "perPage": 30
+ },
+ "messages": []
+}

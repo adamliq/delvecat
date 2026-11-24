@@ -294,7 +294,15 @@
         "dmCatalogObject",
         "addOnAccount",
         "outputGroup",
-        "accelerationSummary"
+        "accelerationSummary",
+        "fieldFilter",
+        "fieldDefinition",
+        "navMenu",
+        "timeRange",
+        "panel",
+        "visualization",
+        "multikvTable",
+        "segmenter"
       ]
     },
     "Sharing": {
@@ -475,6 +483,13 @@
             },
             "dataModelDatasets": {
               "description": "Data model datasets the search names, as Model.Dataset or Model.Root.Child (from tstats nodename=).",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "commands": {
+              "description": "Search commands the search runs after a pipe (built-in and custom), by name.",
               "type": "array",
               "items": {
                 "type": "string"

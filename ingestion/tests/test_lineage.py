@@ -40,8 +40,10 @@ def field_edges(bundle, frm):
 
 
 def problems(entity):
-    """Lineage diagnostics, without field-level lineage (which every search has)."""
-    return {k: v for k, v in (entity.get("lineage") or {}).items() if k != "fields"}
+    """Lineage diagnostics, without what every search has (field lineage, commands run,
+    data model datasets named)."""
+    facts = ("fields", "commands", "dataModelDatasets")
+    return {k: v for k, v in (entity.get("lineage") or {}).items() if k not in facts}
 
 
 def test_bundle_valid(bundle):

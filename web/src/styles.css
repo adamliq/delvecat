@@ -788,3 +788,4 @@ a.spl-link:hover { text-decoration-style: solid; }
 }
 .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .result-table td:nth-child(2) { min-width: 180px; max-width: 360px; overflow-wrap: anywhere; }
+.chip-warn { border-color: var(--warn); }

@@ -1,0 +1,149 @@
+{
+ "updated": "2026-11-24T12:35:55+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "all_time",
+   "id": "https://localhost:8089/servicesNS/nobody/system/data/ui/times/all_time",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "list": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "_reload": "/servicesNS/nobody/system/data/ui/times/all_time/_reload",
+    "edit": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "disable": "/servicesNS/nobody/system/data/ui/times/all_time/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "earliest_time": "0",
+    "header_label": "over all time",
+    "label": "All time",
+    "order": "500"
+   }
+  },
+  {
+   "name": "last_24_hours",
+   "id": "https://localhost:8089/servicesNS/nobody/system/data/ui/times/last_24_hours",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/times/last_24_hours",
+    "list": "/servicesNS/nobody/system/data/ui/times/last_24_hours",
+    "_reload": "/servicesNS/nobody/system/data/ui/times/last_24_hours/_reload",
+    "edit": "/servicesNS/nobody/system/data/ui/times/last_24_hours",
+    "disable": "/servicesNS/nobody/system/data/ui/times/last_24_hours/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "earliest_time": "-24h@h",
+    "header_label": "in the last 24 hours",
+    "label": "Last 24 hours",
+    "latest_time": "now",
+    "order": "40"
+   }
+  },
+  {
+   "name": "business_hours_today",
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/ui/times/business_hours_today",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "list": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "_reload": "/servicesNS/nobody/system/data/ui/times/all_time/_reload",
+    "edit": "/servicesNS/nobody/system/data/ui/times/all_time",
+    "disable": "/servicesNS/nobody/system/data/ui/times/all_time/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:userName": "nobody",
+    "earliest_time": "@d+8h",
+    "header_label": "over all time",
+    "label": "Business hours today",
+    "order": "5",
+    "latest_time": "@d+18h"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 3,
+  "perPage": 30
+ },
+ "messages": []
+}

@@ -81,7 +81,14 @@ class MacroLibrary:
         return resolve
 
 
-SEARCH_TYPES = ("savedSearch", "correlationSearch", "adhocSearch", "dashboard", "workflowAction")
+SEARCH_TYPES = (
+    "savedSearch",
+    "correlationSearch",
+    "adhocSearch",
+    "dashboard",
+    "panel",
+    "workflowAction",
+)
 
 
 def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
@@ -104,7 +111,7 @@ def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
             for d in p.get("datasets") or []
             if d.get("constraint")
         ]
-    if t == "dashboard":
+    if t in ("dashboard", "panel"):
         out = []
         for s in p.get("searches") or []:
             label = f"panel {s.get('title') or s.get('id') or '?'}"
@@ -182,7 +189,7 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
             "workflowAction",
         ):
             lineage["implicitIndex"] = True
-        if combined.dynamic and e["type"] in ("dashboard", "workflowAction"):
+        if combined.dynamic and e["type"] in ("dashboard", "panel", "workflowAction"):
             lineage["dynamic"] = True
         if unresolved:
             lineage["unresolved"] = unresolved
@@ -198,6 +205,8 @@ def derive(entities: list[dict[str, Any]]) -> list[Ref]:
             lineage["warnings"] = warnings
         if combined.datasets:
             lineage["dataModelDatasets"] = sorted(combined.datasets)
+        if combined.commands and not all(fragment for _, fragment, _ in sources):
+            lineage["commands"] = sorted(combined.commands)
         if combined.fields is not None and (combined.fields.used or combined.fields.outputs):
             lineage["fields"] = combined.fields.to_json()
         if lineage:

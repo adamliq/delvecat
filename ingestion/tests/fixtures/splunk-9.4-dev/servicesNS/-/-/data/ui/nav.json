@@ -1,0 +1,103 @@
+{
+ "updated": "2026-11-24T12:35:55+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "default",
+   "id": "https://localhost:8089/servicesNS/nobody/search/data/ui/nav/default",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/search/data/ui/nav/default",
+    "list": "/servicesNS/nobody/search/data/ui/nav/default",
+    "_reload": "/servicesNS/nobody/search/data/ui/nav/default/_reload",
+    "edit": "/servicesNS/nobody/search/data/ui/nav/default"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "search",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "content": {
+    "color": "#5CC05C",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "search",
+    "eai:data": "<nav search_view=\"search\" color=\"#5CC05C\">\n  <view name=\"search\" default=\"true\" />\n  <view name=\"analytics_workspace\" />\n  <view name=\"datasets\" />\n  <view name=\"reports\" />\n  <view name=\"alerts\" />\n  <view name=\"dashboards\" />\n  <view name=\"modules\" />\n</nav>",
+    "eai:digest": "320678c1af612a36c2921b5b9108187b",
+    "eai:userName": "nobody",
+    "rootNode": "nav"
+   }
+  },
+  {
+   "name": "default",
+   "id": "https://localhost:8089/servicesNS/nobody/acme_web/data/ui/nav/default",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/search/data/ui/nav/default",
+    "list": "/servicesNS/nobody/search/data/ui/nav/default",
+    "_reload": "/servicesNS/nobody/search/data/ui/nav/default/_reload",
+    "edit": "/servicesNS/nobody/search/data/ui/nav/default"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "acme_web",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin",
+      "power"
+     ]
+    },
+    "removable": false,
+    "sharing": "app"
+   },
+   "content": {
+    "color": "#5CC05C",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "acme_web",
+    "eai:data": "<nav search_view=\"search\"><view name=\"storefront_health\" default=\"true\"/><collection label=\"Reports\"><view name=\"web_explorer\"/><saved name=\"Web - Top Error Pages\"/></collection></nav>",
+    "eai:digest": "320678c1af612a36c2921b5b9108187b",
+    "eai:userName": "nobody",
+    "rootNode": "nav"
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 2,
+  "perPage": 30
+ },
+ "messages": []
+}

@@ -1,0 +1,105 @@
+{
+ "updated": "2026-11-24T12:35:56+00:00",
+ "generator": {
+  "build": "de9225ad9740",
+  "version": "10.4.5"
+ },
+ "entry": [
+  {
+   "name": "PerfmonMk",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk",
+    "list": "/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk",
+    "_reload": "/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk/_reload",
+    "edit": "/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk",
+    "disable": "/servicesNS/nobody/system/configs/conf-multikv/PerfmonMk/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "body.tokens": "_tokenize_, 0, \"\t\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "header.linecount": "1",
+    "header.start": "\"instance\"",
+    "header.tokens": "_tokenize_, -1, \"\t\"",
+    "pre.linecount": "4",
+    "pre.start": "\"\\d\\d\\/\\d\\d\\/\\d\\d\\d\\d\\s.*\""
+   }
+  },
+  {
+   "name": "WinNetMonMk",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk",
+   "updated": "1970-01-01T00:00:00+00:00",
+   "links": {
+    "alternate": "/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk",
+    "list": "/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk",
+    "_reload": "/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk/_reload",
+    "edit": "/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk",
+    "disable": "/servicesNS/nobody/system/configs/conf-multikv/WinNetMonMk/disable"
+   },
+   "author": "nobody",
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    },
+    "removable": false,
+    "sharing": "system"
+   },
+   "content": {
+    "body.tokens": "_tokenize_, 0, \"\t\"",
+    "disabled": false,
+    "eai:acl": null,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "header.linecount": "1",
+    "header.start": "\"timestamp\"",
+    "header.tokens": "_tokenize_, -1, \"\t\""
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 2,
+  "perPage": 30
+ },
+ "messages": []
+}

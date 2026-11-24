@@ -408,6 +408,34 @@ Searches record which datasets they name (`lineage.dataModelDatasets`):
 `Model.Root.Child`), `| datamodel Model Dataset`, `| from datamodel:Model.Dataset`
 and `| pivot Model Dataset`.
 
+### Commands
+
+Every search records the commands it runs after a pipe (`lineage.commands`), built-in
+and custom; custom ones are also linked (`uses`). A search running a command that
+deletes data, runs a program, runs a search per result or sends data out (`delete`,
+`run`, `runshellscript`, `script`, `map`, `sendemail`, `sendalert`, `dump`, `crawl`,
+`input`, `outputcsv`), or a custom command marked `is_risky` or `passauth` in
+commands.conf, gets a `riskyCommand` health warning. Commands that only write to a
+lookup or index (`outputlookup`, `collect`) are shown as writes in lineage instead.
+
+### Other knowledge objects
+
+- Sourcetype renames (props.conf `rename`): the new name becomes a sourcetype
+  (`renamedFrom`), linked from the indexed one by `mapsTo` (`renamedTo`).
+- Ingest Actions rulesets (`RULESET-` in props.conf) are index-time rules like
+  `TRANSFORMS-`, marked `ruleset`.
+- Field filters (Splunk 9.4 and later, `authorization/fieldfilters`): the field,
+  what is done to it (removed, hashed, replaced, sed), the indexes and the host,
+  source or sourcetype limit, and the exempt roles. A field filter that applies
+  to the roles of whoever builds the catalog limits what the build sees.
+- `fields.conf` (`fieldDefinition`): indexed fields, `INDEXED_VALUE` and tokenizers.
+- App navigation menus (`navMenu`): the dashboards and reports each menu links to.
+  An unused dashboard's reason says whether a menu still links it.
+- Time range presets (`timeRange`), prebuilt panels (`panel`, their searches
+  analysed like a dashboard's; dashboards that include one are linked to it),
+  visualizations (dashboards using a custom one are linked to it), multikv tables
+  and segmenters (their settings).
+
 ### Lookup fields
 
 Every lookup lists its fields (`properties.fields`): lookup definitions as

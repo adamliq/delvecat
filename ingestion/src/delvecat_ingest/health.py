@@ -498,6 +498,37 @@ def _token_checks(
         )
 
 
+# Commands that delete data, run programs or searches per result, or send data out of
+# Splunk: Splunk's own list of risky commands, less the ones that only write to a lookup
+# or index (those show as writes in lineage).
+RISKY_COMMANDS = {
+    "delete": "deletes events (they can no longer be searched)",
+    "run": "runs a script on the search head",
+    "runshellscript": "runs a shell script on the search head",
+    "script": "runs a script on the search head",
+    "map": "runs a search for every result",
+    "sendemail": "sends results by email",
+    "sendalert": "runs an alert action",
+    "dump": "writes raw events to files on the search head",
+    "crawl": "crawls the file system",
+    "input": "adds inputs",
+    "outputcsv": "writes a CSV file on the search head",
+}
+
+
+def _command_checks(
+    e: dict[str, Any],
+    risky_custom: dict[tuple[Any, str], str],
+    checks: list[dict[str, str]],
+) -> None:
+    """Searches running commands that delete data, run programs or send data out."""
+    commands = (e.get("lineage") or {}).get("commands") or []
+    found = [f"{c} ({RISKY_COMMANDS[c]})" for c in commands if c in RISKY_COMMANDS]
+    found += [f"{c} ({why})" for c in commands if (why := risky_custom.get((e.get("instance"), c)))]
+    if found:
+        _check(checks, "riskyCommand", "warning", "Runs " + "; ".join(found))
+
+
 def evaluate_health(
     entities: list[dict[str, Any]], as_of_iso: str | None, scheduler_since_iso: str | None = None
 ) -> None:
@@ -508,6 +539,15 @@ def evaluate_health(
     index_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "index"}
     with_indexes = {i for i, _ in index_names}
     with_users = {i for i, _ in user_names}
+    # Custom commands commands.conf marks risky, or that run with the user's session.
+    risky_custom = {
+        (e.get("instance"), e["name"]): (
+            "runs with the user's session" if p.get("passAuth") else "marked risky in commands.conf"
+        )
+        for e in entities
+        if e["type"] == "searchCommand"
+        and ((p := e.get("properties") or {}).get("risky") or p.get("passAuth"))
+    }
     for e in entities:
         if e.get("disabled"):
             e.pop("health", None)
@@ -574,6 +614,7 @@ def evaluate_health(
             failed = [a for a, r in (obs.get("apps") or {}).items() if r and r != "Ok"]
             if failed:
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(failed)}")
+        _command_checks(e, risky_custom, checks)
         if checks:
             worst = max(checks, key=lambda c: SEVERITY[c["status"]])["status"]
             e["health"] = {"status": worst, "checks": checks}
@@ -608,6 +649,9 @@ def mark_unused(
         )
     }
     audit = "usageSavedSearches" in available or "usageAdhocSearches" in available
+    # Dashboards an app's navigation menu links to (when menus were read).
+    menus = {e["id"] for e in entities if e["type"] == "navMenu"}
+    in_menu = {x["to"] for x in edges if x["from"] in menus}
     views = "usageDashboardViews" in available
     n = 0
     for e in entities:
@@ -624,7 +668,13 @@ def mark_unused(
                 reason = "Not scheduled, never run in the usage window, nothing uses it"
         elif t == "dashboard" and views:
             if not (u.get("views") or u.get("panelSearchRuns")):
-                reason = "Not viewed in the usage window"
+                reason = (
+                    "Not viewed in the usage window (it is in its app's menu)"
+                    if e["id"] in in_menu
+                    else "Not viewed in the usage window, and in no app's menu"
+                    if menus
+                    else "Not viewed in the usage window"
+                )
         elif t in KO_TYPES and audit:
             if not consumers.get(e["id"]) and not u.get("adhocSearches"):
                 reason = "Nothing in the catalog uses it and no search referenced it"

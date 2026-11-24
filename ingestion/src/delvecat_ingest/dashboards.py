@@ -113,6 +113,41 @@ def _studio(root: Element) -> tuple[list[DashboardSearch], list[str]]:
     return found, []
 
 
+def parse_panel(source: str) -> tuple[list[DashboardSearch], list[str]]:
+    """The searches of a prebuilt panel (a Simple XML <panel> on its own)."""
+    try:
+        root = SafeET.fromstring(source or "")
+    except Exception as exc:  # noqa: BLE001 - user content
+        return [], [f"could not parse panel XML: {type(exc).__name__}"]
+    return _simple_xml(root), []
+
+
+def dashboard_references(source: str) -> dict[str, list[Any]]:
+    """Prebuilt panels (name, app) and visualization types a dashboard uses."""
+    try:
+        root = SafeET.fromstring(source or "")
+    except Exception:  # noqa: BLE001 - reported by parse_dashboard
+        return {"panels": [], "visualizations": []}
+    panels: list[tuple[str, str | None]] = []
+    viz: set[str] = set()
+    if root.get("version") == "2":
+        try:
+            data = json.loads(_text(root.find("definition")) or "{}")
+        except ValueError:
+            data = {}
+        for v in (data.get("visualizations") or {}).values():
+            if isinstance(v, dict) and v.get("type"):
+                viz.add(str(v["type"]))
+    else:
+        for el in root.iter("panel"):
+            if el.get("ref"):
+                panels.append((el.get("ref") or "", el.get("app")))
+        for el in root.iter("viz"):
+            if el.get("type"):
+                viz.add(str(el.get("type")))
+    return {"panels": panels, "visualizations": sorted(viz)}
+
+
 _TOKEN = re.compile(r"\$[^$\s]+\$")
 
 

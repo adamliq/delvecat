@@ -7,7 +7,7 @@ import json
 import re
 from typing import Any
 
-from ...dashboards import parse_dashboard
+from ...dashboards import dashboard_references, parse_dashboard
 from ...model import ExtractResult, fqn
 from ...splunk_rest import as_bool, iter_entries
 from ...transport import EndpointForbidden, EndpointNotFound, SearchError, search_in_app
@@ -230,6 +230,7 @@ def extract_dashboards(ctx: Ctx, out: ExtractResult) -> int:
         c = content(e)
         source = str(c.get("eai:data") or "")
         framework, searches, warnings = parse_dashboard(source)
+        refs = dashboard_references(source)
         ent = add_ko(
             ctx,
             out,
@@ -242,10 +243,19 @@ def extract_dashboards(ctx: Ctx, out: ExtractResult) -> int:
                 "visible": as_bool(c.get("isVisible", True)),
                 "isDashboard": as_bool(c.get("isDashboard", True)),
                 "searches": [s.as_dict() for s in searches],
+                "panelRefs": [p for p, _ in refs["panels"]] or None,
+                "visualizations": refs["visualizations"] or None,
             },
         )
         if warnings:
             ent["lineage"] = {"warnings": warnings}
+        app = acl(e)[0]
+        for panel, panel_app in refs["panels"]:
+            out.refs.append(ref(ent["id"], "panel", panel, "uses", app=panel_app or app))
+        for viz in refs["visualizations"]:
+            viz_app, _, viz_name = viz.rpartition(".")
+            if viz_app and not viz_app.startswith("splunk"):  # built-in Studio charts
+                out.refs.append(ref(ent["id"], "visualization", viz_name, "uses", app=viz_app))
         n += 1
     return n
 
@@ -613,10 +623,10 @@ def extract_transforms(ctx: Ctx, out: ExtractResult) -> int:
 
 
 def extract_index_time_rules(ctx: Ctx, out: ExtractResult) -> int:
-    """props.conf TRANSFORMS- and SEDCMD- rules: which sourcetypes (or source::/host::
-    patterns) each index-time transform applies to. Links sourcetype -> transform, and
-    sourcetype -> index for data a transform routes there; the sourcetype records a
-    summary (what is routed, dropped, forwarded or masked)."""
+    """props.conf TRANSFORMS-, RULESET- (Ingest Actions) and SEDCMD- rules: which
+    sourcetypes (or source::/host:: patterns) each index-time transform applies to. Links
+    sourcetype -> transform, and sourcetype -> index for data a transform routes there; the
+    sourcetype records a summary (what is routed, dropped, forwarded or masked)."""
     transforms: dict[tuple[str | None, str], dict[str, Any]] = {}
     for ent in out.entities:
         if ent["type"] == "transform":
@@ -635,7 +645,7 @@ def extract_index_time_rules(ctx: Ctx, out: ExtractResult) -> int:
         rules = [
             (k, v)
             for k, v in c.items()
-            if (k.startswith("TRANSFORMS-") or k.startswith("SEDCMD-")) and v not in (None, "")
+            if k.startswith(("TRANSFORMS-", "SEDCMD-", "RULESET-")) and v not in (None, "")
         ]
         if not rules or stanza == "default":
             continue
@@ -651,6 +661,7 @@ def extract_index_time_rules(ctx: Ctx, out: ExtractResult) -> int:
                 summary.append(
                     {
                         "rule": key,
+                        **({"ruleset": True} if key.startswith("RULESET-") else {}),
                         "transform": name,
                         "app": app,
                         "actions": [a["action"] for a in actions],

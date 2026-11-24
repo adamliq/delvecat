@@ -21,6 +21,7 @@ import { FieldPanel, SearchFieldsTab } from "../components/FieldLineage";
 import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LookupFieldsTab } from "../components/LookupFieldsTab";
 import { DataModelTab } from "../components/DataModelTab";
+import { CommandList } from "../components/CommandList";
 import { lookupColumns } from "../lib/lookups";
 import { LineageTab } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
@@ -251,6 +252,7 @@ export function EntityPage() {
                 : <pre className="code">{v as string}</pre>}
             </section>
           ))}
+          <CommandList catalog={catalog} entity={entity} />
 
           {!!props.pivot && <PivotSource entity={entity} pivot={props.pivot as { dataModel: string; dataset: string }} />}
           <EmailRecipients recipients={props.alertRecipients} />

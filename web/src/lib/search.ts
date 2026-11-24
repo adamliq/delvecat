@@ -28,6 +28,7 @@ export const FACETS = {
     if (!cs.length) return [];
     return [cs.some((c) => !c.derived) ? "sensitive" : "sensitive (derived)"];
   },
+  command: (e: Entity) => e.lineage?.commands ?? [],
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   missing: (e: Entity) => e.annotations?.missingProperties ?? [],
   quality: (e: Entity) => (!e.quality ? [] : e.quality.failed ? ["failing checks"] : ["all checks passing"]),

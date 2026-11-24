@@ -40,6 +40,7 @@ const FACET_TITLES: Record<string, string> = {
   sensitivity: "Sensitivity",
   usage: "Usage",
   field: "Has field",
+  command: "Runs command",
 };
 
 let instanceNames: Record<string, string> = {};

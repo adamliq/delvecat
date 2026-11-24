@@ -79,7 +79,15 @@ export type EntityType =
   | "dmCatalogObject"
   | "addOnAccount"
   | "outputGroup"
-  | "accelerationSummary";
+  | "accelerationSummary"
+  | "fieldFilter"
+  | "fieldDefinition"
+  | "navMenu"
+  | "timeRange"
+  | "panel"
+  | "visualization"
+  | "multikvTable"
+  | "segmenter";
 /**
  * The Splunk product an entity belongs to.
  */
@@ -282,6 +290,10 @@ export interface Entity {
      * Data model datasets the search names, as Model.Dataset or Model.Root.Child (from tstats nodename=).
      */
     dataModelDatasets?: string[];
+    /**
+     * Search commands the search runs after a pipe (built-in and custom), by name.
+     */
+    commands?: string[];
   };
   /**
    * Data quality check results (derived; never changes the catalog version).
