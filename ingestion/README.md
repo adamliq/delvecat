@@ -70,7 +70,10 @@ most-run ones (`--adhoc-objects`, default 1000; `0` for none) become **Ad-hoc
 Search** objects (`adhocSearch`): the SPL, runs, number of people who ran it,
 last run, where it was run from (search bar, REST API...), and `reads` edges to
 the indexes, sourcetypes, lookups and macros it uses. Dashboard panel searches
-are counted on their dashboards instead. Who ran a search is not kept. The same
+are counted on their dashboards instead, and searches Splunk's own apps run
+(Monitoring Console, instrumentation and the like) count for usage but are not
+kept as objects unless `--adhoc-splunk-apps` is given. Who ran a search is not kept. Object types collected for the first time (after an upgrade) are not listed as
+changes either. The same
 text in the same app is one object across builds; they are left out of "changes
 since the last build", since they come and go with what people type. The
 `public` redaction profile drops the SPL (`adhocSearches: drop`); the objects,
@@ -427,7 +430,12 @@ lookup or index (`outputlookup`, `collect`) are shown as writes in lineage inste
 - Field filters (Splunk 9.4 and later, `authorization/fieldfilters`): the field,
   what is done to it (removed, hashed, replaced, sed), the indexes and the host,
   source or sourcetype limit, and the exempt roles. A field filter that applies
-  to the roles of whoever builds the catalog limits what the build sees.
+  to the roles of whoever builds the catalog limits what the build sees: such a
+  filter gets an `appliesToBuilder` flag and a `fieldFilterOnBuilder` warning, and
+  the app's "much smaller" refusal names it. Governance treats a classified column
+  a filter removes, hashes or replaces as masked (`maskedBy`); a store whose every
+  sensitive column is masked is not counted as exposed (`access.masked`, with the
+  exempt roles in `unmaskedRoles`).
 - `fields.conf` (`fieldDefinition`): indexed fields, `INDEXED_VALUE` and tokenizers.
 - App navigation menus (`navMenu`): the dashboards and reports each menu links to.
   An unused dashboard's reason says whether a menu still links it.
@@ -443,7 +451,8 @@ Splunk reports them (`fields_list`), KV Store collections from their field
 types, and lookup table files from the definition that reads them. A CSV file no
 definition describes gets its fields from its header row: a read-only
 `| inputlookup "<file>" max=20 | fieldsummary | fields field`, run in the file's
-own app, for at most `--lookup-headers` files (default 300; `0` for none).
+own app, for at most `--lookup-headers` files (default 300; `0` for none), four at a time
+and within two minutes overall (files not reached are left without fields).
 Only field names come back, never values; files shared privately with one user
 are skipped. A definition without a field list takes its file's or
 collection's (`fieldsFrom` names where they came from), and an automatic lookup

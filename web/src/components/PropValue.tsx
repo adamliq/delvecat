@@ -13,9 +13,7 @@ export const PropContext = createContext<{ catalog: Catalog; entity: Entity } | 
 function Reference({ type, name }: { type: string; name: string }) {
   const ctx = useContext(PropContext);
   if (!ctx || !type) return <>{name}</>;
-  const target = ctx.catalog.entities.find(
-    (e) => e.type === type && e.instance === ctx.entity.instance && e.name === name,
-  );
+  const target = ctx.catalog.findOne(ctx.entity.instance, type, name);
   return target ? <Link to={`/entity/${encodeURIComponent(target.id)}`}>{name}</Link> : <>{name}</>;
 }
 

@@ -122,3 +122,17 @@ def test_http_search_in_app_runs_in_the_apps_context():
     t = HttpTransport("https://splunk:8089", "tok", http_transport=httpx.MockTransport(handler))
     assert t.search_in_app("acme web", "h", '| inputlookup "x.csv"') == [{"field": "status"}]
     assert seen == ["/servicesNS/-/acme%20web/search/jobs"]
+
+
+def test_header_reads_stop_at_the_time_limit():
+    import time
+
+    class Slow(Spy):
+        def search_in_app(self, app, name, spl, earliest="-24h", latest="now"):
+            time.sleep(1.5)
+            return super().search_in_app(app, name, spl, earliest, latest)
+
+    started = time.monotonic()
+    files = _files(Slow(), lookup_header_seconds=0.2)
+    assert time.monotonic() - started < 1.0  # did not wait for the slow search
+    assert "fields" not in files["web_status_codes.csv"]["properties"]

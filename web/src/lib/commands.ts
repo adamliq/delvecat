@@ -21,7 +21,7 @@ export const commandsOf = (e: Entity): string[] => e.lineage?.commands ?? [];
 
 /** The catalogued custom command of this name on the entity's instance, if any. */
 export function customCommand(catalog: Catalog, e: Entity, name: string): Entity | undefined {
-  return catalog.entities.find((c) => c.type === "searchCommand" && c.instance === e.instance && c.name === name);
+  return catalog.findOne(e.instance, "searchCommand", name);
 }
 
 /** Why a custom command is risky (commands.conf is_risky, or passauth), or undefined. */
@@ -36,6 +36,8 @@ export interface CommandRow {
   risk?: string;
   searches: number;
   enabled: number;
+  /** Stacks whose searches run it. */
+  stacks: Set<string>;
 }
 
 const cache = new WeakMap<Catalog, CommandRow[]>();
@@ -45,15 +47,21 @@ export function commandInventory(catalog: Catalog): CommandRow[] {
   const hit = cache.get(catalog);
   if (hit) return hit;
   const rows = new Map<string, CommandRow>();
-  const custom = new Map(catalog.entities.filter((c) => c.type === "searchCommand").map((c) => [c.name, c]));
   for (const e of catalog.entities) {
     for (const name of commandsOf(e)) {
+      // The custom command on the search's own stack (another stack may have a different one).
+      const c = catalog.findOne(e.instance, "searchCommand", name);
       let r = rows.get(name);
       if (!r) {
-        const c = custom.get(name);
-        r = { name, custom: c, risk: RISKY_COMMANDS[name] ?? customRisk(c), searches: 0, enabled: 0 };
+        r = { name, custom: c, risk: RISKY_COMMANDS[name] ?? customRisk(c), searches: 0, enabled: 0, stacks: new Set() };
         rows.set(name, r);
+      } else if (c && !r.custom) {
+        r.custom = c;
+        r.risk ??= customRisk(c);
+      } else if (c && r.custom && r.custom.id !== c.id) {
+        r.risk ??= customRisk(c);
       }
+      r.stacks.add(e.instance);
       r.searches++;
       if (!e.disabled) r.enabled++;
     }

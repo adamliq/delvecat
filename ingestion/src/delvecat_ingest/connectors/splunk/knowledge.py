@@ -5,6 +5,9 @@ from __future__ import annotations
 
 import json
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError as FuturesTimeout
 from typing import Any
 
 from ...dashboards import dashboard_references, parse_dashboard
@@ -704,18 +707,17 @@ def extract_lookup_files(ctx: Ctx, out: ExtractResult) -> int:
         }
     except (EndpointNotFound, EndpointForbidden):
         described = set()
-    budget = ctx.options.lookup_headers
+    # Files to read the header of: CSV files no definition describes, not private ones.
+    wanted = [
+        (e, acl(e)[0] or "search")
+        for e in files
+        if _CSV_FILE.search(e["name"])
+        and e["name"] not in described
+        and acl(e)[2] != "user"  # personal files need their owner's context
+    ][: max(0, ctx.options.lookup_headers)]
+    headers = _read_headers(ctx, wanted)
     for e in files:
-        app, _, sharing = acl(e)
-        fields = None
-        if (
-            budget > 0
-            and _CSV_FILE.search(e["name"])
-            and e["name"] not in described
-            and sharing != "user"  # personal files need their owner's context
-        ):
-            budget -= 1
-            fields = lookup_header(ctx, app or "search", e["name"])
+        fields = headers.get(id(e))
         add_ko(
             ctx,
             out,
@@ -728,6 +730,28 @@ def extract_lookup_files(ctx: Ctx, out: ExtractResult) -> int:
             },
         )
     return len(files)
+
+
+HEADER_WORKERS = 4  # header searches at a time
+
+
+def _read_headers(ctx: Ctx, wanted: list[tuple[dict[str, Any], str]]) -> dict[int, list[str]]:
+    """Header field names of these files, a few searches at a time, within the overall
+    time limit (files not reached in time are left without fields)."""
+    if not wanted:
+        return {}
+    deadline = time.monotonic() + ctx.options.lookup_header_seconds
+    out: dict[int, list[str]] = {}
+    pool = ThreadPoolExecutor(max_workers=HEADER_WORKERS)
+    futures = {pool.submit(lookup_header, ctx, app, e["name"]): e for e, app in wanted}
+    try:
+        for f in as_completed(futures, timeout=max(0.0, deadline - time.monotonic())):
+            out[id(futures[f])] = f.result()
+    except FuturesTimeout:
+        pass  # the rest are left without fields; the report says how many were read
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+    return out
 
 
 def lookup_header(ctx: Ctx, app: str, filename: str) -> list[str]:

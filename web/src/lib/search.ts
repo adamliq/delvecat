@@ -29,6 +29,7 @@ export const FACETS = {
     return [cs.some((c) => !c.derived) ? "sensitive" : "sensitive (derived)"];
   },
   command: (e: Entity) => e.lineage?.commands ?? [],
+  runFrom: (e: Entity) => (e.type === "adhocSearch" ? ((e.properties as { runFrom?: string[] } | undefined)?.runFrom ?? []) : []),
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   missing: (e: Entity) => e.annotations?.missingProperties ?? [],
   quality: (e: Entity) => (!e.quality ? [] : e.quality.failed ? ["failing checks"] : ["all checks passing"]),
@@ -40,6 +41,12 @@ export const FACETS = {
 } satisfies Record<string, (e: Entity) => string[]>;
 
 /** Built-in facets plus any added per bundle (structured properties use "p.<id>"). */
+/** Settings that ship with Splunk (time ranges, chart types, segmenters...): many, rarely
+ * interesting, so Browse leaves them out unless asked. */
+export const SETTING_TYPES = new Set(["timeRange", "visualization", "segmenter", "multikvTable", "fieldDefinition", "navMenu"]);
+export const isBuiltinSetting = (e: Entity) =>
+  SETTING_TYPES.has(e.type) && (e.properties as { builtin?: boolean } | undefined)?.builtin === true;
+
 export type Facet = string;
 export const FACET_NAMES = Object.keys(FACETS) as Facet[];
 export type Filters = Partial<Record<Facet, string[]>>;
@@ -188,8 +195,11 @@ export class EntitySearch {
     return { list: [...exact, ...words.filter((e) => !seen.has(e.id))], matches };
   }
 
-  query(query: string, filters: Filters = {}, sort: Sort = "relevance"): SearchResult {
-    const { list: base, matches } = this.matching(query);
+  /** ``hide`` leaves objects out entirely (counts included), e.g. built-in settings. */
+  query(query: string, filters: Filters = {}, sort: Sort = "relevance", hide?: (e: Entity) => boolean): SearchResult {
+    const matched = this.matching(query);
+    const base = hide ? matched.list.filter((e) => !hide(e)) : matched.list;
+    const { matches } = matched;
     const active = this.facetNames.filter((f) => filters[f]?.length);
     const passes = (e: Entity, skip?: Facet) =>
       active.every((f) => f === skip || this.facets[f](e).some((v) => filters[f]!.includes(v)));

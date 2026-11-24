@@ -29,6 +29,7 @@ export function GovernancePanel({ catalog, entity }: { catalog: Catalog; entity:
                 {c.columns?.length ? <> · in {c.columns.map((col, i) => <span key={col}>{i > 0 && ", "}<code>{col}</code></span>)}</>
                   : c.how === "lineage" ? " · every column (no column-level evidence)" : null}
                 {c.sensitive ? "" : " · not sensitive"}
+                {c.maskedBy?.length ? <> · <span className="status-label status-good">masked</span> by {c.maskedBy.map((f, i) => <span key={f}>{i > 0 && ", "}{link(f)}</span>)}</> : null}
               </span>
             </li>
           ))}
@@ -47,7 +48,9 @@ export function GovernancePanel({ catalog, entity }: { catalog: Catalog; entity:
           <dd>{a.roles.map((r, i) => <span key={r}>{i > 0 && ", "}{link(r)}{a.filteredRoles.includes(r) && <span className="muted small"> (filtered)</span>}</span>)}</dd>
           <dt>Users with access</dt>
           <dd>{a.users.length ? a.users.map((u, i) => <span key={u}>{i > 0 && ", "}{link(u)}</span>) : <span className="muted">none</span>}</dd>
-          {a.everyone && (<><dt>Exposure</dt><dd><span className="status-label status-warning">! Every role can reach it</span></dd></>)}
+          {a.masked && (<><dt>Masked</dt><dd>Field filters mask every sensitive column here{a.unmaskedRoles?.length
+            ? <> except for {a.unmaskedRoles.map((r, i) => <span key={r}>{i > 0 && ", "}{link(r)}</span>)} (exempt)</> : null}</dd></>)}
+          {a.everyone && !a.masked && (<><dt>Exposure</dt><dd><span className="status-label status-warning">! Every role can reach it</span></dd></>)}
         </dl>
       )}
       {reach.length > 0 && (

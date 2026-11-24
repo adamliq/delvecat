@@ -105,9 +105,9 @@ export function FieldPanel({ catalog, entity }: { catalog: Catalog; entity: Enti
   const lookups = lookupsWithField(catalog, fieldName(entity), entity.instance);
   const models = dataModelsWithField(catalog, fieldName(entity), entity.instance);
   const name_ = fieldName(entity);
-  const filters = catalog.entities.filter((f) => f.type === "fieldFilter" && f.instance === entity.instance
+  const filters = catalog.ofType("fieldFilter").filter((f) => f.instance === entity.instance
     && String((f.properties as { field?: unknown } | undefined)?.field ?? "") === name_);
-  const definition = catalog.entities.find((f) => f.type === "fieldDefinition" && f.instance === entity.instance && f.name === name_);
+  const definition = catalog.findOne(entity.instance, "fieldDefinition", name_);
   return (
     <>
       <section>

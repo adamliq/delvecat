@@ -69,6 +69,64 @@ def _taxonomy(bundle: dict[str, Any]):
     return sensitive, propagates
 
 
+def _apply_field_filters(
+    entities: list[dict[str, Any]],
+    edges: list[dict[str, Any]],
+    by_id: dict[str, dict[str, Any]],
+) -> dict[str, set[str]]:
+    """Mark classifications held in columns a field filter removes, hashes or replaces
+    (``maskedBy``). Returns the stores whose every sensitive classification is masked,
+    with the roles exempt from those filters."""
+    filters = [e for e in entities if e["type"] == "fieldFilter" and not e.get("disabled")]
+    if not filters:
+        return {}
+    feeds: dict[str, set[str]] = defaultdict(set)  # sourcetype id -> index names it feeds
+    for edge in edges:
+        if edge["type"] == "feeds" and edge["to"] in by_id and by_id[edge["to"]]["type"] == "index":
+            feeds[edge["from"]].add(by_id[edge["to"]]["name"])
+
+    def covers(f: dict[str, Any], store: dict[str, Any], column: str) -> bool:
+        p = f.get("properties") or {}
+        if f.get("instance") != store.get("instance") or p.get("field") != column:
+            return False
+        if p.get("action") not in ("remove", "hash", "replace"):
+            return False  # sed rewrites _raw: not a column
+        indexes = set(p.get("indexes") or [])
+        limit = p.get("limit") or {}
+        if store["type"] == "index":
+            return store["name"] in indexes and not limit
+        st = store if store["type"] == "sourcetype" else by_id.get(
+            f"{store['instance']}:sourcetype:{(store.get('properties') or {}).get('sourcetype')}"
+        )  # fmt: skip
+        if st is None:
+            return False
+        if limit:
+            return limit.get("type") == "sourcetype" and st["name"] in (limit.get("values") or [])
+        return bool(indexes & feeds.get(st["id"], set()))
+
+    masked: dict[str, set[str]] = {}
+    for e in entities:
+        gov = e.get("governance") or {}
+        if e["type"] not in ("index", "sourcetype", "field") or not gov.get("classifications"):
+            continue
+        all_masked, exempt = True, set()
+        for c in gov["classifications"]:
+            columns = c.get("columns") or (
+                [(e.get("properties") or {}).get("field")] if e["type"] == "field" else []
+            )
+            hits = [[f for f in filters if covers(f, e, col)] for col in columns if col]
+            if columns and hits and all(hits):
+                c["maskedBy"] = sorted({f["id"] for h in hits for f in h})
+                for h in hits:
+                    for f in h:
+                        exempt |= set((f.get("properties") or {}).get("roleExemptions") or [])
+            elif c.get("sensitive"):
+                all_masked = False
+        if all_masked and any(c.get("maskedBy") for c in gov["classifications"]):
+            masked[e["id"]] = exempt
+    return masked
+
+
 def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
     entities = bundle["entities"]
     edges = bundle["edges"]
@@ -241,6 +299,7 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         by_id[eid].setdefault("governance", {})["readsClassified"] = sorted(cls)
     for eid, cls in stopped.items():
         by_id[eid].setdefault("governance", {})["stops"] = sorted(cls)
+    masked = _apply_field_filters(entities, edges, by_id)
     for eid, access in store_access.items():
         role_ids = {a["role"] for a in access}
         everyone = "*" in set((by_id[eid].get("permissions") or {}).get("read", [])) or any(
@@ -252,6 +311,14 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
             "users": sorted(users_of(role_ids)),
             "everyone": everyone,
         }
+        if eid in masked:
+            # Every sensitive column here is masked by a field filter, except for its
+            # exempt roles, which still see the values.
+            exempt = masked[eid]
+            by_id[eid]["governance"]["access"]["masked"] = True
+            by_id[eid]["governance"]["access"]["unmaskedRoles"] = sorted(
+                r for r in role_ids if role_names.get(r, r.rsplit(":", 1)[-1]) in exempt
+            )
     for rid, access in role_access.items():
         by_id[rid].setdefault("governance", {})["sensitiveAccess"] = access
     # A user's reach is the union of their roles' (which already include inherited
@@ -270,8 +337,12 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
             1 for eid in found if sensitive_classes(eid) and by_id[eid]["type"] in STORE_TYPES
         ),
         "exposedToEveryone": sum(
-            1 for e in entities if (e.get("governance") or {}).get("access", {}).get("everyone")
+            1
+            for e in entities
+            if (acc := (e.get("governance") or {}).get("access", {})).get("everyone")
+            and not acc.get("masked")
         ),
+        "maskedByFieldFilters": len(masked),
     }
     reports = [r for r in bundle.get("ingestionReport", []) if r["connector"] != "governance"]
     bundle["ingestionReport"] = [

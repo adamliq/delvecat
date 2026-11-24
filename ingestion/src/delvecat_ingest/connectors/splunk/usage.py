@@ -85,6 +85,8 @@ def extract_adhoc_searches(ctx: Ctx, out: ExtractResult) -> int:
         out.adhoc_searches.append(row)
         if row["dashboard"] or not _is_adhoc_object(row["search"], prov):
             continue  # dashboard panels are part of their dashboards
+        if not ctx.options.adhoc_splunk_apps and (row["app"] or "") in SPLUNK_APPS:
+            continue
         key = (row["app"] or "search", row["search"])
         o = objects.setdefault(key, {"runs": 0, "users": 0, "lastUsed": None, "from": set()})
         o["runs"] += row["runs"]
@@ -131,6 +133,24 @@ def _provenance_label(prov: str) -> str:
         return prov.split(":", 2)[1] or "UI"
     return "REST API" if prov in ("", "N/A") or prov.startswith("rest") else prov
 
+
+# Apps that ship with Splunk and search on their own (health checks, telemetry, consoles).
+SPLUNK_APPS = frozenset(
+    {
+        "splunk_monitoring_console",
+        "splunk_instrumentation",
+        "SplunkDeploymentServerConfig",
+        "splunk_secure_gateway",
+        "splunk_rapid_diag",
+        "splunk_assist",
+        "python_upgrade_readiness_app",
+        "splunk_internal_metrics",
+        "splunk_metrics_workspace",
+        "splunk-dashboard-studio",
+        "dmc",
+        "launcher",
+    }
+)
 
 # Searches Splunk runs for itself, and this app's own build command.
 _SYSTEM_SEARCH = re.compile(r"^\s*\|?\s*(summarize|delvecatbuild)\b", re.IGNORECASE)

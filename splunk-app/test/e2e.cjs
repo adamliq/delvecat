@@ -17,6 +17,7 @@ const USERS = {
 };
 const KV = '/servicesNS/nobody/delvecat/storage/collections/data/delvecat_catalog';
 const results = [];
+const skipped = [];
 const check = (name, ok, detail = '') => {
   results.push({ name, ok });
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  — ' + detail : ''}`);
@@ -99,6 +100,13 @@ const sections = {
   },
 
   async empty() {
+    // These checks need a Splunk with no catalog published (a fresh install). Elsewhere they
+    // are skipped, not failed: removing a catalog to test this would be a write.
+    if ((await pointer())?.generation) {
+      console.log('SKIP  empty: a catalog is published here; these checks run on a fresh install');
+      skipped.push('empty');
+      return;
+    }
     const v = await session('viewer');
     await v.page.goto(app());
     await v.page.waitForSelector('h1');
@@ -610,6 +618,7 @@ const sections = {
   }
   await browser.close();
   const failed = results.filter((r) => !r.ok);
+  if (skipped.length) console.log(`skipped: ${skipped.join(', ')}`);
   console.log(`\n${results.length - failed.length} passed, ${failed.length} failed`);
   process.exit(failed.length ? 1 : 0);
 })();

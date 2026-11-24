@@ -333,9 +333,7 @@ export function EntityPage() {
 /** A report made in Pivot: the data model and dataset it pivots on. */
 function PivotSource({ entity, pivot }: { entity: Entity; pivot: { dataModel: string; dataset: string } }) {
   const { catalog } = useCatalog();
-  const model = catalog.entities.find(
-    (e) => e.type === "dataModel" && e.instance === entity.instance && e.name === pivot.dataModel,
-  );
+  const model = catalog.findOne(entity.instance, "dataModel", pivot.dataModel);
   return (
     <section>
       <h2>Pivot</h2>

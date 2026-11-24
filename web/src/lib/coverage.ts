@@ -141,7 +141,7 @@ export interface DataModelCoverage {
 export function dataModelCoverage(catalog: Catalog, detections: DetectionStatus[]): DataModelCoverage[] {
   const names = new Set(detections.flatMap((d) => d.dataModels));
   return [...names].sort().map((name) => {
-    const entity = catalog.entities.find((e) => e.type === "dataModel" && e.name === name);
+    const entity = catalog.ofType("dataModel").find((e) => e.name === name);
     return {
       name,
       entity,

@@ -9,7 +9,7 @@ import { entityPath } from "../lib/routes";
 import { StatusLabel } from "./HealthPage";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
-import { type Facet, type Filters, type Sort } from "../lib/search";
+import { isBuiltinSetting, SETTING_TYPES, type Facet, type Filters, type Sort } from "../lib/search";
 import { exportFileName, resultRows } from "../lib/exportResults";
 import { downloadText, toCsv } from "../lib/health";
 import { riskMap } from "../lib/risk";
@@ -39,8 +39,10 @@ const FACET_TITLES: Record<string, string> = {
   health: "Health",
   sensitivity: "Sensitivity",
   usage: "Usage",
+  origin: "Origin",
   field: "Has field",
   command: "Runs command",
+  runFrom: "Ad-hoc search run from",
 };
 
 let instanceNames: Record<string, string> = {};
@@ -144,7 +146,14 @@ export function SearchPage() {
     return f;
   }, [params]);
 
-  const { results, facets, matches } = useMemo(() => search.query(q, filters, sort), [search, q, filters, sort]);
+  // Built-in time ranges, chart types and settings stay out unless asked for: a type or
+  // origin filter, or "show built-in settings".
+  const showSettings = params.has("settings") || Boolean(filters.origin?.length) || (filters.type ?? []).some((t) => SETTING_TYPES.has(t));
+  const hiddenSettings = useMemo(() => (showSettings ? 0 : catalog.entities.filter(isBuiltinSetting).length), [catalog, showSettings]);
+  const { results, facets, matches } = useMemo(
+    () => search.query(q, filters, sort, showSettings ? undefined : isBuiltinSetting),
+    [search, q, filters, sort, showSettings],
+  );
   const view = params.get("view") === "table" ? "table" : "list";
   const activeCount = Object.values(filters).reduce((n, v) => n + (v?.length ?? 0), 0);
 
@@ -185,6 +194,13 @@ export function SearchPage() {
       </aside>
       <div className="stack search-main">
         <h1>{q ? <>Results for “{q}”</> : "Browse the catalog"}</h1>
+        {(hiddenSettings > 0 || params.has("settings")) && (
+          <p className="muted small">
+            {params.has("settings")
+              ? <>Showing built-in time ranges, chart types and settings. <button type="button" className="link-btn" onClick={() => update((n) => n.delete("settings"))}>Hide them</button></>
+              : <>{hiddenSettings.toLocaleString()} built-in time ranges, chart types and settings are not shown. <button type="button" className="link-btn" onClick={() => update((n) => n.set("settings", "1"))}>Show them</button></>}
+          </p>
+        )}
         {activeCount > 0 && (
           <div className="active-filters">
             {FACET_NAMES.flatMap((f) =>

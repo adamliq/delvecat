@@ -100,6 +100,15 @@ def test_ad_hoc_searches_are_not_reported_as_changes():
     assert not [r for r in changes["removed"] if r["type"] == "adhocSearch"]
 
 
+def test_types_collected_for_the_first_time_are_not_changes():
+    bundle, _ = _adhoc([row(WEB)])
+    previous = {**bundle, "entities": [e for e in bundle["entities"] if e["type"] != "timeRange"]}
+    previous["entities"] = [e for e in previous["entities"] if e["name"] != "acme_web"]
+    changes = apply_versions(bundle["entities"], "2026-11-24T00:00:00Z", previous)
+    added = {i.split(":")[1] for i in changes["added"]}
+    assert "timeRange" not in added and "app" in added  # a known type still counts
+
+
 def test_public_profile_drops_the_typed_text():
     bundle, objs = _adhoc([row(WEB)])
     counts = redact_bundle(bundle, load_profile("public"), salt="s")
@@ -113,3 +122,14 @@ def test_public_profile_drops_the_typed_text():
     redact_bundle(bundle, load_profile("internal"))
     o = next(e for e in bundle["entities"] if e["type"] == "adhocSearch")
     assert o["properties"]["search"] == WEB
+
+
+def test_splunk_apps_searches_count_but_are_not_objects_unless_asked():
+    rows = [row("| rest /services/server/info", app="splunk_monitoring_console", runs=50), row(WEB)]
+    out = ExtractResult()
+    extract_adhoc_searches(Ctx(Rows(rows), "acme", Options()), out)
+    assert [e["app"] for e in out.entities if e["type"] == "adhocSearch"] == ["search"]
+    assert len(out.adhoc_searches) == 2  # both still count for usage
+    out = ExtractResult()
+    extract_adhoc_searches(Ctx(Rows(rows), "acme", Options(adhoc_splunk_apps=True)), out)
+    assert len([e for e in out.entities if e["type"] == "adhocSearch"]) == 2

@@ -615,6 +615,14 @@ def evaluate_health(
             if failed:
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(failed)}")
         _command_checks(e, risky_custom, checks)
+        if e["type"] == "fieldFilter" and (e.get("properties") or {}).get("appliesToBuilder"):
+            _check(
+                checks,
+                "fieldFilterOnBuilder",
+                "warning",
+                "Applies to the account that built this catalog: its searches saw filtered "
+                "data and Splunk restricts some commands for it, so the catalog may miss data",
+            )
         if checks:
             worst = max(checks, key=lambda c: SEVERITY[c["status"]])["status"]
             e["health"] = {"status": worst, "checks": checks}

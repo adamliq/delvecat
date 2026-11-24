@@ -48,6 +48,32 @@ export class Catalog {
     return this.incoming.get(id) ?? [];
   }
 
+  private named?: Map<string, Entity[]>;
+  private typed?: Map<string, Entity[]>;
+
+  /** Objects of a type with this name on an instance (built once, on first use). */
+  find(instance: string, type: string, name: string): Entity[] {
+    if (!this.named) {
+      this.named = new Map();
+      for (const e of this.bundle.entities) push(this.named, `${e.instance}\u0000${e.type}\u0000${e.name}`, e);
+    }
+    return this.named.get(`${instance}\u0000${type}\u0000${name}`) ?? [];
+  }
+
+  /** The first object of a type with this name on an instance, if any. */
+  findOne(instance: string, type: string, name: string): Entity | undefined {
+    return this.find(instance, type, name)[0];
+  }
+
+  /** Every object of a type (built once, on first use). */
+  ofType(type: string): Entity[] {
+    if (!this.typed) {
+      this.typed = new Map();
+      for (const e of this.bundle.entities) push(this.typed, e.type, e);
+    }
+    return this.typed.get(type) ?? [];
+  }
+
   countBy<K extends "type" | "product">(key: K): Map<K extends "type" ? EntityType : Product, number> {
     const counts = new Map();
     for (const e of this.bundle.entities) counts.set(e[key], (counts.get(e[key]) ?? 0) + 1);

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { commandsOf, customCommand, customRisk, RISKY_COMMANDS } from "../lib/commands";
-import { entityPath, searchPath } from "../lib/routes";
+import { commandPath, entityPath } from "../lib/routes";
 
 /** The commands a search runs: custom ones linked, risky ones marked. */
 export function CommandList({ catalog, entity }: { catalog: Catalog; entity: Entity }) {
@@ -19,8 +19,8 @@ export function CommandList({ catalog, entity }: { catalog: Catalog; entity: Ent
           return (
             <span key={n} className={`chip${risk ? " chip-warn" : ""}`} title={risk ? `Risky: ${risk}` : custom ? "Custom command" : "Built-in command"}>
               {risk && <span aria-hidden>! </span>}
-              {custom ? <Link to={entityPath(custom.id)}>{label}</Link> : <Link to={searchPath({ command: n })}>{label}</Link>}
-              {custom && <span className="muted small"> custom</span>}
+              <Link to={commandPath(n)}>{label}</Link>
+              {custom && <> <Link className="muted small" to={entityPath(custom.id)}>custom</Link></>}
             </span>
           );
         })}

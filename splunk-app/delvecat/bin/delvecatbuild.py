@@ -176,6 +176,19 @@ class DelveCatBuild(GeneratingCommand):
                     else "you may see less of this Splunk than "
                     + (published_by or "whoever built it")
                 )
+                filtered = [
+                    e["name"]
+                    for e in bundle["entities"]
+                    if e["type"] == "fieldFilter"
+                    and (e.get("properties") or {}).get("appliesToBuilder")
+                ]
+                if filtered:
+                    why += (
+                        "; field filters apply to your roles ("
+                        + ", ".join(sorted(filtered)[:5])
+                        + "), which limit what this build's searches see: exempt one of "
+                        "your roles from them"
+                    )
                 raise MuchSmaller(
                     f"the new catalog has {after:,} objects (not counting fields), "
                     f"the current one {before:,}: {why}. Nothing was published. "

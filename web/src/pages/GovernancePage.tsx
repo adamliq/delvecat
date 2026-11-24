@@ -57,7 +57,8 @@ export function GovernancePage() {
   const roles = catalog.entities.filter((e) => e.type === "role" && sensitiveAccess(e).some((a) => reachableIds.has(a.id)));
   const users = catalog.entities.filter((e) => e.type === "user" && sensitiveAccess(e, catalog).some((a) => reachableIds.has(a.id)));
   const groups = catalog.entities.filter((e) => e.type === "authGroup" && sensitiveAccess(e, catalog).some((a) => reachableIds.has(a.id)));
-  const everyone = matching.filter((s) => access(s)?.everyone);
+  const everyone = matching.filter((s) => access(s)?.everyone && !access(s)?.masked);
+  const masked = matching.filter((s) => access(s)?.masked || effectiveClassifications(s).some((c) => c.maskedBy?.length));
   const consumers = catalog.entities.filter((e) => readsClassified(e).some((c) => matchesClass(c, filter)));
   const taxonomy = catalog.bundle.classifications ?? [];
 
@@ -117,6 +118,9 @@ export function GovernancePage() {
             <div className="tile static"><span className="tile-num">{groups.length}</span><span className="tile-label">identity groups (SAML, LDAP) can reach them</span></div>
           )}
           <div className="tile static"><span className="tile-num">{everyone.length}</span><span className="tile-label">readable by every role</span></div>
+          {masked.length > 0 && (
+            <div className="tile static"><span className="tile-num">{masked.length}</span><span className="tile-label">masked by field filters</span></div>
+          )}
         </div>
       </section>
 

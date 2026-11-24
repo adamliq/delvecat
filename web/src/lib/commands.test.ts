@@ -39,3 +39,16 @@ describe("commands", () => {
     expect(s.query("", { command: ["stats"] }).results.map((e) => e.name).sort()).toEqual(["enrich", "top"]);
   });
 });
+
+describe("commands on several stacks", () => {
+  it("takes the custom command from each search's own stack", () => {
+    const a = ent("savedSearch", "a", { lineage: { commands: ["whois"] } });
+    const b = { ...ent("savedSearch", "b", { lineage: { commands: ["whois"] } }), id: "j:savedSearch:b", instance: "j" };
+    const risky = { ...ent("searchCommand", "whois", { app: "TA-other", properties: { risky: true } }), id: "j:searchCommand:whois", instance: "j" };
+    const cat = new Catalog({ ...bundle, instances: [...bundle.instances, { id: "j", name: "j", kind: "splunkEnterprise" }], entities: [a, b, whois, risky] });
+    const row = commandInventory(cat).find((r) => r.name === "whois")!;
+    expect([...row.stacks].sort()).toEqual(["i", "j"]);
+    expect(customCommand(cat, b, "whois")).toBe(risky);
+    expect(customCommand(cat, a, "whois")).toBe(whois);
+  });
+});

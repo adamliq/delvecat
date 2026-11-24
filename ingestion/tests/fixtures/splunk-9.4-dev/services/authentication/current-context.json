@@ -1,0 +1,11 @@
+{
+ "entry": [
+  {
+   "name": "admin",
+   "acl": {"app": "", "owner": "admin", "sharing": "system"},
+   "content": {"username": "admin", "roles": ["admin", "power", "user"], "defaultApp": "launcher", "eai:acl": null}
+  }
+ ],
+ "paging": {"offset": 0, "total": 1, "perPage": 30},
+ "messages": []
+}

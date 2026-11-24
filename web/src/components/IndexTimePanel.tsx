@@ -9,9 +9,8 @@ export function IndexTimePanel({ entity }: { entity: Entity }) {
   const { catalog } = useCatalog();
   const p = (entity.properties ?? {}) as Record<string, unknown>;
   const transformLink = (name: string, app?: string) => {
-    const t = catalog.entities.find(
-      (e) => e.type === "transform" && e.instance === entity.instance && e.name === name && (!app || e.app === app),
-    );
+    const same = catalog.find(entity.instance, "transform", name);
+    const t = same.find((e) => !app || e.app === app);
     return t ? <Link to={`/entity/${encodeURIComponent(t.id)}`}>{name}</Link> : <code>{name}</code>;
   };
   if (entity.type === "transform") {

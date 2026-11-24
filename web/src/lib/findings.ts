@@ -40,6 +40,7 @@ export const CHECK_TITLES: Record<string, string> = {
   summaryError: "Acceleration build failed",
   summaryUnused: "Acceleration not used",
   riskyCommand: "Runs a risky command",
+  fieldFilterOnBuilder: "Field filter limits the catalog build",
   suppressionExpired: "Suppression ended",
   suppressesWholeDetection: "Suppression hides a whole detection",
 };

@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { CatalogCtx } from "../lib/CatalogContext";
+import { entityPath } from "../lib/routes";
 import { DataTable } from "../components/DataTable";
 import { canBuild } from "../lib/splunkBuild";
 import { recentTargets, rememberTarget, testConnection, type ConnectivityResult, type StepResult } from "../lib/connectivity";
@@ -17,6 +20,31 @@ function StepStatus({ s }: { s: StepResult["status"] }) {
 }
 
 /** Testing: check that this Splunk can reach another stack with the app installed. */
+/** Field filters that applied to whoever built the catalog: that build saw filtered data
+ * and some commands were blocked for it. */
+function FieldFilterCheck() {
+  const ctx = useContext(CatalogCtx);
+  if (ctx?.state.status !== "ready") return null;
+  const filters = ctx.state.catalog.ofType("fieldFilter");
+  if (!filters.length) return null;
+  const hit = filters.filter((f) => (f.properties as { appliesToBuilder?: boolean } | undefined)?.appliesToBuilder);
+  return (
+    <section>
+      <h2>Field filters and the catalog build</h2>
+      {hit.length ? (
+        <div className="notice">
+          <p><strong>! {hit.length} field filter{hit.length === 1 ? "" : "s"} applied to the account that built this catalog.</strong>{" "}
+            Its searches saw filtered data and Splunk blocks some commands for it, so the catalog may be missing objects or data.
+            Exempt one of that account's roles from {hit.length === 1 ? "it" : "them"}, then build again.</p>
+          <ul className="plain-list">{hit.map((f) => <li key={f.id}><Link to={entityPath(f.id)}>{f.name}</Link></li>)}</ul>
+        </div>
+      ) : (
+        <p>✓ None of the {filters.length} field filter{filters.length === 1 ? "" : "s"} applied to the account that built this catalog.</p>
+      )}
+    </section>
+  );
+}
+
 export function TestingPage() {
   const [url, setUrl] = useState(() => recentTargets()[0] ?? "");
   const [token, setToken] = useState("");
@@ -53,8 +81,10 @@ export function TestingPage() {
     <div className="stack">
       <div>
         <h1>Testing</h1>
-        <p className="lede">Check that this Splunk can reach another stack that has Licoryx Delvecat installed.</p>
+        <p className="lede">Check that this Splunk can reach another stack that has Licoryx Delvecat installed, and that nothing limited the last build.</p>
       </div>
+
+      <FieldFilterCheck />
 
       <section>
         <h2>Test connectivity to another stack</h2>

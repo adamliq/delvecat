@@ -12,6 +12,7 @@ from defusedxml import ElementTree as SafeET  # navigation menus are user conten
 from ...dashboards import parse_panel
 from ...model import ExtractResult, edge, fqn
 from ...splunk_rest import as_bool, iter_entries
+from ...transport import EndpointForbidden, EndpointNotFound
 from .common import NS, Ctx, acl, add_global, add_ko, content, ref, split_list
 
 # Apps whose objects ship with Splunk (default menus, time ranges, chart types).
@@ -66,11 +67,24 @@ def parse_field_filter_action(action: str | None) -> dict[str, Any]:
     return {"field": field, "action": "replace", "replacement": op.strip('"')}
 
 
+def builder_roles(ctx: Ctx) -> list[str] | None:
+    """Roles of the account this build runs as (None if Splunk does not say)."""
+    try:
+        entry = ctx.transport.get("/services/authentication/current-context")["entry"][0]
+    except (EndpointNotFound, EndpointForbidden, KeyError, IndexError, TypeError):
+        return None
+    roles = content(entry).get("roles")
+    return [str(r) for r in roles] if isinstance(roles, list) else None
+
+
 def extract_field_filters(ctx: Ctx, out: ExtractResult) -> int:
     """Field filters (Splunk 9.4 and later): remove, hash or replace a field's values in
-    search results for every role not exempt."""
+    search results for every role not exempt. A filter that applies to the account
+    running the build also limits what the build sees (and blocks some commands)."""
+    filters = list(iter_entries(ctx.transport, "/services/authorization/fieldfilters"))
+    roles = builder_roles(ctx) if filters else None
     n = 0
-    for e in iter_entries(ctx.transport, "/services/authorization/fieldfilters"):
+    for e in filters:
         c = content(e)
         limit_type, _, limit_values = str(c.get("limit") or "").partition("::")
         ent = add_global(
@@ -86,6 +100,12 @@ def extract_field_filters(ctx: Ctx, out: ExtractResult) -> int:
                 if limit_type and limit_values
                 else None,
                 "roleExemptions": split_list(c.get("roleExemptions")) or None,
+                # True when no role of the building account is exempt.
+                "appliesToBuilder": (
+                    not set(roles) & set(split_list(c.get("roleExemptions")))
+                    if roles is not None
+                    else None
+                ),
             },
         )
         for index in split_list(c.get("index")):

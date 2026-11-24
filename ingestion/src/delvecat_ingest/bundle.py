@@ -165,6 +165,10 @@ def apply_versions(
     ]
     # Ad-hoc searches come and go with what people type: not changes to the deployment.
     churn = {e["id"] for e in entities if e["type"] in CHURN_TYPES}
+    # Types the previous catalog had none of were not collected then (an upgrade added
+    # them): their objects are new to the catalog, not changes to the deployment.
+    known_types = {o["type"] for o in prev.values()}
+    churn |= {e["id"] for e in entities if e["type"] not in known_types}
     added = [i for i in added if i not in churn]
     modified = [i for i in modified if i not in churn]
     removed = [r for r in removed if r["type"] not in CHURN_TYPES]

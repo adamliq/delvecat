@@ -112,6 +112,7 @@ def _build(args: argparse.Namespace) -> int:
         usage_window=args.usage_window,
         health_window=args.health_window,
         adhoc_objects=args.adhoc_objects,
+        adhoc_splunk_apps=args.adhoc_splunk_apps,
         lookup_headers=args.lookup_headers,
     )
     only = set(args.only.split(",")) if args.only else None
@@ -490,6 +491,12 @@ def main(argv: list[str] | None = None) -> int:
         metavar="N",
         help="keep the N most-run ad-hoc searches as catalog objects, with their SPL "
         "(default 1000; 0 for none)",
+    )
+    use.add_argument(
+        "--adhoc-splunk-apps",
+        action="store_true",
+        help="also keep ad-hoc searches run by Splunk's own apps (Monitoring Console, "
+        "instrumentation...) as objects; they always count for usage",
     )
     use.add_argument(
         "--usage-window",

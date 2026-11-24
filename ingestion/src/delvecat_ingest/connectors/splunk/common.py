@@ -37,8 +37,12 @@ class Options:
     # Lookup table files with no lookup definition listing their fields: read the header
     # of at most this many (field names only; 0 for none).
     lookup_headers: int = 300
+    lookup_header_seconds: float = 120  # overall time for reading them
     # The most-run ad-hoc searches kept as catalog objects (with their SPL); 0 for none.
     adhoc_objects: int = 1000
+    # Ad-hoc searches Splunk's own apps run (Monitoring Console, instrumentation...) are
+    # counted for usage but not kept as objects unless this is set.
+    adhoc_splunk_apps: bool = False
     # Called with each step's name before it runs (the Splunk app shows build progress).
     progress: Callable[[str], None] | None = None
 

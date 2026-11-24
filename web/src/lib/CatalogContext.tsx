@@ -8,6 +8,7 @@ import { dataModelColumns } from "./dataModels";
 import { schemaFields } from "./schema";
 import { fieldName } from "./fieldLineage";
 import { EntitySearch } from "./search";
+import { isVendor } from "./insights";
 import { propertyDefs, propertyFacets } from "./structured";
 
 type State =
@@ -32,6 +33,8 @@ function ready(bundle: CatalogBundle, origin: string): State {
   const stFields = new Map<string, string[]>();
   const search = new EntitySearch(bundle.entities, {
     ...propertyFacets(propertyDefs(bundle)),
+    // Shipped with Splunk or a vendor app, or made here.
+    origin: (e) => [isVendor(catalog, e) || (e.properties as { builtin?: boolean } | undefined)?.builtin === true ? "built-in" : "custom"],
     // Sourcetypes by the fields found on them; lookups, collections and data models by theirs.
     field: (e) => {
       if (e.type === "dataModel") return dataModelColumns(e);

@@ -10,7 +10,7 @@ import { useCatalog } from "../lib/CatalogContext";
 import { coverageBy, METRICS, mostUsed, USAGE_GROUPS, type Coverage, type GroupBy } from "../lib/insights";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
 import type { EntityType } from "../generated/catalog";
-import { domainPath, entityPath, searchPath } from "../lib/routes";
+import { commandPath, domainPath, entityPath, searchPath } from "../lib/routes";
 
 const pct = ([ok, of]: [number, number]) => (of ? Math.round((100 * ok) / of) : undefined);
 
@@ -42,10 +42,11 @@ function CommandInventory({ catalog }: { catalog: Catalog }) {
         csvName="delvecat-commands.csv"
         limit={50}
         columns={[
-          { label: "Command", value: (r) => r.name, render: (r) => <><Link to={searchPath({ command: r.name })}><code>{r.name}</code></Link>{r.risk && <> <span className="status-label status-warning" title={r.risk}>! risky</span></>}</> },
+          { label: "Command", value: (r) => r.name, render: (r) => <><Link to={commandPath(r.name)}><code>{r.name}</code></Link>{r.risk && <> <span className="status-label status-warning" title={r.risk}>! risky</span></>}</> },
           { label: "Kind", value: (r) => (r.custom ? "custom" : "built-in"), render: (r) => (r.custom ? <Link to={entityPath(r.custom.id)}>custom ({r.custom.app})</Link> : "built-in") },
           { label: "Searches running it", value: (r) => r.searches },
           { label: "Enabled", value: (r) => r.enabled },
+          ...(catalog.bundle.instances.length > 1 ? [{ label: "Stacks", value: (r: (typeof rows)[number]) => r.stacks.size }] : []),
           { label: "Why risky", value: (r) => r.risk ?? "", render: (r) => r.risk ?? <span className="muted">—</span> },
         ]}
       />

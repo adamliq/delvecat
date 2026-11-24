@@ -9,6 +9,8 @@ export interface EffectiveClassification {
   sensitive: boolean;
   /** The columns that hold it; absent when the whole object is classified. */
   columns?: string[];
+  /** Field filters that remove, hash or replace every column holding it. */
+  maskedBy?: string[];
 }
 
 export interface Access {
@@ -16,6 +18,9 @@ export interface Access {
   filteredRoles: string[];
   users: string[];
   everyone: boolean;
+  /** Every sensitive column is masked by field filters (except for unmaskedRoles). */
+  masked?: boolean;
+  unmaskedRoles?: string[];
 }
 
 export interface SensitiveAccess {
