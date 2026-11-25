@@ -524,6 +524,35 @@ RISKY_COMMANDS = {
 }
 
 
+# Objects whose owner is a Splunk user (authentication tokens have their own check).
+_NOT_OWNED = frozenset({"authToken", "user", "role", "app", "index", "instance", "capability"})
+_SYSTEM_OWNERS = frozenset({"nobody", "admin", "splunk-system-user", "system", ""})
+
+
+def _orphan_checks(
+    e: dict[str, Any], users: set[tuple[Any, str]] | None, checks: list[dict[str, str]]
+) -> None:
+    """A knowledge object whose owner no longer exists. Scheduled searches owned by a
+    removed user stop running; other objects can no longer be managed by their owner."""
+    owner = e.get("owner")
+    if users is None or not owner or owner in _SYSTEM_OWNERS or e["type"] in _NOT_OWNED:
+        return
+    if (e.get("instance"), owner) in users:
+        return
+    p = e.get("properties") or {}
+    scheduled = e["type"] in ("savedSearch", "correlationSearch", "scheduledView") and p.get(
+        "isScheduled"
+    )
+    if scheduled:
+        msg = f"Owner {owner} no longer exists: Splunk does not run this scheduled search"
+        _check(checks, "orphaned", "critical", msg)
+    else:
+        private = (
+            " (private, so nobody else can see or change it)" if e.get("sharing") == "user" else ""
+        )
+        _check(checks, "orphaned", "warning", f"Owner {owner} no longer exists{private}")
+
+
 def _command_checks(
     e: dict[str, Any],
     risky_custom: dict[tuple[Any, str], str],
@@ -623,6 +652,7 @@ def evaluate_health(
             if failed:
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(failed)}")
         _command_checks(e, risky_custom, checks)
+        _orphan_checks(e, user_names if e.get("instance") in with_users else None, checks)
         if e["type"] == "role" and e["name"] not in SPLUNK_ROLES:
             risky = [c for c in (e.get("properties") or {}).get("capabilities") or [] if risk_of(c)]
             if risky:

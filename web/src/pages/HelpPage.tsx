@@ -88,7 +88,7 @@ const SECTIONS: Section[] = [
     body: (
       <>
         <p>
-          Each build checks data freshness and volume, ingestion delay, parsing, skipped and failed scheduled searches,
+          Each build checks data freshness and volume, ingestion delay, parsing, skipped and failed scheduled searches, objects whose owner no longer exists,
           noisy alerts, forwarders, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
           authentication tokens. The thresholds used are listed at the top of the <L to="/health">Health</L> page.
         </p>

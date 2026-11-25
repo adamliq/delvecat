@@ -457,6 +457,15 @@ or change the platform (`admin_all_objects`, `edit_roles`, `edit_user`,
 `install_apps`, `edit_scripted`...), are marked `risk: high` with the reason; a custom
 role granting one gets a `riskyCapability` warning (Splunk's own roles are left out).
 
+### Orphaned objects
+
+A knowledge object whose owner is not among the instance's users (read in the same
+build) gets an `orphaned` check: `critical` for an enabled scheduled search, which
+Splunk no longer runs, `warning` for anything else (noting private ones, which nobody
+else can see or change). Objects owned by `nobody`, `admin` or Splunk's system user,
+and authentication tokens (they have `tokenNoOwner`), are not checked; nothing is
+checked when users were not read.
+
 ### Other knowledge objects
 
 - Sourcetype renames (props.conf `rename`): the new name becomes a sourcetype
