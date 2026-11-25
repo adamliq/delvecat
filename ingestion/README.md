@@ -447,6 +447,16 @@ deletes data, runs a program, runs a search per result or sends data out (`delet
 commands.conf, gets a `riskyCommand` health warning. Commands that only write to a
 lookup or index (`outputlookup`, `collect`) are shown as writes in lineage instead.
 
+### Capabilities
+
+Every capability (`authorize.conf` `capability::<name>`, built-in or from an app) is
+an object; roles are linked to the capabilities they grant (`grantsAccess`). High-risk
+capabilities, those that change who may do what, read secrets, run code, delete data
+or change the platform (`admin_all_objects`, `edit_roles`, `edit_user`,
+`change_authentication`, `list_storage_passwords`, `delete_by_keyword`,
+`install_apps`, `edit_scripted`...), are marked `risk: high` with the reason; a custom
+role granting one gets a `riskyCapability` warning (Splunk's own roles are left out).
+
 ### Other knowledge objects
 
 - Sourcetype renames (props.conf `rename`): the new name becomes a sourcetype

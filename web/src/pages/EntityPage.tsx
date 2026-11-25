@@ -22,6 +22,7 @@ import { FieldsTab, fieldsTable } from "../components/FieldsTab";
 import { LookupFieldsTab } from "../components/LookupFieldsTab";
 import { DataModelTab } from "../components/DataModelTab";
 import { CommandList } from "../components/CommandList";
+import { CapabilityPanel } from "../components/CapabilityPanel";
 import { DiffTable } from "./ChangesPage";
 import { LazyDetails } from "../components/LazyDetails";
 import { objectHistory } from "../lib/changes";
@@ -108,7 +109,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy", "capabilities", "importedCapabilities"]);
   const shownInStorage = entity.type === "index" && !!props.storage;
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)) && !(shownInStorage && STORAGE_KEYS.has(k)),
@@ -287,6 +288,7 @@ export function EntityPage() {
             </section>
           ))}
           <CommandList catalog={catalog} entity={entity} />
+          <CapabilityPanel catalog={catalog} entity={entity} />
           {Array.isArray(props.createdBy) && (
             <section>
               <h2>Created by</h2>

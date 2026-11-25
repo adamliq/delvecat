@@ -9,6 +9,7 @@ from ...model import ExtractResult
 from ...transport import EndpointForbidden, EndpointNotFound, SearchTimeout, Transport
 from . import (
     access,
+    capabilities,
     data,
     data_management,
     extras,
@@ -30,6 +31,7 @@ EXTRACTORS: dict[str, Extractor] = {
     "apps": access.extract_apps,
     "users": access.extract_users,
     "roles": access.extract_roles,
+    "capabilities": capabilities.extract_capabilities,
     "authGroups": access.extract_auth_groups,
     "authTokens": access.extract_auth_tokens,
     "indexes": data.extract_indexes,

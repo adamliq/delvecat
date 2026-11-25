@@ -24,7 +24,7 @@ export const SECTIONS: Section[] = [
   { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment"], empty: "Every forwarder and client reported recently." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
   { id: "storage", title: "Storage, routing and acceleration", checks: ["retentionBySize", "routeToMissingIndex", "summaryError", "summaryUnused"], empty: "No storage, routing or acceleration problems." },
-  { id: "access", title: "Authentication tokens and field filters", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder"], empty: "No token or field filter problems." },
+  { id: "access", title: "Access: tokens, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability"], empty: "No token, field filter or capability problems." },
   { id: "commands", title: "Risky commands", checks: ["riskyCommand"], empty: "No search runs a command that deletes data, runs programs or sends data out." },
   { id: "es", title: "Enterprise Security", checks: ["suppressionExpired", "suppressesWholeDetection"], empty: "No suppression problems." },
   { id: "other", title: "Other", checks: [], empty: "Nothing else." },
@@ -142,6 +142,10 @@ export const REMEDIES: Record<string, Remedy> = {
     why: "The acceleration summary does not build, so searches that use it fall back to slow raw searches, or show partial results.",
     fix: "Open the data model or report and look at its acceleration status; rebuild after fixing the search or permissions.",
     spl: () => `index=_internal sourcetype=scheduler savedsearch_name="_ACCELERATE_*" status!=success | stats count by savedsearch_name, status, reason`,
+  },
+  riskyCapability: {
+    why: "A custom role grants capabilities that change who may do what, read secrets, run code, delete data or change the platform. Everyone holding the role, or a role that imports it, can do so.",
+    fix: "Check each capability is needed; move it to a separate role given only to the people who need it, or remove it.",
   },
   fieldFilterOnBuilder: {
     why: "Field filters apply to the account that builds the catalog unless one of its roles is exempt: the build's searches see filtered data, and Splunk restricts commands such as tstats and mstats for it, so objects and data can be missing from the catalog.",

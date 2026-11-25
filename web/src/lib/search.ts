@@ -43,7 +43,7 @@ export const FACETS = {
 /** Built-in facets plus any added per bundle (structured properties use "p.<id>"). */
 /** Settings that ship with Splunk (time ranges, chart types, segmenters...): many, rarely
  * interesting, so Browse leaves them out unless asked. */
-export const SETTING_TYPES = new Set(["timeRange", "visualization", "segmenter", "multikvTable", "fieldDefinition", "navMenu"]);
+export const SETTING_TYPES = new Set(["timeRange", "visualization", "segmenter", "multikvTable", "fieldDefinition", "navMenu", "capability"]);
 export const isBuiltinSetting = (e: Entity) =>
   SETTING_TYPES.has(e.type) && (e.properties as { builtin?: boolean } | undefined)?.builtin === true;
 

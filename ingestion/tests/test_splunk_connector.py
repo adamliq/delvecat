@@ -91,7 +91,11 @@ def test_no_secrets_or_emails(bundle):
 
 def test_role_index_access_is_effective_and_expands_wildcards(bundle):
     # acme_soc: firewall;wineventlog directly, plus main;os inherited from the user role
-    granted = {t for _, _, t in edges(bundle, frm="dev:role:acme_soc", type_="grantsAccess")}
+    granted = {
+        t
+        for _, _, t in edges(bundle, frm="dev:role:acme_soc", type_="grantsAccess")
+        if ":index:" in t  # roles also grant capabilities
+    }
     assert granted == {
         "dev:index:firewall",
         "dev:index:wineventlog",

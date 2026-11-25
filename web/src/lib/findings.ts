@@ -41,6 +41,7 @@ export const CHECK_TITLES: Record<string, string> = {
   summaryUnused: "Acceleration not used",
   riskyCommand: "Runs a risky command",
   fieldFilterOnBuilder: "Field filter limits the catalog build",
+  riskyCapability: "Role grants high-risk capabilities",
   suppressionExpired: "Suppression ended",
   suppressesWholeDetection: "Suppression hides a whole detection",
 };

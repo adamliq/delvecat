@@ -1,0 +1,3717 @@
+{
+ "entry": [
+  {
+   "name": "capability::accelerate_datamodel",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aaccelerate_datamodel",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::accelerate_search",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aaccelerate_search",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::admin_all_objects",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aadmin_all_objects",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::apps_backup",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aapps_backup",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::apps_restore",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aapps_restore",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::capture_ingest_events",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Acapture_ingest_events",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::change_audit",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Achange_audit",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::change_authentication",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Achange_authentication",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::change_own_password",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Achange_own_password",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::create_external_lookup",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Acreate_external_lookup",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::delete_by_keyword",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Adelete_by_keyword",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::dispatch_rest_to_indexers",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Adispatch_rest_to_indexers",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_authentication_extensions",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_authentication_extensions",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_bookmarks_mc",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_bookmarks_mc",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_certificates",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_certificates",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_cmd",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_cmd",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_deployment_client",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_deployment_client",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_deployment_server",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_deployment_server",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_dist_peer",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_dist_peer",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_encryption_key_provider",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_encryption_key_provider",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_external_lookup",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_external_lookup",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_field_filter",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_field_filter",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_forwarders",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_forwarders",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_global_banner",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_global_banner",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_health",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_health",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_httpauths",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_httpauths",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_indexer_cluster",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_indexer_cluster",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_indexerdiscovery",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_indexerdiscovery",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_ingest_rulesets",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_ingest_rulesets",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_input_defaults",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_input_defaults",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_kvstore",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_kvstore",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_local_apps",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_local_apps",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_log_alert_event",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_log_alert_event",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_manager_xml",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_manager_xml",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_messages",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_messages",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_metric_alerts",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_metric_alerts",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_metric_schema",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_metric_schema",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_metrics_rollup",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_metrics_rollup",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_modinput_journald",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_modinput_journald",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_monitor",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_monitor",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_own_objects",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_own_objects",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_restmap",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_restmap",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_roles",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_roles",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_scripted",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_scripted",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_concurrency_all",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_concurrency_all",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_head_clustering",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_head_clustering",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_schedule_priority",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_schedule_priority",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_schedule_window",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_schedule_window",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_scheduler",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_scheduler",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_search_server",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_search_server",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_server",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_server",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_server_crl",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_server_crl",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_sourcetypes",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_sourcetypes",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_spl2_permissions",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_spl2_permissions",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_splunktcp",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_splunktcp",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_splunktcp_ssl",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_splunktcp_ssl",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_splunktcp_token",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_splunktcp_token",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_statsd_transforms",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_statsd_transforms",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_storage_passwords",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_storage_passwords",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_tcp",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_tcp",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_tcp_stream",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_tcp_stream",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_telemetry_settings",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_telemetry_settings",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_token_http",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_token_http",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_tokens_all",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_tokens_all",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_tokens_own",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_tokens_own",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_tokens_settings",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_tokens_settings",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_transforms",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_transforms",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_udp",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_udp",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_upload_and_index",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_upload_and_index",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_user",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_user",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_user_seed",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_user_seed",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_view_html",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_view_html",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_web_features",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_web_features",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_web_settings",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_web_settings",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_workload_policy",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_workload_policy",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_workload_pools",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_workload_pools",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::edit_workload_rules",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aedit_workload_rules",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::embed_report",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aembed_report",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::export_results_is_visible",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aexport_results_is_visible",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::fsh_manage",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Afsh_manage",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::fsh_search",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Afsh_search",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::get_diag",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aget_diag",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::get_metadata",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aget_metadata",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::get_typeahead",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aget_typeahead",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::indexes_edit",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aindexes_edit",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::input_csv_file",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Ainput_csv_file",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::input_file",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Ainput_file",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::install_apps",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Ainstall_apps",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::license_edit",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alicense_edit",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::license_tab",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alicense_tab",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::license_view_warnings",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alicense_view_warnings",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_accelerate_search",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_accelerate_search",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_all_objects",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_all_objects",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_cascading_plans",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_cascading_plans",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_certificates",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_certificates",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_deployment_client",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_deployment_client",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_deployment_server",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_deployment_server",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_dist_peer",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_dist_peer",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_field_filter",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_field_filter",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_forwarders",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_forwarders",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_health",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_health",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_httpauths",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_httpauths",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_indexer_cluster",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_indexer_cluster",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_indexerdiscovery",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_indexerdiscovery",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_ingest_rulesets",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_ingest_rulesets",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_inputs",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_inputs",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_introspection",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_introspection",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_metric_alerts",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_metric_alerts",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_metrics_catalog",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_metrics_catalog",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_pipeline_sets",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_pipeline_sets",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_remote_input_queue",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_remote_input_queue",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_remote_output_queue",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_remote_output_queue",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_search_head_clustering",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_search_head_clustering",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_search_scheduler",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_search_scheduler",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_settings",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_settings",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_storage_passwords",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_storage_passwords",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_token_http",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_token_http",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_tokens_all",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_tokens_all",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_tokens_own",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_tokens_own",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_workload_policy",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_workload_policy",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_workload_pools",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_workload_pools",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::list_workload_rules",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Alist_workload_rules",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::merge_buckets",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Amerge_buckets",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::metric_alerts",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Ametric_alerts",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::never_expire",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Anever_expire",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::never_lockout",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Anever_lockout",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::output_csv_file",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aoutput_csv_file",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::output_file",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aoutput_file",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::pattern_detect",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Apattern_detect",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::refresh_application_licenses",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arefresh_application_licenses",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::request_remote_tok",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arequest_remote_tok",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rest_access_server_endpoints",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arest_access_server_endpoints",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rest_apps_management",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arest_apps_management",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rest_apps_view",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arest_apps_view",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rest_properties_get",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arest_properties_get",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rest_properties_set",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arest_properties_set",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::restart_reason",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arestart_reason",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::restart_splunkd",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arestart_splunkd",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::rtsearch",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Artsearch",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_collect",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_collect",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_commands_ignoring_field_filter",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_commands_ignoring_field_filter",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_custom_command",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_custom_command",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_debug_commands",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_debug_commands",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_dump",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_dump",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_mcollect",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_mcollect",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_msearch",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_msearch",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_search_profiler",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_search_profiler",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::run_sendalert",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Arun_sendalert",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::schedule_rtsearch",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aschedule_rtsearch",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::schedule_search",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aschedule_search",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::search",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Asearch",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::search_process_config_refresh",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Asearch_process_config_refresh",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::select_workload_pools",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aselect_workload_pools",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::splunk_mobile_administration",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Asplunk_mobile_administration",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::upgrade_splunk_idxc",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aupgrade_splunk_idxc",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::upgrade_splunk_shc",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aupgrade_splunk_shc",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::upload_lookup_files",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aupload_lookup_files",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::upload_mmdb_files",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aupload_mmdb_files",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::use_remote_proxy",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Ause_remote_proxy",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::web_debug",
+   "id": "https://localhost:8089/servicesNS/nobody/system/configs/conf-authorize/capability%3A%3Aweb_debug",
+   "acl": {
+    "app": "system",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "system",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  },
+  {
+   "name": "capability::acme_run_playbook",
+   "id": "https://localhost:8089/servicesNS/nobody/acme_secops/configs/conf-authorize/capability%3A%3Aacme_run_playbook",
+   "acl": {
+    "app": "acme_secops",
+    "owner": "nobody",
+    "sharing": "system",
+    "perms": {
+     "read": [
+      "*"
+     ],
+     "write": [
+      "admin"
+     ]
+    }
+   },
+   "content": {
+    "disabled": false,
+    "eai:appName": "acme_secops",
+    "eai:userName": "nobody",
+    "eai:acl": null
+   }
+  }
+ ],
+ "paging": {
+  "offset": 0,
+  "total": 161,
+  "perPage": 30
+ },
+ "messages": [],
+ "generator": {
+  "build": "1b0c587000b8",
+  "version": "9.4.17"
+ }
+}

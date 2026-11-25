@@ -22,6 +22,7 @@ GLOBAL_TYPES = frozenset(
         "field",
         "fieldFilter",
         "fieldDefinition",
+        "capability",
         "multikvTable",
         "segmenter",
         # Product objects whose names are unique within their product on an instance.

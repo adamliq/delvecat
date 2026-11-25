@@ -2,6 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { DataTable } from "../components/DataTable";
 import { Link, useSearchParams } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
+import { holders, isHighRisk } from "../lib/capabilities";
 import { useCatalog } from "../lib/CatalogContext";
 import { access, effectiveClassifications, HOW_LABEL, isSensitive, matchesClass, readsClassified, sensitiveAccess } from "../lib/governance";
 import { typeLabel } from "../lib/labels";
@@ -40,6 +41,35 @@ function runners(e: Entity): string {
   return e.sharing === "user" ? `only ${e.owner ?? "its owner"}` : "";
 }
 
+/** High-risk capabilities and who holds them. */
+function RiskyCapabilities() {
+  const { catalog } = useCatalog();
+  const rows = catalog.ofType("capability").filter(isHighRisk).map((c) => ({ c, h: holders(catalog, c) }))
+    .filter((r) => r.h.direct.length + r.h.inherited.length > 0)
+    .sort((a, b) => b.h.users.length - a.h.users.length || a.c.name.localeCompare(b.c.name));
+  if (!rows.length) return null;
+  return (
+    <section>
+      <h2>High-risk capabilities <span className="muted">({rows.length})</span></h2>
+      <p className="muted small">Capabilities that change who may do what, read secrets, run code, delete data or change the platform, and the roles and users holding them.</p>
+      <DataTable
+        rows={rows}
+        rowKey={(r) => r.c.id}
+        csvName="delvecat-high-risk-capabilities.csv"
+        columns={[
+          { label: "Capability", value: (r) => r.c.name, render: (r) => <Link to={entityPath(r.c.id)}><code>{r.c.name}</code></Link> },
+          { label: "Lets a user", value: (r) => r.c.description ?? "" },
+          { label: "Roles", value: (r) => r.h.direct.length + r.h.inherited.length, render: (r) => (
+            <>{[...r.h.direct, ...r.h.inherited].slice(0, 6).map((x, i) => <span key={x.id}>{i > 0 && ", "}<Link to={entityPath(x.id)}>{x.name}</Link></span>)}{r.h.direct.length + r.h.inherited.length > 6 ? " …" : ""}</>
+          ) },
+          { label: "Users", value: (r) => r.h.users.length },
+          ...(catalog.bundle.instances.length > 1 ? [{ label: "Stack", value: (r: (typeof rows)[number]) => r.c.instance }] : []),
+        ]}
+      />
+    </section>
+  );
+}
+
 export function GovernancePage() {
   const { catalog } = useCatalog();
   const [params, setParams] = useSearchParams();
@@ -67,6 +97,7 @@ export function GovernancePage() {
       <div className="stack">
         <h1>Governance</h1>
         <p className="muted">No sensitive classifications in this bundle. Classify fields, sourcetypes, indexes or lookups in <code>annotations/</code> (for example <code>classifications: [PII.Email]</code>) to see who can reach them.</p>
+        <RiskyCapabilities />
       </div>
     );
   }
@@ -135,6 +166,8 @@ export function GovernancePage() {
           </ul>
         </section>
       )}
+
+      <RiskyCapabilities />
 
       <section>
         <h2>Sensitive data and who can reach it</h2>

@@ -309,7 +309,8 @@
         "panel",
         "visualization",
         "multikvTable",
-        "segmenter"
+        "segmenter",
+        "capability"
       ]
     },
     "Sharing": {

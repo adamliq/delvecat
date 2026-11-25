@@ -87,7 +87,8 @@ export type EntityType =
   | "panel"
   | "visualization"
   | "multikvTable"
-  | "segmenter";
+  | "segmenter"
+  | "capability";
 /**
  * The Splunk product an entity belongs to.
  */

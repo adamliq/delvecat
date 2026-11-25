@@ -29,7 +29,7 @@ INSTANCE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 # Every part a build can run: the Splunk platform extractors, then the products.
 PARTS = [*splunk.EXTRACTORS, *PRODUCTS]
 # Parts that need another one's results.
-NEEDS = {"fields": "inventory", "indexTimeRules": "transforms"}
+NEEDS = {"fields": "inventory", "indexTimeRules": "transforms", "capabilities": "roles"}
 
 
 def resolve_parts(parts: set[str] | None) -> set[str]:

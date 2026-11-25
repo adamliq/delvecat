@@ -20,6 +20,7 @@ from datetime import datetime
 from statistics import median
 from typing import Any
 
+from .connectors.splunk.capabilities import risk_of
 from .cron import runs_per_day
 from .lineage import (
     KNOWLEDGE_TYPES,
@@ -498,6 +499,13 @@ def _token_checks(
         )
 
 
+# Roles Splunk ships, whose capabilities are by design (custom roles are checked).
+SPLUNK_ROLES = frozenset(
+    {"admin", "sc_admin", "splunk-system-role", "can_delete", "power", "user", "apps",
+     "tokens_auth", "splunk_system_upgrader", "list_users_roles", "internal_ops_admin",
+     "data_management_admin", "data_management_user", "securegateway", "securegateway_admin"}
+)  # fmt: skip
+
 # Commands that delete data, run programs or searches per result, or send data out of
 # Splunk: Splunk's own list of risky commands, less the ones that only write to a lookup
 # or index (those show as writes in lineage).
@@ -615,6 +623,15 @@ def evaluate_health(
             if failed:
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(failed)}")
         _command_checks(e, risky_custom, checks)
+        if e["type"] == "role" and e["name"] not in SPLUNK_ROLES:
+            risky = [c for c in (e.get("properties") or {}).get("capabilities") or [] if risk_of(c)]
+            if risky:
+                _check(
+                    checks,
+                    "riskyCapability",
+                    "warning",
+                    "Grants high-risk capabilities: " + ", ".join(sorted(risky)),
+                )
         if e["type"] == "fieldFilter" and (e.get("properties") or {}).get("appliesToBuilder"):
             _check(
                 checks,

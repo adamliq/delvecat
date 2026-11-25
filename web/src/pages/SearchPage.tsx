@@ -43,6 +43,7 @@ const FACET_TITLES: Record<string, string> = {
   field: "Has field",
   command: "Runs command",
   runFrom: "Ad-hoc search run from",
+  capability: "Has capability",
 };
 
 let instanceNames: Record<string, string> = {};
