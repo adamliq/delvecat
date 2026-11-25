@@ -21,6 +21,7 @@ def extract_server_info(ctx: Ctx, out: ExtractResult) -> int:
             "kind": "splunkCloud" if cloud else "splunkEnterprise",
             "properties": {
                 "serverName": c.get("serverName"),
+                "guid": c.get("guid"),
                 "productType": c.get("product_type"),
                 "build": c.get("build"),
                 "os": c.get("os_name"),

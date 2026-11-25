@@ -650,7 +650,12 @@ def evaluate_health(
                 )
             failed = [a for a, r in (obs.get("apps") or {}).items() if r and r != "Ok"]
             if failed:
-                _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(failed)}")
+                why = obs.get("appFailures") or {}
+                parts = [
+                    f"{a} ({why[a]['reason']})" if (why.get(a) or {}).get("reason") else a
+                    for a in failed
+                ]
+                _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(parts)}")
         _command_checks(e, risky_custom, checks)
         _orphan_checks(e, user_names if e.get("instance") in with_users else None, checks)
         if e["type"] == "role" and e["name"] not in SPLUNK_ROLES:

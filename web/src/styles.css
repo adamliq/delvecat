@@ -316,6 +316,9 @@ a.chip:hover { text-decoration: none; border-color: var(--accent); }
 .risk-banner { border: 1px solid var(--border); border-left: 4px solid var(--status-warning); border-radius: 6px; padding: 10px 14px; background: var(--surface); }
 .risk-banner.risk-critical { border-left-color: var(--status-critical); }
 .risk-banner p { margin: 0 0 6px; }
+.tier-panel { border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 14px; background: var(--surface); }
+.tier-panel p { margin: 0 0 4px; }
+.tier-panel p:last-child { margin-bottom: 0; }
 .risk-banner ul { margin: 0; }
 .risk-banner li + li { margin-top: 4px; }
 .results-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }

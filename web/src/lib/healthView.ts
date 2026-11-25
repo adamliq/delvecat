@@ -21,7 +21,7 @@ export interface Section {
 export const SECTIONS: Section[] = [
   { id: "data", title: "Data sources", checks: ["freshness", "volume", "ingestDelay", "parsing"], empty: "Every index and sourcetype looks healthy." },
   { id: "searches", title: "Scheduled searches and alerts", checks: ["skipped", "failed", "runtime", "notRunning", "alertNoisy"], empty: "No skipped, failing, missing or noisy scheduled searches." },
-  { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment"], empty: "Every forwarder and client reported recently." },
+  { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment", "relay"], empty: "Every forwarder and client reported recently." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
   { id: "storage", title: "Storage, routing and acceleration", checks: ["retentionBySize", "routeToMissingIndex", "summaryError", "summaryUnused"], empty: "No storage, routing or acceleration problems." },
   { id: "access", title: "Access: tokens, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability"], empty: "No token, field filter or capability problems." },
@@ -110,6 +110,11 @@ export const REMEDIES: Record<string, Remedy> = {
     why: "Apps the deployment server sends did not install, so this client runs old or missing configuration.",
     fix: "Look at the client's splunkd.log for the install error (often permissions, disk space or a bad app).",
     spl: (e) => `index=_internal sourcetype=splunkd component=DeployedApplication host=${q(e.name)} log_level!=INFO | table _time log_level message | sort - _time`,
+  },
+  relay: {
+    why: "This client is a second-tier deployment server: it keeps the apps it gets in its deployment-apps folder to pass on, so it cannot enable them. Classes that send it apps to enable make the install fail at every phone home.",
+    fix: "Set stateOnClient = noop on the server classes that send apps to it (or keep it out of them, for example by narrowing a whitelist of *), then reload the deployment server.",
+    spl: (e) => `index=_internal sourcetype=splunkd component=DeployedApplication host=${q(e.name)} "Failed to install" | stats count latest(_time) as last by message | eval last=strftime(last, "%F %T")`,
   },
   hecOff: {
     why: "HTTP Event Collector is off: every HEC token on this instance refuses data.",

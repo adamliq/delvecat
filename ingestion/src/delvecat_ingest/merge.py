@@ -11,6 +11,8 @@ module joins them and recomputes what crosses instances:
   across instances, by name; ``web`` on two indexer clusters is linked to both.
 - **Hosts**: deployment clients, forwarders and Stream forwarders are linked again
   to the ``host`` values seen on any instance.
+- **Deployment tiers**: a deployment server that takes apps from another is joined to
+  it, app by app (``tiers.link_deployment_tiers``).
 - Broken-reference diagnostics fixed by another instance are cleared, objects
   that gained consumers lose their "unused" flag, and governance is recomputed.
 
@@ -34,6 +36,7 @@ from .health import _merge_usage as merge_usage
 from .link import link_hosts
 from .quality import apply_quality
 from .resolve import Resolver
+from .tiers import link_deployment_tiers
 
 
 class MergeError(ValueError):
@@ -207,8 +210,11 @@ def merge_bundles(
         if not matches or ref.target.pattern:
             still_open.append(ref_to_json(ref))  # patterns stay open for further merges
 
-    # 2. machines to hosts on any instance
+    # 2. machines to hosts on any instance; deployment servers in tiers
     for edge in link_hosts(entities):
+        add(edge)
+    tier_edges = link_deployment_tiers(entities, instances)
+    for edge in tier_edges:
         add(edge)
 
     # 3. searches to fields of sourcetypes they now reach on another instance
@@ -289,6 +295,7 @@ def merge_bundles(
                 "instances": len(instances),
                 "crossInstanceEdges": len(new_edges),
                 "foldedIndexes": len(id_map),
+                "deploymentTierLinks": len(tier_edges),
                 "openReferences": len(still_open),
                 "noLongerUnused": revived,
             },

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TierPanel } from "../components/TierPanel";
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { CopyButton } from "../components/CopyButton";
 import { rememberViewed } from "../lib/recent";
@@ -109,7 +110,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy", "capabilities", "importedCapabilities"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy", "capabilities", "importedCapabilities", "deploymentServerInstance", "receivedFrom", "movedTo"]);
   const shownInStorage = entity.type === "index" && !!props.storage;
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)) && !(shownInStorage && STORAGE_KEYS.has(k)),
@@ -183,6 +184,7 @@ export function EntityPage() {
       </div>
 
       <RiskBanner catalog={catalog} entity={entity} />
+      <TierPanel catalog={catalog} entity={entity} />
 
       <div className="tabs" role="tablist">
         {tabs.map(([t, label]) => (

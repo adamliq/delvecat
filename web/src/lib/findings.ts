@@ -25,6 +25,7 @@ export const CHECK_TITLES: Record<string, string> = {
   silent: "Forwarder silent",
   phoneHome: "Deployment client not phoning home",
   deployment: "App deployment failed",
+  relay: "Second-tier deployment server sent apps to enable",
   hecOff: "HTTP Event Collector off",
   hecRejected: "HEC requests rejected",
   hecErrors: "HEC errors",

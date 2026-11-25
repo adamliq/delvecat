@@ -89,7 +89,7 @@ const SECTIONS: Section[] = [
       <>
         <p>
           Each build checks data freshness and volume, ingestion delay, parsing, skipped and failed scheduled searches, objects whose owner no longer exists,
-          noisy alerts, forwarders, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
+          noisy alerts, forwarders and deployment servers (including second-tier ones), HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
           authentication tokens. The thresholds used are listed at the top of the <L to="/health">Health</L> page.
         </p>
         <ul>
@@ -110,7 +110,7 @@ const SECTIONS: Section[] = [
         <p>The catalog is a snapshot: it changes only when someone builds it again.</p>
         <ul>
           <li><strong>In Splunk</strong>: the <em>Build</em> button (catalog publishers and admins) reads this Splunk with your permissions and publishes the result. Choose the parts to read, field discovery and a search time limit. A build that would replace the catalog with a much smaller one asks first. To refresh it regularly, turn on the <em>Schedule</em> on the Build page (daily, weekly or a cron expression); it builds with the parts and options chosen there.</li>
-          <li><strong>Outside Splunk</strong>: <code>delvecat-ingest build</code> (or <code>scripts/Build-Catalog.ps1</code>) then <code>delvecat-ingest publish</code>. Use it to combine several instances (indexers, Deployment Server, SOAR, UBA), apply annotations from a repository, or redact a catalog for public use.</li>
+          <li><strong>Outside Splunk</strong>: <code>delvecat-ingest build</code> (or <code>scripts/Build-Catalog.ps1</code>) then <code>delvecat-ingest publish</code>. Use it to combine several instances (indexers, Deployment Servers, including two tiers of them, SOAR, UBA), apply annotations from a repository, or redact a catalog for public use.</li>
           <li>Outside Splunk you can also open a catalog with <em>Open file</em> or <em>Open folder</em>.</li>
         </ul>
       </>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { tierLabel } from "../lib/tiers";
 import type { EntityType } from "../generated/catalog";
 import { CoverageReport } from "../components/CoverageReport";
 import { PropValue } from "../components/PropValue";
@@ -137,6 +138,7 @@ export function Home() {
                 {KIND_LABELS[i.kind] ?? i.kind}
                 {i.version && <> · {i.version}</>}
               </div>
+              {tierLabel(catalog, i) && <div className="small">{tierLabel(catalog, i)}</div>}
               <p className="small stack-counts">
                 <Link to={searchPath({ instance: i.id })}>{(perInstance.get(i.id)?.objects ?? 0).toLocaleString()} objects</Link>
                 {healthReport && (perInstance.get(i.id)?.critical || perInstance.get(i.id)?.warning) ? (

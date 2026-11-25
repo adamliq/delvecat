@@ -48,7 +48,7 @@ Objects that reference something missing or not shared get
 
 | Connector | Source | Notes |
 |---|---|---|
-| Deployment Server | `deployment/server/{serverclasses,applications,clients}`, `configs/conf-serverclass`, optional deployment-apps folder | verified against Splunk 9.4 with a real universal forwarder |
+| Deployment Server | `deployment/server/{serverclasses,applications,clients}`, `configs/conf-serverclass`, `deployment/client` and `configs/conf-deploymentclient` (second tier), optional deployment-apps folder | verified against Splunk 9.4 with a real universal forwarder |
 | DB Connect | `configs/conf-{identities,db_connections,db_inputs,db_outputs,db_lookups}` in `splunk_app_db_connect` | identity user names and passwords are never collected; key names follow DB Connect 3.x docs and should be checked against your version |
 | Enterprise Security | saved searches (`action.correlationsearch.*`, `action.escu.*`), `alerts/alert_actions`, `configs/conf-inputs` (`threatlist://`, `identity_manager://`), `configs/conf-analyticstories` | verified against ES-format content in a dev Splunk |
 | SOAR (`--soar-url`, token in `DELVECAT_SOAR_TOKEN`) | `/rest/{version,app,asset,playbook,custom_function}` | asset configuration is never read; sample responses only so far |
@@ -378,6 +378,40 @@ data, ES detections to SOAR labels, UBA data sources to Splunk indexes. Names
 of global objects (indexes, sourcetypes, hosts, SOAR labels) are matched
 across instances; an index name configured on several indexer clusters links
 to all of them. Merge unredacted bundles and redact the result.
+
+### Deployment servers in two tiers
+
+A second-tier deployment server takes apps from an upstream one into its own
+`deployment-apps` folder (`repositoryLocation` in its `deploymentclient.conf`) and
+passes them on to its forwarders. Build each deployment server as its own instance
+and merge them:
+
+```bash
+uv run delvecat-ingest build --url https://ds:8089      --instance prod-ds      --only serverInfo \
+    --products deploymentServer --deployment-apps-dir /opt/splunk/etc/deployment-apps --out ds.json
+uv run delvecat-ingest build --url https://ds-emea:8089 --instance prod-ds-emea --only serverInfo \
+    --products deploymentServer --deployment-apps-dir /opt/splunk/etc/deployment-apps --out ds-emea.json
+uv run delvecat-ingest merge ds.json ds-emea.json ... --out catalog/
+```
+
+Each build records whether the server is itself a deployment client (its upstream,
+repository location, and the apps it got from upstream: `origin` `upstream` or
+`local` on its apps). The merge recognises the upstream's client record as the
+second-tier server (same GUID as its `server/info`, else the same host name) and:
+
+- gives each deployment server a `deploymentTier` (1 = top) and the second tier its
+  `upstreamInstance`;
+- links each upstream app to the copy it becomes downstream (`deploys`), so lineage
+  runs from the top-tier server class to the forwarders of the second tier;
+- warns when server classes send the second-tier server apps with `stateOnClient`
+  other than `noop`: it cannot enable them, so the install fails at every phone home
+  (a `whitelist.0 = *` class often catches it by accident);
+- marks a forwarder that moved from one deployment server to the other (`movedTo`):
+  its old record no longer counts as not phoning home.
+
+Every server class also records the settings each of its apps gets (`appSettings`:
+`restartSplunkd`, `stateOnClient`, from the class:app stanza, the class, or `[global]`),
+and a client's failed apps keep Splunk's reason (`observed.appFailures`).
 
 ### From PowerShell
 
