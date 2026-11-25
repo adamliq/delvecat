@@ -566,6 +566,63 @@ def _command_checks(
         _check(checks, "riskyCommand", "warning", "Runs " + "; ".join(found))
 
 
+def _db_checks(
+    e: dict[str, Any], names: dict[tuple, dict[str, Any]], checks: list[dict[str, str]]
+) -> None:
+    """DB Connect: a missing identity or connection, a disabled connection in use, and
+    runs that failed or did not happen (from DB Connect's job metrics)."""
+    p, inst = e.get("properties") or {}, e.get("instance")
+    if e["type"] == "dbConnection":
+        ident = p.get("identity")
+        if ident and not (i := names.get((inst, "dbIdentity", ident))):
+            _check(
+                checks,
+                "dbMissing",
+                "critical",
+                f"Its identity {ident} does not exist, so DB Connect cannot connect",
+            )
+        elif ident and i.get("disabled"):
+            _check(checks, "dbMissing", "critical", f"Its identity {ident} is disabled")
+        return
+    conn = p.get("connection")
+    if conn:
+        c = names.get((inst, "dbConnection", conn))
+        if not c:
+            _check(
+                checks,
+                "dbMissing",
+                "critical",
+                f"Its connection {conn} does not exist, so it cannot run",
+            )
+        elif c.get("disabled"):
+            _check(
+                checks,
+                "dbMissing",
+                "critical",
+                f"Its connection {conn} is disabled, so it cannot run",
+            )
+    u = e.get("usage") or {}
+    runs, failed = u.get("dbRuns"), u.get("dbFailedRuns") or 0
+    window = str(u.get("dbWindow") or "").lstrip("-")
+    if runs == 0 and e["type"] in ("dbInput", "dbOutput"):
+        _check(
+            checks,
+            "dbNotRunning",
+            "warning",
+            f"No runs recorded in the last {window}" if window else "No runs recorded",
+        )
+    elif runs and failed:
+        last = str(u.get("dbLastStatus") or "").upper()
+        status = "critical" if failed == runs or last not in ("COMPLETED", "SUCCESS") else "warning"
+        _check(
+            checks,
+            "dbFailed",
+            status,
+            f"{failed} of {runs} runs failed in the last {window}"
+            + (f" (last run: {last.lower()})" if last else ""),
+        )
+
+
 def evaluate_health(
     entities: list[dict[str, Any]], as_of_iso: str | None, scheduler_since_iso: str | None = None
 ) -> None:
@@ -584,6 +641,12 @@ def evaluate_health(
         for e in entities
         if e["type"] == "searchCommand"
         and ((p := e.get("properties") or {}).get("risky") or p.get("passAuth"))
+    }
+    # DB Connect: identities and connections per instance, and which connections are off.
+    db_names = {
+        (e.get("instance"), e["type"], e["name"]): e
+        for e in entities
+        if e["type"] in ("dbIdentity", "dbConnection")
     }
     for e in entities:
         if e.get("disabled"):
@@ -656,6 +719,8 @@ def evaluate_health(
                     for a in failed
                 ]
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(parts)}")
+        if e["type"] in ("dbConnection", "dbInput", "dbOutput", "dbLookup"):
+            _db_checks(e, db_names, checks)
         _command_checks(e, risky_custom, checks)
         _orphan_checks(e, user_names if e.get("instance") in with_users else None, checks)
         if e["type"] == "role" and e["name"] not in SPLUNK_ROLES:

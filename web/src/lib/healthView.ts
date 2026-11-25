@@ -22,6 +22,7 @@ export const SECTIONS: Section[] = [
   { id: "data", title: "Data sources", checks: ["freshness", "volume", "ingestDelay", "parsing"], empty: "Every index and sourcetype looks healthy." },
   { id: "searches", title: "Scheduled searches and alerts", checks: ["skipped", "failed", "runtime", "notRunning", "alertNoisy"], empty: "No skipped, failing, missing or noisy scheduled searches." },
   { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment", "relay"], empty: "Every forwarder and client reported recently." },
+  { id: "db", title: "DB Connect", checks: ["dbMissing", "dbFailed", "dbNotRunning"], empty: "Every DB Connect input and output has what it needs and runs." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
   { id: "storage", title: "Storage, routing and acceleration", checks: ["retentionBySize", "routeToMissingIndex", "summaryError", "summaryUnused"], empty: "No storage, routing or acceleration problems." },
   { id: "access", title: "Access: tokens, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability"], empty: "No token, field filter or capability problems." },
@@ -115,6 +116,20 @@ export const REMEDIES: Record<string, Remedy> = {
     why: "This client is a second-tier deployment server: it keeps the apps it gets in its deployment-apps folder to pass on, so it cannot enable them. Classes that send it apps to enable make the install fail at every phone home.",
     fix: "Set stateOnClient = noop on the server classes that send apps to it (or keep it out of them, for example by narrowing a whitelist of *), then reload the deployment server.",
     spl: (e) => `index=_internal sourcetype=splunkd component=DeployedApplication host=${q(e.name)} "Failed to install" | stats count latest(_time) as last by message | eval last=strftime(last, "%F %T")`,
+  },
+  dbMissing: {
+    why: "DB Connect cannot open the connection, so every input, output and lookup on it fails, and no data arrives.",
+    fix: "Create or enable the identity or connection it names in DB Connect (Configuration > Databases), or point it at one that exists.",
+  },
+  dbFailed: {
+    why: "Runs of this DB Connect job fail: an input misses rows from the database, an output does not write them.",
+    fix: "Look at DB Connect's server log for the error (sign-in, network, SQL, a changed table), fix it, then check the next run.",
+    spl: (e) => `index=_internal sourcetype=dbx_job_metrics (input_name=${q(e.name)} OR output_name=${q(e.name)}) | table _time status read_count write_count error_count duration | sort - _time`,
+  },
+  dbNotRunning: {
+    why: "DB Connect records runs of other jobs but none of this one: it is not scheduled, or DB Connect stopped running it.",
+    fix: "Check its interval and that it is enabled in DB Connect, and look for errors about it in DB Connect's server log.",
+    spl: (e) => `index=_internal sourcetype=dbx_server ${q(e.name)} | table _time log_level message | sort - _time`,
   },
   hecOff: {
     why: "HTTP Event Collector is off: every HEC token on this instance refuses data.",

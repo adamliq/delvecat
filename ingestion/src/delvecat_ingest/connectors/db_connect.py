@@ -8,20 +8,82 @@ Identity user names and passwords are never collected.
 Lineage: external table → DB input → index/sourcetype; search → DB output →
 external table; DB lookup ← external table. ``dbxquery`` in SPL is handled by the
 SPL analyzer.
+
+A connection given as a custom JDBC URL keeps only its server, port and database (the URL
+itself can carry a user name and password, so it is never stored). An output keeps its
+field → column mappings. Run status of inputs and outputs comes from DB Connect's job
+metrics in ``_internal`` (``sourcetype=dbx_job_metrics``), when that log is searchable.
 """
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..model import ExtractResult, edge, fqn
 from ..splunk_rest import as_bool, iter_entries
 from ..sql import tables
 from .splunk import run_extractors
-from .splunk.common import Ctx, add_global, content, ref, split_list
+from .splunk.common import Ctx, add_global, content, epoch_to_iso, ref, split_list, to_int
 
 APP = "splunk_app_db_connect"
 PRODUCT = "dbConnect"
+
+
+_HOST_PORT = re.compile(r"^(\[[^\]]+\]|[^/:;?@()=\s]+)(?::(\d+))?")
+
+
+def parse_jdbc_url(url: str | None) -> dict[str, str]:
+    """Server, port and database of a JDBC URL, for the common drivers. Never returns user
+    names, passwords or other parameters."""
+    if not url or not url.lower().startswith("jdbc:"):
+        return {}
+    rest = url[5:]
+    out: dict[str, str] = {}
+    params = dict(
+        (k.strip().lower(), v.strip())
+        for k, v in re.findall(r"[;?&]\s*([A-Za-z_.]+)\s*=\s*([^;&]*)", rest)
+    )
+    if rest.lower().startswith("oracle:"):
+        desc = {
+            k.lower(): v
+            for k, v in re.findall(r"\((HOST|PORT|SERVICE_NAME|SID)\s*=\s*([^)]+)\)", rest, re.I)
+        }
+        if desc:
+            out = {
+                "host": desc.get("host", ""),
+                "port": desc.get("port", ""),
+                "database": desc.get("service_name") or desc.get("sid", ""),
+            }
+        else:
+            m = re.search(r"@(?://)?([^:/]+)(?::(\d+))?(?:[:/]([^?;]+))?", rest)
+            if m:
+                out = {"host": m.group(1), "port": m.group(2) or "", "database": m.group(3) or ""}
+    else:
+        m = re.search(r"//([^/;?]*)", rest)
+        if m:
+            hostpart = m.group(1).rsplit("@", 1)[-1]  # drop user:password@
+            h = _HOST_PORT.match(hostpart.split(",")[0])
+            if h:
+                out = {"host": h.group(1), "port": h.group(2) or ""}
+            path = rest[m.end() :]
+            db = re.match(r"/([^;?/]+)", path)
+            if db:
+                out["database"] = db.group(1)
+    for key in ("databasename", "database", "db"):
+        if not out.get("database") and params.get(key):
+            out["database"] = params[key]
+    return {k: v for k, v in out.items() if v}
+
+
+def _mappings(value: str | None) -> list[dict[str, str]]:
+    """``customized_mappings`` = ``field:column:sqltype,...`` (DB Connect outputs)."""
+    out = []
+    for item in split_list(value):
+        parts = item.split(":")
+        if len(parts) >= 2 and parts[0] and parts[1]:
+            out.append({"field": parts[0].strip(), "column": parts[1].strip()})
+    return out
 
 
 def table_id(instance: str, connection: str, table: str) -> str:
@@ -71,6 +133,7 @@ def extract_identities(ctx: Ctx, out: ExtractResult) -> int:
 def extract_connections(ctx: Ctx, out: ExtractResult) -> int:
     n = 0
     for e, c in _stanzas(ctx, "db_connections"):
+        jdbc = parse_jdbc_url(c.get("customizedJdbcUrl"))
         ent = add_global(
             ctx,
             out,
@@ -81,9 +144,9 @@ def extract_connections(ctx: Ctx, out: ExtractResult) -> int:
             disabled=as_bool(c.get("disabled", False)),
             properties={
                 "databaseType": c.get("connection_type"),
-                "host": c.get("host") or None,
-                "port": c.get("port") or None,
-                "database": c.get("database") or None,
+                "host": c.get("host") or jdbc.get("host"),
+                "port": c.get("port") or jdbc.get("port"),
+                "database": c.get("database") or jdbc.get("database"),
                 "identity": c.get("identity") or None,
                 "readonly": as_bool(c.get("readonly", False)),
                 "ssl": as_bool(c.get("jdbcUseSSL", False)),
@@ -160,6 +223,7 @@ def extract_outputs(ctx: Ctx, out: ExtractResult) -> int:
             properties={
                 "connection": conn,
                 "table": c.get("table_name") or None,
+                "columnMappings": _mappings(c.get("customized_mappings")) or None,
                 "search": c.get("search") or None,
                 "interval": c.get("interval") or None,
             },
@@ -202,12 +266,67 @@ def extract_lookups(ctx: Ctx, out: ExtractResult) -> int:
     return n
 
 
+def extract_job_metrics(ctx: Ctx, out: ExtractResult) -> int:
+    """Runs of each input and output in the health window, from DB Connect's job metrics:
+    how many, how many failed, rows read or written, errors, and the last run. Enabled
+    inputs and outputs with no run are recorded with zero runs, when the log has any run
+    at all (otherwise it is simply not searchable here). Error messages are not read:
+    they can carry user names and SQL."""
+    rows = ctx.transport.search(
+        "dbx_job_metrics",
+        "index=_internal sourcetype=dbx_job_metrics "
+        "| eval job=coalesce(input_name, output_name, name), "
+        'failed=if(upper(status)="COMPLETED" OR upper(status)="SUCCESS", 0, 1) '
+        "| stats count as runs sum(failed) as failed sum(read_count) as rows_read "
+        "sum(write_count) as rows_written sum(error_count) as errors "
+        "latest(status) as last_status max(_time) as last by job",
+        earliest=ctx.options.health_window,
+    )
+    seen = set()
+    for r in rows:
+        if not r.get("job"):
+            continue
+        seen.add(r["job"])
+        out.usage.append(
+            {
+                "types": ["dbInput", "dbOutput"],
+                "name": r["job"],
+                "usage": {
+                    "dbRuns": to_int(r.get("runs")) or 0,
+                    "dbFailedRuns": to_int(r.get("failed")) or 0,
+                    "dbRowsRead": to_int(r.get("rows_read")),
+                    "dbRowsWritten": to_int(r.get("rows_written")),
+                    "dbErrors": to_int(r.get("errors")) or 0,
+                    "dbLastStatus": r.get("last_status") or None,
+                    "lastUsed": epoch_to_iso(r.get("last")),
+                    "dbWindow": ctx.options.health_window,
+                },
+            }
+        )
+    if seen:
+        for e in out.entities:
+            if (
+                e["type"] in ("dbInput", "dbOutput")
+                and not e.get("disabled")
+                and e["name"] not in seen
+            ):
+                out.usage.append(
+                    {
+                        "types": [e["type"]],
+                        "name": e["name"],
+                        "usage": {"dbRuns": 0, "dbWindow": ctx.options.health_window},
+                    }
+                )
+    return len(seen)
+
+
 EXTRACTORS = {
     "identities": extract_identities,
     "connections": extract_connections,
     "inputs": extract_inputs,
     "outputs": extract_outputs,
     "lookups": extract_lookups,
+    "jobMetrics": extract_job_metrics,
 }
 
 
