@@ -89,7 +89,7 @@ const SECTIONS: Section[] = [
       <>
         <p>
           Each build checks data freshness and volume, ingestion delay, parsing, skipped and failed scheduled searches, objects whose owner no longer exists,
-          noisy alerts, forwarders and deployment servers (including second-tier ones), DB Connect inputs and outputs, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
+          noisy alerts, forwarders and deployment servers (including second-tier ones), DB Connect inputs and outputs, Stream groups, streams and sensors, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
           authentication tokens. The thresholds used are listed at the top of the <L to="/health">Health</L> page.
         </p>
         <ul>

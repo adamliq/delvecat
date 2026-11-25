@@ -53,7 +53,7 @@ Objects that reference something missing or not shared get
 | Enterprise Security | saved searches (`action.correlationsearch.*`, `action.escu.*`), `alerts/alert_actions`, `configs/conf-inputs` (`threatlist://`, `identity_manager://`), `configs/conf-analyticstories` | verified against ES-format content in a dev Splunk |
 | SOAR (`--soar-url`, token in `DELVECAT_SOAR_TOKEN`) | `/rest/{version,app,asset,playbook,custom_function}` | asset configuration is never read; sample responses only so far |
 | UEBA (`--ueba-url`, token in `DELVECAT_UEBA_TOKEN`) | UBA REST, paths overridable with `--ueba-path kind=/path` | **unverified** paths and fields |
-| Stream | KV store collections `streams`, `streamforwardergroups` in `splunk_app_stream`; forwarders from `stream:*` data | document fields follow the Stream app and should be checked against your version |
+| Stream | KV store collections `streams`, `streamforwardergroups` in `splunk_app_stream`; forwarders from `stream:*` data | each stream feeds `stream:<stream id>`; estimate mode (`sendToIndexer` false) and expired ephemeral captures (`expirationDate`) feed nothing; filters and aggregation are kept; checks: group naming a missing stream, expired capture, stream no forwarder sends, sensor not sending the unfiltered streams its groups deploy. Document fields follow the Stream app and should be checked against your version |
 
 Machines are tied to the `host` values in the data by hostname (case-insensitive,
 short name against FQDN), so lineage answers "which forwarders, databases and
