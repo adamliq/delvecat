@@ -98,11 +98,23 @@ are `input` objects like the built-in kinds, with `modular: true`, the input
 kind's title and `feeds` edges to their index and sourcetype. Their own settings
 are listed by name only (`settingNames`): values can be accounts, queues or keys.
 
+Each LDAP strategy is an `authStrategy` object, read from `authentication.conf`
+(so the LDAP server need not answer): whether it is in use and in which order,
+port, SSL and certificate checking, nested and dynamic groups, the attributes
+used for users and groups, whether filters are set, and limits. Never kept: the
+server's name, bind DN, bind password, base DNs and the filters themselves.
+
 SAML and LDAP groups mapped to Splunk roles are `authGroup` objects with
-`memberOf` edges to those roles, so a group reaches what its roles reach. An
-LDAP group records its strategy and how many members it has, never who they
-are. The instance records how people log in (`authentication`: Splunk, LDAP or
-SAML, with LDAP strategies by name and SSL only; no bind DN, password or host).
+`memberOf` edges to those roles, so a group reaches what its roles reach, and a
+`contains` edge from their LDAP strategy. The mapping comes from the
+`roleMap_<strategy>` stanzas, so it is complete even when the LDAP server is
+down (the part is then marked partial). When the server answers, Splunk's group
+list adds each group's type, how many members it has (never who they are) and
+`foundInDirectory`. Checks: a strategy in use without SSL or without checking
+the server's certificate (`ldapTls`), a group mapped to a role that does not
+exist (`authGroupRole`), and a mapped group LDAP does not have
+(`authGroupNotFound`). The instance also records how people log in
+(`authentication`: Splunk, LDAP or SAML, and the strategies in order).
 
 ### Enterprise Security triage
 

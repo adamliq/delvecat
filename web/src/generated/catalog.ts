@@ -6,6 +6,7 @@ export type EntityType =
   | "user"
   | "role"
   | "authGroup"
+  | "authStrategy"
   | "authToken"
   | "index"
   | "sourcetype"

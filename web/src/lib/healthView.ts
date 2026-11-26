@@ -25,7 +25,7 @@ export const SECTIONS: Section[] = [
   { id: "db", title: "DB Connect", checks: ["dbMissing", "dbFailed", "dbNotRunning"], empty: "Every DB Connect input and output has what it needs and runs." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
   { id: "storage", title: "Storage, routing and acceleration", checks: ["retentionBySize", "routeToMissingIndex", "summaryError", "summaryUnused"], empty: "No storage, routing or acceleration problems." },
-  { id: "access", title: "Access: tokens, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability"], empty: "No token, field filter or capability problems." },
+  { id: "access", title: "Access: tokens, LDAP, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability", "ldapTls", "authGroupRole", "authGroupNotFound"], empty: "No token, LDAP, field filter or capability problems." },
   { id: "ownership", title: "Owners no longer here", checks: ["orphaned"], empty: "Every object's owner still exists." },
   { id: "commands", title: "Risky commands", checks: ["riskyCommand"], empty: "No search runs a command that deletes data, runs programs or sends data out." },
   { id: "es", title: "Enterprise Security", checks: ["suppressionExpired", "suppressesWholeDetection"], empty: "No suppression problems." },
@@ -116,6 +116,18 @@ export const REMEDIES: Record<string, Remedy> = {
     why: "This client is a second-tier deployment server: it keeps the apps it gets in its deployment-apps folder to pass on, so it cannot enable them. Classes that send it apps to enable make the install fail at every phone home.",
     fix: "Set stateOnClient = noop on the server classes that send apps to it (or keep it out of them, for example by narrowing a whitelist of *), then reload the deployment server.",
     spl: (e) => `index=_internal sourcetype=splunkd component=DeployedApplication host=${q(e.name)} "Failed to install" | stats count latest(_time) as last by message | eval last=strftime(last, "%F %T")`,
+  },
+  ldapTls: {
+    why: "Splunk sends the bind account's password, and every user's password at sign-in, to the LDAP server: without SSL anyone on the network path can read them; without a certificate check another server can pose as LDAP and collect them.",
+    fix: "Turn on SSL (port 636) and certificate checking for the strategy (Settings > Authentication methods > LDAP, or SSLEnabled and sslVerifyServerCert in authentication.conf) with the directory's CA trusted.",
+  },
+  authGroupRole: {
+    why: "The group is mapped to a role that does not exist, so its members do not get the access the mapping meant to give.",
+    fix: "Map the group to an existing role, or create the role, in Settings > Authentication methods > LDAP > Map groups (roleMap in authentication.conf).",
+  },
+  authGroupNotFound: {
+    why: "The mapping names a group the LDAP strategy does not find: its roles go to nobody, and a new group created later with that name would get them.",
+    fix: "Update the mapping to the group's current name, or remove it.",
   },
   dbMissing: {
     why: "DB Connect cannot open the connection, so every input, output and lookup on it fails, and no data arrives.",

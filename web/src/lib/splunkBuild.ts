@@ -33,7 +33,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "apps", label: "Apps" },
       { id: "users", label: "Users" },
       { id: "roles", label: "Roles" },
-      { id: "authGroups", label: "SAML and LDAP group mappings" },
+      { id: "authGroups", label: "LDAP strategies, and SAML and LDAP group mappings" },
       { id: "capabilities", label: "Capabilities (what roles may do)", needs: "roles" },
       { id: "authTokens", label: "Authentication tokens (never their values)" },
     ],

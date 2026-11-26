@@ -13,6 +13,7 @@ export const PRODUCT_LABELS: Record<Product, string> = {
 
 const SPECIAL: Partial<Record<EntityType, string>> = {
   authGroup: "Identity Group",
+  authStrategy: "LDAP Strategy",
   authToken: "Authentication Token",
   scheduledView: "Scheduled View",
   federatedProvider: "Federated Provider",
@@ -84,7 +85,7 @@ export const TYPE_GROUPS: [string, string[]][] = [
   ["Inputs and forwarding", ["input", "forwarder", "outputGroup", "addOnAccount", "serverClass", "deploymentApp", "deploymentClient", "streamForwarder", "streamGroup", "streamDefinition"]],
   ["Searches, alerts and dashboards", ["savedSearch", "adhocSearch", "dashboard", "panel", "visualization", "navMenu", "timeRange", "scheduledView", "adaptiveResponseAction"]],
   ["Knowledge objects", ["macro", "eventtype", "tag", "fieldAlias", "calculatedField", "fieldExtraction", "transform", "workflowAction", "searchCommand", "fieldDefinition", "multikvTable", "segmenter"]],
-  ["Platform and access", ["instance", "app", "user", "role", "authGroup", "authToken", "capability", "fieldFilter"]],
+  ["Platform and access", ["instance", "app", "user", "role", "authGroup", "authStrategy", "authToken", "capability", "fieldFilter"]],
   ["Enterprise Security", ["correlationSearch", "findingType", "riskRule", "threatIntelSource", "assetIdentitySource", "analyticStory", "responseTemplate", "esReviewStatus", "esSuppression", "esAggregationRule", "esAutomationRule", "esQueue"]],
   ["SOAR", ["soarPlaybook", "soarCustomFunction", "soarApp", "soarAsset", "soarLabel", "soarWorkbook"]],
   ["UEBA and Asset & Risk Intelligence", ["uebaDataSource", "uebaModel", "uebaAnomalyType", "uebaThreatRule", "uebaOutputConnector", "ariSource", "ariAssetType", "ariMetric", "ariExposure"]],

@@ -566,6 +566,49 @@ def _command_checks(
         _check(checks, "riskyCommand", "warning", "Runs " + "; ".join(found))
 
 
+def _auth_checks(e: dict[str, Any], roles: set[tuple] | None, checks: list[dict[str, str]]) -> None:
+    """LDAP strategies without TLS or certificate checks; group mappings to roles that do
+    not exist, or of groups the directory does not have."""
+    p = e.get("properties") or {}
+    if e["type"] == "authStrategy":
+        if not p.get("active"):
+            return
+        if not p.get("ssl"):
+            _check(
+                checks,
+                "ldapTls",
+                "warning",
+                "Talks to LDAP without SSL: the bind password and users' passwords "
+                "cross the network in clear",
+            )
+        elif not p.get("verifyServerCert"):
+            _check(
+                checks,
+                "ldapTls",
+                "warning",
+                "Uses SSL but does not check the LDAP server's certificate, so another "
+                "server could pose as it",
+            )
+        return
+    if roles is not None:
+        missing = [r for r in p.get("roles") or [] if (e.get("instance"), r) not in roles]
+        if missing:
+            _check(
+                checks,
+                "authGroupRole",
+                "warning",
+                "Mapped to roles that do not exist: " + ", ".join(missing),
+            )
+    if p.get("foundInDirectory") is False:
+        _check(
+            checks,
+            "authGroupNotFound",
+            "warning",
+            f"Not found in LDAP strategy {p.get('strategy')}: the mapping gives its roles "
+            "to nobody (group renamed or deleted?)",
+        )
+
+
 def _db_checks(
     e: dict[str, Any], names: dict[tuple, dict[str, Any]], checks: list[dict[str, str]]
 ) -> None:
@@ -633,6 +676,8 @@ def evaluate_health(
     index_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "index"}
     with_indexes = {i for i, _ in index_names}
     with_users = {i for i, _ in user_names}
+    role_names = {(e.get("instance"), e["name"]) for e in entities if e["type"] == "role"}
+    with_roles = {i for i, _ in role_names}
     # Custom commands commands.conf marks risky, or that run with the user's session.
     risky_custom = {
         (e.get("instance"), e["name"]): (
@@ -719,6 +764,8 @@ def evaluate_health(
                     for a in failed
                 ]
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(parts)}")
+        if e["type"] in ("authStrategy", "authGroup"):
+            _auth_checks(e, role_names if e.get("instance") in with_roles else None, checks)
         if e["type"] in ("dbConnection", "dbInput", "dbOutput", "dbLookup"):
             _db_checks(e, db_names, checks)
         _command_checks(e, risky_custom, checks)
