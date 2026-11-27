@@ -10,6 +10,10 @@ sourcetypes with about 25 fields each, 20,000 hosts, 12,000 saved searches,
 2,000 detections, 3,000 dashboards, 5,000 users and the macros, lookups,
 eventtypes, tags, data models and props.conf objects that connect them.
 Output is deterministic for a given seed and scale.
+
+``host_indexes`` sets how many indexes a host sends to on average (1 by default; servers
+in large estates often send OS, security, performance and application data to a dozen
+or more), which raises the relationships per object without adding objects.
 """
 
 from __future__ import annotations
@@ -58,7 +62,9 @@ CIM_MODELS = {
 INST = "big"
 
 
-def generate(scale: float = 1.0, seed: int = 7) -> tuple[list[dict[str, Any]], ExtractResult]:
+def generate(
+    scale: float = 1.0, seed: int = 7, host_indexes: int = 1
+) -> tuple[list[dict[str, Any]], ExtractResult]:
     rnd = random.Random(seed)
     n = lambda base: max(1, int(base * scale))  # noqa: E731
     out = ExtractResult()
@@ -178,7 +184,9 @@ def generate(scale: float = 1.0, seed: int = 7) -> tuple[list[dict[str, Any]], E
     for i in range(n(20000)):
         h = f"host-{i:05d}.corp.example"
         ents.append(entity(id=fqn(INST, "host", h), type="host", name=h, instance=INST))
-        edges.append(edge(fqn(INST, "host", h), fqn(INST, "index", rnd.choice(indexes)), "feeds"))
+        k = 1 if host_indexes <= 1 else rnd.randint(1, 2 * host_indexes - 1)
+        for idx in rnd.sample(indexes, min(k, len(indexes))) if k > 1 else [rnd.choice(indexes)]:
+            edges.append(edge(fqn(INST, "host", h), fqn(INST, "index", idx), "feeds"))
 
     tags = [f"tag_{i}" for i in range(n(300))] + list(CIM_MODELS.values())
     for t in tags:
@@ -353,9 +361,9 @@ def generate(scale: float = 1.0, seed: int = 7) -> tuple[list[dict[str, Any]], E
     return instances, out
 
 
-def build(scale: float = 1.0, seed: int = 7, log=print) -> dict[str, Any]:
+def build(scale: float = 1.0, seed: int = 7, log=print, host_indexes: int = 1) -> dict[str, Any]:
     t0 = time.perf_counter()
-    instances, result = generate(scale, seed)
+    instances, result = generate(scale, seed, host_indexes)
     log(
         f"  generate      {time.perf_counter() - t0:6.1f}s  "
         f"{len(result.entities):,} entities, {len(result.edges):,} edges"

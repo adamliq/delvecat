@@ -409,7 +409,7 @@ def _synth(args: argparse.Namespace) -> int:
     from .synth import build
 
     print(f"synthetic catalog, scale {args.scale}, seed {args.seed}")
-    bundle = build(args.scale, args.seed)
+    bundle = build(args.scale, args.seed, host_indexes=args.host_indexes)
     if args.validate:
         t = time.perf_counter()
         problems = validate(bundle)
@@ -641,6 +641,12 @@ def main(argv: list[str] | None = None) -> int:
     sy = sub.add_parser("synth", help="generate a large synthetic catalog for performance testing")
     sy.add_argument("--scale", type=float, default=1.0, help="1.0 is about 100,000 objects")
     sy.add_argument("--seed", type=int, default=7)
+    sy.add_argument(
+        "--host-indexes",
+        type=int,
+        default=1,
+        help="indexes each host sends to, on average (more relationships per object)",
+    )
     sy.add_argument("--out", required=True)
     sy.add_argument("--shard", action="store_true", help="write a manifest plus per-type shards")
     sy.add_argument("--validate", action="store_true", help="also validate against the schema")
