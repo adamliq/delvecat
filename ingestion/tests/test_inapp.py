@@ -170,3 +170,14 @@ def test_build_command_accepts_every_part_name():
     pattern = re.search(r'Match\("parts", r"([^"]+)"\)', source.read_text(encoding="utf-8"))
     assert pattern, "parts validator not found"
     assert re.fullmatch(pattern.group(1), ",".join(PARTS))
+
+
+def test_build_stops_with_a_clear_message_when_memory_is_short():
+    import pytest
+
+    from delvecat_ingest.inapp import NotEnoughMemory, check_memory
+
+    check_memory(301_405, available=4 * 1024**3)  # enough: nothing happens
+    check_memory(1_000, available=1)  # small builds are never stopped
+    with pytest.raises(NotEnoughMemory, match=r"needs about 1\.5 GB, and 0\.5 GB is available"):
+        check_memory(301_405, available=512 * 1024**2)

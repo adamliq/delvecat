@@ -50,6 +50,55 @@ def default_instance_id(transport: Any) -> str:
     return re.sub(r"[^A-Za-z0-9_-]+", "-", str(name or "splunk")).strip("-") or "splunk"
 
 
+# Memory a build needs from here on, per object (measured: 1.56 GB for 301,405 objects
+# and 2 million relationships in Splunk 10.4's Python, building and publishing).
+BYTES_PER_OBJECT = 5300
+
+
+class NotEnoughMemory(RuntimeError):
+    pass
+
+
+def memory_available() -> int | None:
+    """Bytes this process can still use: the machine's available memory, or the
+    container's limit if lower. None where it cannot be told (not Linux)."""
+    free = None
+    try:
+        with open("/proc/meminfo", encoding="ascii") as f:
+            for line in f:
+                if line.startswith("MemAvailable:"):
+                    free = int(line.split()[1]) * 1024
+                    break
+    except (OSError, ValueError):
+        return None
+    try:  # cgroup v2 limit (Splunk in a container)
+        with open("/sys/fs/cgroup/memory.max", encoding="ascii") as f:
+            limit = f.read().strip()
+        with open("/sys/fs/cgroup/memory.current", encoding="ascii") as f:
+            used = int(f.read().strip())
+        if limit != "max" and free is not None:
+            free = min(free, int(limit) - used)
+    except (OSError, ValueError):
+        pass
+    return free
+
+
+def check_memory(objects: int, available: int | None = None) -> None:
+    """Stop before the memory-heavy part of a build when the search head cannot hold it,
+    with a message saying what to do, instead of being killed half way."""
+    need = objects * BYTES_PER_OBJECT
+    free = memory_available() if available is None else available
+    if free is None or need < 256 * 1024 * 1024 or free >= need:
+        return
+    gb = 1024**3
+    raise NotEnoughMemory(
+        f"Not enough free memory on this search head to build a catalog of {objects:,} objects: "
+        f"it needs about {need / gb:.1f} GB, and {max(free, 0) / gb:.1f} GB is available. Build "
+        "fewer parts, build when the search head is less busy, or build outside Splunk with "
+        "delvecat-ingest and publish the result."
+    )
+
+
 def build_here(
     transport: Any,
     instance_id: str | None = None,
@@ -112,6 +161,7 @@ def build_here(
     if isinstance(instance.get("properties"), dict):
         instance["properties"] = {k: v for k, v in instance["properties"].items() if v is not None}
 
+    check_memory(len(result.entities))
     say("assemble")
     bundle = assemble([instance], result, None, previous)
     say("governance")
