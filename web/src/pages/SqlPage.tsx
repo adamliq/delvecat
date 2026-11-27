@@ -4,7 +4,7 @@ import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
 import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
 import { EXAMPLES, runQuery, type QueryResult } from "../lib/sql";
-import { catalogDb, type CatalogDb } from "../lib/sqlDb";
+import { catalogDb, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
 import * as store from "../lib/sqlStore";
@@ -27,6 +27,7 @@ export default function SqlPage() {
   const [history, setHistory] = useState(store.history);
   const [savedQueries, setSaved] = useState(store.saved);
   const [copied, setCopied] = useState(false);
+  const [filling, setFilling] = useState<LoadProgress | null>(null);
   const editor = useRef<SqlEditorHandle>(null);
   const lastRun = useRef<string | null>(null);
 
@@ -43,10 +44,19 @@ export default function SqlPage() {
 
   const tables = db.status === "ready" ? db.tables : [];
 
-  const run = useCallback((text: string) => {
+  const run = useCallback(async (text: string) => {
     if (db.status !== "ready") return;
     lastRun.current = text;
     setParams((p) => { const next = new URLSearchParams(p); next.set("q", text); return next; }, { replace: true });
+    try {
+      // Fill the tables this query uses (and entities, for the hints below) on first use.
+      await db.ensure(`${text} entities`, setFilling);
+    } catch (e) {
+      setFilling(null);
+      setError({ message: `Could not load the catalog into SQLite: ${e instanceof Error ? e.message : String(e)}` });
+      return;
+    }
+    setFilling(null);
     try {
       const r = runQuery(db.db, text);
       setResult(r);
@@ -127,6 +137,13 @@ export default function SqlPage() {
           </div>
 
           {db.status === "loading" && <p className="muted">Loading SQLite…</p>}
+          {filling && (
+            <p className="muted" role="status">
+              Loading table <code>{filling.table}</code>
+              {filling.rows ? <> ({filling.rows.toLocaleString()} rows)</> : null}: {Math.round(filling.done * 100)}%
+              {" "}· each table is loaded the first time a query uses it
+            </p>
+          )}
           {db.status === "error" && <p className="error">Could not start SQLite: {db.message}</p>}
           {error && (
             <div className="error sql-error" role="alert">
@@ -175,7 +192,7 @@ export default function SqlPage() {
           {side === "tables" && db.status === "ready" && db.tables.map((t) => (
             <details key={t.name}>
               <summary>
-                <code>{t.name}</code> <span className="muted small">{t.rows.length.toLocaleString()}</span>
+                <code>{t.name}</code> <span className="muted small">{db.loaded.has(t.name) || t.built ? t.rows.length.toLocaleString() : t.count !== undefined ? t.count.toLocaleString() : "loads when used"}</span>
               </summary>
               <p className="small">{t.doc}</p>
               <ul className="plain-list small">

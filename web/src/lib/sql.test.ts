@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { CatalogBundle, Entity, EntityType } from "../generated/catalog";
 import { Catalog } from "./catalog";
 import { riskMap } from "./risk";
-import { catalogTables, EXAMPLES, fillDatabase, runQuery } from "./sql";
+import { catalogTables, createSchema, EXAMPLES, fillDatabase, fillTable, runQuery, tablesIn } from "./sql";
 
 const require = createRequire(import.meta.url);
 const ent = (type: EntityType, name: string, extra: Partial<Entity> = {}): Entity =>
@@ -189,5 +189,26 @@ describe("SQL console", () => {
     expect(outs).toEqual([["siem", "tcpout", 0, 0, '["a:9997"]', "copy_to_siem"]]);
     const sums = runQuery(db, EXAMPLES.find((x) => x.title.startsWith("Acceleration summaries"))!.sql).rows;
     expect(sums.map((r) => [r[0], r[1], r[5]])).toEqual([["Data model acceleration: X", 900, 1], ["Report acceleration: Y", 5, null]]);
+  });
+});
+
+describe("tables filled on first use", () => {
+  it("builds rows only when read, and fills only the tables a query names", async () => {
+    const SQL = await initSqlJs({ locateFile: (f) => require.resolve(`sql.js/dist/${f}`) });
+    const tables = catalogTables(bundle);
+    const edges = tables.find((t) => t.name === "edges")!;
+    expect(edges.built).toBe(false);
+    expect(edges.count).toBe(bundle.edges.length);
+    expect(tablesIn("SELECT * FROM entities e JOIN labels l ON l.entity_id = e.id WHERE e.name = 'edges'", tables).map((t) => t.name))
+      .toEqual(["entities", "labels"]);
+    const db = new SQL.Database();
+    createSchema(db, tables);
+    expect(runQuery(db, "SELECT count(*) FROM edges").rows[0][0]).toBe(0);
+    const seen: number[] = [];
+    await fillTable(db, tables.find((t) => t.name === "entities")!, (d) => seen.push(d));
+    expect(seen[0]).toBe(0);
+    expect(seen.at(-1)).toBe(1);
+    expect(runQuery(db, "SELECT count(*) FROM entities").rows[0][0]).toBe(bundle.entities.length);
+    expect(edges.built).toBe(false); // never read
   });
 });

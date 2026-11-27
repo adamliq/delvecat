@@ -14,7 +14,31 @@ export interface Table {
   name: string;
   doc: string;
   columns: Column[];
-  rows: SqlValue[][];
+  /** Built on first read (large catalogs: millions of rows), then kept. */
+  readonly rows: SqlValue[][];
+  /** Whether rows have been built, and the row count when known without building them. */
+  readonly built: boolean;
+  count?: number;
+  /** Rows start..end, for tables with one row per source item (entities, edges): lets a
+   * fill build and insert them a batch at a time instead of all at once. */
+  slice?: (start: number, end: number) => SqlValue[][];
+}
+
+type TableDef = Omit<Table, "rows" | "built"> & { build: () => SqlValue[][] };
+
+/** A table whose rows are worked out the first time they are read. */
+function lazyTable(def: TableDef): Table {
+  const { build, ...rest } = def;
+  let rows: SqlValue[][] | undefined;
+  return {
+    ...rest,
+    get rows() {
+      return (rows ??= build());
+    },
+    get built() {
+      return rows !== undefined;
+    },
+  };
 }
 
 type Cell = SqlValue | boolean | undefined | unknown[] | Record<string, unknown>;
@@ -34,9 +58,10 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
   const E = bundle.entities;
   const per = <T,>(fn: (e: Entity) => T[]) => E.flatMap((e) => fn(e));
 
-  const entities: Table = {
+  const entities: Table = lazyTable({
     name: "entities",
     doc: "One row per catalog object.",
+    count: E.length,
     columns: [
       col("id", "TEXT", "Unique id: instance:type:app/name"),
       col("type"), col("name"), col("display_name"), col("product"), col("instance"), col("app"),
@@ -58,28 +83,35 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("settings", "TEXT", "Splunk settings as JSON; use json_extract(settings, '$.cronSchedule')"),
       col("props", "TEXT", "Structured property values as JSON"),
     ],
-    rows: E.map((e) => [
+    build: () => E.map(entityRow),
+    slice: (a, b) => E.slice(a, b).map(entityRow),
+  });
+  function entityRow(e: Entity): SqlValue[] {
+    return [
       e.id, e.type, e.name, e.displayName, e.product, e.instance, e.app, e.owner, e.sharing, e.disabled ?? false,
       effectiveDescription(e), e.annotations?.domain, e.health?.status, isSensitive(e), access(e)?.everyone,
       e.permissions?.read?.join(", "),
       e.usage?.unused, e.usage?.runs, e.usage?.searches, e.usage?.views,
       e.usage?.alertFires, e.usage?.alertsSuppressed, e.usage?.lastUsed,
       e.updatedAt, e.firstSeenAt, e.version, e.sourceUrl, e.properties, e.annotations?.properties,
-    ].map(cell)),
-  };
+    ].map(cell);
+  }
 
-  const edges: Table = {
+  const edgeRow = (x: CatalogBundle["edges"][number]) => [x.from, x.to, x.type, x.origin].map(cell);
+  const edges: Table = lazyTable({
     name: "edges",
     doc: "Relationships: from_id <type> to_id, e.g. a search reads an index.",
+    count: bundle.edges.length,
     columns: [col("from_id"), col("to_id"), col("type"), col("origin", "TEXT", "config, spl, connector or annotation")],
-    rows: bundle.edges.map((x) => [x.from, x.to, x.type, x.origin].map(cell)),
-  };
+    build: () => bundle.edges.map(edgeRow),
+    slice: (a, b) => bundle.edges.slice(a, b).map(edgeRow),
+  });
 
-  const labels: Table = {
+  const labels: Table = lazyTable({
     name: "labels",
     doc: "Annotations with several values: owner, tag, term, dataProduct, missingProperty.",
     columns: [col("entity_id"), col("kind"), col("value")],
-    rows: per((e) => {
+    build: () => per((e) => {
       const a = e.annotations ?? {};
       const kinds: [string, string[] | undefined][] = [
         ["owner", a.owners], ["tag", a.tags], ["term", a.glossaryTerms],
@@ -87,9 +119,9 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       ];
       return kinds.flatMap(([k, vs]) => (vs ?? []).map((v) => [e.id, k, v].map(cell)));
     }),
-  };
+  });
 
-  const classifications: Table = {
+  const classifications: Table = lazyTable({
     name: "classifications",
     doc: "Classifications on each object, annotated or derived (how / via say where they came from).",
     columns: [
@@ -97,30 +129,30 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("how", "TEXT", "annotated, field, derivedField, sourcetype or lineage"), col("via", "TEXT", "The object it came from or through"),
       col("columns", "TEXT", "Comma-separated columns that hold it; NULL when the whole object is classified"),
     ],
-    rows: per((e) => effectiveClassifications(e).map((c) => [e.id, c.name, c.sensitive, c.how, c.via, c.columns?.join(",")].map(cell))),
-  };
+    build: () => per((e) => effectiveClassifications(e).map((c) => [e.id, c.name, c.sensitive, c.how, c.via, c.columns?.join(",")].map(cell))),
+  });
 
-  const properties: Table = {
+  const properties: Table = lazyTable({
     name: "properties",
     doc: "Structured property values, one row per value.",
     columns: [col("entity_id"), col("property"), col("value")],
-    rows: per((e) =>
+    build: () => per((e) =>
       Object.entries(e.annotations?.properties ?? {}).flatMap(([k, v]) =>
         (Array.isArray(v) ? v : [v]).map((x) => [e.id, k, x as Cell].map(cell)))),
-  };
+  });
 
-  const settings: Table = {
+  const settings: Table = lazyTable({
     name: "settings",
     doc: "Splunk settings, one row per key (nested 'observed' values as observed.<key>). Fields are in the fields table.",
     columns: [col("entity_id"), col("key"), col("value")],
-    rows: per((e) => e.type === "field" ? [] :
+    build: () => per((e) => e.type === "field" ? [] :
       Object.entries(e.properties ?? {}).flatMap(([k, v]) =>
         k === "observed" && v && typeof v === "object" && !Array.isArray(v)
           ? Object.entries(v).map(([k2, v2]) => [e.id, `observed.${k2}`, v2 as Cell].map(cell))
           : [[e.id, k, v as Cell].map(cell)])),
-  };
+  });
 
-  const fieldsTable: Table = {
+  const fieldsTable: Table = lazyTable({
     name: "fields",
     doc: "Sourcetype fields (sampled or defined in props.conf), one row each.",
     columns: [
@@ -128,34 +160,34 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("fill_rate", "REAL", "Share of sampled events with the field (0-1); NULL if not sampled"),
       col("distinct_values", "INTEGER"), col("defined_in", "TEXT", "configuration, or NULL when seen in sampled events"),
     ],
-    rows: E.filter((e) => e.type === "field").map((e) => {
+    build: () => E.filter((e) => e.type === "field").map((e) => {
       const p = (e.properties ?? {}) as { sourcetype?: string; field?: string; numeric?: boolean; definedIn?: string; observed?: { coverage?: number; distinctCount?: number } };
       return [e.id, p.sourcetype, p.field, p.numeric, p.observed?.coverage, p.observed?.distinctCount, p.definedIn].map(cell);
     }),
-  };
+  });
 
-  const healthChecks: Table = {
+  const healthChecks: Table = lazyTable({
     name: "health_checks",
     doc: "Health findings (freshness, volume, skipped runs...).",
     columns: [col("entity_id"), col("check_name"), col("status"), col("message")],
-    rows: per((e) => (e.health?.checks ?? []).map((c) => [e.id, c.check, c.status, c.message].map(cell))),
-  };
+    build: () => per((e) => (e.health?.checks ?? []).map((c) => [e.id, c.check, c.status, c.message].map(cell))),
+  });
 
-  const lineageIssues: Table = {
+  const lineageIssues: Table = lazyTable({
     name: "lineage_issues",
     doc: "Search problems: unresolved references and lineage warnings.",
     columns: [col("entity_id"), col("kind", "TEXT", "unresolved or warning"), col("detail")],
-    rows: per((e) => [
+    build: () => per((e) => [
       ...(e.lineage?.unresolved ?? []).map((d) => [e.id, "unresolved", d]),
       ...(e.lineage?.warnings ?? []).map((d) => [e.id, "warning", d]),
     ].map((r) => r.map(cell))),
-  };
+  });
 
-  const accessTable: Table = {
+  const accessTable: Table = lazyTable({
     name: "access",
     doc: "Who can read each object: roles and users (filtered = role has a search filter).",
     columns: [col("entity_id"), col("principal_type", "TEXT", "role or user"), col("principal"), col("filtered", "INTEGER")],
-    rows: per((e) => {
+    build: () => per((e) => {
       const a = access(e);
       if (!a) return [];
       return [
@@ -163,9 +195,9 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
         ...a.users.map((u) => [e.id, "user", u, false]),
       ].map((r) => r.map((v) => cell(v as Cell)));
     }),
-  };
+  });
 
-  const instances: Table = {
+  const instances: Table = lazyTable({
     name: "instances",
     doc: "Splunk instances the bundle was built from.",
     columns: [
@@ -175,56 +207,63 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("imported_at", "TEXT", "When it was imported (ISO time)"),
       col("imported_by", "TEXT", "Who imported it"),
     ],
-    rows: bundle.instances.map((i) => [i.id, i.name, i.kind, i.version, i.product, i.webUrl, i.imported?.from, i.imported?.at, i.imported?.by].map(cell)),
-  };
+    build: () => bundle.instances.map((i) => [i.id, i.name, i.kind, i.version, i.product, i.webUrl, i.imported?.from, i.imported?.at, i.imported?.by].map(cell)),
+  });
 
-  const domains: Table = {
+  const domains: Table = lazyTable({
     name: "domains",
     doc: "Business domains.",
     columns: [col("name"), col("parent"), col("description")],
-    rows: (bundle.domains ?? []).map((d) => [d.name, d.parent, d.description].map(cell)),
-  };
+    build: () => (bundle.domains ?? []).map((d) => [d.name, d.parent, d.description].map(cell)),
+  });
 
-  const dataProducts: Table = {
+  const dataProducts: Table = lazyTable({
     name: "data_products",
     doc: "Data products and their assets (one row per asset).",
     columns: [col("name"), col("domain"), col("asset_id")],
-    rows: (bundle.dataProducts ?? []).flatMap((p) => p.assets.map((a) => [p.name, p.domain, a].map(cell))),
-  };
+    build: () => (bundle.dataProducts ?? []).flatMap((p) => p.assets.map((a) => [p.name, p.domain, a].map(cell))),
+  });
 
-  const fieldIds = new Map<string, string[]>(); // "entity|field name" -> matched field ids
-  for (const x of bundle.edges) {
-    if (x.type !== "readsField") continue;
-    const name = x.to.slice(x.to.lastIndexOf("/") + 1);
-    const key = `${x.from}|${name}`;
-    fieldIds.set(key, [...(fieldIds.get(key) ?? []), x.to]);
-  }
-  const fieldUsage: Table = {
+  let fieldIdsCache: Map<string, string[]> | undefined;
+  const fieldIds = () => { // "entity|field name" -> matched field ids, built on first use
+    if (fieldIdsCache) return fieldIdsCache;
+    fieldIdsCache = new Map();
+    for (const x of bundle.edges) {
+      if (x.type !== "readsField") continue;
+      const name = x.to.slice(x.to.lastIndexOf("/") + 1);
+      const key = `${x.from}|${name}`;
+      const list = fieldIdsCache.get(key);
+      if (list) list.push(x.to);
+      else fieldIdsCache.set(key, [x.to]);
+    }
+    return fieldIdsCache;
+  };
+  const fieldUsage: Table = lazyTable({
     name: "field_usage",
     doc: "Fields each search reads, from its SPL: one row per field and matched sourcetype field (field_id is NULL when none matched).",
     columns: [
       col("entity_id"), col("field"), col("how", "TEXT", "Comma-separated: filter, groupBy, aggregate, eval, rename, lookup, extract, enrich, join, dedup, sort, select, output"),
       col("source", "TEXT", "events, datamodel, lookup, search, database, metrics or other"), col("field_id"),
     ],
-    rows: per((e) => {
+    build: () => per((e) => {
       const fl = e.lineage?.fields;
       if (!fl) return [];
       return fl.used.flatMap((u) => {
-        const ids = fieldIds.get(`${e.id}|${u.name}`) ?? [undefined];
+        const ids = fieldIds().get(`${e.id}|${u.name}`) ?? [undefined];
         return ids.map((fid) => [e.id, u.name, u.how.join(","), fl.source, fid].map(cell));
       });
     }),
-  };
+  });
 
-  const columnLineage: Table = {
+  const columnLineage: Table = lazyTable({
     name: "column_lineage",
     doc: "Result columns of searches whose output shape is known, one row per source field they are computed from (source_field NULL for counts and constants).",
     columns: [col("entity_id"), col("column_name"), col("source_field")],
-    rows: per((e) => (e.lineage?.fields?.outputs ?? []).flatMap((o) =>
+    build: () => per((e) => (e.lineage?.fields?.outputs ?? []).flatMap((o) =>
       (o.from.length ? o.from : [undefined]).map((f) => [e.id, o.name, f].map(cell)))),
-  };
+  });
 
-  const riskTable: Table = {
+  const riskTable: Table = lazyTable({
     name: "risk",
     doc: "Objects at risk from upstream problems: one row per cause (the object with the problem).",
     columns: [
@@ -232,28 +271,74 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("problem"), col("hops", "INTEGER", "1 = direct dependency"), col("via_id"),
       col("partial", "INTEGER", "1 if the cause is one of several sources"),
     ],
-    rows: [...risk].flatMap(([id, r]) => r.causes.map((c) => [
+    build: () => [...risk].flatMap(([id, r]) => r.causes.map((c) => [
       id, r.severity, c.root.id, c.problems.map((p) => p.summary).join("; "), c.depth, c.via?.id, c.partial ?? false,
     ].map(cell))),
-  };
+  });
 
   return [entities, edges, labels, classifications, properties, settings, fieldsTable, healthChecks, lineageIssues,
     fieldUsage, columnLineage, riskTable, accessTable, instances, domains, dataProducts];
 }
 
-/** Create and fill an in-memory database. It is read-only once loaded. */
+/** Indexes made when a table is filled. */
+const INDEXED_BY_ENTITY = new Set(["labels", "classifications", "properties", "settings", "fields", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]);
+function indexStatements(t: Table): string[] {
+  if (t.name === "edges") return ["CREATE INDEX edges_from ON edges(from_id)", "CREATE INDEX edges_to ON edges(to_id)"];
+  if (t.name === "entities") return ["CREATE INDEX entities_type ON entities(type)"];
+  return INDEXED_BY_ENTITY.has(t.name) ? [`CREATE INDEX ${t.name}_entity ON ${t.name}(entity_id)`] : [];
+}
+
+/** Every table, empty: queries see the whole schema before any table is filled. */
+export function createSchema(db: Database, tables: Table[]) {
+  for (const t of tables) db.run(`CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`);
+}
+
+/** Tables a query names (words outside string literals and comments). */
+export function tablesIn(sql: string, tables: Table[]): Table[] {
+  const text = sql.replace(/'(?:[^']|'')*'/g, "''").replace(/--[^\n]*/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ").toLowerCase();
+  const words = new Set(text.match(/[a-z_][a-z0-9_]*/g) ?? []);
+  return tables.filter((t) => words.has(t.name));
+}
+
+const BATCH = 20000;
+
+/** Fill one table and index it. Yields to the browser between batches (onProgress gets 0-1),
+ * so the page stays responsive while millions of rows go in. */
+export async function fillTable(db: Database, t: Table, onProgress?: (done: number) => void): Promise<void> {
+  onProgress?.(0);
+  await new Promise((r) => setTimeout(r)); // let the progress message show before building rows
+  const sliced = !!t.slice && !t.built && t.count !== undefined;
+  const total = sliced ? t.count! : t.rows.length;
+  const stmt = db.prepare(`INSERT INTO ${t.name} VALUES (${t.columns.map(() => "?").join(", ")})`);
+  try {
+    for (let i = 0; i < total; i += BATCH) {
+      const end = Math.min(total, i + BATCH);
+      const batch = sliced ? t.slice!(i, end) : t.rows.slice(i, end);
+      db.run("BEGIN");
+      for (const r of batch) stmt.run(r);
+      db.run("COMMIT");
+      onProgress?.((end / total) * 0.9); // the last tenth is indexing
+      if (end < total) await new Promise((r) => setTimeout(r));
+    }
+  } finally {
+    stmt.free();
+  }
+  for (const s of indexStatements(t)) {
+    db.run(s);
+    await new Promise((r) => setTimeout(r));
+  }
+  onProgress?.(1);
+}
+
+/** Create and fill an in-memory database in one go (tests, small catalogs). */
 export function fillDatabase(db: Database, tables: Table[]) {
+  createSchema(db, tables);
   db.run("BEGIN");
   for (const t of tables) {
-    db.run(`CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`);
     const stmt = db.prepare(`INSERT INTO ${t.name} VALUES (${t.columns.map(() => "?").join(", ")})`);
     for (const r of t.rows) stmt.run(r);
     stmt.free();
-  }
-  db.run("CREATE INDEX edges_from ON edges(from_id)");
-  db.run("CREATE INDEX edges_to ON edges(to_id)");
-  for (const t of ["labels", "classifications", "properties", "settings", "fields", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]) {
-    db.run(`CREATE INDEX ${t}_entity ON ${t}(entity_id)`);
+    for (const s of indexStatements(t)) db.run(s);
   }
   db.run("COMMIT");
   db.run("PRAGMA query_only = 1");
