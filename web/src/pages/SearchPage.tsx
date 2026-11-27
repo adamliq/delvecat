@@ -43,16 +43,31 @@ const FACET_TITLES: Record<string, string> = {
   field: "Has field",
   command: "Runs command",
   runFrom: "Ad-hoc search run from",
+  inputType: "Input type",
+  microsoftService: "Microsoft service",
+  microsoftAddOn: "Microsoft add-on",
   capability: "Has capability",
 };
 
+/** Input type -> its modular input's title ("mscs_azure_event_hub" -> "Azure Event Hub"). */
+function inputTypeTitles(entities: Entity[]): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const e of entities) {
+    const p = e.type === "input" ? (e.properties as { kind?: string; modularInputTitle?: string } | undefined) : undefined;
+    if (p?.kind && p.modularInputTitle && !out[p.kind]) out[p.kind] = p.modularInputTitle;
+  }
+  return out;
+}
+
 let instanceNames: Record<string, string> = {};
 let propertyNames: Record<string, string> = {};
+let inputTitles: Record<string, string> = {};
 const facetTitle = (f: Facet): string => FACET_TITLES[f] ?? propertyNames[f.replace(/^p\./, "")] ?? f;
 
 function valueLabel(facet: Facet, value: string): string {
   if (facet === "instance") return instanceNames[value] ?? value;
   if (facet === "missing") return propertyNames[value] ?? value;
+  if (facet === "inputType") return inputTitles[value] ? `${inputTitles[value]} (${value})` : value;
   if (facet === "risk") return value === "critical" ? "Critical" : "Warning";
   if (facet === "type") return pluralTypeLabel(value as EntityType);
   if (facet === "product") return PRODUCT_LABELS[value as Product] ?? value;
@@ -133,6 +148,7 @@ export function SearchPage() {
   const { search, catalog } = useCatalog();
   instanceNames = Object.fromEntries(catalog.bundle.instances.map((i) => [i.id, i.name]));
   propertyNames = Object.fromEntries(propertyDefs(catalog.bundle).map((d) => [d.id, label(d)]));
+  inputTitles = inputTypeTitles(catalog.bundle.entities);
   const FACET_NAMES = search.facetNames;
   const [params, setParams] = useSearchParams();
   const [limit, setLimit] = useState(PAGE);

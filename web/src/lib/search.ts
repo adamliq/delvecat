@@ -30,6 +30,18 @@ export const FACETS = {
   },
   command: (e: Entity) => e.lineage?.commands ?? [],
   runFrom: (e: Entity) => (e.type === "adhocSearch" ? ((e.properties as { runFrom?: string[] } | undefined)?.runFrom ?? []) : []),
+  inputType: (e: Entity) => {
+    const k = e.type === "input" ? (e.properties as { kind?: string } | undefined)?.kind : undefined;
+    return k ? [k] : [];
+  },
+  microsoftService: (e: Entity) => {
+    const s = (e.properties as { microsoft?: { service?: string | null } } | undefined)?.microsoft?.service;
+    return s ? [s] : [];
+  },
+  microsoftAddOn: (e: Entity) => {
+    const a = (e.properties as { microsoft?: { addOn?: string | null } } | undefined)?.microsoft?.addOn;
+    return a ? [a] : [];
+  },
   usage: (e: Entity) => (e.usage?.unused ? [e.usage.builtin ? "unused (built-in)" : "unused"] : []),
   missing: (e: Entity) => e.annotations?.missingProperties ?? [],
   quality: (e: Entity) => (!e.quality ? [] : e.quality.failed ? ["failing checks"] : ["all checks passing"]),

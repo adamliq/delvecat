@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Entity, EntityType } from "../generated/catalog";
-import { EntitySearch, propertyValues } from "./search";
+import { EntitySearch, FACETS, propertyValues } from "./search";
 
 const ent = (type: EntityType, name: string, properties: Record<string, unknown> = {}): Entity =>
   ({ id: `i:${type}:${name}`, type, name, product: "splunk", instance: "i", properties });
@@ -28,5 +28,22 @@ describe("search by values", () => {
     const s2 = new EntitySearch([macro, out2]);
     expect(s2.search("10.9.0.1")[0].name).toBe("tcpout:siem2");
     expect(s2.search("10.9.0.1:9997")[0].name).toBe("tcpout:siem2");
+  });
+});
+
+describe("input type and Microsoft facets", () => {
+  const inp = (name: string, kind: string, ms?: { addOn: string; service: string }) =>
+    ({ id: `i:input:${name}`, type: "input", name, product: "splunk", instance: "i",
+       properties: { kind, ...(ms ? { microsoft: ms } : {}) } }) as unknown as Entity;
+  const ents = [
+    inp("mscs_azure_event_hub://eh", "mscs_azure_event_hub", { addOn: "Splunk Add-on for Microsoft Cloud Services", service: "Event Hubs" }),
+    inp("MS_AAD_signins://s", "MS_AAD_signins", { addOn: "Splunk Add-on for Microsoft Azure", service: "Entra ID sign-ins" }),
+    inp("monitor:///var/log", "monitor"),
+  ];
+  const s = new EntitySearch(ents, { inputType: FACETS.inputType, microsoftService: FACETS.microsoftService, microsoftAddOn: FACETS.microsoftAddOn });
+  it("filters by input type, Microsoft service and add-on", () => {
+    expect(s.query("", { inputType: ["monitor"] }).results.map((e) => e.name)).toEqual(["monitor:///var/log"]);
+    expect(s.query("", { microsoftService: ["Event Hubs"] }).results.map((e) => e.name)).toEqual(["mscs_azure_event_hub://eh"]);
+    expect(s.query("", { microsoftAddOn: ["Splunk Add-on for Microsoft Azure"] }).results.map((e) => e.name)).toEqual(["MS_AAD_signins://s"]);
   });
 });
