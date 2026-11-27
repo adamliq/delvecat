@@ -7,14 +7,34 @@ import { lookupFieldEntities, schemaLookups } from "./lookups";
 /** Fields of a sourcetype (sampled or defined in props.conf), by name; for a lookup or KV
  * Store collection, its fields as field-like objects. */
 export function schemaFields(catalog: Catalog, st: Entity): Entity[] {
-  if (st.type === "lookup" || st.type === "kvCollection") {
-    return lookupFieldEntities(st).sort((a, b) => fieldName(a).localeCompare(fieldName(b)));
+  let perCatalog = fieldsCache.get(catalog);
+  if (!perCatalog) fieldsCache.set(catalog, (perCatalog = new Map()));
+  let fields = perCatalog.get(st);
+  if (!fields) {
+    const raw = st.type === "lookup" || st.type === "kvCollection"
+      ? lookupFieldEntities(st)
+      : catalog.edgesFrom(st.id)
+        .filter((x) => x.type === "contains")
+        .map((x) => catalog.byId.get(x.to))
+        .filter((f): f is Entity => f?.type === "field");
+    fields = byName(raw);
+    perCatalog.set(st, fields);
   }
-  return catalog.edgesFrom(st.id)
-    .filter((x) => x.type === "contains")
-    .map((x) => catalog.byId.get(x.to))
-    .filter((f): f is Entity => f?.type === "field")
-    .sort((a, b) => fieldName(a).localeCompare(fieldName(b)));
+  return fields;
+}
+
+/** Fields worked out once per catalog: several Insights and Schemas panels ask for the
+ * same sourcetypes (callers must not change the list). */
+const fieldsCache = new WeakMap<Catalog, Map<Entity, Entity[]>>();
+/** The same order as localeCompare, without creating a collator for every comparison. */
+const collator = new Intl.Collator();
+
+/** Sorted by field name (each name worked out once, not per comparison). */
+function byName(fields: Entity[]): Entity[] {
+  return fields
+    .map((f) => [fieldName(f), f] as const)
+    .sort((a, b) => collator.compare(a[0], b[0]))
+    .map(([, f]) => f);
 }
 
 export type FieldType = "number" | "string" | "unknown";

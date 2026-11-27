@@ -117,16 +117,19 @@ export class Catalog {
     return this.incoming.get(id) ?? [];
   }
 
-  private named?: Map<string, Entity[]>;
+  private named = new Map<string, Map<string, Entity[]>>();
   private typed?: Map<string, Entity[]>;
 
-  /** Objects of a type with this name on an instance (built once, on first use). */
+  /** Objects of a type with this name on an instance (indexed per type, on first use:
+   * looking up custom commands does not index a million other objects). */
   find(instance: string, type: string, name: string): Entity[] {
-    if (!this.named) {
-      this.named = new Map();
-      for (const e of this.bundle.entities) push(this.named, `${e.instance}\u0000${e.type}\u0000${e.name}`, e);
+    let byName = this.named.get(type);
+    if (!byName) {
+      byName = new Map();
+      for (const e of this.ofType(type)) push(byName, `${e.instance}\u0000${e.name}`, e);
+      this.named.set(type, byName);
     }
-    return this.named.get(`${instance}\u0000${type}\u0000${name}`) ?? [];
+    return byName.get(`${instance}\u0000${name}`) ?? [];
   }
 
   /** The first object of a type with this name on an instance, if any. */
