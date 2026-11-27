@@ -162,11 +162,16 @@ def propagate(
         via: dict[str, str] = {}
         depth: dict[str, int] = {}
         queue: deque[str] = deque()
+        # For each object, its inputs that carry this class so far (instead of scanning
+        # all of its inputs each time: an index can be fed by thousands of hosts).
+        carriers: dict[str, set[str]] = defaultdict(set)
         for node, per in seeds.items():
             if cls in per:
                 cols[node] = per[cls]
                 depth[node] = 0
                 queue.append(node)
+                for s in succs.get(node, ()):
+                    carriers[s].add(node)
 
         def out_cols(
             node: str,
@@ -196,7 +201,7 @@ def propagate(
             changed: list[str] = []
             for nxt in dirty:
                 e = by_id[nxt]
-                inputs = [(p, out_cols(p)) for p in preds[nxt] if p in cols]
+                inputs = [(p, out_cols(p)) for p in carriers.get(nxt, ())]
                 inputs = [(p, c) for p, c in inputs if c is ALL or c]
                 if not inputs:
                     continue
@@ -213,6 +218,9 @@ def propagate(
                 merged = _union(old, new) if nxt in cols else new
                 if nxt in cols and merged == old:
                     continue
+                if nxt not in cols:
+                    for s in succs.get(nxt, ()):
+                        carriers[s].add(nxt)
                 cols[nxt] = merged
                 via.setdefault(nxt, min(p for p, _ in inputs))
                 depth[nxt] = min(depth.get(nxt, level), level)

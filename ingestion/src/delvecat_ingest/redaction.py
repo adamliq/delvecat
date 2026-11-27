@@ -102,15 +102,43 @@ def load_profile(name: str | None = None, file: Path | None = None) -> Profile:
 
 
 class _Pseudonyms:
+    """Short stable names: ``<kind>-`` and 8 hex characters of a keyed hash. Values whose
+    8 characters would collide (likely from about 50,000 hosts on) get 16 instead, all of
+    them, decided from the full list first so the result does not depend on order; any
+    other clash is lengthened as it is met. Names never collide."""
+
+    SHORT, LONG = 8, 16
+
     def __init__(self, salt: bytes):
         self.salt = salt
         self.map: dict[tuple[str, str], str] = {}
+        self.taken: dict[str, tuple[str, str]] = {}
+        self.long: set[tuple[str, str]] = set()
+
+    def _digest(self, kind: str, value: str) -> str:
+        return hmac.new(self.salt, f"{kind}:{value}".encode(), hashlib.sha256).hexdigest()
+
+    def prepare(self, kind: str, values: Any) -> None:
+        """Note every value of a kind up front, so colliding ones all get long names."""
+        seen: dict[str, str] = {}
+        for v in sorted(set(values)):
+            short = self._digest(kind, v)[: self.SHORT]
+            if short in seen:
+                self.long.update({(kind, v), (kind, seen[short])})
+            else:
+                seen[short] = v
 
     def __call__(self, kind: str, value: str) -> str:
         key = (kind, value)
         if key not in self.map:
-            digest = hmac.new(self.salt, f"{kind}:{value}".encode(), hashlib.sha256).hexdigest()
-            self.map[key] = f"{kind}-{digest[:8]}"
+            digest = self._digest(kind, value)
+            size = self.LONG if key in self.long else self.SHORT
+            name = f"{kind}-{digest[:size]}"
+            while self.taken.get(name, key) != key:  # met late: lengthen until unique
+                size += 4
+                name = f"{kind}-{digest[:size]}"
+            self.taken[name] = key
+            self.map[key] = name
         return self.map[key]
 
 
@@ -190,6 +218,10 @@ def redact_bundle(
     for e in entities:
         props = e.get("properties") or {}
         hosts.update(str(props[k]) for k in ("hostname", "dns") if props.get(k))
+
+    pseudo.prepare("user", users)
+    pseudo.prepare("host", hosts)
+    pseudo.prepare("source", (e["name"] for e in entities if e["type"] == "source"))
 
     def rename(kind: str, value: str) -> str:
         return pseudo(kind, value)

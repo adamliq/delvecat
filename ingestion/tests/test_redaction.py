@@ -125,3 +125,26 @@ def test_profile_file_and_cli(plain, tmp_path, monkeypatch):
         == 2
     )
     assert main(["redact", str(plain), "--out", str(out)]) == 2
+
+
+def test_pseudonyms_never_collide_and_stay_short_when_they_can(monkeypatch):
+    from delvecat_ingest.redaction import _Pseudonyms
+
+    monkeypatch.setattr(_Pseudonyms, "SHORT", 1)  # one hex character: collisions guaranteed
+    p = _Pseudonyms(b"salt")
+    hosts = [f"host-{i}" for i in range(40)]
+    p.prepare("host", hosts)
+    names = [p("host", h) for h in hosts]
+    assert len(set(names)) == len(hosts)
+    assert p("host", "host-3") == names[3]  # stable within a run
+    late = p("host", "not-prepared")  # a value met only later still gets a unique name
+    assert late not in names
+    # same salt, other order: same names (decided from the full list, not the order)
+    q = _Pseudonyms(b"salt")
+    q.prepare("host", reversed(hosts))
+    assert [q("host", h) for h in reversed(hosts)] == names[::-1]
+    # without collisions names keep their usual short form
+    monkeypatch.setattr(_Pseudonyms, "SHORT", 8)
+    r = _Pseudonyms(b"salt")
+    r.prepare("host", ["a", "b"])
+    assert len(r("host", "a")) == len("host-") + 8
