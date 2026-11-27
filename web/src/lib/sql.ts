@@ -54,7 +54,11 @@ function cell(v: Cell): SqlValue {
 
 const col = (name: string, type: Column["type"] = "TEXT", doc?: string): Column => ({ name, type, doc });
 
-export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = new Map()): Table[] {
+export function catalogTables(
+  bundle: CatalogBundle,
+  riskSource: Map<string, Risk> | (() => Map<string, Risk>) = new Map(),
+): Table[] {
+  const riskOf = () => (typeof riskSource === "function" ? riskSource() : riskSource);
   const E = bundle.entities;
   const per = <T,>(fn: (e: Entity) => T[]) => E.flatMap((e) => fn(e));
 
@@ -271,7 +275,7 @@ export function catalogTables(bundle: CatalogBundle, risk: Map<string, Risk> = n
       col("problem"), col("hops", "INTEGER", "1 = direct dependency"), col("via_id"),
       col("partial", "INTEGER", "1 if the cause is one of several sources"),
     ],
-    build: () => [...risk].flatMap(([id, r]) => r.causes.map((c) => [
+    build: () => [...riskOf()].flatMap(([id, r]) => r.causes.map((c) => [
       id, r.severity, c.root.id, c.problems.map((p) => p.summary).join("; "), c.depth, c.via?.id, c.partial ?? false,
     ].map(cell))),
   });
@@ -304,7 +308,13 @@ const BATCH = 20000;
 
 /** Fill one table and index it. Yields to the browser between batches (onProgress gets 0-1),
  * so the page stays responsive while millions of rows go in. */
-export async function fillTable(db: Database, t: Table, onProgress?: (done: number) => void): Promise<void> {
+export async function fillTable(
+  db: Database,
+  t: Table,
+  onProgress?: (done: number) => void,
+  /** Checked between batches: while true, wait (a background fill giving way to a query). */
+  pause?: () => boolean,
+): Promise<void> {
   onProgress?.(0);
   await new Promise((r) => setTimeout(r)); // let the progress message show before building rows
   const sliced = !!t.slice && !t.built && t.count !== undefined;
@@ -314,20 +324,34 @@ export async function fillTable(db: Database, t: Table, onProgress?: (done: numb
     for (let i = 0; i < total; i += BATCH) {
       const end = Math.min(total, i + BATCH);
       const batch = sliced ? t.slice!(i, end) : t.rows.slice(i, end);
-      db.run("BEGIN");
-      for (const r of batch) stmt.run(r);
-      db.run("COMMIT");
+      writable(db, () => {
+        db.run("BEGIN");
+        for (const r of batch) stmt.run(r);
+        db.run("COMMIT");
+      });
       onProgress?.((end / total) * 0.9); // the last tenth is indexing
       if (end < total) await new Promise((r) => setTimeout(r));
+      while (pause?.()) await new Promise((r) => setTimeout(r, 30));
     }
   } finally {
     stmt.free();
   }
   for (const s of indexStatements(t)) {
-    db.run(s);
+    writable(db, () => db.run(s));
     await new Promise((r) => setTimeout(r));
   }
   onProgress?.(1);
+}
+
+/** Run ``fn`` with writes allowed; the database is read-only again before any query can
+ * run (queries run between batches, never during one). */
+function writable(db: Database, fn: () => void) {
+  db.run("PRAGMA query_only = 0");
+  try {
+    fn();
+  } finally {
+    db.run("PRAGMA query_only = 1");
+  }
 }
 
 /** Create and fill an in-memory database in one go (tests, small catalogs). */

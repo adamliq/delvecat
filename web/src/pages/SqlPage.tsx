@@ -28,6 +28,7 @@ export default function SqlPage() {
   const [savedQueries, setSaved] = useState(store.saved);
   const [copied, setCopied] = useState(false);
   const [filling, setFilling] = useState<LoadProgress | null>(null);
+  const [background, setBackground] = useState<LoadProgress | null>(null);
   const editor = useRef<SqlEditorHandle>(null);
   const lastRun = useRef<string | null>(null);
 
@@ -35,7 +36,11 @@ export default function SqlPage() {
     let cancelled = false;
     setDb({ status: "loading" });
     catalogDb(catalog)
-      .then((d) => !cancelled && setDb({ status: "ready", ...d }))
+      .then((d) => {
+        if (cancelled) return;
+        setDb({ status: "ready", ...d });
+        void d.prefetch((p) => !cancelled && setBackground(p)).finally(() => !cancelled && setBackground(null));
+      })
       .catch((e: unknown) => !cancelled && setDb({ status: "error", message: String(e) }));
     return () => {
       cancelled = true; // the database stays cached for the next visit
@@ -142,6 +147,11 @@ export default function SqlPage() {
               Loading table <code>{filling.table}</code>
               {filling.rows ? <> ({filling.rows.toLocaleString()} rows)</> : null}: {Math.round(filling.done * 100)}%
               {" "}· each table is loaded the first time a query uses it
+            </p>
+          )}
+          {!filling && background && (
+            <p className="muted small" role="status">
+              Loading table <code>{background.table}</code> in the background: {Math.round(background.done * 100)}%
             </p>
           )}
           {db.status === "error" && <p className="error">Could not start SQLite: {db.message}</p>}

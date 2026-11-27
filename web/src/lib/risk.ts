@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { EdgeType, Entity } from "../generated/catalog";
 import type { Catalog } from "./catalog";
 
@@ -75,6 +76,35 @@ export function problems(e: Entity): Problem[] {
 const worst = (a: Severity, b: Severity): Severity => (a === "critical" || b === "critical" ? "critical" : "warning");
 
 const cache = new WeakMap<Catalog, Map<string, Risk>>();
+const pending = new WeakMap<Catalog, Promise<Map<string, Risk>>>();
+
+/** Work out the risk map when the browser is idle (seconds on large catalogs), so the
+ * first page does not wait for it. Pages that need it at once still get it at once. */
+export function riskLater(catalog: Catalog): Promise<Map<string, Risk>> {
+  const done = cache.get(catalog);
+  if (done) return Promise.resolve(done);
+  let p = pending.get(catalog);
+  if (!p) {
+    const idle = (globalThis as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    p = new Promise((resolve) => (idle ? idle(() => resolve(riskMap(catalog)), { timeout: 3000 }) : setTimeout(() => resolve(riskMap(catalog)), 50)));
+    pending.set(catalog, p);
+  }
+  return p;
+}
+
+/** The risk map once it is ready (undefined until then); re-renders when it is. */
+export function useRiskMap(catalog: Catalog): Map<string, Risk> | undefined {
+  const [map, setMap] = useState(() => cache.get(catalog));
+  useEffect(() => {
+    let live = true;
+    setMap(cache.get(catalog));
+    void riskLater(catalog).then((m) => live && setMap(m));
+    return () => {
+      live = false;
+    };
+  }, [catalog]);
+  return map;
+}
 
 /** Every at-risk object, with what puts it at risk. Computed once per catalog. */
 export function riskMap(catalog: Catalog): Map<string, Risk> {

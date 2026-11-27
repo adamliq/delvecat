@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CatalogBundle, Entity } from "../generated/catalog";
 import { Catalog, defaultBundleUrl, fetchBundle, openLocalFiles } from "./catalog";
-import { riskMap, type Risk } from "./risk";
+import { riskLater, riskMap, type Risk } from "./risk";
 import { IN_SPLUNK, fetchSplunkCatalog } from "./splunkSource";
 import { lookupColumns } from "./lookups";
 import { dataModelColumns } from "./dataModels";
@@ -36,7 +36,9 @@ const sourcetypeFieldNames = (catalog: Catalog, st: Entity) => schemaFields(cata
 
 function ready(bundle: CatalogBundle, origin: string): State {
   const catalog = new Catalog(bundle);
-  const risk = riskMap(catalog);
+  // Worked out when the browser is idle after the page appears (seconds on large
+  // catalogs); the "at risk" filter computes it at once if used before that.
+  void riskLater(catalog);
   const stFields = new Map<string, string[]>();
   const search = new EntitySearch(bundle.entities, {
     ...propertyFacets(propertyDefs(bundle)),
@@ -54,7 +56,7 @@ function ready(bundle: CatalogBundle, origin: string): State {
       return names;
     },
     risk: (e) => {
-      const r = risk.get(e.id);
+      const r = riskMap(catalog).get(e.id);
       return r ? [r.severity] : [];
     },
   });

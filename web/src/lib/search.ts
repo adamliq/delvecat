@@ -284,20 +284,44 @@ export class EntitySearch {
     const base = hide ? matched.list.filter((e) => !hide(e)) : matched.list;
     const { matches } = matched;
     const active = this.facetNames.filter((f) => filters[f]?.length);
-    const passes = (e: Entity, skip?: Facet) =>
-      active.every((f) => f === skip || this.facets[f](e).some((v) => filters[f]!.includes(v)));
+    const wanted = new Map(active.map((f) => [f, new Set(filters[f])]));
+    const ok = (f: Facet, e: Entity) => {
+      const want = wanted.get(f)!;
+      return this.facets[f](e).some((v) => want.has(v));
+    };
 
+    // A facet's counts cover objects passing every *other* active filter. So each object
+    // is checked against each active filter once: passing all, it counts for every facet;
+    // failing exactly one, only for that facet; failing more, for none.
+    const counts = new Map<Facet, Map<string, number>>(this.facetNames.map((f) => [f, new Map()]));
+    const add = (f: Facet, e: Entity) => {
+      const c = counts.get(f)!;
+      const vs = this.facets[f](e);
+      if (vs.length === 1) c.set(vs[0], (c.get(vs[0]) ?? 0) + 1);
+      else if (vs.length > 1) for (const v of new Set(vs)) c.set(v, (c.get(v) ?? 0) + 1);
+    };
+    const results: Entity[] = [];
+    for (const e of base) {
+      let failed: Facet | null = null;
+      let fails = 0;
+      for (const f of active) {
+        if (!ok(f, e)) {
+          failed = f;
+          if (++fails > 1) break;
+        }
+      }
+      if (fails === 0) {
+        results.push(e);
+        for (const f of this.facetNames) add(f, e);
+      } else if (fails === 1) {
+        add(failed!, e);
+      }
+    }
     const facets = {} as Record<Facet, Map<string, number>>;
     for (const f of this.facetNames) {
-      const counts = new Map<string, number>();
-      for (const e of base) {
-        if (!passes(e, f)) continue;
-        for (const v of new Set(this.facets[f](e))) counts.set(v, (counts.get(v) ?? 0) + 1);
-      }
-      facets[f] = new Map([...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
+      facets[f] = new Map([...counts.get(f)!.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
     }
 
-    const results = base.filter((e) => passes(e));
     const effective = sort === "relevance" && !query.trim() ? "name" : sort;
     if (effective === "name") results.sort((a, b) => (a.displayName ?? a.name).localeCompare(b.displayName ?? b.name));
     if (effective === "type") results.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));

@@ -5,7 +5,7 @@ import { CoverageReport } from "../components/CoverageReport";
 import { PropValue } from "../components/PropValue";
 import { effectiveDescription } from "../lib/annotate";
 import { detectionStatus, isDetection } from "../lib/coverage";
-import { riskMap } from "../lib/risk";
+import { useRiskMap } from "../lib/risk";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, typeGroup, typeLabel } from "../lib/labels";
 import { entityPath, searchPath } from "../lib/routes";
@@ -73,7 +73,8 @@ export function Home() {
   const classified = bundle.entities.filter((e) => e.annotations?.classifications?.length).length;
   const detections = bundle.entities.filter(isDetection).map((e) => detectionStatus(catalog, e));
   const firing = detections.filter((d) => d.state === "ready").length;
-  const atRisk = riskMap(catalog).size;
+  const risk = useRiskMap(catalog); // worked out after the page appears
+  const atRisk = risk?.size;
   const missingRequired = bundle.entities.filter((e) => e.annotations?.missingProperties?.length).length;
   const broken = bundle.entities.filter((e) => e.lineage?.unresolved?.length).length;
   const healthReport = bundle.ingestionReport?.find((r) => r.connector === "health");
@@ -94,7 +95,9 @@ export function Home() {
         trend: history.map((h) => h.critical + h.warning), title: "Open the health report" },
       { num: unusedCustom.toLocaleString(), label: "unused objects in custom apps", to: "/health", title: "Cleanup report on the Health page", trend: history.some((h) => h.unused !== undefined) ? history.map((h) => h.unused ?? 0) : undefined },
     ] : []),
-    ...(atRisk ? [{ num: atRisk.toLocaleString(), label: "at risk from upstream problems", to: searchPath({ risk: ["critical", "warning"] }), tone: "warning" as const }] : []),
+    ...(atRisk === undefined
+      ? [{ num: "…", label: "at risk from upstream problems (working it out)", to: searchPath({ risk: ["critical", "warning"] }) }]
+      : atRisk ? [{ num: atRisk.toLocaleString(), label: "at risk from upstream problems", to: searchPath({ risk: ["critical", "warning"] }), tone: "warning" as const }] : []),
     ...(detections.length ? [{ num: `${firing} / ${detections.length}`, label: "detections can fire", to: "/coverage", tone: firing < detections.length ? "warning" as const : undefined, title: "ATT&CK and CIM coverage" }] : []),
     ...(gov && gov.sensitiveStores > 0 ? [{ num: gov.sensitiveStores.toLocaleString(), label: `sensitive data stores${gov.exposedToEveryone ? `, ${gov.exposedToEveryone} readable by every role` : ""}`, to: "/governance", tone: gov.exposedToEveryone ? "warning" as const : undefined }] : []),
     ...(broken ? [{ num: broken.toLocaleString(), label: "objects with broken references", to: searchPath({ issue: "broken reference" }), tone: "warning" as const, title: "Macros, lookups, indexes or saved searches that are missing or not shared" }] : []),

@@ -43,7 +43,9 @@ def encode(
     # Streamed: the JSON is produced and compressed a piece at a time, so the whole text
     # (hundreds of MB on large catalogs) is never held in memory at once.
     buf = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=9, mtime=0) as gz:
+    with gzip.GzipFile(
+        fileobj=buf, mode="wb", compresslevel=6, mtime=0
+    ) as gz:  # 9: 3x slower, 3% smaller
         write_json(compact_bundle(bundle), gz)
     packed = buf.getvalue()
     text = base64.b64encode(packed).decode("ascii")

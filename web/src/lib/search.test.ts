@@ -82,3 +82,40 @@ describe("searching while the word index is still being built", () => {
     expect(full.results.length).toBeGreaterThan(0);
   });
 });
+
+describe("facet counts", () => {
+  it("match the straightforward definition for any combination of filters", () => {
+    const types = ["savedSearch", "dashboard", "index", "macro"] as const;
+    const apps = ["a", "b", "c"];
+    let seed = 7;
+    const rnd = (n: number) => (seed = (seed * 1103515245 + 12345) % 2147483648) % n;
+    const ents = Array.from({ length: 400 }, (_, i) => ({
+      ...ent(types[rnd(4)], `o${i}`, {}),
+      app: apps[rnd(3)],
+      disabled: rnd(5) === 0,
+      annotations: rnd(3) ? { tags: [["x"], ["y"], ["x", "y"], []][rnd(4)] } : undefined,
+    })) as Entity[];
+    const s = new EntitySearch(ents);
+    const reference = (filters: Record<string, string[]>) => {
+      const active = s.facetNames.filter((f) => filters[f]?.length);
+      const passes = (e: Entity, skip?: string) => active.every((f) => f === skip || s.facets[f](e).some((v) => filters[f]!.includes(v)));
+      const out: Record<string, Record<string, number>> = {};
+      for (const f of s.facetNames) {
+        const c: Record<string, number> = {};
+        for (const e of ents) if (passes(e, f)) for (const v of new Set(s.facets[f](e))) c[v] = (c[v] ?? 0) + 1;
+        out[f] = c;
+      }
+      return { out, n: ents.filter((e) => passes(e)).length };
+    };
+    const combos: Record<string, string[]>[] = [
+      {}, { type: ["savedSearch"] }, { type: ["savedSearch", "macro"], app: ["a"] },
+      { app: ["b"], status: ["disabled"] }, { tag: ["x"], type: ["index"], app: ["c", "a"] }, { tag: ["nope"] },
+    ];
+    for (const f of combos) {
+      const got = s.query("", f);
+      const want = reference(f);
+      expect(got.results.length).toBe(want.n);
+      for (const facet of s.facetNames) expect(Object.fromEntries(got.facets[facet])).toEqual(want.out[facet]);
+    }
+  });
+});
