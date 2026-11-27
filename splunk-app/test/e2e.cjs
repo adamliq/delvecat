@@ -642,6 +642,24 @@ const sections = {
     check('publisher removes the shared query', del.status < 300, `HTTP ${del.status}`);
   },
 
+  async restCatalog() {
+    // GET /services/delvecat/catalog: the catalog for scripts, with the caller's own access.
+    const list = await rest('GET', '/services/delvecat/catalog?type=index&limit=5', 'viewer');
+    check('REST catalog: viewer lists indexes', list.status === 200 && list.json?.results?.length > 0 && list.json.results.every((x) => x.type === 'index'),
+      `HTTP ${list.status}, ${list.json?.total} indexes`);
+    const id = list.json?.results?.[0]?.id;
+    const one = id ? await rest('GET', `/services/delvecat/catalog?id=${encodeURIComponent(id)}`, 'viewer') : { status: 0 };
+    check('REST catalog: one object with its relationships', one.status === 200 && one.json?.object?.id === id && Array.isArray(one.json?.incoming), `HTTP ${one.status}`);
+    const search = await rest('GET', '/services/delvecat/catalog?type=savedSearch&limit=1000', 'viewer');
+    const s = (search.json?.results || [])[0];
+    const up = s ? await rest('GET', `/services/delvecat/catalog?upstream=${encodeURIComponent(s.id)}&depth=3`, 'viewer') : { status: 0 };
+    check('REST catalog: upstream of a saved search', up.status === 200 && Array.isArray(up.json?.results), `HTTP ${up.status}, ${up.json?.total} found`);
+    const bad = await rest('GET', '/services/delvecat/catalog?limit=0', 'viewer');
+    check('REST catalog: a bad parameter says why', bad.status === 400 && /limit/.test(bad.json?.error || ''), `HTTP ${bad.status}`);
+    const plain = await rest('GET', '/services/delvecat/catalog?type=index', 'plain');
+    check('REST catalog: a user without the app role is refused', plain.status === 403, `HTTP ${plain.status}`);
+  },
+
   async layout() {
     // Every page fits the window from phone to wide screen: no sideways scrolling of the
     // page (graphs and tables may scroll inside their own boxes).

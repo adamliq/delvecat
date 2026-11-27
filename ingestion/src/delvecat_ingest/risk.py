@@ -34,7 +34,7 @@ def _problems(e: dict[str, Any]) -> tuple[bool, bool, bool]:
         if c.get("status") != "ok":
             kinds.append("health")
             critical |= c.get("status") == "critical"
-    if ((e.get("lineage") or {}).get("unresolved") or []):
+    if (e.get("lineage") or {}).get("unresolved") or []:
         kinds.append("brokenReference")
     if e.get("disabled"):
         kinds.append("disabled")
