@@ -609,6 +609,43 @@ def _auth_checks(e: dict[str, Any], roles: set[tuple] | None, checks: list[dict[
         )
 
 
+def _stream_checks(e: dict[str, Any], checks: list[dict[str, str]]) -> None:
+    """Stream: groups naming missing streams, expired captures, streams nobody sends,
+    forwarders not sending what their groups deploy."""
+    p = e.get("properties") or {}
+    if e["type"] == "streamGroup" and p.get("missingStreams"):
+        _check(
+            checks,
+            "streamMissing",
+            "warning",
+            "Deploys streams that do not exist: " + ", ".join(p["missingStreams"]),
+        )
+    elif e["type"] == "streamDefinition":
+        if p.get("expired"):
+            _check(
+                checks,
+                "streamExpired",
+                "warning",
+                f"Ephemeral capture expired {str(p.get('expiresAt', ''))[:10]}: it captures "
+                "nothing any more",
+            )
+        elif p.get("observedSending") is False:
+            _check(
+                checks,
+                "streamNoData",
+                "warning",
+                f"No forwarder sent {p.get('sourcetype')} in the last 7 days",
+            )
+    elif e["type"] == "streamForwarder" and p.get("notSending"):
+        _check(
+            checks,
+            "streamsNotArriving",
+            "warning",
+            "Its groups deploy " + ", ".join(p["notSending"]) + " but it sent none of that "
+            "data in the last 7 days (it may see no such traffic)",
+        )
+
+
 def _db_checks(
     e: dict[str, Any], names: dict[tuple, dict[str, Any]], checks: list[dict[str, str]]
 ) -> None:
@@ -766,6 +803,8 @@ def evaluate_health(
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(parts)}")
         if e["type"] in ("authStrategy", "authGroup"):
             _auth_checks(e, role_names if e.get("instance") in with_roles else None, checks)
+        if e["type"] in ("streamDefinition", "streamGroup", "streamForwarder"):
+            _stream_checks(e, checks)
         if e["type"] in ("dbConnection", "dbInput", "dbOutput", "dbLookup"):
             _db_checks(e, db_names, checks)
         _command_checks(e, risky_custom, checks)

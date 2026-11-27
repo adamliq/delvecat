@@ -23,6 +23,7 @@ export const SECTIONS: Section[] = [
   { id: "searches", title: "Scheduled searches and alerts", checks: ["skipped", "failed", "runtime", "notRunning", "alertNoisy"], empty: "No skipped, failing, missing or noisy scheduled searches." },
   { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment", "relay"], empty: "Every forwarder and client reported recently." },
   { id: "db", title: "DB Connect", checks: ["dbMissing", "dbFailed", "dbNotRunning"], empty: "Every DB Connect input and output has what it needs and runs." },
+  { id: "stream", title: "Stream", checks: ["streamMissing", "streamExpired", "streamNoData", "streamsNotArriving"], empty: "Every Stream group, stream and sensor looks right." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
   { id: "storage", title: "Storage, routing and acceleration", checks: ["retentionBySize", "routeToMissingIndex", "summaryError", "summaryUnused"], empty: "No storage, routing or acceleration problems." },
   { id: "access", title: "Access: tokens, LDAP, field filters, capabilities", checks: ["tokenExpired", "tokenExpiring", "tokenNoExpiry", "tokenStale", "tokenNoOwner", "fieldFilterOnBuilder", "riskyCapability", "ldapTls", "authGroupRole", "authGroupNotFound"], empty: "No token, LDAP, field filter or capability problems." },
@@ -128,6 +129,24 @@ export const REMEDIES: Record<string, Remedy> = {
   authGroupNotFound: {
     why: "The mapping names a group the LDAP strategy does not find: its roles go to nobody, and a new group created later with that name would get them.",
     fix: "Update the mapping to the group's current name, or remove it.",
+  },
+  streamMissing: {
+    why: "The group names a stream that no longer exists, so its forwarders do not capture what the group was set up for.",
+    fix: "Remove the stream from the group in Stream (Distributed Forwarder Management), or create the stream again.",
+  },
+  streamExpired: {
+    why: "An ephemeral capture (often started from Enterprise Security for an investigation) ran past its end date and captures nothing now.",
+    fix: "Delete it in Stream if the investigation is over, or extend it if the capture is still needed.",
+  },
+  streamNoData: {
+    why: "The stream is on and sends to Splunk, but no forwarder sent any of its data: it may be in no group, its groups may match no sensor, or the traffic is not seen.",
+    fix: "Check which groups deploy it and that their rules match running sensors; then that the sensors see that traffic.",
+    spl: (e) => `| tstats count max(_time) as last where index=* sourcetype=${q(`stream:${e.name}`)} by host | eval last=strftime(last, "%F %T")`,
+  },
+  streamsNotArriving: {
+    why: "Its groups deploy these streams to it, but none of their data came from it: the sensor may not see that traffic, or a capture setting on it is wrong.",
+    fix: "Check the sensor's network interfaces and capture settings in Stream, and whether that traffic passes it at all.",
+    spl: (e) => `| tstats count max(_time) as last where index=* sourcetype=stream:* host=${q(e.name)} by sourcetype | eval last=strftime(last, "%F %T")`,
   },
   dbMissing: {
     why: "DB Connect cannot open the connection, so every input, output and lookup on it fails, and no data arrives.",
