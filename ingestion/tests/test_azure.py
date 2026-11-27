@@ -111,4 +111,7 @@ def test_azure_input_in_the_catalog_and_public_profile():
     redact_bundle(public, load_profile("public"), salt="t")
     text = json.dumps(public)
     assert "0f1e2d3c-aaaa-bbbb-cccc-111122223333" not in text  # tenant id
+    assert "acme-eh.servicebus.windows.net" not in text  # Event Hub namespace
+    pub = next(e for e in public["entities"] if e["name"] == "mscs_azure_event_hub://prod_signins")
+    assert pub["properties"]["microsoft"]["settings"]["event_hub_name"] == "aad-signins"  # kept
     assert "acmesplunk" not in text  # storage account

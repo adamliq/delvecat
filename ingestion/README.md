@@ -290,7 +290,10 @@ Microsoft Azure (`TA-MS-AAD`) and Microsoft Security (`Splunk_TA_MS_Security`):
   Intelligence, Graph security alerts), the account or tenant used (a `uses` edge
   to it), and the values of settings that only name things (Event Hub namespace
   and name, consumer group, container, tables, content type, subscription, tenant
-  and workspace ids). Every other setting stays names only.
+  and workspace ids). Every other setting stays names only. The public profile drops
+  the subscription, tenant and workspace ids, the Event Hub namespace, the storage
+  account and custom endpoints (they identify the customer's Azure resources); the
+  Event Hub name and consumer group stay.
 - Part `microsoftAccounts` reads their accounts and tenants from the add-ons' own
   configuration endpoints (`splunk_ta_mscs_azureaccount`,
   `splunk_ta_o365_tenants`, `TA_MS_AAD_account`,

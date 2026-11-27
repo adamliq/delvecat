@@ -304,8 +304,17 @@ def redact_bundle(
             if profile.users == "pseudonymize" and props.get("serviceAccount"):
                 props["serviceAccount"] = rename("user", str(props["serviceAccount"]))
         if profile.urls == "drop" and e["type"] == "input" and (ms := props.get("microsoft")):
-            # Tenant, subscription and workspace ids identify the customer.
-            for k in ("subscription_id", "tenant_id", "workspace_id"):
+            # Tenant, subscription and workspace ids identify the customer, and so do the
+            # Event Hub namespace (<name>.servicebus.windows.net), storage account and
+            # custom endpoints of their Azure resources.
+            for k in (
+                "subscription_id",
+                "tenant_id",
+                "workspace_id",
+                "event_hub_namespace",
+                "storage_account",
+                "endpoint",
+            ):
                 if (ms.get("settings") or {}).pop(k, None):
                     counts["urls"] += 1
         if profile.urls == "drop" and e["type"] == "outputGroup":
