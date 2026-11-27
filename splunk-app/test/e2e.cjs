@@ -200,9 +200,11 @@ const sections = {
     // The console cannot change its data, even with a pragma; Stop ends a runaway query;
     // the tables are kept in the browser and reopened on the next visit.
     const sqlError = async (sql) => {
+      const prev = await v.page.locator('.sql-error').innerText().catch(() => '');
       await v.page.locator('textarea').fill(sql);
       await v.page.click('button:has-text("Run")');
-      try { await v.page.waitForFunction(() => document.querySelector('.sql-error'), null, { timeout: 20000 }); } catch {}
+      // a new message (the previous query's error may still be shown)
+      try { await v.page.waitForFunction((p) => { const t = document.querySelector('.sql-error')?.textContent; return t && t !== p; }, prev, { timeout: 20000 }); } catch {}
       return (await v.page.locator('.sql-error').innerText().catch(() => '')).replace(/\s+/g, ' ');
     };
     const sqlValue = async (alias, sql) => {

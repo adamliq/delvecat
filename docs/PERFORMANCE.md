@@ -61,6 +61,35 @@ per object. Tried and not kept: maintaining the relationship indexes while the S
 console fills edges in the background avoids the one pause on the first join (29 s
 at a million), but made the fill take 170 s instead of 34 s.
 
+## 0.46.0: governance, Insights and Schemas at scale
+
+| | 300k | 600k | 1M |
+|---|---:|---:|---:|
+| Governance step of the build (this machine) | 23.5 → 17 s | 51.6 → 42 s | 101 → 75 s |
+| Governance step in Splunk's Python 3.13 | | | 88 → 72 s |
+| Insights page | 2.2 → 1.7 s | 4.5 → 3.6 s | 9.2 → 7.5 s |
+| Schemas page | 1.0 → 0.3 s | 1.7 → 0.4 s | 3.3 → 0.5 s |
+
+- **Governance**: propagation keeps a running union of what each object's inputs
+  pass on (columns only grow), updated when an input changes, instead of reading
+  every input again at each evaluation (an index can have thousands of hosts), and
+  skips objects whose inputs did not change. One pass over the relationships instead
+  of six. Output identical (all objects' governance hashed) at 88k and 300k.
+- **Insights / Schemas**: `Catalog.find` indexes only the type asked for (it indexed
+  every object to look up custom commands); sourcetype fields are sorted once with a
+  shared collator and kept per catalog; data models per sourcetype come from one pass
+  over the relationships instead of each sourcetype's incoming relationships (every
+  host sending to it); the most-used lists keep their top ten while scanning.
+- Page timings in `scripts/perf.cjs` are taken seconds after opening, while the search
+  index is still built in the background: an index's relationships tab measured 3.5 s
+  at a million there, 1 s when opened on its own.
+
+SQL console additions: Stop (restarts the worker; saved tables reopen), results cut
+to 100,000 rows with "Download all" (CSV built in the worker in pieces: 2 million
+rows, 149 MB), saved databases per catalog and scope (the two most recently used),
+fills that start again if the database restarts meanwhile, and a failed start (another
+tab) that no longer deletes the saved tables (SQLite's default removes them).
+
 ## SQL console in a worker, kept in the browser (0.45.0)
 
 The console moved from sql.js on the page to SQLite's official WebAssembly build in

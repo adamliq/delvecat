@@ -200,7 +200,9 @@ const SECTIONS: Section[] = [
         <li>A result of a label and a number can be shown as a chart. Results download as CSV; <em>Copy link</em> shares the query.</li>
         <li>It runs in your browser on the loaded catalog and cannot change anything. SQLite works in the background, so the page keeps responding while tables load and queries run.</li>
         <li>Tables load the first time a query uses them; objects and relationships also load in the background once the console is open.</li>
-        <li>Where the browser allows, the loaded tables are kept in its private storage (about 0.5 GB at 300,000 objects, 1.6 GB at a million), so your next visit opens them at once until a new catalog is published. The console says when they are kept for the visit only (private windows, a full disk, or the console open in another tab). They are removed with the saved catalog when you lose access.</li>
+        <li><em>Stop</em> ends a query that runs too long; the tables already loaded stay.</li>
+        <li>A result shows its first 100,000 rows and says how many there are; <em>Download all</em> saves every row as CSV.</li>
+        <li>Where the browser allows, the loaded tables are kept in its private storage (about 0.5 GB at 300,000 objects, 1.6 GB at a million), so your next visit opens them at once until a new catalog is published (for the whole catalog and for the last single stack you chose). The console says when they are kept for the visit only (private windows, a full disk, or the console open in another tab). They are removed with the saved catalog when you lose access.</li>
       </ul>
     ),
   },
@@ -257,7 +259,7 @@ const SECTIONS: Section[] = [
           detections, dashboards, users and fields in the proportions of a large estate (at 300,000 objects: 68,000 hosts,
           40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users and 123,000 fields).
           Up to about 300,000 objects every page answers within about 2 seconds; at a million, everything works but opening
-          takes about 25 seconds and the heaviest pages up to 9.
+          takes about 25 seconds and the heaviest page (Insights) about 7.5.
         </p>
         <div className="table-wrap">
           <table className="mini-table">
@@ -265,7 +267,7 @@ const SECTIONS: Section[] = [
               <tr><th>Objects / relationships</th><th>301,405 / 2.0 million</th><th>603,037 / 4.0 million</th><th>1,008,734 / 6.8 million</th></tr>
             </thead>
             <tbody>
-              <tr><td>Building the catalog in Splunk's own Python (lineage, health, governance, quality)</td><td>62 s, 1.6 GB</td><td>109 s, 3.2 GB</td><td>190 s, 5.4 GB</td></tr>
+              <tr><td>Building the catalog in Splunk's own Python (lineage, health, governance, quality)</td><td>62 s, 1.6 GB</td><td>109 s, 3.2 GB</td><td>186 s, 5.4 GB</td></tr>
               <tr><td>Checking it against the catalog schema (part of every build outside Splunk)</td><td>29 s</td><td>52 s</td><td>95 s</td></tr>
               <tr><td>Size; as stored in Splunk (compressed)</td><td>211 MB; 26 MB</td><td>425 MB; 55 MB</td><td>714 MB; 93 MB</td></tr>
               <tr><td>Publishing into Splunk</td><td>26 s</td><td>37 s</td><td>60 s</td></tr>
@@ -275,7 +277,7 @@ const SECTIONS: Section[] = [
               <tr><td>Browse and its filters</td><td>0.1–0.5 s</td><td>0.7 s</td><td>1.2 s</td></tr>
               <tr><td>Object pages (overview, lineage, relationships, fields)</td><td>under 0.6 s</td><td>0.1–1.6 s</td><td>0.6–1.8 s</td></tr>
               <tr><td>Health, Findings, Coverage, Changes, Domains, Glossary</td><td>under 0.3 s</td><td>under 0.4 s</td><td>under 0.3 s</td></tr>
-              <tr><td>Governance; Schemas; Insights</td><td>0.4 s; 1 s; 2.2 s</td><td>0.7 s; 1.7 s; 4.5 s</td><td>1.5 s; 3.3 s; 9 s</td></tr>
+              <tr><td>Governance; Schemas; Insights</td><td>0.4 s; 0.3 s; 1.7 s</td><td>1.4 s; 0.4 s; 3.6 s</td><td>1.5 s; 0.5 s; 7.5 s</td></tr>
               <tr><td>SQL console: ready; first query on objects; first on relationships; first join on them (the page keeps responding throughout)</td><td>1 s; 3.7 s; 6.9 s; 0.6 s</td><td>1 s; 6.7 s; 18 s; 1.4 s</td><td>1.1 s; 12.5 s; 28 s; 1.4 s</td></tr>
               <tr><td>SQL console on a later visit (tables kept in the browser): first join</td><td>0.7 s</td><td>1.9 s</td><td>1.9 s</td></tr>
             </tbody>
