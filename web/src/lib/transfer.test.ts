@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogBundle } from "../generated/catalog";
-import { bytesToBase64, exportName, gzipBundle, importCatalog } from "./transfer";
+import { bytesToBase64, exportName, gzipBundle, importCatalog, jsonPieces } from "./transfer";
 
 describe("export and import", () => {
   it("names the file after the instances and the day", () => {
@@ -33,5 +33,14 @@ describe("export and import", () => {
     expect(body).toMatchObject({ source: "stack", mode: "combine" });
     await expect(importCatalog({ source: "file", data: "", mode: "replace" }, async () => new Response(JSON.stringify({ error: "Not a catalog" }), { status: 400 }))).rejects.toThrow(/Not a catalog/);
     await expect(importCatalog({ source: "file", data: "", mode: "replace" }, async () => new Response("", { status: 404 }))).rejects.toThrow(/update the app/);
+  });
+});
+
+describe("JSON in pieces", () => {
+  it("joins to exactly JSON.stringify of the object", () => {
+    const obj = { a: 1, skip: undefined, list: Array.from({ length: 2503 }, (_, i) => ({ i, s: `x${i}` })), small: [1, 2], o: { n: null } };
+    expect(jsonPieces(obj, 1000).join("")).toBe(JSON.stringify(obj));
+    expect(jsonPieces({}, 10).join("")).toBe("{}");
+    expect(jsonPieces({ only: undefined, b: 2 }, 10).join("")).toBe(JSON.stringify({ only: undefined, b: 2 }));
   });
 });

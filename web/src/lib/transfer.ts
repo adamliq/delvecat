@@ -53,8 +53,30 @@ export async function gzipBundle(bundle: CatalogBundle): Promise<Blob> {
   const { shards: _shards, ...whole } = bundle as CatalogBundle & { shards?: unknown };
   // Stored form: relationships as an edge table (much smaller on large catalogs).
   const stored = { ...whole, schemaVersion: "0.2.0", modelVersion: whole.schemaVersion, edges: [], edgeTable: compactEdges(whole.edges) };
-  const stream = new Blob([JSON.stringify(stored)]).stream().pipeThrough(new CompressionStream("gzip"));
+  const stream = new Blob(jsonPieces(stored)).stream().pipeThrough(new CompressionStream("gzip"));
   return new Response(stream).blob();
+}
+
+/** An object as JSON in pieces: large top-level lists a thousand items at a time, so no
+ * single string holds the whole catalog (browsers cap a string at about 512 million
+ * characters, which a merged catalog of several large stacks can exceed). */
+export function jsonPieces(obj: Record<string, unknown>, chunk = 1000): string[] {
+  const out: string[] = ["{"];
+  Object.entries(obj).forEach(([k, v], i) => {
+    if (v === undefined) return;
+    out.push(`${i && out.length > 1 ? "," : ""}${JSON.stringify(k)}:`);
+    if (Array.isArray(v) && v.length > chunk) {
+      out.push("[");
+      for (let j = 0; j < v.length; j += chunk) {
+        out.push((j ? "," : "") + v.slice(j, j + chunk).map((x) => JSON.stringify(x) ?? "null").join(","));
+      }
+      out.push("]");
+    } else {
+      out.push(JSON.stringify(v));
+    }
+  });
+  out.push("}");
+  return out;
 }
 
 /** Download the catalog: in Splunk, the published bytes as stored (already gzipped). */
