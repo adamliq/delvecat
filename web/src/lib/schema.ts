@@ -70,19 +70,36 @@ export function dataModelFields(dm: Entity): { names: Set<string>; fromReference
 
 /** Data models a sourcetype feeds: directly, or through a tag on it (CIM tagging). */
 export function dataModelsOf(catalog: Catalog, st: Entity): Entity[] {
+  let idx = modelIndex.get(catalog);
+  if (!idx) modelIndex.set(catalog, (idx = buildModelIndex(catalog)));
   const out = new Map<string, Entity>();
-  for (const x of catalog.edgesTo(st.id)) {
+  for (const dm of idx.direct.get(st.id) ?? []) out.set(dm.id, dm);
+  for (const tag of idx.tags.get(st.id) ?? []) for (const dm of idx.tagUsers.get(tag) ?? []) out.set(dm.id, dm);
+  return [...out.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Who maps to what, from one pass over the relationships (each sourcetype's incoming
+ * relationships include every host sending to it: millions on large estates). */
+const modelIndex = new WeakMap<Catalog, { direct: Map<string, Entity[]>; tags: Map<string, string[]>; tagUsers: Map<string, Entity[]> }>();
+
+function buildModelIndex(catalog: Catalog) {
+  const direct = new Map<string, Entity[]>(); // sourcetype -> data models reading it
+  const tags = new Map<string, string[]>(); // sourcetype -> tags mapped to it
+  const tagUsers = new Map<string, Entity[]>(); // tag -> data models using it
+  const add = <V,>(m: Map<string, V[]>, k: string, v: V) => {
+    const l = m.get(k);
+    if (l) l.push(v);
+    else m.set(k, [v]);
+  };
+  for (const x of catalog.bundle.edges) {
+    if (x.type !== "reads" && x.type !== "mapsTo" && x.type !== "uses") continue;
     const from = catalog.byId.get(x.from);
     if (!from) continue;
-    if (from.type === "dataModel" && x.type === "reads") out.set(from.id, from);
-    if (from.type === "tag" && x.type === "mapsTo") {
-      for (const y of catalog.edgesTo(from.id)) {
-        const dm = catalog.byId.get(y.from);
-        if (dm?.type === "dataModel" && y.type === "uses") out.set(dm.id, dm);
-      }
-    }
+    if (x.type === "reads" && from.type === "dataModel") add(direct, x.to, from);
+    else if (x.type === "mapsTo" && from.type === "tag") add(tags, x.to, from.id);
+    else if (x.type === "uses" && from.type === "dataModel") add(tagUsers, x.to, from);
   }
-  return [...out.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return { direct, tags, tagUsers };
 }
 
 export interface CimCoverage {

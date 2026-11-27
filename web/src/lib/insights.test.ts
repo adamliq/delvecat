@@ -57,3 +57,27 @@ describe("insights", () => {
     expect(badges(cat, sick)[1].title).toBe("Sensitive: PII.Email in email");
   });
 });
+
+describe("mostUsed keeps the order a full sort gives", () => {
+  it("matches sorting everything, ties included", () => {
+    const names = ["b", "a", "c", "a", "d", "b", "é", "e", "B"];
+    const entities: Entity[] = Array.from({ length: 300 }, (_, i) => ({
+      id: `i:${i % 3 ? "savedSearch" : "dashboard"}:${i}`,
+      type: (i % 3 ? "savedSearch" : "dashboard") as EntityType,
+      name: names[i % names.length],
+      product: "splunk",
+      instance: "i",
+      usage: { runs: (i * 7919) % 13 },
+    }));
+    const c = new Catalog({ schemaVersion: "0.1.2", generatedAt: "x", generator: { name: "t", version: "0" }, instances: [], entities, edges: [] } as CatalogBundle);
+    const full = entities
+      .filter((e) => e.type === "savedSearch" || e.type === "dashboard")
+      .map((entity) => ({ entity, score: usageScore(entity) ?? 0 }))
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score || a.entity.name.localeCompare(b.entity.name));
+    for (const limit of [1, 10, 50]) {
+      expect(mostUsed(c, ["savedSearch", "dashboard"], limit).map((x) => x.entity.id)).toEqual(full.slice(0, limit).map((x) => x.entity.id));
+    }
+  });
+});
+

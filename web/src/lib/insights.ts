@@ -102,13 +102,28 @@ export const USAGE_GROUPS: { label: string; types: EntityType[]; measure: string
 
 /** The most used objects of some types, highest first (objects with no use left out). */
 export function mostUsed(catalog: Catalog, types: EntityType[], limit = 10): { entity: Entity; score: number }[] {
-  return catalog.entities
-    .filter((e) => types.includes(e.type))
-    .map((entity) => ({ entity, score: usageScore(entity) ?? 0 }))
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || a.entity.name.localeCompare(b.entity.name))
-    .slice(0, limit);
+  // The top few kept while scanning, in the order a full sort would give (highest score,
+  // then name; ties in catalog order), without sorting every object.
+  const want = new Set<string>(types);
+  const top: { entity: Entity; score: number }[] = [];
+  const before = (a: { entity: Entity; score: number }, b: { entity: Entity; score: number }) =>
+    b.score - a.score || nameOrder.compare(a.entity.name, b.entity.name);
+  for (const entity of catalog.entities) {
+    if (!want.has(entity.type)) continue;
+    const score = usageScore(entity) ?? 0;
+    if (score <= 0) continue;
+    const x = { entity, score };
+    if (top.length === limit && before(x, top[limit - 1]) >= 0) continue;
+    let i = top.length;
+    while (i > 0 && before(x, top[i - 1]) < 0) i--;
+    top.splice(i, 0, x);
+    if (top.length > limit) top.pop();
+  }
+  return top;
 }
+
+/** The same order as localeCompare, without a collator per comparison. */
+const nameOrder = new Intl.Collator();
 
 const pctCache = new WeakMap<Catalog, Map<string, number>>();
 
