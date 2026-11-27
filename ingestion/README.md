@@ -372,7 +372,7 @@ cleanup lists tokens that received no events in the usage window.
 
 ## Several instances
 
-Build each instance with its own `--instance`, then merge:
+Build each instance with its own `--instance`, then merge (about 6.5 GB of memory per million objects merged; see docs/PERFORMANCE.md):
 
 ```bash
 uv run delvecat-ingest build --url https://sh:8089   --instance prod-sh  --out sh.json

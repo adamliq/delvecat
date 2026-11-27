@@ -70,6 +70,39 @@ What changed:
   (byte-identical output), so the whole text is never held at once. Generating it in
   pieces is slower (42 s against 32 s).
 
+### 0.43.0: further improvements at the same size
+
+| Step | 0.42.0 | 0.43.0 |
+|---|---:|---:|
+| Build | 75 s, 1.8 GB | 69 s, 1.8 GB |
+| Build in Splunk 10.4's own Python (pipeline / publish) | not measured | 62 s / 27 s, 1.6 GB |
+| Publish (`delvecat-ingest publish`) | 42 s | **26 s** (gzip level 6, 26.8 MB) |
+| Opening in Splunk Web, first time / again | 6.8 s / 5.7 s | **5.1 s / 4.4 s**, 540 MB |
+| Browse, no filter / one filter | 1.0 s / 0.6 s | **0.5 s / 0.1 s** |
+| SQL: query on loaded tables while edges load | waited for them (12.8 s) | **0.4 s** |
+| SQL: first edges query after 25 s on the page | 9.7 s | **1.2 s** (loaded in the background) |
+| Redact (public profile) | **failed** (duplicate pseudonym) | 56 s, 2.0 GB |
+| Merge two 300k catalogs | 160 s, 3.8 GB | 149 s, 3.8 GB |
+| Export from the browser | one string (fails beyond ~512 M characters) | 6.8 s, 25 MB, written in pieces |
+
+- **Build**: the SPL tokenizer works on runs of text and caches per clause (identical
+  tokens on 300,000 random cases and all 56,435 SPL texts); classification works out
+  each object's column behaviour once, and keeps each object's classified inputs as they
+  appear instead of scanning all inputs. Output identical byte for byte at 88,903
+  objects. Analysing identical SPL once was tried and dropped: no repeats here, and
+  copying cost more than it saved.
+- **In Splunk**: a build stops with a clear message before the memory-heavy part when
+  the search head (or its container) has less than about 5.3 KB per object available.
+- **Redaction**: pseudonyms were 8 hex characters; among 68,000 hosts two collided, so
+  the public catalog had a duplicate id. Values whose short names would collide now all
+  get 16 characters (decided from the full list, order-independent); others keep theirs.
+- **Opening**: the risk analysis (1.4 s) runs when the browser is idle after the page
+  appears. Opening from the copy kept in the browser was measured (decompress 1 s,
+  parse 0.8 s in Chromium) and left as is: nothing cheap remains there.
+- **Browse**: each object is checked against each active filter once (same counts).
+- **SQL console**: entities and edges load in the background once the console is idle,
+  giving way to queries; the database is read-only again after every batch.
+
 ## Web app (headless Chromium, 1280×900)
 
 Time from navigation until the page has rendered. Before = the code before
