@@ -12,12 +12,12 @@
     "gen:types": "json2ts -i ../schemas/catalog.schema.json -o src/generated/catalog.ts --bannerComment \"/* Generated from schemas/catalog.schema.json by npm run gen:types. Do not edit. */\" --additionalProperties false"
   },
   "dependencies": {
+    "@sqlite.org/sqlite-wasm": "3.54.1-build1",
     "d3-force": "3.0.0",
     "minisearch": "^7.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5",
-    "sql.js": "1.15.1"
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@types/d3-force": "3.0.10",
@@ -26,6 +26,7 @@
     "@types/sql.js": "1.4.11",
     "@vitejs/plugin-react": "^6.2.1",
     "json-schema-to-typescript": "^16.0.0",
+    "sql.js": "1.15.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.6",
     "vitest": "^5.1.0"

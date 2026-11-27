@@ -61,6 +61,41 @@ per object. Tried and not kept: maintaining the relationship indexes while the S
 console fills edges in the background avoids the one pause on the first join (29 s
 at a million), but made the fill take 170 s instead of 34 s.
 
+## SQL console in a worker, kept in the browser (0.45.0)
+
+The console moved from sql.js on the page to SQLite's official WebAssembly build in
+a Web Worker, with the database kept in OPFS (the sahpool VFS) where the browser
+allows. Chosen after benchmarking sql.js, SQLite in a worker, DuckDB-WASM and
+Parquet/Arrow at 300k and 1M objects; DuckDB had the fastest aggregates but needed
+3.5–9 GB loaded from rows and a 33 MB download.
+
+Headless Chromium with a normal profile: open the console, run queries, reload:
+
+| | 300k (before → now) | 600k | 1M (before → now) |
+|---|---:|---:|---:|
+| Longest the page did not respond | 5 s → 0.07 s | 0.16 s | 16 s → 1 s |
+| First query on objects | 2.6 → 3.7 s | 6.7 s | 11 → 12.5 s |
+| First query on relationships | 5.6 → 6.9 s | 18 s | 34 → 28 s |
+| First join on relationships | 5 s frozen → 0.6 s | 1.4 s | 29 s frozen → 1.4 s |
+| Later visit: first join (tables kept) | refilled → 0.7 s | 1.9 s | refilled → 1.9 s |
+| Browser storage used | | 1 GB | 1.6 GB |
+
+How it is filled: rows are still built on the page from the catalog, 20,000 at a
+time, and sent as one JSON string per batch (two in flight), unpacked inside SQLite
+with `json_each` and JSONB (parsing each row once: 2.6× faster than `->>` on the
+text). Settings that mattered on OPFS: 64 KB pages, a 128 MB cache, temporary data in
+memory, no journal or syncing (indexing objects went from 7.8 s to 0.5 s and a batch
+of relationships from 200–380 ms to 20–80 ms). Without a journal, a write left
+unfinished (page closed) marks the file, which is then discarded and filled again.
+
+The saved database is keyed by the app build, the catalog's generation time, stacks
+and counts; another catalog replaces it, and it is deleted with the saved catalog
+when access is lost. Private windows (a small, in-memory quota), a full disk or a
+second tab holding it fall back to memory, and the console says which. Queries run
+with `query_only` and an authorizer that refuses ATTACH and pragmas that set values.
+Every example query returns the same rows as sql.js did (tested on the demo
+catalog).
+
 ## 300,000 objects and 2 million relationships
 
 The size first tested in detail:

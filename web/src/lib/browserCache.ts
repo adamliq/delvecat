@@ -91,8 +91,18 @@ export async function writeCachedCatalog(entry: CachedCatalog): Promise<void> {
   }
 }
 
-/** Remove the kept copy (no catalog published, or access lost). */
+/** Where the SQL console keeps its database (OPFS), so it can be removed with the copy. */
+export const SQL_DIR = ".delvecat-sql";
+
+/** Remove the kept copy (no catalog published, or access lost), and the SQL console's
+ * saved database with it. */
 export async function clearCachedCatalog(): Promise<void> {
+  try {
+    const root = await navigator.storage?.getDirectory?.();
+    await root?.removeEntry(SQL_DIR, { recursive: true });
+  } catch {
+    /* none kept, or in use by another tab (it is replaced when it does not match) */
+  }
   const db = await open();
   if (!db) return;
   try {

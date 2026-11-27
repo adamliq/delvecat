@@ -612,10 +612,13 @@ surfaces; status is always icon + label, never color alone.
 
 ### SQL console (done)
 
-- From Magda's in-browser SQL console. `/#/sql` loads SQLite (sql.js,
-  WebAssembly) only when opened, so the main bundle stays the same size, and
-  fills an in-memory database from the loaded bundle. Redacted bundles stay
-  redacted. The database is set `query_only`, so nothing can change.
+- From Magda's in-browser SQL console. `/#/sql` loads SQLite (the official
+  WebAssembly build, in a Web Worker since 0.45.0; sql.js before) only when
+  opened, so the main bundle stays the same size, and fills it from the loaded
+  bundle. Where the browser allows, the database is kept in OPFS for the next
+  visit (keyed by build and catalog). Redacted bundles stay redacted. Queries
+  run with `query_only` and an authorizer refusing ATTACH and setting pragmas,
+  so nothing can change.
 - Tables: `entities` (with `settings` and `props` as JSON for
   `json_extract`), `edges`, `labels` (owners, tags, terms, data products,
   missing properties), `classifications`, `properties`, `settings` (one row

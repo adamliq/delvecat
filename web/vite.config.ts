@@ -7,6 +7,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig(({ mode }) => ({
   base: "./",
   plugins: [react()],
+  // The SQL console's saved database belongs to one build: a new build fills it again.
+  define: { __DELVECAT_BUILD__: JSON.stringify(new Date().toISOString()) },
+  worker: { format: "es" },
+  optimizeDeps: { exclude: ["@sqlite.org/sqlite-wasm"] },
   build:
     mode === "splunk"
       ? {

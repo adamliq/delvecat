@@ -286,21 +286,27 @@ export function catalogTables(
 
 /** Indexes made when a table is filled. */
 const INDEXED_BY_ENTITY = new Set(["labels", "classifications", "properties", "settings", "fields", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]);
-/** Indexes on edges are made only when a query looks things up by from_id or to_id
- * (joins): 2 million relationships take seconds to index, and counting or grouping them
- * does not need it. */
+/** Indexes on edges, for lookups by from_id or to_id (joins). Made after the edges are
+ * filled (in the background, or when a join needs them first): 7 million relationships
+ * take about 11 seconds, and counting or grouping them does not need it. */
 export const EDGE_INDEXES = ["CREATE INDEX edges_from ON edges(from_id)", "CREATE INDEX edges_to ON edges(to_id)"];
 export const needsEdgeIndexes = (sql: string) => /\b(from_id|to_id)\b/i.test(sql);
 
-function indexStatements(t: Table, lazyEdges = false): string[] {
-  if (t.name === "edges") return lazyEdges ? [] : EDGE_INDEXES;
-  if (t.name === "entities") return ["CREATE INDEX entities_type ON entities(type)"];
+/** Indexes made when a table is filled (the edges' are made separately, see EDGE_INDEXES). */
+export function tableIndexes(t: Table): string[] {
+  if (t.name === "edges") return [];
+  if (t.name === "entities") return ["CREATE INDEX entities_type ON entities(type)", "CREATE INDEX entities_id ON entities(id)"];
   return INDEXED_BY_ENTITY.has(t.name) ? [`CREATE INDEX ${t.name}_entity ON ${t.name}(entity_id)`] : [];
+}
+
+/** CREATE TABLE statements for every table. */
+export function schemaStatements(tables: Table[]): string[] {
+  return tables.map((t) => `CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`);
 }
 
 /** Every table, empty: queries see the whole schema before any table is filled. */
 export function createSchema(db: Database, tables: Table[]) {
-  for (const t of tables) db.run(`CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`);
+  for (const s of schemaStatements(tables)) db.run(s);
 }
 
 /** Tables a query names (words outside string literals and comments). */
@@ -308,58 +314,6 @@ export function tablesIn(sql: string, tables: Table[]): Table[] {
   const text = sql.replace(/'(?:[^']|'')*'/g, "''").replace(/--[^\n]*/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ").toLowerCase();
   const words = new Set(text.match(/[a-z_][a-z0-9_]*/g) ?? []);
   return tables.filter((t) => words.has(t.name));
-}
-
-const BATCH = 20000;
-
-/** Fill one table and index it. Yields to the browser between batches (onProgress gets 0-1),
- * so the page stays responsive while millions of rows go in. */
-export async function fillTable(
-  db: Database,
-  t: Table,
-  onProgress?: (done: number) => void,
-  /** Checked between batches: while true, wait (a background fill giving way to a query). */
-  pause?: () => boolean,
-  /** Leave the edges table's indexes for later (see EDGE_INDEXES). */
-  lazyEdges = false,
-): Promise<void> {
-  onProgress?.(0);
-  await new Promise((r) => setTimeout(r)); // let the progress message show before building rows
-  const sliced = !!t.slice && !t.built && t.count !== undefined;
-  const total = sliced ? t.count! : t.rows.length;
-  const stmt = db.prepare(`INSERT INTO ${t.name} VALUES (${t.columns.map(() => "?").join(", ")})`);
-  try {
-    for (let i = 0; i < total; i += BATCH) {
-      const end = Math.min(total, i + BATCH);
-      const batch = sliced ? t.slice!(i, end) : t.rows.slice(i, end);
-      writable(db, () => {
-        db.run("BEGIN");
-        for (const r of batch) stmt.run(r);
-        db.run("COMMIT");
-      });
-      onProgress?.((end / total) * 0.9); // the last tenth is indexing
-      if (end < total) await new Promise((r) => setTimeout(r));
-      while (pause?.()) await new Promise((r) => setTimeout(r, 30));
-    }
-  } finally {
-    stmt.free();
-  }
-  for (const s of indexStatements(t, lazyEdges)) {
-    writable(db, () => db.run(s));
-    await new Promise((r) => setTimeout(r));
-  }
-  onProgress?.(1);
-}
-
-/** Run ``fn`` with writes allowed; the database is read-only again before any query can
- * run (queries run between batches, never during one). */
-export function writable(db: Database, fn: () => void) {
-  db.run("PRAGMA query_only = 0");
-  try {
-    fn();
-  } finally {
-    db.run("PRAGMA query_only = 1");
-  }
 }
 
 /** Create and fill an in-memory database in one go (tests, small catalogs). */
@@ -370,7 +324,7 @@ export function fillDatabase(db: Database, tables: Table[]) {
     const stmt = db.prepare(`INSERT INTO ${t.name} VALUES (${t.columns.map(() => "?").join(", ")})`);
     for (const r of t.rows) stmt.run(r);
     stmt.free();
-    for (const s of indexStatements(t)) db.run(s);
+    for (const s of [...tableIndexes(t), ...(t.name === "edges" ? EDGE_INDEXES : [])]) db.run(s);
   }
   db.run("COMMIT");
   db.run("PRAGMA query_only = 1");

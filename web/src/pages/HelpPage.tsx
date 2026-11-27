@@ -198,7 +198,9 @@ const SECTIONS: Section[] = [
         <li>Tables include <code>entities</code>, <code>edges</code>, <code>settings</code>, <code>health_checks</code>, <code>labels</code>, <code>access</code> and more; the <em>Tables</em> tab lists them with their columns.</li>
         <li>Ctrl+Enter runs the query; Tab completes table and column names; <em>Format</em> lays it out.</li>
         <li>A result of a label and a number can be shown as a chart. Results download as CSV; <em>Copy link</em> shares the query.</li>
-        <li>It runs in your browser on the loaded catalog and cannot change anything.</li>
+        <li>It runs in your browser on the loaded catalog and cannot change anything. SQLite works in the background, so the page keeps responding while tables load and queries run.</li>
+        <li>Tables load the first time a query uses them; objects and relationships also load in the background once the console is open.</li>
+        <li>Where the browser allows, the loaded tables are kept in its private storage (about 0.5 GB at 300,000 objects, 1.6 GB at a million), so your next visit opens them at once until a new catalog is published. The console says when they are kept for the visit only (private windows, a full disk, or the console open in another tab). They are removed with the saved catalog when you lose access.</li>
       </ul>
     ),
   },
@@ -274,7 +276,8 @@ const SECTIONS: Section[] = [
               <tr><td>Object pages (overview, lineage, relationships, fields)</td><td>under 0.6 s</td><td>0.1–1.6 s</td><td>0.6–1.8 s</td></tr>
               <tr><td>Health, Findings, Coverage, Changes, Domains, Glossary</td><td>under 0.3 s</td><td>under 0.4 s</td><td>under 0.3 s</td></tr>
               <tr><td>Governance; Schemas; Insights</td><td>0.4 s; 1 s; 2.2 s</td><td>0.7 s; 1.7 s; 4.5 s</td><td>1.5 s; 3.3 s; 9 s</td></tr>
-              <tr><td>SQL console: ready; first query on objects; first on relationships; first join on them</td><td>1 s; 2.6 s; 5.6 s; 5 s</td><td>1.2 s; 6 s; 14 s; 11 s</td><td>1 s; 11 s; 34 s; 29 s</td></tr>
+              <tr><td>SQL console: ready; first query on objects; first on relationships; first join on them (the page keeps responding throughout)</td><td>1 s; 3.7 s; 6.9 s; 0.6 s</td><td>1 s; 6.7 s; 18 s; 1.4 s</td><td>1.1 s; 12.5 s; 28 s; 1.4 s</td></tr>
+              <tr><td>SQL console on a later visit (tables kept in the browser): first join</td><td>0.7 s</td><td>1.9 s</td><td>1.9 s</td></tr>
             </tbody>
           </table>
         </div>
@@ -283,7 +286,7 @@ const SECTIONS: Section[] = [
           <li><strong>Why a million is the maximum</strong>: the browser tab holds the whole catalog, about 2 to 2.5 GB at a million objects, and browsers stop a tab at about 4 GB; building needs about 5.3 KB of memory per object (5.4 GB at a million). Larger catalogs are not supported: split them by stack, or leave out what you do not need (for example hosts, which are most of the objects in these tests).</li>
           <li><strong>Opening</strong>: the loading screen says what it is doing. The catalog is kept in your browser, so opening it again does not download it again until a new build is published (Splunk is still asked which build is current, and whether you may read it).</li>
           <li><strong>Browser</strong>: a desktop browser with 8 GB of memory is comfortable up to 300,000 objects; allow 16 GB for a million.</li>
-          <li><strong>SQL console</strong>: tables load the first time a query uses them, and objects and relationships load in the background once the console is open. The first query that joins relationships (by <code>from_id</code> or <code>to_id</code>) indexes them first; the page does not respond while it does (5 s at 300,000 objects, 11 s at 600,000, 29 s at a million), and later queries are quick.</li>
+          <li><strong>SQL console</strong>: tables load the first time a query uses them, and objects and relationships load (and are indexed for joins) in the background once the console is open. SQLite runs off the page, which keeps responding. The tables are kept in the browser (0.5 GB at 300,000 objects, 1 GB at 600,000, 1.6 GB at a million) and reused on later visits until a new catalog is published; in a private window, or when the browser's storage is full, they are kept for the visit only.</li>
           <li><strong>Building in Splunk</strong>: the <em>Build</em> button reads a real Splunk, so its time depends on that Splunk (searches, permissions, the search time limit) more than on the catalog's size. A build stops with a message saying so, before the memory-heavy part, when the search head has less free memory than it needs. Build outside Splunk with <code>delvecat-ingest</code> and publish the result instead.</li>
           <li>Measured on 4 CPU cores and 15 GB of memory, headless Chromium, Splunk 10.4 on the same machine (a slower network adds download time to the first opening). Re-run it with <code>delvecat-ingest synth --scale 3.4 --host-indexes 16</code> (6.8 for 600,000 objects, 11.4 for a million).</li>
         </ul>

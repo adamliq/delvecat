@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
 import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
-import { EXAMPLES, runQuery, type QueryResult } from "../lib/sql";
+import { EXAMPLES, type QueryResult } from "../lib/sql";
 import { catalogDb, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
@@ -29,6 +29,7 @@ export default function SqlPage() {
   const [copied, setCopied] = useState(false);
   const [filling, setFilling] = useState<LoadProgress | null>(null);
   const [background, setBackground] = useState<LoadProgress | null>(null);
+  const [running, setRunning] = useState(false);
   const editor = useRef<SqlEditorHandle>(null);
   const lastRun = useRef<string | null>(null);
 
@@ -63,23 +64,28 @@ export default function SqlPage() {
     }
     setFilling(null);
     try {
-      const r = runQuery(db.db, text);
+      setRunning(true);
+      const r = await db.query(text);
       setResult(r);
       setError(null);
       setHistory(store.remember(text, r.rows.length));
       // JSON paths the query reads from settings that no object has: likely a typo.
-      setHints(jsonPaths(text).filter((path) => {
+      const missing: string[] = [];
+      for (const path of jsonPaths(text)) {
         try {
-          const n = runQuery(db.db, `SELECT count(*) FROM entities WHERE json_extract(settings, '${path.replace(/'/g, "''")}') IS NOT NULL`);
-          return n.rows[0]?.[0] === 0;
+          const n = await db.query(`SELECT count(*) FROM entities WHERE json_extract(settings, '${path.replace(/'/g, "''")}') IS NOT NULL`);
+          if (n.rows[0]?.[0] === 0) missing.push(path);
         } catch {
-          return false;
+          /* not a valid path: the query's own error says so */
         }
-      }).map((path) => `No object's settings contain ${path}: check the key (an object's Raw tab shows its properties).`));
+      }
+      setHints(missing.map((path) => `No object's settings contain ${path}: check the key (an object's Raw tab shows its properties).`));
     } catch (e) {
       setResult(null);
       setHints([]);
       setError(explainError(e instanceof Error ? e.message : String(e), text, db.tables));
+    } finally {
+      setRunning(false);
     }
   }, [db, setParams]);
 
@@ -142,6 +148,7 @@ export default function SqlPage() {
           </div>
 
           {db.status === "loading" && <p className="muted">Loading SQLite…</p>}
+          {running && !filling && <p className="muted" role="status">Running…</p>}
           {filling && (
             <p className="muted" role="status">
               Loading table <code>{filling.table}</code>
@@ -155,6 +162,18 @@ export default function SqlPage() {
             </p>
           )}
           {db.status === "error" && <p className="error">Could not start SQLite: {db.message}</p>}
+          {db.status === "ready" && (() => {
+            const st = db.storage();
+            return (
+              <p className="muted small">
+                {st.saved
+                  ? st.reopened
+                    ? "Tables kept in this browser from your last visit: they open at once until a new catalog is published."
+                    : "Tables are kept in this browser once filled, so your next visit opens them at once."
+                  : `Tables are filled for this visit only: ${st.memoryReason ?? "the browser's storage is not available"}.`}
+              </p>
+            );
+          })()}
           {error && (
             <div className="error sql-error" role="alert">
               <div>{error.message}{error.line ? <span className="muted small"> · line {error.line}, column {error.column}</span> : null}</div>
@@ -202,7 +221,7 @@ export default function SqlPage() {
           {side === "tables" && db.status === "ready" && db.tables.map((t) => (
             <details key={t.name}>
               <summary>
-                <code>{t.name}</code> <span className="muted small">{db.loaded.has(t.name) || t.built ? t.rows.length.toLocaleString() : t.count !== undefined ? t.count.toLocaleString() : "loads when used"}</span>
+                <code>{t.name}</code> <span className="muted small">{db.counts.get(t.name)?.toLocaleString() ?? (t.built ? t.rows.length.toLocaleString() : t.count !== undefined ? t.count.toLocaleString() : "loads when used")}</span>
               </summary>
               <p className="small">{t.doc}</p>
               <ul className="plain-list small">
