@@ -52,12 +52,19 @@ jobs:
       - run: uv run --python 3.9 pytest -q
 
   web:
+    # Some tests read the demo catalog the ingestion job builds (e.g. the build's riskTable
+    # against the web app's own risk rules), so they run on that very catalog.
+    needs: ingestion
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: web
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: demo-catalog
+          path: web/public/catalog
       - uses: actions/setup-node@v4
         with:
           node-version: 22
