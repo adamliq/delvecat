@@ -110,7 +110,12 @@ export function GovernancePage() {
   // Large estates: hundreds of roles and stores. The matrix keeps the most-reached stores
   // and the widest-reaching roles; lists show the first few names.
   const accessOf = new Map(roles.map((r) => [r.id, new Map(sensitiveAccess(r).map((a) => [a.id, a]))]));
-  const reach = (s: Entity) => roles.reduce((n, r) => n + (accessOf.get(r.id)!.has(s.id) ? 1 : 0), 0);
+  // How many roles reach each store, counted once (not in every comparison of the sort).
+  const reachCount = new Map<string, number>();
+  if (reachable.length > MATRIX_STORES) {
+    for (const r of roles) for (const id of accessOf.get(r.id)!.keys()) reachCount.set(id, (reachCount.get(id) ?? 0) + 1);
+  }
+  const reach = (s: Entity) => reachCount.get(s.id) ?? 0;
   const matrixStores = reachable.length > MATRIX_STORES ? [...reachable].sort((a, b) => reach(b) - reach(a)).slice(0, MATRIX_STORES) : reachable;
   const userRoles = userFilter
     ? new Set(catalog.edgesFrom(userFilter).filter((x) => x.type === "memberOf").map((x) => x.to))
