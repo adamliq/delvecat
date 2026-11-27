@@ -64,7 +64,7 @@ function why(e: unknown): string {
 async function handle(m: Request): Promise<unknown> {
   if (m.op === "open") {
     sqlite3 ??= await sqlite3InitModule();
-    const p = m.save ? await pool() : { pool: null, reason: "not requested" };
+    const p = m.save ? await pool() : { pool: null, reason: "you chose not to keep them in this browser" };
     engine = SqlEngine.open(sqlite3, m.key, m.schema, p.pool, p.reason);
     opened = { key: m.key, schema: m.schema };
     return engine.info;

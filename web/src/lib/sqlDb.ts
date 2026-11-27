@@ -14,6 +14,7 @@ import { riskMap } from "./risk";
 import { catalogTables, EDGE_INDEXES, needsEdgeIndexes, schemaStatements, tableIndexes, tablesIn, type QueryResult, type Table } from "./sql";
 import type { OpenInfo, QueryOutput } from "./sqlEngine";
 import type { Reply, Request } from "./sqlWorker";
+import { SQL_DIR } from "./browserCache";
 
 declare const __DELVECAT_BUILD__: string;
 
@@ -43,6 +44,9 @@ export interface CatalogDb {
   csv: (sql: string) => Promise<Blob>;
   /** Stop whatever the database is doing (a long query); it opens again. */
   stop: () => Promise<void>;
+  /** Delete the saved tables (keep: whether to keep tables in this browser from now on);
+   * false when they could not be deleted (open in another tab). */
+  clearSaved: (keep: boolean) => Promise<boolean>;
 }
 
 /** Rows per batch: about a million values (objects have 29 columns, relationships 4),
@@ -143,7 +147,7 @@ async function open(catalog: Catalog, onClose: (close: () => void) => void): Pro
       state.memoryReason = "the browser's storage is full";
       state.reopened = false;
     });
-    const info = await conn.call<OpenInfo>({ op: "open", key, schema, save: true });
+    const info = await conn.call<OpenInfo>({ op: "open", key, schema, save: keepSaved() });
     state.saved = info.saved;
     state.memoryReason = info.memoryReason;
     state.reopened = Object.keys(info.loaded).length > 0;
@@ -283,5 +287,72 @@ async function open(catalog: Catalog, onClose: (close: () => void) => void): Pro
     return call<Blob>({ op: "csv", sql });
   };
 
-  return { tables, loaded, counts, storage: () => ({ ...state }), ensure, prefetch, query, csv, stop };
+  // Clear the saved tables (and, with keep false, stop keeping them in this browser): the
+  // worker lets go of them first, then they are deleted and the database opens again.
+  const clearSaved = async (keep: boolean) => {
+    setKeepSaved(keep);
+    restart();
+    conn.close(new Stopped());
+    let removed = true;
+    try {
+      const root = await navigator.storage?.getDirectory?.();
+      for (let attempt = 0; root; attempt++) {
+        try {
+          await root.removeEntry(SQL_DIR, { recursive: true });
+          break;
+        } catch (e) {
+          if ((e as Error).name === "NotFoundError") break;
+          if (attempt >= 15) throw e; // still held: another tab
+          await sleep(200); // the stopped worker lets go a moment later
+        }
+      }
+    } catch {
+      removed = false;
+    }
+    ready = start();
+    prefetching = null;
+    await ready;
+    return removed;
+  };
+
+  return { tables, loaded, counts, storage: () => ({ ...state }), ensure, prefetch, query, csv, stop, clearSaved };
+}
+
+const KEEP_KEY = "delvecat.sql.keepTables";
+
+/** Whether the console keeps its tables in this browser (on unless turned off). */
+export function keepSaved(): boolean {
+  try {
+    return localStorage.getItem(KEEP_KEY) !== "no";
+  } catch {
+    return true;
+  }
+}
+
+function setKeepSaved(keep: boolean) {
+  try {
+    if (keep) localStorage.removeItem(KEEP_KEY);
+    else localStorage.setItem(KEEP_KEY, "no");
+  } catch {
+    /* not remembered: this visit only */
+  }
+}
+
+/** Bytes the saved tables take in this browser's storage (OPFS), or undefined. */
+export async function savedSize(): Promise<number | undefined> {
+  try {
+    const root = await navigator.storage?.getDirectory?.();
+    if (!root) return undefined;
+    const dir = await root.getDirectoryHandle(SQL_DIR);
+    const walk = async (d: FileSystemDirectoryHandle): Promise<number> => {
+      let total = 0;
+      for await (const h of (d as unknown as { values(): AsyncIterable<FileSystemHandle> }).values()) {
+        total += h.kind === "file" ? (await (h as FileSystemFileHandle).getFile()).size : await walk(h as FileSystemDirectoryHandle);
+      }
+      return total;
+    };
+    return await walk(dir);
+  } catch {
+    return undefined; // nothing saved
+  }
 }

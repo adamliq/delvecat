@@ -4,7 +4,7 @@ import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
 import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
 import { EXAMPLES, VIEWS, type QueryResult, type Table } from "../lib/sql";
-import { catalogDb, Stopped, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
+import { catalogDb, keepSaved, savedSize, Stopped, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
 import * as store from "../lib/sqlStore";
@@ -30,6 +30,22 @@ export default function SqlPage() {
   const [filling, setFilling] = useState<LoadProgress | null>(null);
   const [background, setBackground] = useState<LoadProgress | null>(null);
   const [running, setRunning] = useState(false);
+  const [savedBytes, setSavedBytes] = useState<number | undefined>();
+  const [storageNote, setStorageNote] = useState<string | null>(null);
+  const [, setStorageTick] = useState(0);
+  const refreshSize = useCallback(() => { void savedSize().then(setSavedBytes); }, []);
+  useEffect(() => { if (!background && !filling) refreshSize(); }, [background, filling, db.status, refreshSize]);
+  const clearSaved = async (keep: boolean) => {
+    if (db.status !== "ready") return;
+    const turningOn = keep && !keepSaved();
+    setStorageNote(turningOn ? "Keeping tables in this browser again…" : keep ? "Clearing the saved tables…" : "Clearing the saved tables and keeping them for this visit only from now on…");
+    const ok = await db.clearSaved(keep);
+    setStorageNote(!ok ? "Could not clear them: the console is open in another tab. Close it and try again."
+      : turningOn ? "Tables will be kept in this browser again."
+      : keep ? "Saved tables cleared." : "Saved tables cleared; tables will be kept for each visit only.");
+    setStorageTick((n) => n + 1);
+    refreshSize();
+  };
   const editor = useRef<SqlEditorHandle>(null);
   const lastRun = useRef<string | null>(null);
 
@@ -171,14 +187,25 @@ export default function SqlPage() {
           {db.status === "error" && <p className="error">Could not start SQLite: {db.message}</p>}
           {db.status === "ready" && (() => {
             const st = db.storage();
+            const mb = savedBytes ? ` (${savedBytes >= 1e9 ? `${(savedBytes / 1e9).toFixed(1)} GB` : `${Math.max(1, Math.round(savedBytes / 1e6))} MB`} in this browser)` : "";
             return (
-              <p className="muted small">
-                {st.saved
-                  ? st.reopened
-                    ? "Tables kept in this browser from your last visit: they open at once until a new catalog is published."
-                    : "Tables are kept in this browser once filled, so your next visit opens them at once."
-                  : `Tables are filled for this visit only: ${st.memoryReason ?? "the browser's storage is not available"}.`}
-              </p>
+              <div className="muted small sql-storage">
+                <p className="muted small">
+                  {st.saved
+                    ? st.reopened
+                      ? `Tables kept in this browser from your last visit${mb}: they open at once until a new catalog is published.`
+                      : `Tables are kept in this browser once filled${mb}, so your next visit opens them at once.`
+                    : `Tables are filled for this visit only: ${st.memoryReason ?? "the browser's storage is not available"}.`}
+                </p>
+                <label>
+                  <input type="checkbox" checked={keepSaved()} onChange={(e) => void clearSaved(e.target.checked)} disabled={running || !!filling} />{" "}
+                  Keep tables in this browser
+                </label>
+                {(st.saved || !!savedBytes) && (
+                  <> {" · "}<button type="button" className="link-btn" onClick={() => void clearSaved(true)} disabled={running || !!filling}>Clear saved tables</button></>
+                )}
+                {storageNote && <span role="status"> · {storageNote}</span>}
+              </div>
             );
           })()}
           {error && (
