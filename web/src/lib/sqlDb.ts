@@ -11,7 +11,7 @@ import initSqlJs, { type Database } from "sql.js";
 import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 import type { Catalog } from "./catalog";
 import { riskMap } from "./risk";
-import { catalogTables, createSchema, fillTable, tablesIn, type Table } from "./sql";
+import { catalogTables, createSchema, EDGE_INDEXES, fillTable, needsEdgeIndexes, tablesIn, writable, type Table } from "./sql";
 
 export interface LoadProgress {
   table: string;
@@ -46,7 +46,7 @@ export function catalogDb(catalog: Catalog): Promise<CatalogDb> {
     const fill = (t: Table, background: boolean, onProgress?: (p: LoadProgress) => void) => {
       let p = filling.get(t.name);
       if (!p) {
-        p = fillTable(db, t, (done) => onProgress?.({ table: t.name, rows: t.count ?? (t.built ? t.rows.length : 0), done }), background ? () => waiting > 0 : undefined)
+        p = fillTable(db, t, (done) => onProgress?.({ table: t.name, rows: t.count ?? (t.built ? t.rows.length : 0), done }), background ? () => waiting > 0 : undefined, true)
           .then(() => { loaded.add(t.name); })
           .catch((e) => {
             db.run("PRAGMA query_only = 0");
@@ -60,9 +60,21 @@ export function catalogDb(catalog: Catalog): Promise<CatalogDb> {
     };
     // Tables a query needs: those loaded already cost nothing; one being loaded in the
     // background is waited for; others are loaded now, ahead of background loading.
+    let edgesIndexed = false;
+    const indexEdges = async (onProgress?: (p: LoadProgress) => void) => {
+      if (edgesIndexed) return;
+      onProgress?.({ table: "edges (indexing)", rows: 0, done: 0.95 });
+      await new Promise((r) => setTimeout(r)); // show the message first
+      for (const s of EDGE_INDEXES) writable(db, () => db.run(s));
+      edgesIndexed = true;
+    };
     const ensure = async (sql: string, onProgress?: (p: LoadProgress) => void) => {
       const need = tablesIn(sql, tables).filter((t) => !loaded.has(t.name));
-      if (!need.length) return;
+      const wantsIndex = !edgesIndexed && needsEdgeIndexes(sql) && tablesIn(sql, tables).some((t) => t.name === "edges");
+      if (!need.length) {
+        if (wantsIndex) await indexEdges(onProgress);
+        return;
+      }
       waiting++;
       try {
         for (const t of need) {
@@ -78,6 +90,7 @@ export function catalogDb(catalog: Catalog): Promise<CatalogDb> {
       } finally {
         waiting--;
       }
+      if (wantsIndex) await indexEdges(onProgress);
     };
     // Once the console is open and idle, load the two tables most queries use, in the
     // background (giving way to queries), so the first query on them does not wait.

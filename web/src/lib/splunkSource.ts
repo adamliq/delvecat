@@ -104,7 +104,7 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch, onStage?: OnStag
   if (cached) {
     onStage?.("Opening the copy saved in this browser…");
     try {
-      return parseBundle(await gunzip(cached));
+      return parseBundle(cached.text ?? (await gunzip(cached.bytes!)));
     } catch {
       void clearCachedCatalog(); // damaged copy: fetch it again below
     }
@@ -121,8 +121,9 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch, onStage?: OnStag
   const hash = await sha256Hex(bytes);
   if (hash && hash !== pointer.sha256) throw new BundleError("The published catalog is corrupt (sha256 mismatch).");
   onStage?.("Reading the catalog…");
-  const bundle = parseBundle(await gunzip(bytes));
-  void writeCachedCatalog({ generation: pointer.generation, sha256: pointer.sha256, bytes });
+  const text = await gunzip(bytes);
+  const bundle = parseBundle(text);
+  void writeCachedCatalog({ generation: pointer.generation, sha256: pointer.sha256, text, bytes });
   return bundle;
 }
 

@@ -286,8 +286,14 @@ export function catalogTables(
 
 /** Indexes made when a table is filled. */
 const INDEXED_BY_ENTITY = new Set(["labels", "classifications", "properties", "settings", "fields", "health_checks", "lineage_issues", "field_usage", "column_lineage", "risk", "access"]);
-function indexStatements(t: Table): string[] {
-  if (t.name === "edges") return ["CREATE INDEX edges_from ON edges(from_id)", "CREATE INDEX edges_to ON edges(to_id)"];
+/** Indexes on edges are made only when a query looks things up by from_id or to_id
+ * (joins): 2 million relationships take seconds to index, and counting or grouping them
+ * does not need it. */
+export const EDGE_INDEXES = ["CREATE INDEX edges_from ON edges(from_id)", "CREATE INDEX edges_to ON edges(to_id)"];
+export const needsEdgeIndexes = (sql: string) => /\b(from_id|to_id)\b/i.test(sql);
+
+function indexStatements(t: Table, lazyEdges = false): string[] {
+  if (t.name === "edges") return lazyEdges ? [] : EDGE_INDEXES;
   if (t.name === "entities") return ["CREATE INDEX entities_type ON entities(type)"];
   return INDEXED_BY_ENTITY.has(t.name) ? [`CREATE INDEX ${t.name}_entity ON ${t.name}(entity_id)`] : [];
 }
@@ -314,6 +320,8 @@ export async function fillTable(
   onProgress?: (done: number) => void,
   /** Checked between batches: while true, wait (a background fill giving way to a query). */
   pause?: () => boolean,
+  /** Leave the edges table's indexes for later (see EDGE_INDEXES). */
+  lazyEdges = false,
 ): Promise<void> {
   onProgress?.(0);
   await new Promise((r) => setTimeout(r)); // let the progress message show before building rows
@@ -336,7 +344,7 @@ export async function fillTable(
   } finally {
     stmt.free();
   }
-  for (const s of indexStatements(t)) {
+  for (const s of indexStatements(t, lazyEdges)) {
     writable(db, () => db.run(s));
     await new Promise((r) => setTimeout(r));
   }
@@ -345,7 +353,7 @@ export async function fillTable(
 
 /** Run ``fn`` with writes allowed; the database is read-only again before any query can
  * run (queries run between batches, never during one). */
-function writable(db: Database, fn: () => void) {
+export function writable(db: Database, fn: () => void) {
   db.run("PRAGMA query_only = 0");
   try {
     fn();
