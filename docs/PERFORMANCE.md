@@ -61,6 +61,37 @@ per object. Tried and not kept: maintaining the relationship indexes while the S
 console fills edges in the background avoids the one pause on the first join (29 s
 at a million), but made the fill take 170 s instead of 34 s.
 
+## 0.47.0: risk in the build, faster writing, measured dead ends
+
+- **Risk is worked out when a catalog is written** (`riskTable`, compact integers):
+  the web app reads it instead of working risk out in every browser. At 301,405 objects
+  64,812 objects are at risk, identical both ways; reading it 0.96 s against 2.2 s;
+  4.5 s in the build; +6.4 MB uncompressed (about 3%).
+- **Writing JSON through the C encoder** a thousand items at a time (identical bytes):
+  JSON 11 → 2.7 s at 300k; encoding for publish 27 → 18 s including the risk table;
+  publishing 300k into Splunk 26 → 17.5 s. Uploading the parts is a small share, so
+  parts stay one at a time.
+- **Relationships indexed compactly** in the web app (integer arrays, lists made on
+  first use): 754 → 307 ms at 300k.
+- **Opening at 300k in Splunk Web**: first time 6.8 → 5.1 s, again (saved copy) 4.6 →
+  3.9 s. Before: downloading 1.1 s, reading 3.4 s (mostly JSON parsing), preparing
+  objects and drawing Home 2.0 s (1.3 s now). JSON parsing is the fixed cost of the
+  format; the 0.44 benchmark showed other formats read slower into the app's objects.
+
+Measured and not done:
+
+- **Saving the search index with the catalog**: at 300k, restoring it (3.8 s to read
+  back, 1.7 s to load) against 7.1 s to rebuild, for 78 MB more browser storage. The
+  index is built while the browser is idle, and search answers from names meanwhile.
+- **Assemble**: profiled at 300k; SPL analysis (already in parallel processes) is two
+  thirds; no other large step. The macro scanner was made faster (identical output),
+  with little effect on a normal build.
+- **Incremental builds**: designed in `docs/INCREMENTAL_BUILDS.md`; needs a large real
+  stack to measure first.
+
+CI now runs a large-catalog check (about 89,000 objects) with time budgets per page
+(`web/scripts/perf-budget.json`) and for the build.
+
 ## 0.46.0: governance, Insights and Schemas at scale
 
 | | 300k | 600k | 1M |

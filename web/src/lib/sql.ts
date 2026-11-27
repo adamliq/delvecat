@@ -394,7 +394,7 @@ ORDER BY app, name;`,
   },
   {
     title: "Everything an object depends on (upstream)",
-    sql: `-- Change the object: any id from Browse (Copy id), e.g. SELECT 'my:dashboard:id'.
+    sql: `-- Change the object: any id (Copy id on its page), e.g. SELECT 'my:dashboard:id'.
 -- Each object is visited once (UNION), so loops end and large estates stay quick.
 WITH RECURSIVE start(id) AS (
   SELECT e.id FROM entities e WHERE e.type = 'dashboard' AND EXISTS (SELECT 1 FROM depends d WHERE d.object_id = e.id)

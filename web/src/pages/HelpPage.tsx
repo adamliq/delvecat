@@ -200,10 +200,32 @@ const SECTIONS: Section[] = [
         <li>A result of a label and a number can be shown as a chart. Results download as CSV; <em>Copy link</em> shares the query.</li>
         <li>It runs in your browser on the loaded catalog and cannot change anything. SQLite works in the background, so the page keeps responding while tables load and queries run.</li>
         <li>Tables load the first time a query uses them; objects and relationships also load in the background once the console is open.</li>
+        <li>The <code>depends</code> view puts every dependency one way round (<code>object_id</code> depends on <code>on_id</code>: a search on the index it reads, an index on the sourcetype feeding it). The <em>Lineage and dependencies</em> examples use it to list everything upstream or downstream of an object.</li>
         <li><em>Stop</em> ends a query that runs too long; the tables already loaded stay.</li>
         <li>A result shows its first 100,000 rows and says how many there are; <em>Download all</em> saves every row as CSV.</li>
-        <li>Where the browser allows, the loaded tables are kept in its private storage (about 0.5 GB at 300,000 objects, 1.6 GB at a million), so your next visit opens them at once until a new catalog is published (for the whole catalog and for the last single stack you chose). The console says when they are kept for the visit only (private windows, a full disk, or the console open in another tab). They are removed with the saved catalog when you lose access.</li>
+        <li>Where the browser allows, the loaded tables are kept in its private storage (about 0.5 GB at 300,000 objects, 1.6 GB at a million), so your next visit opens them at once until a new catalog is published (for the whole catalog and for the last single stack you chose). The console says when they are kept for the visit only (private windows, a full disk, or the console open in another tab). They are removed with the saved catalog when you lose access. The console shows how much space they take; <em>Clear saved tables</em> removes them, and unticking <em>Keep tables in this browser</em> stops keeping them.</li>
+        <li><em>Saved</em> lists queries shared with everyone in the app above your own. Catalog publishers and admins share a saved query (<em>share</em>) or remove a shared one; everyone else runs them.</li>
       </ul>
+    ),
+  },
+  {
+    id: "api",
+    title: "Reading the catalog from scripts (REST)",
+    keywords: "api rest endpoint script automation curl json query upstream downstream",
+    body: (
+      <>
+        <p>
+          <code>GET /services/delvecat/catalog</code> on Splunk's management port (8089) returns the published catalog as JSON,
+          with your own Splunk account: you need the same access as for this page (the <code>delvecat_user</code> role).
+          It never changes anything.
+        </p>
+        <ul>
+          <li><code>?type=index,sourcetype&amp;app=search&amp;name=web&amp;limit=100&amp;offset=0</code>: objects a page at a time (at most 1,000), filtered by type, stack (<code>instance</code>), app or part of the name; <code>fields=full</code> for whole objects.</li>
+          <li><code>?id=&lt;object id&gt;</code>: one object with its incoming and outgoing relationships.</li>
+          <li><code>?upstream=&lt;id&gt;&amp;depth=3</code>: what it depends on; <code>?downstream=&lt;id&gt;&amp;depth=3</code>: what depends on it (up to 10 steps), each with how many steps away.</li>
+        </ul>
+        <p>For example: <code>curl -u me https://splunk:8089/services/delvecat/catalog?type=index&amp;output_mode=json</code>. Object ids are on each object's page (<em>Copy id</em>).</p>
+      </>
     ),
   },
   {
