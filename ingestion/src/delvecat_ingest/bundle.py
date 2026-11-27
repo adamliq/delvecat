@@ -552,22 +552,53 @@ def supported_version(version: Any) -> bool:
 
 
 def write_json(data: Any, out: Any, pretty: bool = False) -> None:
-    """Write ``data`` as JSON (plus a newline) to a binary stream a piece at a time."""
-    enc = json.JSONEncoder(
-        indent=2 if pretty else None,
-        separators=None if pretty else (",", ":"),
-        ensure_ascii=False,
-    )
+    """Write ``data`` as JSON (plus a newline) to a binary stream a piece at a time.
+
+    Compact output goes through Python's C encoder a thousand list items at a time:
+    its streaming encoder (``iterencode``) runs in pure Python, about four times slower
+    on large catalogs. The bytes are the same either way."""
     pending: list[str] = []
     size = 0
-    for chunk in enc.iterencode(data):
+
+    def emit(chunk: str) -> None:
+        nonlocal pending, size
         pending.append(chunk)
         size += len(chunk)
         if size >= 1 << 20:
             out.write("".join(pending).encode())
             pending, size = [], 0
+
+    if pretty:
+        enc = json.JSONEncoder(indent=2, ensure_ascii=False)
+        for chunk in enc.iterencode(data):
+            emit(chunk)
+    else:
+        for chunk in _compact_pieces(data, 0):
+            emit(chunk)
     pending.append("\n")
     out.write("".join(pending).encode())
+
+
+_ONE_SHOT = json.JSONEncoder(separators=(",", ":"), ensure_ascii=False)
+_ITEMS = 1000
+
+
+def _compact_pieces(value: Any, depth: int) -> Any:
+    """Compact JSON of ``value`` in pieces: the top levels (the bundle, its edge and risk
+    tables) member by member, their long lists a thousand items at a time."""
+    if depth <= 1 and isinstance(value, dict):
+        yield "{"
+        for i, (k, v) in enumerate(value.items()):
+            yield ("," if i else "") + _ONE_SHOT.encode(str(k)) + ":"
+            yield from _compact_pieces(v, depth + 1)
+        yield "}"
+    elif depth <= 2 and isinstance(value, list) and len(value) > _ITEMS:
+        yield "["
+        for i in range(0, len(value), _ITEMS):
+            yield ("," if i else "") + _ONE_SHOT.encode(value[i : i + _ITEMS])[1:-1]
+        yield "]"
+    else:
+        yield _ONE_SHOT.encode(value)
 
 
 def _dump(data: Any, pretty: bool) -> bytes:
