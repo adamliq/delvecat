@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogBundle, Edge, Entity, EntityType } from "../generated/catalog";
 import { Catalog } from "./catalog";
-import { atRiskFrom, problems, riskMap } from "./risk";
+import { demoBundle } from "./demoCatalog.testutil";
+import { atRiskFrom, problems, RISK_RULES_VERSION, riskMap, type Risk } from "./risk";
 
 const ent = (type: EntityType, name: string, extra: Partial<Entity> = {}): Entity =>
   ({ id: `i:${type}:${name}`, type, name, product: "splunk", instance: "i", ...extra });
@@ -90,5 +91,20 @@ describe("shared producers", () => {
 
   it("ignores one disabled producer among several", () => {
     expect(r.has(notable.id)).toBe(false);
+  });
+});
+
+describe("riskTable written by the build", () => {
+  it("gives the same risk as working it out here (demo catalog)", () => {
+    const b = demoBundle();
+    expect(b.riskTable?.version).toBe(RISK_RULES_VERSION);
+    const { riskTable: _t, ...without } = b;
+    void _t;
+    const show = (m: Map<string, Risk>) =>
+      [...m].sort(([a], [b2]) => (a < b2 ? -1 : 1)).map(([id, r]) => [id, r.severity, r.causes.map((c) => [c.root.id, c.depth, c.via?.id, !!c.partial, c.problems.length])]);
+    const fromBuild = riskMap(new Catalog(b));
+    const here = riskMap(new Catalog(without as typeof b));
+    expect(fromBuild.size).toBeGreaterThan(5);
+    expect(show(fromBuild)).toEqual(show(here));
   });
 });

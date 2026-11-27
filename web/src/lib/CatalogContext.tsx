@@ -71,8 +71,10 @@ const SCOPE_KEY = "delvecat.scope";
 export function scopedBundle(b: CatalogBundle, instance: string): CatalogBundle {
   const entities = b.entities.filter((e) => e.instance === instance);
   const ids = new Set(entities.map((e) => e.id));
+  const { riskTable: _whole, ...rest } = b; // risk of the whole catalog: worked out again for one stack
+  void _whole;
   return {
-    ...b,
+    ...rest,
     instances: b.instances.filter((i) => i.id === instance),
     entities,
     edges: b.edges.filter((x) => ids.has(x.from) && ids.has(x.to)),

@@ -143,6 +143,14 @@ export interface CatalogBundle {
     origins: string[];
     rows: number[];
   };
+  /**
+   * Objects at risk, worked out when the catalog was written (see ingestion risk.py; the web app works it out itself when version differs from its rules). ids once; rows: for each at-risk object [object, severity (1 critical, 0 warning), number of causes] then [root, depth, via (-1 when direct), partial (1/0)] per cause, all indexing ids.
+   */
+  riskTable?: {
+    version: number;
+    ids: string[];
+    rows: number[];
+  };
   generatedAt: string;
   generator: {
     name: string;

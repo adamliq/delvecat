@@ -52,6 +52,9 @@ export interface Risk {
 }
 
 const MAX_DEPTH = 10;
+/** Must match RULES_VERSION in the ingestion's risk.py: a catalog written with other
+ * rules has its riskTable ignored, and risk is worked out here instead. */
+export const RISK_RULES_VERSION = 1;
 
 /** An object's own problems, the ones that put what depends on it at risk. */
 export function problems(e: Entity): Problem[] {
@@ -106,10 +109,51 @@ export function useRiskMap(catalog: Catalog): Map<string, Risk> | undefined {
   return map;
 }
 
-/** Every at-risk object, with what puts it at risk. Computed once per catalog. */
+/** Every at-risk object, with what puts it at risk. Read from the catalog's riskTable
+ * (worked out when it was written) or, without one, worked out here; once per catalog. */
 export function riskMap(catalog: Catalog): Map<string, Risk> {
   const cached = cache.get(catalog);
   if (cached) return cached;
+  const table = catalog.bundle.riskTable;
+  const out = table?.version === RISK_RULES_VERSION ? fromTable(catalog, table) : computeRisk(catalog);
+  for (const r of out.values()) r.causes.sort(causeOrder);
+  cache.set(catalog, out);
+  return out;
+}
+
+/** The same order as localeCompare, without a collator per comparison. */
+const names = new Intl.Collator();
+const causeOrder = (a: RiskCause, b: RiskCause) =>
+  a.depth - b.depth || (a.root === b.root ? 0 : names.compare(a.root.name, b.root.name) || (a.root.id < b.root.id ? -1 : a.root.id > b.root.id ? 1 : 0));
+
+/** The risk map from a catalog's riskTable (see the catalog schema). */
+export function fromTable(catalog: Catalog, table: { ids: string[]; rows: number[] }): Map<string, Risk> {
+  const { ids, rows } = table;
+  const own = new Map<string, Problem[]>();
+  const problemsOf = (e: Entity) => {
+    let p = own.get(e.id);
+    if (!p) own.set(e.id, (p = problems(e)));
+    return p;
+  };
+  const out = new Map<string, Risk>();
+  for (let i = 0; i < rows.length; ) {
+    const entity = catalog.byId.get(ids[rows[i]]);
+    const severity: Severity = rows[i + 1] ? "critical" : "warning";
+    const n = rows[i + 2];
+    i += 3;
+    const causes: RiskCause[] = [];
+    for (let j = 0; j < n; j++, i += 4) {
+      const root = catalog.byId.get(ids[rows[i]]);
+      if (!root) continue;
+      const via = rows[i + 2] >= 0 ? catalog.byId.get(ids[rows[i + 2]]) : undefined;
+      causes.push({ root, problems: problemsOf(root), depth: rows[i + 1], via, ...(rows[i + 3] ? { partial: true } : {}) });
+    }
+    if (entity && causes.length) out.set(entity.id, { severity, causes });
+  }
+  return out;
+}
+
+function computeRisk(catalog: Catalog): Map<string, Risk> {
 
   // dependents: id -> objects that depend on it
   const dependents = new Map<string, { dep: string; producerKey?: string }[]>();
@@ -162,10 +206,6 @@ export function riskMap(catalog: Catalog): Map<string, Risk> {
       frontier = next;
     }
   }
-  for (const r of out.values()) {
-    r.causes.sort((a, b) => a.depth - b.depth || a.root.name.localeCompare(b.root.name));
-  }
-  cache.set(catalog, out);
   return out;
 }
 

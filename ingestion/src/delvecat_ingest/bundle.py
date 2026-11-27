@@ -25,6 +25,7 @@ from .lineage import derive, record_unresolved, runtime_lookups
 from .link import link_hosts
 from .model import GLOBAL_TYPES, ExtractResult, Ref, Target
 from .resolve import Resolver
+from .risk import risk_table
 
 # Bookkeeping and human annotations never count as a change to the Splunk object.
 CHURN_TYPES = frozenset({"adhocSearch"})
@@ -528,11 +529,15 @@ def compact_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
         "modelVersion": bundle.get("schemaVersion", SCHEMA_VERSION),
         "edges": [],
         "edgeTable": compact_edges(bundle.get("edges") or []),
+        # Worked out from this very catalog every time it is written, so a merged,
+        # redacted or imported catalog never carries another's.
+        "riskTable": risk_table(bundle),
     }
 
 
 def expand_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
     """Turn a stored bundle back into the in-memory form (in place; returns it)."""
+    bundle.pop("riskTable", None)  # derived: worked out again whenever the catalog is written
     table = bundle.pop("edgeTable", None)
     if table is not None:
         bundle["edges"] = [*bundle.get("edges", []), *expand_edges(table)]
@@ -614,6 +619,7 @@ def write_bundle(
         "modelVersion": bundle.get("schemaVersion", SCHEMA_VERSION),
         "entities": [],
         "edges": [],
+        "riskTable": risk_table(bundle),
         "shards": shards,
     }
     (out / "catalog.json").write_bytes(_dump(manifest, pretty))

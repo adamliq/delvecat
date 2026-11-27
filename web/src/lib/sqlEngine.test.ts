@@ -1,32 +1,14 @@
 import sqlite3InitModule, { type Sqlite3Static } from "@sqlite.org/sqlite-wasm";
-import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import initSqlJs from "sql.js";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { CatalogBundle } from "../generated/catalog";
-import { expandBundle, expandEdges, type EdgeTable } from "./catalog";
+import { demoBundle } from "./demoCatalog.testutil";
 import { catalogTables, EDGE_INDEXES, EXAMPLES, fillDatabase, runQuery, schemaStatements, tableIndexes } from "./sql";
 import { fileFor, splitStatements, SqlEngine } from "./sqlEngine";
 
 const require = createRequire(import.meta.url);
-const DIR = new URL("../../public/catalog/", import.meta.url);
-
-/** The demo catalog with its shard files read in. */
-function demo(): CatalogBundle {
-  const read = (p: string) => JSON.parse(readFileSync(new URL(p, DIR), "utf8"));
-  const m = read("catalog.json") as CatalogBundle & { shards?: { path: string; kind: string }[] };
-  const entities = [...m.entities];
-  const edges = [...m.edges];
-  for (const sh of m.shards ?? []) {
-    const body = read(sh.path);
-    if (body.edgeTable) expandEdges(body.edgeTable as EdgeTable, edges);
-    else for (const x of body[sh.kind]) (sh.kind === "entities" ? entities : edges).push(x);
-  }
-  const { shards: _s, ...rest } = m;
-  void _s;
-  return expandBundle({ ...rest, entities, edges });
-}
-const bundle = demo();
+const bundle = demoBundle();
 
 let sqlite3: Sqlite3Static;
 beforeAll(async () => {
