@@ -1,4 +1,5 @@
 import type { CatalogBundle, Edge, Entity, EntityType, Product } from "../generated/catalog";
+import { parseJsonBytes, TooLargeJson } from "./bigJson";
 
 export class BundleError extends Error {}
 
@@ -61,6 +62,22 @@ export function parseBundle(text: string): CatalogBundle {
   } catch {
     throw new BundleError("File is not valid JSON.");
   }
+  return checkBundle(data);
+}
+
+/** The same from UTF-8 bytes, however large: a catalog of a million objects is more JSON
+ * than a browser will hold in one string. */
+export function parseBundleBytes(bytes: Uint8Array): CatalogBundle {
+  let data: unknown;
+  try {
+    data = parseJsonBytes(bytes);
+  } catch (e) {
+    throw new BundleError(e instanceof TooLargeJson ? e.message : "File is not valid JSON.");
+  }
+  return checkBundle(data);
+}
+
+function checkBundle(data: unknown): CatalogBundle {
   const b = data as Partial<CatalogBundle>;
   if (!b || typeof b !== "object" || typeof b.schemaVersion !== "string") {
     throw new BundleError("Not a Licoryx Delvecat bundle (missing schemaVersion).");
@@ -165,7 +182,7 @@ export async function inlineShards(
       const data = await read(shard);
       const hash = await sha256Hex(data);
       if (hash && hash !== shard.sha256) throw new BundleError(`Shard ${shard.path} is corrupt (sha256 mismatch).`);
-      return { shard, body: JSON.parse(new TextDecoder().decode(data)) as Record<string, unknown> };
+      return { shard, body: parseJsonBytes(new Uint8Array(data)) as Record<string, unknown> };
     }),
   );
   for (const { shard, body } of parts) {
@@ -189,7 +206,7 @@ export async function fetchBundle(url: string, onStage?: (stage: string) => void
   onStage?.("Downloading the catalog…");
   const resp = await fetch(url, { cache: "no-cache" });
   if (!resp.ok) throw new BundleError(`Could not load ${url} (HTTP ${resp.status}).`);
-  const manifest = parseBundle(await resp.text());
+  const manifest = parseBundleBytes(new Uint8Array(await resp.arrayBuffer()));
   if (manifest.shards?.length) onStage?.(`Downloading and reading ${manifest.shards.length} catalog files…`);
   const base = new URL(url, window.location.href);
   return inlineShards(manifest, async (shard) => {
@@ -210,7 +227,7 @@ export async function openLocalFiles(files: File[]): Promise<{ bundle: CatalogBu
     files.find((f) => /(^|\/)catalog\.json$/.test(pathOf(f)) && !/\/entities\//.test(pathOf(f))) ??
     (files.length === 1 ? files[0] : undefined);
   if (!manifestFile) throw new BundleError("Select catalog.json (and its shard files), or the bundle folder.");
-  const manifest = parseBundle(await manifestFile.text());
+  const manifest = parseBundleBytes(new Uint8Array(await manifestFile.arrayBuffer()));
   const root = pathOf(manifestFile).replace(/catalog\.json$/, "");
   const bundle = await inlineShards(manifest, async (shard) => {
     const exact = files.find((f) => pathOf(f) === root + shard.path);

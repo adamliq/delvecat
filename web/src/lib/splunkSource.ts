@@ -8,7 +8,7 @@
  * viewer's own session, so the collection's permissions decide who can see it.
  */
 import type { CatalogBundle } from "../generated/catalog";
-import { BundleError, parseBundle } from "./catalog";
+import { BundleError, parseBundle, parseBundleBytes } from "./catalog";
 import { clearCachedCatalog, readCachedCatalog, writeCachedCatalog } from "./browserCache";
 
 /** What loading is doing, for the loading screen. */
@@ -88,9 +88,11 @@ async function sha256Hex(data: Uint8Array<ArrayBuffer>): Promise<string | null> 
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function gunzip(data: Uint8Array<ArrayBuffer>): Promise<string> {
+/** The JSON's bytes, not its text: a million-object catalog is more than a browser
+ * string can hold. */
+async function gunzip(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBuffer>> {
   const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("gzip"));
-  return new Response(stream).text();
+  return new Uint8Array(await new Response(stream).arrayBuffer());
 }
 
 class StaleGeneration extends Error {}
@@ -104,7 +106,8 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch, onStage?: OnStag
   if (cached) {
     onStage?.("Opening the copy saved in this browser…");
     try {
-      return parseBundle(cached.text ?? (await gunzip(cached.bytes!)));
+      if (cached.text) return parseBundle(cached.text); // kept by an earlier version
+      return parseBundleBytes(cached.json ?? (await gunzip(cached.bytes!)));
     } catch {
       void clearCachedCatalog(); // damaged copy: fetch it again below
     }
@@ -121,9 +124,9 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch, onStage?: OnStag
   const hash = await sha256Hex(bytes);
   if (hash && hash !== pointer.sha256) throw new BundleError("The published catalog is corrupt (sha256 mismatch).");
   onStage?.("Reading the catalog…");
-  const text = await gunzip(bytes);
-  const bundle = parseBundle(text);
-  void writeCachedCatalog({ generation: pointer.generation, sha256: pointer.sha256, text, bytes });
+  const json = await gunzip(bytes);
+  const bundle = parseBundleBytes(json);
+  void writeCachedCatalog({ generation: pointer.generation, sha256: pointer.sha256, json, bytes });
   return bundle;
 }
 
