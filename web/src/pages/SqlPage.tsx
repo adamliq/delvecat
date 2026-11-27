@@ -8,6 +8,7 @@ import { catalogDb, keepSaved, savedSize, Stopped, type CatalogDb, type LoadProg
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
 import * as store from "../lib/sqlStore";
+import { sharedQueries, type SharedQuery } from "../lib/sharedQueries";
 
 type DbState = { status: "loading" } | { status: "error"; message: string } | ({ status: "ready" } & CatalogDb);
 type Side = "examples" | "tables" | "history" | "saved";
@@ -27,6 +28,37 @@ export default function SqlPage() {
   const [history, setHistory] = useState(store.history);
   const [savedQueries, setSaved] = useState(store.saved);
   const [copied, setCopied] = useState(false);
+  const shared = useMemo(() => sharedQueries(), []);
+  const [sharedList, setSharedList] = useState<SharedQuery[] | null>(null);
+  const [canShare, setCanShare] = useState(false);
+  const [shareNote, setShareNote] = useState<string | null>(null);
+  useEffect(() => {
+    if (!shared || side !== "saved") return;
+    let live = true;
+    shared.list().then((l) => live && setSharedList(l)).catch((e) => live && (setSharedList([]), setShareNote(String(e instanceof Error ? e.message : e))));
+    shared.canWrite().then((w) => live && setCanShare(w)).catch(() => undefined);
+    return () => { live = false; };
+  }, [shared, side]);
+  const share = async (name: string, text: string) => {
+    if (!shared) return;
+    try {
+      const q = await shared.share(name, text);
+      setSharedList((l) => [...(l ?? []).filter((x) => x._key !== q._key), q].sort((a, b) => a.name.localeCompare(b.name)));
+      setShareNote(`Shared "${q.name}" with everyone in the app.`);
+    } catch (e) {
+      setShareNote(e instanceof Error ? e.message : String(e));
+    }
+  };
+  const unshare = async (key: string) => {
+    if (!shared) return;
+    try {
+      await shared.remove(key);
+      setSharedList((l) => (l ?? []).filter((x) => x._key !== key));
+      setShareNote("Removed.");
+    } catch (e) {
+      setShareNote(e instanceof Error ? e.message : String(e));
+    }
+  };
   const [filling, setFilling] = useState<LoadProgress | null>(null);
   const [background, setBackground] = useState<LoadProgress | null>(null);
   const [running, setRunning] = useState(false);
@@ -306,17 +338,40 @@ export default function SqlPage() {
           )}
 
           {side === "saved" && (
-            savedQueries.length === 0 ? <p className="muted small">Save a query with <em>Save…</em>; saved queries stay in this browser.</p> : (
-              <ul className="plain-list sql-history">
-                {savedQueries.map((s) => (
-                  <li key={s.name}>
-                    <button type="button" className="link-btn" onClick={() => load(s.sql)} title={s.sql}>{s.name}</button>{" "}
-                    <button type="button" className="link-btn muted small" onClick={() => setSaved(store.unsave(s.name))} aria-label={`Delete saved query ${s.name}`}>delete</button>
-                    <div className="muted small"><code>{s.sql.replace(/\s+/g, " ").slice(0, 70)}</code></div>
-                  </li>
-                ))}
-              </ul>
-            )
+            <div>
+              {shared && (
+                <>
+                  <div className="facet-group-title">Shared with everyone in the app</div>
+                  {sharedList === null ? <p className="muted small">Loading…</p> : sharedList.length === 0 ? (
+                    <p className="muted small">{canShare ? "None yet: Share a query saved below." : "None yet. Catalog publishers can share queries here."}</p>
+                  ) : (
+                    <ul className="plain-list sql-history">
+                      {sharedList.map((q) => (
+                        <li key={q._key}>
+                          <button type="button" className="link-btn" onClick={() => load(q.sql)} title={q.sql}>{q.name}</button>{" "}
+                          {canShare && <button type="button" className="link-btn muted small" onClick={() => void unshare(q._key)} aria-label={`Remove shared query ${q.name}`}>remove</button>}
+                          <div className="muted small">{q.by ? `${q.by} · ` : ""}{when(q.at)}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {shareNote && <p className="small" role="status">{shareNote}</p>}
+                  <div className="facet-group-title">In this browser</div>
+                </>
+              )}
+              {savedQueries.length === 0 ? <p className="muted small">Save a query with <em>Save…</em>; saved queries stay in this browser.</p> : (
+                <ul className="plain-list sql-history">
+                  {savedQueries.map((s) => (
+                    <li key={s.name}>
+                      <button type="button" className="link-btn" onClick={() => load(s.sql)} title={s.sql}>{s.name}</button>{" "}
+                      {shared && canShare && <button type="button" className="link-btn small" onClick={() => void share(s.name, s.sql)} aria-label={`Share saved query ${s.name}`}>share</button>}{" "}
+                      <button type="button" className="link-btn muted small" onClick={() => setSaved(store.unsave(s.name))} aria-label={`Delete saved query ${s.name}`}>delete</button>
+                      <div className="muted small"><code>{s.sql.replace(/\s+/g, " ").slice(0, 70)}</code></div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
         </aside>
       </div>

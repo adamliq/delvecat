@@ -610,6 +610,38 @@ const sections = {
     await p.close();
   },
 
+  async sharedQueries() {
+    // SQL queries shared with everyone in the app: publishers write, viewers only read.
+    const Q = '/servicesNS/nobody/delvecat/storage/collections/data/delvecat_queries';
+    const doc = { _key: 'q-e2e', name: 'E2E shared query', sql: 'SELECT count(*) AS shared_n FROM entities', at: new Date().toISOString() };
+    const post = (user) => fetch(`${MGMT}${Q}/batch_save?output_mode=json`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`${user}:${USERS[user]}`).toString('base64'), 'Content-Type': 'application/json' },
+      body: JSON.stringify([doc]),
+    });
+    const byViewer = await post('viewer');
+    check('viewer cannot share a query', byViewer.status === 403 || byViewer.status === 401, `HTTP ${byViewer.status}`);
+    const byPublisher = await post('publisher');
+    check('publisher shares a query', byPublisher.ok, `HTTP ${byPublisher.status}`);
+    const v = await session('viewer');
+    await v.page.goto(app('#/sql'));
+    await v.page.waitForSelector('button.btn-primary:has-text("Run"):not([disabled])', { timeout: 60000 });
+    await v.page.click('.sql-side-tabs button:has-text("Saved")');
+    let seen = false;
+    try { await v.page.waitForSelector('.sql-schema button:has-text("E2E shared query")', { timeout: 15000 }); seen = true; } catch {}
+    check('viewer sees the shared query', seen);
+    check('viewer is not offered share or remove', (await v.page.locator('.sql-schema button:has-text("remove")').count()) === 0);
+    if (seen) {
+      await v.page.click('.sql-schema button:has-text("E2E shared query")');
+      let ran = false;
+      try { await v.page.waitForFunction(() => [...document.querySelectorAll('.sql-main th')].some((th) => th.textContent.trim().startsWith('shared_n')), null, { timeout: 30000 }); ran = true; } catch {}
+      check('viewer runs the shared query', ran);
+    }
+    await v.close();
+    const del = await rest('DELETE', `${Q}/q-e2e`, 'publisher');
+    check('publisher removes the shared query', del.status < 300, `HTTP ${del.status}`);
+  },
+
   async layout() {
     // Every page fits the window from phone to wide screen: no sideways scrolling of the
     // page (graphs and tables may scroll inside their own boxes).
