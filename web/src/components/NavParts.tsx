@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
-import type { EntitySearch } from "../lib/search";
+import { useSearchReady, type EntitySearch } from "../lib/search";
 import { typeLabel } from "../lib/labels";
 import { ALL_PAGES, type NavItem } from "../lib/nav";
 import { recentIds } from "../lib/recent";
@@ -50,6 +50,7 @@ const name = (e: Entity) => e.displayName ?? e.name;
 /** The search box: suggestions while typing (Enter opens Browse with the query), and "/"
  * anywhere to jump to it. */
 export function SearchBox({ search }: { search?: EntitySearch }) {
+  const indexReady = useSearchReady(search);
   const [q, setQ] = useState("");
   const [focus, setFocus] = useState(false);
   const [sel, setSel] = useState(-1);
@@ -69,7 +70,7 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
   }, []);
   const suggestions = useMemo(
     () => (search && q.trim().length >= 2 ? search.query(q.trim()).results.slice(0, 8) : []),
-    [search, q],
+    [search, q, indexReady],
   );
   const go = (to: string) => { setFocus(false); setQ(""); setSel(-1); input.current?.blur(); navigate(to); };
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {

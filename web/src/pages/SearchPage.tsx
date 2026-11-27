@@ -9,7 +9,7 @@ import { entityPath } from "../lib/routes";
 import { StatusLabel } from "./HealthPage";
 import { useCatalog } from "../lib/CatalogContext";
 import { PRODUCT_LABELS, pluralTypeLabel, TYPE_GROUPS, splTitleClass, typeGroup, typeLabel } from "../lib/labels";
-import { isBuiltinSetting, SETTING_TYPES, type Facet, type Filters, type Sort } from "../lib/search";
+import { isBuiltinSetting, SETTING_TYPES, type Facet, type Filters, type Sort, useSearchReady } from "../lib/search";
 import { exportFileName, resultRows } from "../lib/exportResults";
 import { downloadText, toCsv } from "../lib/health";
 import { riskMap } from "../lib/risk";
@@ -167,13 +167,14 @@ export function SearchPage() {
   // origin filter, or "show built-in settings".
   const showSettings = params.has("settings") || Boolean(filters.origin?.length) || (filters.type ?? []).some((t) => SETTING_TYPES.has(t));
   // How many of the objects matching this search and these filters are hidden.
+  const indexReady = useSearchReady(search); // search again once full-text search is ready
   const hiddenSettings = useMemo(
     () => (showSettings ? 0 : search.query(q, filters, sort).results.filter(isBuiltinSetting).length),
-    [search, q, filters, sort, showSettings],
+    [search, q, filters, sort, showSettings, indexReady],
   );
-  const { results, facets, matches } = useMemo(
+  const { results, facets, matches, partial } = useMemo(
     () => search.query(q, filters, sort, showSettings ? undefined : isBuiltinSetting),
-    [search, q, filters, sort, showSettings],
+    [search, q, filters, sort, showSettings, indexReady],
   );
   const view = params.get("view") === "table" ? "table" : "list";
   const activeCount = Object.values(filters).reduce((n, v) => n + (v?.length ?? 0), 0);
@@ -238,6 +239,7 @@ export function SearchPage() {
         <div className="results-bar">
           <span className="muted">
             {results.length.toLocaleString()} result{results.length === 1 ? "" : "s"}
+            {partial && <span className="muted small" role="status"> · full-text search is still being prepared: these match names, apps and descriptions; the list updates when it is ready</span>}
           </span>
           <div className="results-actions">
             <button type="button" className="btn btn-small" onClick={exportCsv} disabled={!results.length}

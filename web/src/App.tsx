@@ -31,7 +31,7 @@ function Body() {
   const { pathname } = useLocation();
   // In the Splunk app the Build page works with or without a catalog.
   if (IN_SPLUNK && pathname === "/build") return <BuildPage />;
-  if (state.status === "loading") return <p className="muted">Loading catalog…</p>;
+  if (state.status === "loading") return <p className="muted" role="status">{state.stage ?? "Loading catalog…"}</p>;
   if (state.status === "error") {
     return (
       <div className="stack">

@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 import pytest
 
+from delvecat_ingest.bundle import expand_bundle
 from delvecat_ingest.compat import UTC
 from delvecat_ingest.publish import (
     PublishError,
@@ -115,7 +116,7 @@ def read_back(kv: FakeKV) -> dict:
     text = "".join(kv.docs[f"{ptr['generation']}-{n}"]["data"] for n in range(ptr["parts"]))
     packed = base64.b64decode(text)
     assert hashlib.sha256(packed).hexdigest() == ptr["sha256"]
-    return json.loads(gzip.decompress(packed))
+    return expand_bundle(json.loads(gzip.decompress(packed)))
 
 
 def test_allowlist_is_only_the_catalog_collection():

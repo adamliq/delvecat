@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -379,26 +380,189 @@ def assemble(
     return bundle
 
 
-def validate(bundle: dict[str, Any], schema_path: Path | None = None) -> list[str]:
-    """Return a list of human-readable problems (empty when valid)."""
+# Objects per validation job, and the size from which jobs run in parallel processes.
+_CHUNK = 20000
+_PARALLEL_FROM = 40000
+
+
+def _check_edges(edges: list[Any], schema: dict[str, Any]) -> list[str]:
+    """Edges have a fixed, flat shape: checked directly (the schema's rules, read from it)
+    instead of through the general validator, which takes minutes on millions of them."""
+    spec = schema["$defs"]["Edge"]
+    required = set(spec["required"])
+    allowed = set(spec["properties"])
+    types = set(schema["$defs"]["EdgeType"]["enum"])
+    origins = set(spec["properties"]["origin"]["enum"])
+    problems = []
+    for i, e in enumerate(edges):
+        if not isinstance(e, dict):
+            problems.append(f"edges/{i}: {e!r} is not of type 'object'")
+            continue
+        for k in sorted(required - e.keys()):
+            problems.append(f"edges/{i}: '{k}' is a required property")
+        extra = sorted(e.keys() - allowed)
+        if extra:
+            problems.append(
+                f"edges/{i}: Additional properties are not allowed ({', '.join(map(repr, extra))} "
+                f"{'was' if len(extra) == 1 else 'were'} unexpected)"
+            )
+        for k in ("from", "to"):
+            if k in e and not isinstance(e[k], str):
+                problems.append(f"edges/{i}/{k}: {e[k]!r} is not of type 'string'")
+        if "type" in e and e["type"] not in types:
+            problems.append(f"edges/{i}/type: {e['type']!r} is not one of {sorted(types)}")
+        if "origin" in e and e["origin"] not in origins:
+            problems.append(f"edges/{i}/origin: {e['origin']!r} is not one of {sorted(origins)}")
+        if len(problems) > 1000:
+            break
+    return problems
+
+
+def _schema_errors(bundle: dict[str, Any], schema: dict[str, Any], offset: int = 0) -> list[str]:
     # Imported here: the Splunk app runs without jsonschema (it ships compiled code).
     from jsonschema import Draft202012Validator, FormatChecker
 
-    schema = json.loads((schema_path or find_schema()).read_text(encoding="utf-8"))
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
-    problems = [
-        f"{'/'.join(map(str, err.absolute_path)) or '<root>'}: {err.message}"
-        for err in validator.iter_errors(bundle)
+    out = []
+    for err in validator.iter_errors(bundle):
+        path = list(err.absolute_path)
+        if offset and len(path) > 1 and path[0] == "entities" and isinstance(path[1], int):
+            path[1] += offset
+        out.append(f"{'/'.join(map(str, path)) or '<root>'}: {err.message}")
+    return out
+
+
+def _entity_job(args: tuple[dict[str, Any], dict[str, Any], int]) -> list[str]:
+    shell, schema, offset = args
+    return _schema_errors(shell, schema, offset)
+
+
+def validate(bundle: dict[str, Any], schema_path: Path | None = None) -> list[str]:
+    """Return a list of human-readable problems (empty when valid).
+
+    The catalog's top level is checked whole; objects in jobs of 20,000 (in parallel
+    processes for large catalogs); relationships by a direct check of their flat shape."""
+    schema = json.loads((schema_path or find_schema()).read_text(encoding="utf-8"))
+    entities = bundle.get("entities", [])
+    edges = bundle.get("edges", [])
+    top = {**bundle, "entities": [], "edges": []}
+    if not isinstance(entities, list) or not isinstance(edges, list):
+        return _schema_errors(bundle, schema)  # wrong shape: let the schema say how
+    problems = _schema_errors(top, schema)
+    jobs = [
+        ({**top, "entities": entities[i : i + _CHUNK]}, schema, i)
+        for i in range(0, len(entities), _CHUNK)
     ]
+    results: list[list[str]] = []
+    if len(entities) >= _PARALLEL_FROM and (os.cpu_count() or 1) > 1:
+        try:
+            from concurrent.futures import ProcessPoolExecutor
+
+            with ProcessPoolExecutor(max_workers=min(len(jobs), os.cpu_count() or 1)) as pool:
+                results = list(pool.map(_entity_job, jobs))
+        except (OSError, RuntimeError, ImportError):  # no processes here: one at a time
+            results = []
+    if not results:
+        results = [_entity_job(j) for j in jobs]
+    for r in results:
+        # The top level was checked already; keep only what is about objects.
+        problems.extend(p for p in r if p.startswith("entities/"))
+    problems.extend(_check_edges(edges, schema))
     seen: set[str] = set()
     dupes: set[str] = set()
-    for e in bundle.get("entities", []):
+    for e in entities:
         (dupes if e.get("id") in seen else seen).add(e.get("id"))
     problems.extend(f"duplicate entity id: {d}" for d in sorted(dupes))
     return problems
 
 
 # --- reading / writing ----------------------------------------------------------------
+
+# Catalog files store relationships compactly (``edgeTable``): each object id once, then
+# four numbers per relationship (from, to, type, origin) instead of repeating the ids as
+# text. A file in this form says schemaVersion 0.2.0, so readers that cannot expand it
+# refuse it instead of showing a catalog without relationships. In memory a bundle always
+# has the plain ``edges`` list (schema 0.1.x).
+COMPACT_VERSION = "0.2.0"
+
+
+def compact_edges(edges: list[dict[str, Any]]) -> dict[str, Any]:
+    ids: dict[str, int] = {}
+    types: dict[str, int] = {}
+    origins: dict[str, int] = {}
+    rows: list[int] = []
+    for e in edges:
+        o = e.get("origin")
+        rows.extend(
+            (
+                ids.setdefault(e["from"], len(ids)),
+                ids.setdefault(e["to"], len(ids)),
+                types.setdefault(e["type"], len(types)),
+                origins.setdefault(o, len(origins)) if o else -1,
+            )
+        )
+    return {"ids": list(ids), "types": list(types), "origins": list(origins), "rows": rows}
+
+
+def expand_edges(table: dict[str, Any]) -> list[dict[str, Any]]:
+    ids, types, origins, rows = table["ids"], table["types"], table["origins"], table["rows"]
+    if len(rows) % 4:
+        raise ValueError("edgeTable rows are not groups of four")
+    out = []
+    for i in range(0, len(rows), 4):
+        f, t, ty, o = rows[i : i + 4]
+        e = {"from": ids[f], "to": ids[t], "type": types[ty]}
+        if o >= 0:
+            e["origin"] = origins[o]
+        out.append(e)
+    return out
+
+
+def compact_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
+    """The bundle as it is stored: relationships in an ``edgeTable`` (shallow copy)."""
+    if bundle.get("edgeTable") is not None:
+        return bundle
+    return {
+        **bundle,
+        "schemaVersion": COMPACT_VERSION,
+        "modelVersion": bundle.get("schemaVersion", SCHEMA_VERSION),
+        "edges": [],
+        "edgeTable": compact_edges(bundle.get("edges") or []),
+    }
+
+
+def expand_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
+    """Turn a stored bundle back into the in-memory form (in place; returns it)."""
+    table = bundle.pop("edgeTable", None)
+    if table is not None:
+        bundle["edges"] = [*bundle.get("edges", []), *expand_edges(table)]
+    # A sharded manifest says 0.2 with its edges in shard files: once read, it is 0.1.
+    if "modelVersion" in bundle or str(bundle.get("schemaVersion", "")).startswith("0.2."):
+        bundle["schemaVersion"] = bundle.pop("modelVersion", SCHEMA_VERSION)
+    return bundle
+
+
+def supported_version(version: Any) -> bool:
+    return str(version or "").startswith(("0.1.", "0.2."))
+
+
+def write_json(data: Any, out: Any, pretty: bool = False) -> None:
+    """Write ``data`` as JSON (plus a newline) to a binary stream a piece at a time."""
+    enc = json.JSONEncoder(
+        indent=2 if pretty else None,
+        separators=None if pretty else (",", ":"),
+        ensure_ascii=False,
+    )
+    pending: list[str] = []
+    size = 0
+    for chunk in enc.iterencode(data):
+        pending.append(chunk)
+        size += len(chunk)
+        if size >= 1 << 20:
+            out.write("".join(pending).encode())
+            pending, size = [], 0
+    pending.append("\n")
+    out.write("".join(pending).encode())
 
 
 def _dump(data: Any, pretty: bool) -> bytes:
@@ -416,7 +580,8 @@ def write_bundle(
     ``catalog.json`` plus one file per entity type and one for edges."""
     if not shard:
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_bytes(_dump(bundle, pretty))
+        with out.open("wb") as f:  # streamed: never the whole text in memory
+            write_json(compact_bundle(bundle), f, pretty)
         return [out]
     out.mkdir(parents=True, exist_ok=True)
     written, shards = [], []
@@ -428,7 +593,8 @@ def write_bundle(
     ]
     parts.append(("edges.json", "edges", None, bundle["edges"]))
     for rel, kind, etype, items in parts:
-        data = _dump({kind: items}, pretty)
+        body = {"edgeTable": compact_edges(items)} if kind == "edges" else {kind: items}
+        data = _dump(body, pretty)
         path = out / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
@@ -442,7 +608,14 @@ def write_bundle(
         if etype:
             shard_info["entityType"] = etype
         shards.append(shard_info)
-    manifest = {**bundle, "entities": [], "edges": [], "shards": shards}
+    manifest = {
+        **bundle,
+        "schemaVersion": COMPACT_VERSION,
+        "modelVersion": bundle.get("schemaVersion", SCHEMA_VERSION),
+        "entities": [],
+        "edges": [],
+        "shards": shards,
+    }
     (out / "catalog.json").write_bytes(_dump(manifest, pretty))
     return [out / "catalog.json", *written]
 
@@ -459,5 +632,9 @@ def load_bundle(path: Path) -> dict[str, Any]:
             data = (path.parent / s["path"]).read_bytes()
             if hashlib.sha256(data).hexdigest() != s["sha256"]:
                 raise ValueError(f"shard {s['path']} does not match its sha256")
-            bundle[s["kind"]].extend(json.loads(data)[s["kind"]])
-    return bundle
+            body = json.loads(data)
+            if "edgeTable" in body:
+                bundle[s["kind"]].extend(expand_edges(body["edgeTable"]))
+            else:
+                bundle[s["kind"]].extend(body[s["kind"]])
+    return expand_bundle(bundle)

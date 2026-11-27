@@ -26,6 +26,7 @@ Useful options:
 |---|---|
 | `--previous PATH` | previous bundle; adds per-entity versions and a change summary |
 | `--shard` | write a directory: `catalog.json` manifest + per-type shards |
+| | Catalog files (single file, shards, published copies, exports) store relationships compactly as an `edgeTable` (schema 0.2.0): each object id once, four numbers per relationship. Every reader expands it back to `edges`; older versions refuse 0.2 files instead of showing a catalog without relationships |
 | `--fields` | sample events per sourcetype to discover fields (`--max-field-sourcetypes`) |
 | `--inventory-window` | time range for observed sourcetypes/hosts/sources (default `-7d`) |
 | `--only a,b` | run selected platform extractors (product connectors are skipped unless `--products` is given) |

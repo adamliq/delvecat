@@ -13,7 +13,7 @@ import { roleCapabilities, userCapabilities } from "./capabilities";
 import { propertyDefs, propertyFacets } from "./structured";
 
 type State =
-  | { status: "loading" }
+  | { status: "loading"; stage?: string }
   | { status: "error"; message: string }
   | { status: "ready"; catalog: Catalog; search: EntitySearch; origin: string };
 
@@ -58,6 +58,8 @@ function ready(bundle: CatalogBundle, origin: string): State {
       return r ? [r.severity] : [];
     },
   });
+  // The word index is built after the page appears (seconds on large catalogs).
+  void search.indexInBackground();
   return { status: "ready", catalog, search, origin };
 }
 
@@ -81,12 +83,18 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   // In the Splunk app: the catalog published to this Splunk's KV store; elsewhere a URL.
   const load = useCallback(() => {
     const fail = (err: Error) => setState({ status: "error", message: err.message });
+    const stage = (s: string) => setState({ status: "loading", stage: s });
+    // Show "Preparing" before the synchronous set-up (seconds on large catalogs).
+    const prepare = (b: CatalogBundle, origin: string) => {
+      stage(`Preparing ${b.entities.length.toLocaleString()} objects and ${b.edges.length.toLocaleString()} relationships…`);
+      return new Promise<void>((r) => setTimeout(r, 30)).then(() => setState(ready(b, origin)));
+    };
     const override = new URLSearchParams(window.location.search).get("bundle");
     if (IN_SPLUNK && !override) {
-      return fetchSplunkCatalog()
+      return fetchSplunkCatalog(undefined, stage)
         .then((r) =>
           r
-            ? setState(ready(r.bundle, `published to Splunk ${r.pointer.publishedAt ?? ""}`.trim()))
+            ? prepare(r.bundle, `published to Splunk ${r.pointer.publishedAt ?? ""}`.trim())
             : fail(
                 new Error(
                   "No catalog found. Either none has been published to this Splunk yet " +
@@ -97,8 +105,8 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         .catch(fail);
     }
     const url = defaultBundleUrl();
-    return fetchBundle(url)
-      .then((b) => setState(ready(b, url)))
+    return fetchBundle(url, stage)
+      .then((b) => prepare(b, url))
       .catch(fail);
   }, []);
 

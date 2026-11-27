@@ -7,10 +7,13 @@ describe("export and import", () => {
     expect(exportName({ instances: [{ id: "sh1" }, { id: "es:1" }] } as CatalogBundle)).toMatch(/^delvecat-sh1\+es_1-\d{4}-\d{2}-\d{2}\.json\.gz$/);
   });
 
-  it("gzips the catalog without its shard list", async () => {
+  it("gzips the catalog in its stored form, without its shard list", async () => {
     const blob = await gzipBundle({ schemaVersion: "0.1.0", instances: [{ id: "a" }], entities: [], edges: [], shards: [{ path: "x" }] } as unknown as CatalogBundle);
     const text = await new Response(blob.stream().pipeThrough(new DecompressionStream("gzip"))).text();
-    expect(JSON.parse(text)).toEqual({ schemaVersion: "0.1.0", instances: [{ id: "a" }], entities: [], edges: [] });
+    expect(JSON.parse(text)).toEqual({
+      schemaVersion: "0.2.0", modelVersion: "0.1.0", instances: [{ id: "a" }], entities: [], edges: [],
+      edgeTable: { ids: [], types: [], origins: [], rows: [] },
+    });
   });
 
   it("encodes large files to base64 in chunks", () => {

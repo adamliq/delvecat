@@ -26,28 +26,49 @@ cd ingestion && uv run delvecat-ingest synth --scale 3.4 --host-indexes 16 --out
 indexes, 40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users,
 122,861 fields. Measured on 4 cores and 15 GB, headless Chromium, Splunk 10.4.
 
-| Step | Measured |
-|---|---:|
-| Build (generate 4.7 s, assemble 35 s, governance 26 s, quality 1.2 s, write 6.6 s) | 75 s, 2.2 GB peak |
-| Schema validation (`delvecat-ingest validate`, part of every `build`) | 167 s, 2.4 GB peak |
-| Size on disk (edges 216 MB) | 383 MB |
-| Published into Splunk (`delvecat-ingest publish`) | 32 s, 27.1 MB compressed in 9 parts |
-| First load, served directly | 12.8 s, 990 MB heap |
-| First load in Splunk Web (and after a reload) | 16.7 s, about 1 GB heap |
-| Search; Browse with facets | 2.0 s; 0.9–1.5 s |
-| Object pages (overview, lineage, relationships, schema, field) | 0.01–0.6 s |
-| Health, Findings, Coverage, Changes, Domains, Glossary, Compare | 0.03–0.14 s |
-| Schemas, Governance, Insights | 0.8–1.9 s |
-| SQL console | not finished after 15 min |
+| Step | 0.41.0 | 0.42.0 |
+|---|---:|---:|
+| Build (generate, assemble, governance, quality, write) | 75 s, 2.2 GB peak | 75 s, 1.8 GB peak |
+| Schema validation (`delvecat-ingest validate`, part of every `build`) | 167 s | **29 s** |
+| Size on disk | 383 MB (edges 216 MB) | **211 MB (edges 44 MB)** |
+| Published into Splunk (`delvecat-ingest publish`) | 32 s, 2.8 GB peak, 27.1 MB | 42 s, **1.7 GB peak**, 26.0 MB |
+| First load, served directly | 12.8 s, 990 MB heap | **6.2 s, 590 MB** |
+| Opening in Splunk Web, first time | 16.7 s, about 1 GB | **6.8 s, 630 MB** |
+| Opening in Splunk Web again | 16.7 s | **5.7 s** (copy kept in the browser) |
+| Search right after opening | 2 s (after the 13 s load) | **0.4 s** quick results; full text about 8 s later |
+| Browse with facets | 0.9–1.5 s | about 1 s |
+| Object pages | 0.01–0.6 s | 0.1–0.6 s |
+| Health, Findings, Coverage, Changes, Domains, Glossary | 0.03–0.14 s | 0.1–0.3 s |
+| Schemas, Governance, Insights | 0.8–1.9 s | 1.1–2.0 s |
+| SQL console ready (Run usable) | 30 s, page frozen 29 s | **0.8 s** |
+| SQL: first query on entities / using edges / later | (all loaded up front) | 1.9 s / 9.7 s / 0.2–1 s |
 
-Limits found:
+What changed:
 
-- **SQL console** copies the whole catalog into SQLite in the browser; at 2.3 million
-  rows it does not finish. It needs to load on demand or in a Web Worker, or be
-  limited at this size.
-- **Schema validation** takes longer than the build itself (jsonschema, pure Python).
-- **First load** is mostly downloading, parsing and indexing 383 MB of JSON; memory
-  per tab is about 1 GB.
+- **SQL console**: tables are created empty and each is filled the first time a query
+  names it, in batches of 20,000 with the page responding in between (longest pause
+  while indexing edges: 2 s). Before, every table (2.3 million rows) was copied in
+  before Run could be used. (The 0.41.0 report said the console did not open at this
+  size; that was the test waiting for an element the page no longer has. It did open,
+  after 30 frozen seconds.)
+- **First load**: the full-text index (5 s of the 12.5 s load) is built after the page
+  appears, in small batches while the browser is idle. A search typed before it is
+  complete answers at once from names, apps and descriptions, says so, and updates
+  when the index is ready. The loading screen names each step.
+- **Kept in the browser** (Splunk app): the compressed catalog is stored in IndexedDB,
+  keyed by generation and checksum. Splunk is asked for the current pointer first
+  (access is checked as before); the copy is used only while it is that generation,
+  and is removed when no catalog is published or access is refused. On a Splunk on the
+  same machine the gain is small (1 s); it saves the download on slower links.
+- **Compact relationships** (schema 0.2.0 on disk): ids once, four integers per edge.
+  Readers expand them to the usual form; older readers refuse 0.2 files with
+  "Unsupported schema version" instead of showing a catalog without relationships.
+- **Validation**: edges are checked directly against the schema's own rules (types and
+  origins read from it); entities are validated in jobs of 20,000, in parallel
+  processes above 40,000. Same messages and positions as before.
+- **Publishing and writing** stream the JSON into gzip or the file a piece at a time
+  (byte-identical output), so the whole text is never held at once. Generating it in
+  pieces is slower (42 s against 32 s).
 
 ## Web app (headless Chromium, 1280×900)
 

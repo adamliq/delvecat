@@ -27,7 +27,7 @@ from pathlib import PurePath
 from typing import Any
 
 from . import SCHEMA_VERSION, __version__
-from .bundle import apply_versions, ref_from_json, ref_to_json
+from .bundle import apply_versions, expand_bundle, ref_from_json, ref_to_json, supported_version
 from .compat import UTC
 from .fields import link_fields
 from .governance import apply_governance
@@ -95,7 +95,8 @@ def merge_bundles(
             raise MergeError(
                 f"{label} is redacted; merge unredacted bundles, then redact the result"
             )
-        if not str(b.get("schemaVersion", "")).startswith("0.1."):
+        expand_bundle(b)
+        if not supported_version(b.get("schemaVersion")):
             raise MergeError(f"{label}: unsupported schema version {b.get('schemaVersion')}")
         for inst in b["instances"]:
             if inst["id"] in owner:

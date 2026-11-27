@@ -1,5 +1,23 @@
 /* Generated from schemas/catalog.schema.json by npm run gen:types. Do not edit. */
 
+/**
+ * Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...); search (or field alias, calculated field, automatic lookup) readsField field; field extraction, alias, calculated field or automatic lookup definesField field.
+ */
+export type EdgeType =
+  | "reads"
+  | "writes"
+  | "contains"
+  | "uses"
+  | "feeds"
+  | "deploys"
+  | "triggers"
+  | "accelerates"
+  | "mapsTo"
+  | "grantsAccess"
+  | "memberOf"
+  | "inherits"
+  | "readsField"
+  | "definesField";
 export type EntityType =
   | "instance"
   | "app"
@@ -103,30 +121,28 @@ export type Product =
   | "deploymentServer"
   | "dbConnect";
 export type Sharing = "user" | "app" | "global" | "system";
-/**
- * Direction conventions: app contains object; sourcetype/host/source/input feeds index; role grantsAccess index; user memberOf role; role inherits importedRole; object uses dependency (transform, lookup file, KV collection, field alias...); search (or field alias, calculated field, automatic lookup) readsField field; field extraction, alias, calculated field or automatic lookup definesField field.
- */
-export type EdgeType =
-  | "reads"
-  | "writes"
-  | "contains"
-  | "uses"
-  | "feeds"
-  | "deploys"
-  | "triggers"
-  | "accelerates"
-  | "mapsTo"
-  | "grantsAccess"
-  | "memberOf"
-  | "inherits"
-  | "readsField"
-  | "definesField";
 
 /**
  * A Licoryx Delvecat catalog bundle: a point-in-time, read-only snapshot of Splunk metadata.
  */
 export interface CatalogBundle {
+  /**
+   * 0.1.x: relationships in edges. 0.2.x: the stored form, relationships in edgeTable (readers expand it back to edges).
+   */
   schemaVersion: string;
+  /**
+   * In the stored (0.2) form: the schema version of the catalog once its edgeTable is expanded.
+   */
+  modelVersion?: string;
+  /**
+   * Relationships stored compactly: every object id once, then four integers per relationship (from, to, type, origin; origin -1 when none), indexing ids, types and origins.
+   */
+  edgeTable?: {
+    ids: string[];
+    types: EdgeType[];
+    origins: string[];
+    rows: number[];
+  };
   generatedAt: string;
   generator: {
     name: string;

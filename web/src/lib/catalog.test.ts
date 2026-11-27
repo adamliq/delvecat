@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogBundle } from "../generated/catalog";
-import { BundleError, Catalog, defaultBundleUrl, parseBundle } from "./catalog";
+import { BundleError, Catalog, compactEdges, defaultBundleUrl, parseBundle } from "./catalog";
 import { pluralTypeLabel, typeLabel } from "./labels";
 import { EntitySearch } from "./search";
 
@@ -93,5 +93,24 @@ describe("helpers", () => {
   it("lets ?bundle= override the bundle url", () => {
     expect(defaultBundleUrl({ search: "?bundle=https://x/y.json" })).toBe("https://x/y.json");
     expect(defaultBundleUrl({ search: "" })).toMatch(/catalog\.json$/);
+  });
+});
+
+describe("compact relationships (schema 0.2)", () => {
+  it("expands an edge table, and compacting round-trips", () => {
+    const edges = [
+      { from: "i:app:a", to: "i:index:web", type: "contains" as const, origin: "config" as const },
+      { from: "i:app:a", to: "i:index:web", type: "reads" as const },
+    ];
+    const table = compactEdges(edges);
+    expect(table.rows).toEqual([0, 1, 0, 0, 0, 1, 1, -1]);
+    const stored = { schemaVersion: "0.2.0", modelVersion: "0.1.2", generatedAt: "2026-11-27T00:00:00Z", instances: [{ id: "i", name: "i", kind: "splunkEnterprise" }], entities: [], edges: [], edgeTable: table };
+    const b = parseBundle(JSON.stringify(stored));
+    expect(b.edges).toEqual(edges);
+    expect(b.schemaVersion).toBe("0.1.2");
+    expect((b as unknown as { edgeTable?: unknown }).edgeTable).toBeUndefined();
+  });
+  it("refuses a version it does not know", () => {
+    expect(() => parseBundle(JSON.stringify({ schemaVersion: "0.3.0", instances: [], entities: [], edges: [] }))).toThrow(/Unsupported schema version/);
   });
 });

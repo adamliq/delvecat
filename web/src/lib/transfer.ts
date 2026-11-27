@@ -5,6 +5,7 @@
  * sent once and not stored.
  */
 import type { CatalogBundle } from "../generated/catalog";
+import { compactEdges } from "./catalog";
 import { formKey } from "./splunkBuild";
 import { readPointer, splunkdUrl, type Pointer } from "./splunkSource";
 
@@ -50,7 +51,9 @@ function base64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
 /** gzip of the catalog as JSON (shards, if any, already joined into the bundle). */
 export async function gzipBundle(bundle: CatalogBundle): Promise<Blob> {
   const { shards: _shards, ...whole } = bundle as CatalogBundle & { shards?: unknown };
-  const stream = new Blob([JSON.stringify(whole)]).stream().pipeThrough(new CompressionStream("gzip"));
+  // Stored form: relationships as an edge table (much smaller on large catalogs).
+  const stored = { ...whole, schemaVersion: "0.2.0", modelVersion: whole.schemaVersion, edges: [], edgeTable: compactEdges(whole.edges) };
+  const stream = new Blob([JSON.stringify(stored)]).stream().pipeThrough(new CompressionStream("gzip"));
   return new Response(stream).blob();
 }
 

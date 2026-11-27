@@ -2,6 +2,57 @@ import type { CatalogBundle, Edge, Entity, EntityType, Product } from "../genera
 
 export class BundleError extends Error {}
 
+/** Relationships as catalog files store them (schema 0.2): ids once, four numbers per edge. */
+export interface EdgeTable {
+  ids: string[];
+  types: Edge["type"][];
+  origins: string[];
+  rows: number[];
+}
+type Stored = CatalogBundle & { edgeTable?: EdgeTable; modelVersion?: string };
+
+/** Expand an edge table into edges, appended to ``out`` (a loop: millions of items). */
+export function expandEdges(t: EdgeTable, out: Edge[] = []): Edge[] {
+  if (t.rows.length % 4) throw new BundleError("The catalog's relationships are damaged (edgeTable).");
+  for (let i = 0; i < t.rows.length; i += 4) {
+    const o = t.rows[i + 3];
+    const e: Edge = { from: t.ids[t.rows[i]], to: t.ids[t.rows[i + 1]], type: t.types[t.rows[i + 2]] };
+    if (o >= 0) e.origin = t.origins[o] as Edge["origin"];
+    out.push(e);
+  }
+  return out;
+}
+
+/** The compact stored form of edges (what Export writes). */
+export function compactEdges(edges: Edge[]): EdgeTable {
+  const ids = new Map<string, number>();
+  const types = new Map<string, number>();
+  const origins = new Map<string, number>();
+  const at = (m: Map<string, number>, k: string) => {
+    let i = m.get(k);
+    if (i === undefined) m.set(k, (i = m.size));
+    return i;
+  };
+  const rows: number[] = [];
+  for (const e of edges) rows.push(at(ids, e.from), at(ids, e.to), at(types, e.type), e.origin ? at(origins, e.origin) : -1);
+  return { ids: [...ids.keys()], types: [...types.keys()] as Edge["type"][], origins: [...origins.keys()], rows };
+}
+
+/** A stored catalog in its in-memory form: edgeTable expanded into edges (in place). */
+export function expandBundle(b: CatalogBundle): CatalogBundle {
+  const s = b as Stored;
+  if (s.edgeTable) {
+    s.edges = expandEdges(s.edgeTable, s.edges ?? []);
+    delete s.edgeTable;
+  }
+  // A sharded manifest says 0.2 with its edges still in shard files: once read, it is 0.1.
+  if (s.modelVersion || s.schemaVersion.startsWith("0.2.")) {
+    s.schemaVersion = s.modelVersion ?? "0.1.2";
+    delete s.modelVersion;
+  }
+  return s;
+}
+
 /** Light structural check; full validation happens in delvecat-ingest. */
 export function parseBundle(text: string): CatalogBundle {
   let data: unknown;
@@ -14,13 +65,14 @@ export function parseBundle(text: string): CatalogBundle {
   if (!b || typeof b !== "object" || typeof b.schemaVersion !== "string") {
     throw new BundleError("Not a Licoryx Delvecat bundle (missing schemaVersion).");
   }
-  if (!/^0\.1\.\d+$/.test(b.schemaVersion)) {
-    throw new BundleError(`Unsupported schema version ${b.schemaVersion}.`);
+  if (!/^0\.[12]\.\d+$/.test(b.schemaVersion)) {
+    throw new BundleError(`Unsupported schema version ${b.schemaVersion}. Update Licoryx Delvecat.`);
   }
+  if (!Array.isArray(b.edges) && (b as Stored).edgeTable) (b as Stored).edges = [];
   if (!Array.isArray(b.entities) || !Array.isArray(b.edges) || !Array.isArray(b.instances)) {
     throw new BundleError("Bundle is missing entities, edges or instances.");
   }
-  return b as CatalogBundle;
+  return expandBundle(b as CatalogBundle);
 }
 
 export class Catalog {
@@ -117,6 +169,10 @@ export async function inlineShards(
     }),
   );
   for (const { shard, body } of parts) {
+    if (shard.kind === "edges" && body.edgeTable) {
+      expandEdges(body.edgeTable as EdgeTable, edges);
+      continue;
+    }
     const items = body[shard.kind];
     if (!Array.isArray(items)) throw new BundleError(`Shard ${shard.path} has no ${shard.kind} array.`);
     // A loop, not push(...items): spreading hundreds of thousands of items into one call
@@ -129,10 +185,12 @@ export async function inlineShards(
   return { ...rest, entities, edges };
 }
 
-export async function fetchBundle(url: string): Promise<CatalogBundle> {
+export async function fetchBundle(url: string, onStage?: (stage: string) => void): Promise<CatalogBundle> {
+  onStage?.("Downloading the catalog…");
   const resp = await fetch(url, { cache: "no-cache" });
   if (!resp.ok) throw new BundleError(`Could not load ${url} (HTTP ${resp.status}).`);
   const manifest = parseBundle(await resp.text());
+  if (manifest.shards?.length) onStage?.(`Downloading and reading ${manifest.shards.length} catalog files…`);
   const base = new URL(url, window.location.href);
   return inlineShards(manifest, async (shard) => {
     const r = await fetch(new URL(shard.path, base), { cache: "no-cache" });

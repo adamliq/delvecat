@@ -47,3 +47,38 @@ describe("input type and Microsoft facets", () => {
     expect(s.query("", { microsoftAddOn: ["Splunk Add-on for Microsoft Azure"] }).results.map((e) => e.name)).toEqual(["MS_AAD_signins://s"]);
   });
 });
+
+describe("word index built after the page appears", () => {
+  const many = Array.from({ length: 7000 }, (_, i) => ent("savedSearch", `search_${i}`, { search: `index=web_${i % 7}` }));
+  it("is not built up front; a text search completes it, so results are never partial", () => {
+    const s = new EntitySearch(many);
+    expect(s.ready).toBe(false);
+    expect(s.query("").results.length).toBe(7000); // filters and Browse need no index
+    expect(s.query("search_6999").results[0].name).toBe("search_6999");
+    expect(s.ready).toBe(true);
+  });
+  it("builds in steps in the background", async () => {
+    const s = new EntitySearch(many);
+    const done = s.indexInBackground();
+    expect(s.ready).toBe(false);
+    await done;
+    expect(s.ready).toBe(true);
+    expect(s.query("search_3").results.some((e) => e.name === "search_3")).toBe(true);
+  });
+});
+
+describe("searching while the word index is still being built", () => {
+  it("answers at once from names and descriptions, marked partial, then fully", async () => {
+    const many = Array.from({ length: 9000 }, (_, i) => ent("savedSearch", `search_${i}`, { search: `index=web_${i % 7}` }));
+    const s = new EntitySearch(many);
+    const done = s.indexInBackground();
+    const quick = s.query("search_8999");
+    expect(quick.partial).toBe(true);
+    expect(quick.results.map((e) => e.name)).toContain("search_8999");
+    expect(s.query("web_3").results.length).toBe(0); // SPL text needs the full index
+    await done;
+    const full = s.query("web_3");
+    expect(full.partial).toBeUndefined();
+    expect(full.results.length).toBeGreaterThan(0);
+  });
+});

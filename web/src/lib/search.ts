@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import MiniSearch from "minisearch";
 import type { Entity } from "../generated/catalog";
 import { effectiveDescription } from "./annotate";
@@ -150,10 +151,21 @@ export interface SearchResult {
   matches: Map<string, Match>;
   /** For each facet: value → count, computed with every *other* active facet applied. */
   facets: Record<Facet, Map<string, number>>;
+  /** True while the word index is still being built: only names, apps and descriptions
+   * were matched (the page shows that, and searches again when the index is ready). */
+  partial?: boolean;
 }
+
+/** Objects added to the word index per step when it is built in the background: small
+ * batches while the browser is idle, or steps with pauses where idle callbacks are missing. */
+const INDEX_BATCH = 250;
+const INDEX_STEP = 1000;
 
 export class EntitySearch {
   private readonly index: MiniSearch<Doc>;
+  /** How many objects are in the word index (and the value map) so far. */
+  private indexed = 0;
+  private background: Promise<void> | null = null;
   private readonly byId: Map<string, Entity>;
   /** Whole values (and their host:port / URL parts), lower-cased, to the objects holding them. */
   private readonly exact = new Map<string, string[]>();
@@ -177,20 +189,79 @@ export class EntitySearch {
         combineWith: "AND",
       },
     });
-    this.index.addAll(entities.map(toDoc));
-    for (const e of entities) {
+  }
+
+  /** Index objects up to ``end`` (word index and whole values). */
+  private indexTo(end: number) {
+    const slice = this.entities.slice(this.indexed, end);
+    this.index.addAll(slice.map(toDoc));
+    for (const e of slice) {
       for (const v of new Set(propertyValues(e.properties ?? {}).flatMap(valueKeys))) {
         const ids = this.exact.get(v);
         if (!ids) this.exact.set(v, [e.id]);
         else if (ids[ids.length - 1] !== e.id) ids.push(e.id);
       }
     }
+    this.indexed = end;
   }
 
-  private matching(query: string): { list: Entity[]; matches: Map<string, Match> } {
+  /** True once every object is in the word index. */
+  get ready(): boolean {
+    return this.indexed >= this.entities.length;
+  }
+
+  /**
+   * Build the word index a step at a time, letting the page draw and respond in between
+   * (large catalogs: seconds of work). Text searches made before it finishes complete the
+   * rest at once, so their results are never partial. Without this, the index is built on
+   * the first text search.
+   */
+  indexInBackground(): Promise<void> {
+    if (this.ready) return Promise.resolve();
+    if (this.background) return this.background;
+    return (this.background = new Promise((resolve) => {
+      // Index only while the browser is idle, a small batch at a time, so clicks, typing
+      // and drawing always come first (without idle callbacks: small steps with pauses).
+      const idle = (globalThis as { requestIdleCallback?: (cb: (d: { timeRemaining(): number }) => void, o?: { timeout: number }) => number }).requestIdleCallback;
+      const step = (deadline?: { timeRemaining(): number }) => {
+        do {
+          if (this.ready) return resolve();
+          this.indexTo(Math.min(this.entities.length, this.indexed + (deadline ? INDEX_BATCH : INDEX_STEP)));
+        } while (deadline && deadline.timeRemaining() > 8);
+        if (idle) idle(step, { timeout: 1000 });
+        else setTimeout(step, 10);
+      };
+      if (idle) idle(step, { timeout: 1000 });
+      else setTimeout(step, 10);
+    }));
+  }
+
+  /** Resolves when the word index is complete. */
+  whenReady(): Promise<void> {
+    return this.ready ? Promise.resolve() : this.indexInBackground();
+  }
+
+  /** While the background index is incomplete: every word must appear in the name, display
+   * name, app or description (no waiting for the index). */
+  private quickMatch(q: string): { list: Entity[]; matches: Map<string, Match> } {
+    const words = q.toLowerCase().split(/[\s_\-:./`|=,()[\]"'*@]+/).filter(Boolean);
+    const matches = new Map<string, Match>();
+    const list = this.entities.filter((e) => {
+      const name = `${e.name} ${e.displayName ?? ""}`.toLowerCase();
+      const rest = `${e.app ?? ""} ${e.description ?? ""}`.toLowerCase();
+      if (!words.every((w) => name.includes(w) || rest.includes(w))) return false;
+      matches.set(e.id, { terms: words, fields: words.some((w) => name.includes(w)) ? ["name"] : ["description"] });
+      return true;
+    });
+    return { list, matches };
+  }
+
+  private matching(query: string): { list: Entity[]; matches: Map<string, Match>; partial?: boolean } {
     const q = query.trim();
     const matches = new Map<string, Match>();
     if (!q) return { list: this.entities, matches };
+    if (!this.ready && this.background) return { ...this.quickMatch(q), partial: true };
+    if (!this.ready) this.indexTo(this.entities.length);
     // A query that is exactly a value an object holds (an IP, a tenant id, a bucket) ranks
     // those objects first: word search splits such values into pieces.
     const exact = (this.exact.get(q.toLowerCase()) ?? []).map((id) => this.byId.get(id)!).filter(Boolean);
@@ -231,7 +302,7 @@ export class EntitySearch {
     if (effective === "name") results.sort((a, b) => (a.displayName ?? a.name).localeCompare(b.displayName ?? b.name));
     if (effective === "type") results.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
     if (effective === "updated") results.sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
-    return { results, facets, matches };
+    return { results, facets, matches, ...(matched.partial ? { partial: true } : {}) };
   }
 
   /** Backwards-compatible single-value filtering used by simple callers. */
@@ -309,4 +380,22 @@ export function highlightParts(text: string, terms: string[]): [string, boolean]
   const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const re = new RegExp(`(${escaped.join("|")})`, "gi");
   return text.split(re).filter((x) => x !== "").map((x) => [x, words.includes(lower(x))] as [string, boolean]);
+}
+
+/** Whether the word index is complete; re-renders once when it becomes so. */
+export function useSearchReady(search: EntitySearch | undefined): boolean {
+  const [ready, setReady] = useState(() => !search || search.ready);
+  useEffect(() => {
+    if (!search || search.ready) {
+      setReady(true);
+      return;
+    }
+    setReady(false);
+    let live = true;
+    void search.whenReady().then(() => live && setReady(true));
+    return () => {
+      live = false;
+    };
+  }, [search]);
+  return ready;
 }

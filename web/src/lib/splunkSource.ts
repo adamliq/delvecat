@@ -9,6 +9,10 @@
  */
 import type { CatalogBundle } from "../generated/catalog";
 import { BundleError, parseBundle } from "./catalog";
+import { clearCachedCatalog, readCachedCatalog, writeCachedCatalog } from "./browserCache";
+
+/** What loading is doing, for the loading screen. */
+export type OnStage = (stage: string) => void;
 
 export const IN_SPLUNK = import.meta.env.MODE === "splunk";
 
@@ -91,10 +95,21 @@ async function gunzip(data: Uint8Array<ArrayBuffer>): Promise<string> {
 
 class StaleGeneration extends Error {}
 
-async function readGeneration(pointer: Pointer, fetchFn: Fetch): Promise<CatalogBundle> {
+async function readGeneration(pointer: Pointer, fetchFn: Fetch, onStage?: OnStage, useCache = true): Promise<CatalogBundle> {
   if (pointer.encoding !== "gzip+base64") {
     throw new BundleError(`Unsupported catalog encoding ${pointer.encoding}. Update the Licoryx Delvecat app.`);
   }
+  // The copy kept in this browser, if it is still the published catalog.
+  const cached = useCache ? await readCachedCatalog(pointer.generation, pointer.sha256) : null;
+  if (cached) {
+    onStage?.("Opening the copy saved in this browser…");
+    try {
+      return parseBundle(await gunzip(cached));
+    } catch {
+      void clearCachedCatalog(); // damaged copy: fetch it again below
+    }
+  }
+  onStage?.(`Downloading the catalog (${(pointer.bytes / 1048576).toFixed(1)} MB compressed)…`);
   const parts = await Promise.all(
     Array.from({ length: pointer.parts }, (_, n) =>
       getDoc<{ data: string }>(`${pointer.generation}-${n}`, fetchFn),
@@ -105,7 +120,10 @@ async function readGeneration(pointer: Pointer, fetchFn: Fetch): Promise<Catalog
   const bytes = base64ToBytes(parts.map((p) => p!.data).join(""));
   const hash = await sha256Hex(bytes);
   if (hash && hash !== pointer.sha256) throw new BundleError("The published catalog is corrupt (sha256 mismatch).");
-  return parseBundle(await gunzip(bytes));
+  onStage?.("Reading the catalog…");
+  const bundle = parseBundle(await gunzip(bytes));
+  void writeCachedCatalog({ generation: pointer.generation, sha256: pointer.sha256, bytes });
+  return bundle;
 }
 
 /** The published catalog's pointer document (who published it, and when), or null. */
@@ -116,12 +134,24 @@ export async function readPointer(fetchFn: Fetch = (u, i) => fetch(u, i)): Promi
 /** The catalog published to this Splunk, or null if none has been published yet. */
 export async function fetchSplunkCatalog(
   fetchFn: Fetch = (u, i) => fetch(u, i),
+  onStage?: OnStage,
 ): Promise<{ bundle: CatalogBundle; pointer: Pointer } | null> {
   for (let attempt = 0; ; attempt++) {
-    const pointer = await getDoc<Pointer>("current", fetchFn);
-    if (!pointer) return null;
+    onStage?.("Checking for the latest catalog…");
+    let pointer: Pointer | null;
     try {
-      return { bundle: await readGeneration(pointer, fetchFn), pointer };
+      pointer = await getDoc<Pointer>("current", fetchFn);
+    } catch (err) {
+      // No access any more: do not keep a copy this viewer may no longer read.
+      if (err instanceof BundleError && /do not have access/.test(err.message)) void clearCachedCatalog();
+      throw err;
+    }
+    if (!pointer) {
+      void clearCachedCatalog();
+      return null;
+    }
+    try {
+      return { bundle: await readGeneration(pointer, fetchFn, onStage, attempt === 0), pointer };
     } catch (err) {
       if (!(err instanceof StaleGeneration) || attempt >= 2) {
         if (err instanceof StaleGeneration) throw new BundleError("The catalog changed while loading. Reload the page.");

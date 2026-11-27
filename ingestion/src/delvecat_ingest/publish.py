@@ -16,6 +16,7 @@ from __future__ import annotations
 import base64
 import gzip
 import hashlib
+import io
 import json
 import uuid
 from collections.abc import Callable
@@ -23,7 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .bundle import load_bundle
+from .bundle import compact_bundle, expand_bundle, load_bundle, write_json
 from .compat import UTC
 from .transport import EndpointForbidden, EndpointNotFound
 
@@ -39,8 +40,12 @@ def encode(
     bundle: dict[str, Any], part_chars: int = DEFAULT_PART_CHARS
 ) -> tuple[list[str], str, int]:
     """(base64 parts, sha256 of the compressed bytes, compressed size)."""
-    raw = json.dumps(bundle, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    packed = gzip.compress(raw, compresslevel=9, mtime=0)
+    # Streamed: the JSON is produced and compressed a piece at a time, so the whole text
+    # (hundreds of MB on large catalogs) is never held in memory at once.
+    buf = io.BytesIO()
+    with gzip.GzipFile(fileobj=buf, mode="wb", compresslevel=9, mtime=0) as gz:
+        write_json(compact_bundle(bundle), gz)
+    packed = buf.getvalue()
     text = base64.b64encode(packed).decode("ascii")
     parts = [text[i : i + part_chars] for i in range(0, len(text), part_chars)] or [""]
     return parts, hashlib.sha256(packed).hexdigest(), len(packed)
@@ -80,7 +85,7 @@ def read_published(
     packed = base64.b64decode(text)
     if hashlib.sha256(packed).hexdigest() != pointer["sha256"]:
         return None
-    return json.loads(gzip.decompress(packed))
+    return expand_bundle(json.loads(gzip.decompress(packed)))
 
 
 def save_doc(

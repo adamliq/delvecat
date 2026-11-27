@@ -15,8 +15,26 @@
   ],
   "properties": {
     "schemaVersion": {
+      "description": "0.1.x: relationships in edges. 0.2.x: the stored form, relationships in edgeTable (readers expand it back to edges).",
+      "type": "string",
+      "pattern": "^0\\.[12]\\.\\d+$"
+    },
+    "modelVersion": {
+      "description": "In the stored (0.2) form: the schema version of the catalog once its edgeTable is expanded.",
       "type": "string",
       "pattern": "^0\\.1\\.\\d+$"
+    },
+    "edgeTable": {
+      "description": "Relationships stored compactly: every object id once, then four integers per relationship (from, to, type, origin; origin -1 when none), indexing ids, types and origins.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ids", "types", "origins", "rows"],
+      "properties": {
+        "ids": { "type": "array", "items": { "type": "string" } },
+        "types": { "type": "array", "items": { "$ref": "#/$defs/EdgeType" } },
+        "origins": { "type": "array", "items": { "type": "string" } },
+        "rows": { "type": "array", "items": { "type": "integer", "minimum": -1 } }
+      }
     },
     "generatedAt": {
       "type": "string",

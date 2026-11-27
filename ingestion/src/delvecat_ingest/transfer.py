@@ -16,6 +16,7 @@ import json
 from datetime import datetime
 from typing import Any
 
+from .bundle import expand_bundle, supported_version
 from .compat import UTC
 from .merge import MergeError, merge_bundles
 from .publish import PublishError, publish_bundle, read_published
@@ -42,17 +43,19 @@ def parse_catalog(data: bytes) -> dict[str, Any]:
     except ValueError:
         raise TransferError("Not a catalog: the file is not JSON.") from None
     check_catalog(bundle)
-    return bundle
+    return expand_bundle(bundle)
 
 
 def check_catalog(bundle: Any) -> None:
-    if not isinstance(bundle, dict) or not str(bundle.get("schemaVersion", "")).startswith("0.1."):
+    if not isinstance(bundle, dict) or not supported_version(bundle.get("schemaVersion")):
         raise TransferError("Not a Licoryx Delvecat catalog (no supported schemaVersion).")
     if bundle.get("shards"):
         raise TransferError(
             "This catalog is split into shard files: export it from the app, or build it "
             "without --shard."
         )
+    if isinstance(bundle.get("edgeTable"), dict) and not isinstance(bundle.get("edges"), list):
+        bundle["edges"] = []
     for key in ("instances", "entities", "edges"):
         if not isinstance(bundle.get(key), list):
             raise TransferError(f"Not a catalog: no {key} list.")

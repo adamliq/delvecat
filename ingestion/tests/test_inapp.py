@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
 
-from delvecat_ingest.bundle import validate
+from delvecat_ingest.bundle import load_bundle, validate
 from delvecat_ingest.cli import main
 from delvecat_ingest.inapp import build_here, default_instance_id
 from delvecat_ingest.transport import FixtureTransport
@@ -22,7 +21,7 @@ def test_same_catalog_as_the_cli(tmp_path):
     out = tmp_path / "cli.json"
     assert main(["build", "--fixtures", str(FIXTURE), "--instance", "acme",
                  "--instance-name", "Acme", "--out", str(out)]) == 0  # fmt: skip
-    cli = json.loads(out.read_text())
+    cli = load_bundle(out)
     assert validate(here) == []
     assert sorted(e["id"] for e in here["entities"]) == sorted(e["id"] for e in cli["entities"])
     assert len(here["edges"]) == len(cli["edges"])

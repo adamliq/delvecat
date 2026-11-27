@@ -97,7 +97,7 @@ def merged(parts, tmp_path_factory):
         )
         == 0
     )
-    return json.loads(out.read_text())
+    return load_bundle(out)
 
 
 def edges(b, frm=None, to=None):

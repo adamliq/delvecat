@@ -134,3 +134,57 @@ def test_epoch_updated_time_is_dropped():
         updatedAt="1970-01-01T00:00:00+00:00",
     )
     assert "updatedAt" not in e
+
+
+def test_compact_edges_round_trip_and_size(tmp_path):
+    from delvecat_ingest.bundle import COMPACT_VERSION, compact_bundle, expand_bundle
+
+    r = ExtractResult(
+        entities=[idx("web"), entity(id="i:app:a", type="app", name="a", instance="i")],
+        edges=[
+            {"from": "i:app:a", "to": "i:index:web", "type": "contains", "origin": "config"},
+            {"from": "i:app:a", "to": "i:index:web", "type": "reads"},
+        ],
+    )
+    bundle = assemble(INSTANCE, r)
+    stored = compact_bundle(bundle)
+    assert stored["schemaVersion"] == COMPACT_VERSION and stored["edges"] == []
+    assert stored["edgeTable"]["rows"] == [0, 1, 0, 0, 0, 1, 1, -1]
+    assert validate(stored) == []  # the stored form is a valid catalog file too
+    back = expand_bundle(json.loads(json.dumps(stored)))
+    assert back["edges"] == bundle["edges"] and back["schemaVersion"] == bundle["schemaVersion"]
+    assert "edgeTable" not in back and "modelVersion" not in back
+    # single file and shards both store the compact form and load back the same
+    one = write_bundle(bundle, tmp_path / "one.json")[0]
+    assert '"edgeTable"' in one.read_text() and load_bundle(one)["edges"] == bundle["edges"]
+    write_bundle(bundle, tmp_path / "sh", shard=True)
+    assert '"edgeTable"' in (tmp_path / "sh" / "edges.json").read_text()
+    sh = load_bundle(tmp_path / "sh")
+    assert sh["edges"] == bundle["edges"] and sh["schemaVersion"] == bundle["schemaVersion"]
+    assert "modelVersion" not in sh
+
+
+def test_validation_still_catches_bad_edges_and_entities_in_later_jobs(monkeypatch):
+    import delvecat_ingest.bundle as bmod
+
+    monkeypatch.setattr(bmod, "_CHUNK", 2)  # several jobs, so positions must be offset
+    ents = [idx(f"i{n}") for n in range(5)]
+    ents[3] = {**ents[3], "type": "notAType"}
+    r = ExtractResult(entities=ents, edges=[])
+    bundle = assemble(INSTANCE, r)
+    bundle["edges"] = [
+        {"from": "i:index:i0", "to": "i:index:i1", "type": "reads"},
+        {"from": "i:index:i0", "to": "i:index:i1", "type": "nope", "extra": 1},
+        {"from": "i:index:i0", "type": "reads", "origin": "guess"},
+    ]
+    problems = validate(bundle)
+    pos = next(i for i, e in enumerate(bundle["entities"]) if e["type"] == "notAType")
+    assert any(p.startswith(f"entities/{pos}/type:") for p in problems), problems
+    assert "edges/1/type: 'nope' is not one of" in "\n".join(problems)
+    assert any(
+        p.startswith("edges/1: Additional properties are not allowed ('extra' was")
+        for p in problems
+    )
+    assert "edges/2: 'to' is a required property" in problems
+    assert any(p.startswith("edges/2/origin: 'guess'") for p in problems)
+    assert not any(p.startswith("edges/0") for p in problems)
