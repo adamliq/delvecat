@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict, deque
+from collections.abc import Callable
 from typing import Any
 
 ALL = None  # every column
@@ -156,32 +157,34 @@ def propagate(
             sp = specs[nxt] = _spec(by_id[nxt], defines.get(nxt, []))
         return sp
 
+    # Successors that are not fields (fields are not evaluated here), worked out once.
+    succ_nf = {a: [b for b in bs if type_of[b] != "field"] for a, bs in succs.items()}
+
     classes = {c for per in seeds.values() for c in per if c in carried}
     for cls in sorted(classes):
         cols: dict[str, frozenset[str] | None] = {}
         via: dict[str, str] = {}
         depth: dict[str, int] = {}
         queue: deque[str] = deque()
-        # For each object, its inputs that carry this class so far (instead of scanning
-        # all of its inputs each time: an index can be fed by thousands of hosts).
-        carriers: dict[str, set[str]] = defaultdict(set)
-        for node, per in seeds.items():
-            if cls in per:
-                cols[node] = per[cls]
-                depth[node] = 0
-                queue.append(node)
-                for s in succs.get(node, ()):
-                    carriers[s].add(node)
-
-        def out_cols(
-            node: str,
-            cls: str = cls,
-            cols: dict[str, frozenset[str] | None] = cols,
-        ) -> frozenset[str] | None:
-            """What a node passes on (after stops)."""
-            if node in stoppers and stops(by_id[node], cls):
-                return frozenset()
-            return cols.get(node, frozenset())
+        seed_c = {node: per[cls] for node, per in seeds.items() if cls in per}
+        # Objects that stop this class pass nothing on (checked once, not per read).
+        stopping = {n for n in stoppers if stops(by_id[n], cls)}
+        # For each object, what its inputs carry so far, kept up to date as they change
+        # (columns only grow), so evaluating an object does not read all of its inputs
+        # again: an index can be fed by thousands of hosts. ``src`` holds the union of
+        # what they pass on (a key only once some input passes something); ``first`` the
+        # smallest input id that does (the "via" shown).
+        src: dict[str, frozenset[str] | None] = {}
+        first: dict[str, str] = {}
+        # Objects whose src changed since they were last evaluated (others would give the
+        # same result again, so they are skipped).
+        stale: set[str] = set()
+        for node, c in seed_c.items():
+            cols[node] = c
+            depth[node] = 0
+            queue.append(node)
+        for node, c in seed_c.items():
+            _fold(node, c, stopping, type_of, succ_nf, spec, specs, src, first, stale)
 
         # Level by level: everything downstream of the last level's changes is evaluated
         # once per level (a node with many inputs is not re-evaluated for each of them).
@@ -192,25 +195,19 @@ def propagate(
         while frontier:
             level += 1
             dirty = dict.fromkeys(
-                nxt
-                for node in frontier
-                if depth[node] < MAX_DEPTH
-                for nxt in succs.get(node, [])
-                if by_id[nxt]["type"] != "field"
+                nxt for node in frontier if depth[node] < MAX_DEPTH for nxt in succ_nf.get(node, ())
             )
             changed: list[str] = []
             for nxt in dirty:
-                e = by_id[nxt]
-                inputs = [(p, out_cols(p)) for p in carriers.get(nxt, ())]
-                inputs = [(p, c) for p, c in inputs if c is ALL or c]
-                if not inputs:
-                    continue
-                new, reads = _evaluate(spec(nxt), inputs, type_of)
+                if nxt not in stale:
+                    continue  # no input passes anything on, or nothing new since last time
+                stale.discard(nxt)
+                new, reads = _evaluate(spec(nxt), src[nxt])
                 if reads:
                     readers[nxt].add(cls)
-                if cls in seeds.get(nxt, {}):
-                    new = _union(new, seeds[nxt][cls])
-                if nxt in stoppers and stops(e, cls) and (new is ALL or new):
+                if nxt in seed_c:
+                    new = _union(new, seed_c[nxt])
+                if nxt in stopping and (new is ALL or new):
                     stopped[nxt].add(cls)
                 old = cols.get(nxt, frozenset())
                 if new is not ALL and not new:
@@ -218,11 +215,9 @@ def propagate(
                 merged = _union(old, new) if nxt in cols else new
                 if nxt in cols and merged == old:
                     continue
-                if nxt not in cols:
-                    for s in succs.get(nxt, ()):
-                        carriers[s].add(nxt)
                 cols[nxt] = merged
-                via.setdefault(nxt, min(p for p, _ in inputs))
+                _fold(nxt, merged, stopping, type_of, succ_nf, spec, specs, src, first, stale)
+                via.setdefault(nxt, first[nxt])
                 depth[nxt] = min(depth.get(nxt, level), level)
                 changed.append(nxt)
             frontier = changed
@@ -256,23 +251,49 @@ def _spec(e: dict[str, Any], defined_names: list[str]) -> tuple:
     )
 
 
-def _evaluate(
-    sp: tuple,
-    inputs: list[tuple[str, frozenset[str] | None]],
+def _fold(
+    p: str,
+    c: frozenset[str] | None,
+    stopping: set[str],
     type_of: dict[str, str],
-) -> tuple[frozenset[str] | None, bool]:
-    """(columns the node carries, whether it reads the classification)."""
+    succ_nf: dict[str, list[str]],
+    spec: Callable[[str], tuple],
+    specs: dict[str, tuple],
+    src: dict[str, frozenset[str] | None],
+    first: dict[str, str],
+    stale: set[str],
+) -> None:
+    """p now carries c: add it to what each of p's outputs reads (see propagate)."""
+    if p in stopping:
+        return  # passes nothing on
+    tp = type_of[p]
+    cached = specs.get
+    for s in succ_nf.get(p, ()):
+        sp = cached(s) or spec(s)
+        v = c if sp[0] != "fields" or tp in sp[1] else ALL
+        if s in src:
+            old = src[s]
+            merged = _union(old, v)
+            if merged != old:
+                src[s] = merged
+                stale.add(s)
+        else:
+            src[s] = v
+            stale.add(s)
+        f = first.get(s)
+        if f is None or p < f:
+            first[s] = p
+
+
+def _evaluate(sp: tuple, src: frozenset[str] | None) -> tuple[frozenset[str] | None, bool]:
+    """(columns the node carries, whether it reads the classification), from what its
+    inputs pass on: ``src`` is their union, with inputs of a kind its fields cannot be
+    matched against counted as every column (see fold in propagate)."""
     if sp[0] == "fixed":
         return sp[1], True
     if sp[0] == "pass":
-        src: frozenset[str] | None = frozenset()
-        for _, c in inputs:
-            src = _union(src, c)
         return src, True
-    _, matchable, used, outputs = sp
-    src = frozenset()
-    for p, c in inputs:
-        src = _union(src, c if type_of[p] in matchable else ALL)
+    _, _matchable, used, outputs = sp
     reads = src is ALL or bool(used & src)
     if outputs is None:
         return src, reads

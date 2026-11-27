@@ -165,15 +165,31 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
             for c in cs:
                 seed_cols[eid][c] = ALL
 
-    # structural: field -> sourcetype -> index
-    out_edges: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    # One pass over the relationships for everything below (millions on large estates).
+    feeds_index: dict[str, list[str]] = defaultdict(list)  # sourcetype -> indexes it feeds
+    contains_field: dict[str, str] = {}  # field -> sourcetype
+    reads_field: list[tuple[str, str]] = []
+    imports: dict[str, set[str]] = defaultdict(set)
+    grants: dict[str, set[str]] = defaultdict(set)  # role id -> index ids it can search
+    member_edges: list[tuple[str, str]] = []
     for edge in edges:
-        out_edges[edge["from"]].append(edge)
-    contains_field = {
-        edge["to"]: edge["from"]
-        for edge in edges
-        if edge["type"] == "contains" and edge["to"].split(":")[1] == "field"
-    }
+        t = edge["type"]
+        if t == "feeds":
+            if edge["to"].split(":")[1] == "index":
+                feeds_index[edge["from"]].append(edge["to"])
+        elif t == "contains":
+            if edge["to"].split(":")[1] == "field":
+                contains_field[edge["to"]] = edge["from"]
+        elif t == "readsField":
+            reads_field.append((edge["from"], edge["to"]))
+        elif t == "inherits":
+            imports[edge["from"]].add(edge["to"])
+        elif t == "grantsAccess":
+            grants[edge["from"]].add(edge["to"])
+        elif t == "memberOf":
+            member_edges.append((edge["from"], edge["to"]))
+
+    # structural: field -> sourcetype -> index
 
     def field_name(fid: str) -> str:
         p = by_id[fid].get("properties") or {}
@@ -187,14 +203,11 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
                 seed_cols[st][c] = cur | {field_name(fid)}
     for e in [x for x in entities if x["type"] == "sourcetype"]:
         for c in list(found.get(e["id"], {})):
-            for edge in out_edges[e["id"]]:
-                if edge["type"] == "feeds" and edge["to"].split(":")[1] == "index":
-                    add(edge["to"], c, e["id"], False, "sourcetype")
-                    cur = seed_cols[edge["to"]].get(c, frozenset())
-                    st_cols = seed_cols[e["id"]].get(c, ALL)
-                    seed_cols[edge["to"]][c] = (
-                        ALL if cur is ALL or st_cols is ALL else cur | st_cols
-                    )
+            for idx in feeds_index.get(e["id"], ()):
+                add(idx, c, e["id"], False, "sourcetype")
+                cur = seed_cols[idx].get(c, frozenset())
+                st_cols = seed_cols[e["id"]].get(c, ALL)
+                seed_cols[idx][c] = ALL if cur is ALL or st_cols is ALL else cur | st_cols
 
     # lineage: carry classifications to derived data through the columns that hold them
     carried = {c for cs in found.values() for c in cs if propagates(c)}
@@ -214,17 +227,12 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
             consumers[node] |= cls
 
     # field lineage: a search that reads a classified field reads that classification
-    for edge in edges:
-        if edge["type"] == "readsField" and edge["from"] in by_id:
-            for c in found.get(edge["to"], {}):
-                if by_id[edge["from"]]["type"] in CONSUMER_TYPES:
-                    consumers[edge["from"]].add(c)
+    for frm, to in reads_field:
+        if frm in by_id and by_id[frm]["type"] in CONSUMER_TYPES:
+            for c in found.get(to, {}):
+                consumers[frm].add(c)
 
     # role closure (role -> itself + imported roles, transitively)
-    imports: dict[str, set[str]] = defaultdict(set)
-    for edge in edges:
-        if edge["type"] == "inherits":
-            imports[edge["from"]].add(edge["to"])
     roles = [e for e in entities if e["type"] == "role"]
     role_names = {e["id"]: e["name"] for e in roles}
 
@@ -238,10 +246,6 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         return out
 
     role_closure = {r["id"]: closure(r["id"]) for r in roles}
-    grants: dict[str, set[str]] = defaultdict(set)  # role id -> index ids it can search
-    for edge in edges:
-        if edge["type"] == "grantsAccess":
-            grants[edge["from"]].add(edge["to"])
 
     sensitive_cache: dict[str, list[str]] = {}
 
@@ -276,18 +280,24 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
                 store_access[sid].append({"role": rid, "filtered": False})
 
     members: dict[str, set[str]] = defaultdict(set)  # role id -> user ids
-    for edge in edges:
+    for frm, to in member_edges:
         # Identity groups are memberOf roles too, but they are not users.
-        if edge["type"] == "memberOf" and (by_id.get(edge["from"]) or {}).get("type") == "user":
-            members[edge["to"]].add(edge["from"])
+        if (by_id.get(frm) or {}).get("type") == "user":
+            members[to].add(frm)
 
-    def users_of(role_ids: set[str]) -> set[str]:
-        """Users holding any of the roles directly or through roles that import them."""
-        out: set[str] = set()
-        for rid, cl in role_closure.items():
-            if cl & role_ids:
-                out |= members.get(rid, set())
-        return out
+    users_cache: dict[frozenset[str], list[str]] = {}
+
+    def users_of(role_ids: set[str]) -> list[str]:
+        """Users holding any of the roles directly or through roles that import them
+        (sorted; many stores share the same roles, so worked out once per set)."""
+        key = frozenset(role_ids)
+        if key not in users_cache:
+            out: set[str] = set()
+            for rid, cl in role_closure.items():
+                if cl & role_ids:
+                    out |= members.get(rid, set())
+            users_cache[key] = sorted(out)
+        return users_cache[key]
 
     # write results
     for eid, cs in found.items():
@@ -308,7 +318,7 @@ def apply_governance(bundle: dict[str, Any]) -> dict[str, Any]:
         by_id[eid].setdefault("governance", {})["access"] = {
             "roles": sorted(role_ids),
             "filteredRoles": sorted({a["role"] for a in access if a["filtered"]}),
-            "users": sorted(users_of(role_ids)),
+            "users": list(users_of(role_ids)),
             "everyone": everyone,
         }
         if eid in masked:
