@@ -223,8 +223,22 @@ def extract_app_inputs(ctx: Ctx, out: ExtractResult, apps_dir: Path) -> int:
         p for p in apps_dir.iterdir() if p.is_dir() and not p.name.startswith("_")
     ):
         app_id = fqn(ctx.instance, "deploymentApp", app_dir.name)
+        conf = read_app_conf(app_dir, "app")
         add_global(
-            ctx, out, "deploymentApp", app_dir.name, product=PRODUCT, properties={"onDisk": True}
+            ctx,
+            out,
+            "deploymentApp",
+            app_dir.name,
+            product=PRODUCT,
+            displayName=(conf.get("ui") or {}).get("label") or None,
+            properties={
+                "onDisk": True,
+                # What forwarders get: the app's own version (launcher, else id stanza).
+                "version": (conf.get("launcher") or {}).get("version")
+                or (conf.get("id") or {}).get("version")
+                or None,
+                "label": (conf.get("ui") or {}).get("label") or None,
+            },
         )
         inputs = read_app_conf(app_dir, "inputs")
         defaults = inputs.get("default", {})
@@ -332,4 +346,32 @@ def extract(transport, instance: str, apps_dir: Path | None = None) -> ExtractRe
         extractors["appInputs"] = lambda c, o: extract_app_inputs(c, o, apps_dir)
     extractors["clientConfig"] = extract_client_config  # last: it marks the apps' origin
     run_extractors(ctx, extractors, "deploymentServer", out)
+    _mark_use(ctx, out)
     return out
+
+
+def _mark_use(ctx: Ctx, out: ExtractResult) -> None:
+    """How many server classes deploy each app and how many clients have it, for the
+    check on apps nothing deploys (only when classes or clients were read)."""
+    read = {r["connector"] for r in out.reports if r.get("status") in ("ok", "partial")}
+    if not {"deploymentServer.classApps", "deploymentServer.clients"} <= read:
+        return
+    kind = lambda i: i.split(":")[1]  # noqa: E731
+    classes: dict[str, set[str]] = {}
+    clients: dict[str, set[str]] = {}
+    for x in out.edges:
+        if (
+            x["type"] != "deploys"
+            or kind(x["from"]) == "deploymentApp"
+            and kind(x["to"]) == "input"
+        ):
+            continue
+        if kind(x["from"]) == "serverClass" and kind(x["to"]) == "deploymentApp":
+            classes.setdefault(x["to"], set()).add(x["from"])
+        elif kind(x["from"]) == "deploymentApp" and kind(x["to"]) == "deploymentClient":
+            clients.setdefault(x["from"], set()).add(x["to"])
+    for e in out.entities:
+        if e["type"] == "deploymentApp" and e["instance"] == ctx.instance:
+            p = e.setdefault("properties", {})
+            p["serverClassCount"] = len(classes.get(e["id"], ()))
+            p["clientCount"] = len(clients.get(e["id"], ()))

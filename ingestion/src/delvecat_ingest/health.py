@@ -803,6 +803,16 @@ def evaluate_health(
                 _check(checks, "deployment", "warning", f"Apps not installed: {', '.join(parts)}")
         if e["type"] in ("authStrategy", "authGroup"):
             _auth_checks(e, role_names if e.get("instance") in with_roles else None, checks)
+        if e["type"] == "deploymentApp":
+            dp = e.get("properties") or {}
+            if dp.get("serverClassCount") == 0 and dp.get("clientCount") == 0:
+                _check(
+                    checks,
+                    "deploymentAppUnused",
+                    "warning",
+                    "In no server class and on no client: nothing deploys it (remove it, or "
+                    "add it to a server class)",
+                )
         if e["type"] in ("streamDefinition", "streamGroup", "streamForwarder"):
             _stream_checks(e, checks)
         if e["type"] in ("dbConnection", "dbInput", "dbOutput", "dbLookup"):

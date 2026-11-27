@@ -25,6 +25,7 @@ export const CHECK_TITLES: Record<string, string> = {
   silent: "Forwarder silent",
   phoneHome: "Deployment client not phoning home",
   deployment: "App deployment failed",
+  deploymentAppUnused: "Deployment app nothing deploys",
   relay: "Second-tier deployment server sent apps to enable",
   ldapTls: "LDAP without SSL or certificate check",
   authGroupRole: "Group mapped to a missing role",

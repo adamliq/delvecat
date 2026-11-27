@@ -425,6 +425,10 @@ second-tier server (same GUID as its `server/info`, else the same host name) and
 - marks a forwarder that moved from one deployment server to the other (`movedTo`):
   its old record no longer counts as not phoning home.
 
+Deployment apps read from the apps folder record their version and label (`app.conf`),
+and each app records how many server classes deploy it and how many clients have it; an
+app in no server class and on no client is flagged (`deploymentAppUnused`).
+
 Every server class also records the settings each of its apps gets (`appSettings`:
 `restartSplunkd`, `stateOnClient`, from the class:app stanza, the class, or `[global]`),
 and a client's failed apps keep Splunk's reason (`observed.appFailures`).

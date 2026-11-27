@@ -21,7 +21,7 @@ export interface Section {
 export const SECTIONS: Section[] = [
   { id: "data", title: "Data sources", checks: ["freshness", "volume", "ingestDelay", "parsing"], empty: "Every index and sourcetype looks healthy." },
   { id: "searches", title: "Scheduled searches and alerts", checks: ["skipped", "failed", "runtime", "notRunning", "alertNoisy"], empty: "No skipped, failing, missing or noisy scheduled searches." },
-  { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment", "relay"], empty: "Every forwarder and client reported recently." },
+  { id: "forwarders", title: "Forwarders and deployment", checks: ["silent", "phoneHome", "deployment", "relay", "deploymentAppUnused"], empty: "Every forwarder and client reported recently." },
   { id: "db", title: "DB Connect", checks: ["dbMissing", "dbFailed", "dbNotRunning"], empty: "Every DB Connect input and output has what it needs and runs." },
   { id: "stream", title: "Stream", checks: ["streamMissing", "streamExpired", "streamNoData", "streamsNotArriving"], empty: "Every Stream group, stream and sensor looks right." },
   { id: "hec", title: "HTTP Event Collector", checks: ["hecOff", "hecRejected", "hecErrors", "hecDisabledInUse"], empty: "No HEC problems." },
@@ -112,6 +112,10 @@ export const REMEDIES: Record<string, Remedy> = {
     why: "Apps the deployment server sends did not install, so this client runs old or missing configuration.",
     fix: "Look at the client's splunkd.log for the install error (often permissions, disk space or a bad app).",
     spl: (e) => `index=_internal sourcetype=splunkd component=DeployedApplication host=${q(e.name)} log_level!=INFO | table _time log_level message | sort - _time`,
+  },
+  deploymentAppUnused: {
+    why: "The app is on the deployment server but in no server class and on no forwarder: it is left over, or a server class was removed by mistake.",
+    fix: "Delete it from the deployment-apps folder if it is no longer needed, or add it to the server class that should deploy it, then reload the deployment server.",
   },
   relay: {
     why: "This client is a second-tier deployment server: it keeps the apps it gets in its deployment-apps folder to pass on, so it cannot enable them. Classes that send it apps to enable make the install fail at every phone home.",

@@ -208,3 +208,26 @@ def test_upstream_alone_still_explains_the_failed_install():
     b = _build(TIER1, "top")
     msg = _by_id(b)["top:deploymentClient:ds-emea"]["health"]["checks"][0]["message"]
     assert msg.startswith("Apps not installed: uf_base (Failed to install")
+
+
+def test_unused_app_is_flagged_and_versions_are_read(tmp_path):
+    routes = {k: list(v) for k, v in TIER1.items()}
+    routes["/services/deployment/server/applications"] = [
+        *routes["/services/deployment/server/applications"],
+        ("retired", {"serverclasses": []}),
+    ]
+    app = tmp_path / "uf_base" / "default"
+    app.mkdir(parents=True)
+    (app / "app.conf").write_text("[launcher]\nversion = 1.4.0\n\n[ui]\nlabel = ACME UF base\n")
+    (tmp_path / "retired" / "default").mkdir(parents=True)
+    r = deployment_server.extract(Mem(routes), "top", tmp_path)
+    inst = {"id": "top", "name": "top", "kind": "splunkEnterprise"}
+    b = assemble([inst], r, NOW)
+    ents = _by_id(b)
+    base = ents["top:deploymentApp:uf_base"]
+    assert base["properties"]["version"] == "1.4.0" and base.get("displayName") == "ACME UF base"
+    assert base["properties"]["serverClassCount"] == 2 and base["properties"]["clientCount"] == 2
+    assert "deploymentAppUnused" not in str(base.get("health"))
+    retired = ents["top:deploymentApp:retired"]
+    checks = {c["check"]: c["message"] for c in retired["health"]["checks"]}
+    assert checks["deploymentAppUnused"].startswith("In no server class and on no client")
