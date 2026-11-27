@@ -4,7 +4,7 @@ import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
 import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
 import { EXAMPLES, type QueryResult } from "../lib/sql";
-import { catalogDb, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
+import { catalogDb, Stopped, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
 import * as store from "../lib/sqlStore";
@@ -59,7 +59,7 @@ export default function SqlPage() {
       await db.ensure(`${text} entities`, setFilling);
     } catch (e) {
       setFilling(null);
-      setError({ message: `Could not load the catalog into SQLite: ${e instanceof Error ? e.message : String(e)}` });
+      setError({ message: e instanceof Stopped ? "Stopped." : `Could not load the catalog into SQLite: ${e instanceof Error ? e.message : String(e)}` });
       return;
     }
     setFilling(null);
@@ -83,7 +83,7 @@ export default function SqlPage() {
     } catch (e) {
       setResult(null);
       setHints([]);
-      setError(explainError(e instanceof Error ? e.message : String(e), text, db.tables));
+      setError(e instanceof Stopped ? { message: "Stopped." } : explainError(e instanceof Error ? e.message : String(e), text, db.tables));
     } finally {
       setRunning(false);
     }
@@ -140,7 +140,10 @@ export default function SqlPage() {
         <div className="sql-main">
           <SqlEditor ref={editor} value={sql} onChange={setSql} onRun={() => run(sql)} tables={tables} errorLine={error?.line} />
           <div className="sql-actions">
-            <button className="btn btn-primary" onClick={() => run(sql)} disabled={db.status !== "ready"}>Run</button>
+            <button className="btn btn-primary" onClick={() => run(sql)} disabled={db.status !== "ready" || running}>Run</button>
+            {(running || filling) && db.status === "ready" && (
+              <button className="btn" onClick={() => { setFilling(null); void db.stop(); }} title="Stop the query; tables already loaded stay">Stop</button>
+            )}
             <button className="btn" onClick={() => setSql(formatSql(sql))}>Format</button>
             <button className="btn" onClick={saveQuery} disabled={!sql.trim()}>Save…</button>
             <button className="btn" onClick={() => void copyLink()}>{copied ? "Link copied" : "Copy link"}</button>
@@ -186,7 +189,7 @@ export default function SqlPage() {
             </div>
           )}
           {hints.map((h) => <p key={h} className="notice small">{h}</p>)}
-          {result && <SqlResults result={result} ids={catalog.byId} />}
+          {result && <SqlResults result={result} ids={catalog.byId} downloadAll={db.status === "ready" && lastRun.current ? () => db.csv(lastRun.current!) : undefined} />}
         </div>
 
         <aside className="sql-schema" aria-label="Examples, tables, history and saved queries">

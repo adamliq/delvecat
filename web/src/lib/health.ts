@@ -1,4 +1,5 @@
 import type { CatalogBundle, Entity } from "../generated/catalog";
+import { csvCell } from "./csv";
 
 export type HealthStatus = "ok" | "warning" | "critical";
 
@@ -30,12 +31,7 @@ export function dayLabel(start: string, offset: number): string {
  * names and descriptions come from Splunk and annotations, not from us.
  */
 export function toCsv(rows: (string | number | undefined)[][]): string {
-  const q = (v: string | number | undefined) => {
-    let s = String(v ?? "");
-    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
-    return `"${s.replace(/"/g, '""')}"`;
-  };
-  return rows.map((r) => r.map(q).join(",")).join("\n") + "\n";
+  return rows.map((r) => r.map(csvCell).join(",")).join("\n") + "\n";
 }
 
 export function downloadText(filename: string, text: string, type = "text/csv") {

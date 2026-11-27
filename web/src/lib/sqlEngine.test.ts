@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { CatalogBundle } from "../generated/catalog";
 import { expandBundle, expandEdges, type EdgeTable } from "./catalog";
 import { catalogTables, EDGE_INDEXES, EXAMPLES, fillDatabase, runQuery, schemaStatements, tableIndexes } from "./sql";
-import { splitStatements, SqlEngine } from "./sqlEngine";
+import { fileFor, splitStatements, SqlEngine } from "./sqlEngine";
 
 const require = createRequire(import.meta.url);
 const DIR = new URL("../../public/catalog/", import.meta.url);
@@ -118,14 +118,7 @@ describe("SqlEngine", () => {
   });
 
   it("reopens the saved copy for the same catalog, and starts again otherwise", () => {
-    // a stand-in for the OPFS pool: one file that outlives close()
-    let file = new sqlite3.oo1.DB(":memory:");
-    const realClose = file.close.bind(file);
-    const keep = (db: typeof file) => Object.assign(db, { close: () => undefined });
-    const pool = {
-      OpfsSAHPoolDb: function () { return keep(file); },
-      unlink: () => { realClose(); file = new sqlite3.oo1.DB(":memory:"); return true; },
-    } as unknown as Parameters<typeof SqlEngine.open>[3];
+    const { pool, files } = fakePool();
     const schema = ["CREATE TABLE entities (id TEXT)"];
 
     const first = SqlEngine.open(sqlite3, "k1", schema, pool);
@@ -139,15 +132,73 @@ describe("SqlEngine", () => {
     expect(again.query("SELECT count(*) AS n FROM entities").rows).toEqual([[2]]);
 
     // a write that did not finish (the page closed): the copy may be damaged, so start again
-    file.exec("PRAGMA query_only = 0; INSERT OR REPLACE INTO delvecat_meta VALUES ('writing', '1')");
+    files.get(fileFor("k1"))!.exec("PRAGMA query_only = 0; INSERT OR REPLACE INTO delvecat_meta VALUES ('writing', '1')");
     const damaged = SqlEngine.open(sqlite3, "k1", schema, pool);
     expect(damaged.info.loaded).toEqual({});
     expect(damaged.query("SELECT count(*) AS n FROM entities").rows).toEqual([[0]]);
+  });
 
-    damaged.insertJson("entities", 1, '[["c"]]');
-    damaged.finish("entities", [], 1);
-    const other = SqlEngine.open(sqlite3, "k2", schema, pool); // another catalog
-    expect(other.info.loaded).toEqual({});
-    expect(other.query("SELECT count(*) AS n FROM entities").rows).toEqual([[0]]);
+  it("keeps the two most recently used catalogs (e.g. all stacks and one stack)", async () => {
+    const { pool, files } = fakePool();
+    const schema = ["CREATE TABLE entities (id TEXT)"];
+    const fill = (key: string) => {
+      const e = SqlEngine.open(sqlite3, key, schema, pool);
+      if (!e.info.loaded.entities) {
+        e.insertJson("entities", 1, '[["x"]]');
+        e.finish("entities", [], 1);
+      }
+      return e;
+    };
+    const tick = () => new Promise((r) => setTimeout(r, 2));
+    fill("all"); await tick();
+    fill("stack-a"); await tick();
+    expect(SqlEngine.open(sqlite3, "all", schema, pool).info.loaded).toEqual({ entities: 1 }); // switching back: kept
+    await tick();
+    fill("stack-b"); // a third: the least recently used (stack-a) goes
+    expect([...files.keys()].sort()).toEqual([fileFor("all"), fileFor("stack-b")].sort());
+    files.set("/delvecat-sql.sqlite3", new sqlite3.oo1.DB(":memory:")); // left by 0.45
+    SqlEngine.open(sqlite3, "all", schema, pool);
+    expect(files.has("/delvecat-sql.sqlite3")).toBe(false);
+  });
+
+  it("returns at most a limit of rows, counts them all, and gives them all as CSV", async () => {
+    const { e } = filled();
+    const sql = "WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n WHERE i < 2500) SELECT i, '=x' || i AS t FROM n";
+    const r = e.query(sql, 1000);
+    expect(r.rows).toHaveLength(1000);
+    expect(r.total).toBe(2500);
+    const csv = await e.csv(sql).text();
+    const lines = csv.replace(/^\ufeff/, "").trim().split("\n");
+    expect(lines).toHaveLength(2501);
+    expect(lines[0]).toBe('"i","t"');
+    expect(lines[2500]).toBe(`"2500","'=x2500"`);
   });
 });
+
+/** A stand-in for the OPFS pool: named files that outlive close(). */
+function fakePool() {
+  type Db = InstanceType<typeof sqlite3.oo1.DB>;
+  const files = new Map<string, Db>();
+  const realClose = new Map<Db, () => void>();
+  const keep = (db: Db) => {
+    if (!realClose.has(db)) {
+      realClose.set(db, db.close.bind(db));
+      Object.assign(db, { close: () => undefined });
+    }
+    return db;
+  };
+  const pool = {
+    getFileNames: () => [...files.keys()],
+    OpfsSAHPoolDb: function (name: string) {
+      let db = files.get(name);
+      if (!db) files.set(name, (db = new sqlite3.oo1.DB(":memory:")));
+      return keep(db);
+    },
+    unlink: (name: string) => {
+      const db = files.get(name);
+      if (db) (realClose.get(db) ?? (() => db.close()))();
+      return files.delete(name);
+    },
+  } as unknown as Parameters<typeof SqlEngine.open>[3];
+  return { pool, files };
+}

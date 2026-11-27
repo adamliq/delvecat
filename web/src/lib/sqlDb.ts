@@ -37,11 +37,19 @@ export interface CatalogDb {
   ensure: (sql: string, onProgress?: (p: LoadProgress) => void) => Promise<void>;
   /** Fill entities and edges in the background, and index edges, once (after a short pause). */
   prefetch: (onProgress?: (p: LoadProgress) => void) => Promise<void>;
-  /** Run a query (read-only); the last statement's result. */
+  /** Run a query (read-only); the last statement's result (its first MAX_ROWS rows). */
   query: (sql: string) => Promise<QueryResult>;
+  /** Every row of a query's result as CSV. */
+  csv: (sql: string) => Promise<Blob>;
+  /** Stop whatever the database is doing (a long query); it opens again. */
+  stop: () => Promise<void>;
 }
 
-const BATCH = 20000;
+/** Rows per batch: about a million values (objects have 29 columns, relationships 4),
+ * so each batch is built and sent in well under a tenth of a second. */
+const batchFor = (t: Table) => Math.max(20000, Math.min(100000, Math.round(1_000_000 / t.columns.length)));
+/** Batches sent ahead: the page builds the next while the worker inserts. */
+const IN_FLIGHT = 3;
 const sleep = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
 /** What the saved database must match: this build of the app, this catalog and scope. */
@@ -51,9 +59,21 @@ export function catalogKey(bundle: Catalog["bundle"], tables: Table[]): string {
     bundle.edges.length, schemaStatements(tables).join(";")].join("|");
 }
 
-class StorageReset extends Error {}
+/** The database started again (storage full: now in memory; or Stop): fills restart. */
+class Restarted extends Error {}
+/** A query stopped with Stop. */
+export class Stopped extends Error {
+  constructor() {
+    super("Stopped.");
+  }
+}
 
-function connect() {
+interface Conn {
+  call: <T>(m: Request) => Promise<T>;
+  close: (why: Error) => void;
+}
+
+function connect(onReset: () => void): Conn {
   const worker = new Worker(new URL("./sqlWorker.ts", import.meta.url), { type: "module" });
   const pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>();
   let next = 0;
@@ -62,20 +82,29 @@ function connect() {
     if (!p) return;
     pending.delete(ev.data.id);
     if (ev.data.ok) p.resolve(ev.data.value);
-    else p.reject(ev.data.reset ? new StorageReset(ev.data.error) : new Error(ev.data.error));
+    else {
+      if (ev.data.reset) onReset();
+      p.reject(ev.data.reset ? new Restarted(ev.data.error) : new Error(ev.data.error));
+    }
   };
   worker.onerror = (ev) => {
     const err = new Error(ev.message || "The SQL worker could not start.");
     for (const p of pending.values()) p.reject(err);
     pending.clear();
   };
-  const call = <T,>(m: Request): Promise<T> =>
-    new Promise<T>((resolve, reject) => {
-      const id = ++next;
-      pending.set(id, { resolve: resolve as (v: unknown) => void, reject });
-      worker.postMessage({ ...m, id });
-    });
-  return { call, close: () => worker.terminate() };
+  return {
+    call: <T,>(m: Request): Promise<T> =>
+      new Promise<T>((resolve, reject) => {
+        const id = ++next;
+        pending.set(id, { resolve: resolve as (v: unknown) => void, reject });
+        worker.postMessage({ ...m, id });
+      }),
+    close: (why) => {
+      worker.terminate();
+      for (const p of pending.values()) p.reject(why);
+      pending.clear();
+    },
+  };
 }
 
 let current: { catalog: Catalog; ready: Promise<CatalogDb>; close: () => void } | null = null;
@@ -83,41 +112,87 @@ let current: { catalog: Catalog; ready: Promise<CatalogDb>; close: () => void } 
 export function catalogDb(catalog: Catalog): Promise<CatalogDb> {
   if (current?.catalog === catalog) return current.ready;
   current?.close();
-  const w = connect();
-  const ready = open(catalog, w.call);
-  current = { catalog, ready, close: w.close };
+  let closeNow = () => {};
+  const ready = open(catalog, (close) => { closeNow = close; });
+  current = { catalog, ready, close: () => closeNow() };
   return ready;
 }
 
-async function open(catalog: Catalog, call: ReturnType<typeof connect>["call"]): Promise<CatalogDb> {
+async function open(catalog: Catalog, onClose: (close: () => void) => void): Promise<CatalogDb> {
   const tables = catalogTables(catalog.bundle, () => riskMap(catalog)); // risk: only if queried
-  const info = await call<OpenInfo>({ op: "open", key: catalogKey(catalog.bundle, tables), schema: schemaStatements(tables), save: true });
-  const state = { saved: info.saved, memoryReason: info.memoryReason, reopened: Object.keys(info.loaded).length > 0 };
-  const loaded = new Set(Object.keys(info.loaded));
-  const counts = new Map(Object.entries(info.loaded));
-  let edgesIndexed = info.indexed.includes("edges");
+  const key = catalogKey(catalog.bundle, tables);
+  const schema = schemaStatements(tables);
+  const state = { saved: false, memoryReason: undefined as string | undefined, reopened: false };
+  const loaded = new Set<string>();
+  const counts = new Map<string, number>();
+  let edgesIndexed = false;
+  // Bumped whenever the database starts again (storage full, or Stop): a fill that sees
+  // it change starts its table again, so no table is ever recorded with part of its rows.
+  let epoch = 0;
+  const restart = () => {
+    epoch++;
+    loaded.clear();
+    counts.clear();
+    edgesIndexed = false;
+  };
+  let conn: Conn;
+  const start = async () => {
+    conn = connect(() => {
+      restart();
+      state.saved = false;
+      state.memoryReason = "the browser's storage is full";
+      state.reopened = false;
+    });
+    const info = await conn.call<OpenInfo>({ op: "open", key, schema, save: true });
+    state.saved = info.saved;
+    state.memoryReason = info.memoryReason;
+    state.reopened = Object.keys(info.loaded).length > 0;
+    for (const [t, n] of Object.entries(info.loaded)) {
+      loaded.add(t);
+      counts.set(t, n);
+    }
+    edgesIndexed = info.indexed.includes("edges");
+  };
+  await start();
+  let closed = false; // another catalog replaced this one
+  onClose(() => {
+    closed = true;
+    conn.close(new Restarted("closed"));
+  });
+  const call = <T,>(m: Request) => conn.call<T>(m);
+
   const filling = new Map<string, Promise<void>>();
   let waiting = 0; // queries waiting for a table: background fills give way meanwhile
 
   const fillOnce = async (t: Table, background: boolean, onProgress?: (p: LoadProgress) => void) => {
+    const mine = epoch;
+    const check = () => {
+      if (epoch !== mine) throw new Restarted("the database started again");
+    };
     const sliced = !!t.slice && !t.built && t.count !== undefined;
     const progress = (done: number) => onProgress?.({ table: t.name, rows: t.count ?? (t.built ? t.rows.length : 0), done });
     progress(0);
     await call({ op: "clear", table: t.name }); // what an unfinished fill left
+    check();
     const total = sliced ? t.count! : t.rows.length;
     const inFlight: Promise<unknown>[] = [];
+    const BATCH = batchFor(t);
     for (let i = 0; i < total; i += BATCH) {
       while (background && waiting > 0) await sleep(30);
+      check();
       const end = Math.min(total, i + BATCH);
       const rows = sliced ? t.slice!(i, end) : t.rows.slice(i, end);
       inFlight.push(call({ op: "insert", table: t.name, ncols: t.columns.length, json: JSON.stringify(rows) }));
-      if (inFlight.length >= 2) await inFlight.shift(); // the next batch is built while one goes in
+      if (inFlight.length >= IN_FLIGHT) await inFlight.shift(); // the next batches are built while one goes in
+      check();
       progress((end / total) * 0.9);
       await sleep();
     }
     await Promise.all(inFlight);
+    check();
     progress(0.95); // indexing
     await call({ op: "finish", table: t.name, indexes: tableIndexes(t), rows: total });
+    check();
     loaded.add(t.name);
     counts.set(t.name, total);
     progress(1);
@@ -126,19 +201,17 @@ async function open(catalog: Catalog, call: ReturnType<typeof connect>["call"]):
   const fill = (t: Table, background: boolean, onProgress?: (p: LoadProgress) => void) => {
     let p = filling.get(t.name);
     if (!p) {
-      p = fillOnce(t, background, onProgress)
-        .catch(async (e) => {
-          if (!(e instanceof StorageReset)) throw e;
-          // The browser's storage refused more: the worker now keeps it in memory, empty.
-          state.saved = false;
-          state.memoryReason = "the browser's storage is full";
-          state.reopened = false;
-          loaded.clear();
-          counts.clear();
-          edgesIndexed = false;
-          await fillOnce(t, background, onProgress);
-        })
-        .finally(() => filling.delete(t.name));
+      p = (async () => {
+        for (let attempt = 0; ; attempt++) {
+          try {
+            return await fillOnce(t, background, onProgress);
+          } catch (e) {
+            if (!(e instanceof Restarted) || attempt >= 2 || closed) throw e;
+            if (loaded.has(t.name)) return; // filled again meanwhile
+            await ready; // after Stop: the new database
+          }
+        }
+      })().finally(() => filling.delete(t.name));
       filling.set(t.name, p);
     }
     return p;
@@ -146,14 +219,16 @@ async function open(catalog: Catalog, call: ReturnType<typeof connect>["call"]):
 
   const indexEdges = async (onProgress?: (p: LoadProgress) => void) => {
     if (edgesIndexed) return;
+    const mine = epoch;
     onProgress?.({ table: "edges (indexing for joins)", rows: counts.get("edges") ?? 0, done: 0.95 });
     await call({ op: "index", group: "edges", statements: EDGE_INDEXES });
-    edgesIndexed = true;
+    if (epoch === mine) edgesIndexed = true;
   };
 
   // Tables a query needs: those loaded already cost nothing; one being loaded in the
   // background is waited for; others are loaded now, ahead of background loading.
   const ensure = async (sql: string, onProgress?: (p: LoadProgress) => void) => {
+    await ready;
     const named = tablesIn(sql, tables);
     const need = named.filter((t) => !loaded.has(t.name));
     const wantsIndex = needsEdgeIndexes(sql) && named.some((t) => t.name === "edges");
@@ -187,10 +262,26 @@ async function open(catalog: Catalog, call: ReturnType<typeof connect>["call"]):
       if (loaded.has("edges")) await indexEdges(onProgress).catch(() => undefined);
     }));
 
-  const query = async (sql: string): Promise<QueryResult> => {
-    const r = await call<QueryOutput>({ op: "query", sql });
-    return { columns: r.columns, rows: r.rows, ms: r.ms };
+  // Stop: end the worker (whatever it is doing) and open the database again. Saved tables
+  // come back at once; a fill that was under way starts again.
+  let ready: Promise<void> = Promise.resolve();
+  const stop = () => {
+    restart();
+    conn.close(new Stopped());
+    ready = start();
+    prefetching = null;
+    return ready;
   };
 
-  return { tables, loaded, counts, storage: () => ({ ...state }), ensure, prefetch, query };
+  const query = async (sql: string): Promise<QueryResult> => {
+    await ready;
+    const r = await call<QueryOutput>({ op: "query", sql });
+    return { columns: r.columns, rows: r.rows, total: r.total, ms: r.ms };
+  };
+  const csv = async (sql: string): Promise<Blob> => {
+    await ready;
+    return call<Blob>({ op: "csv", sql });
+  };
+
+  return { tables, loaded, counts, storage: () => ({ ...state }), ensure, prefetch, query, csv, stop };
 }

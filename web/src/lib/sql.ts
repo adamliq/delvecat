@@ -333,6 +333,8 @@ export function fillDatabase(db: Database, tables: Table[]) {
 export interface QueryResult {
   columns: string[];
   rows: SqlValue[][];
+  /** Rows the query gave, when more than were returned (the console returns the first 100,000). */
+  total?: number;
   ms: number;
 }
 

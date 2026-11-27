@@ -197,6 +197,42 @@ const sections = {
     await sleep(500);
     const err = await v.page.locator('.sql-error').innerText().catch(() => '');
     check('viewer: SQL error suggests a close column', /Did you mean last_used/.test(err.replace(/\s+/g, ' ')), err.slice(0, 80));
+    // The console cannot change its data, even with a pragma; Stop ends a runaway query;
+    // the tables are kept in the browser and reopened on the next visit.
+    const sqlError = async (sql) => {
+      await v.page.locator('textarea').fill(sql);
+      await v.page.click('button:has-text("Run")');
+      try { await v.page.waitForFunction(() => document.querySelector('.sql-error'), null, { timeout: 20000 }); } catch {}
+      return (await v.page.locator('.sql-error').innerText().catch(() => '')).replace(/\s+/g, ' ');
+    };
+    const sqlValue = async (alias, sql) => {
+      await v.page.locator('textarea').fill(sql);
+      await v.page.click('button:has-text("Run")');
+      await v.page.waitForFunction((a) => [...document.querySelectorAll('.sql-main th')].some((th) => th.textContent.trim().startsWith(a)), alias, { timeout: 30000 });
+      return v.page.locator('.sql-main table tbody tr').first().innerText();
+    };
+    const before = await sqlValue('n_before', 'SELECT count(*) AS n_before FROM entities');
+    const del = await sqlError('DELETE FROM entities');
+    check('viewer: SQL console refuses writes', /readonly/.test(del), del.slice(0, 80));
+    const prag = await sqlError('PRAGMA query_only = 0; DELETE FROM entities');
+    check('viewer: SQL console refuses switching writes on', /not authorized/.test(prag), prag.slice(0, 80));
+    await v.page.locator('textarea').fill('WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n) SELECT count(*) AS forever FROM n');
+    await v.page.click('button:has-text("Run")');
+    let stopped = '';
+    try {
+      await v.page.waitForSelector('button:has-text("Stop")', { timeout: 10000 });
+      await sleep(1000);
+      await v.page.click('button:has-text("Stop")');
+      await v.page.waitForFunction(() => /Stopped/.test(document.querySelector('.sql-error')?.textContent || ''), null, { timeout: 15000 });
+      stopped = 'Stopped';
+    } catch (e) { stopped = String(e.message).slice(0, 80); }
+    check('viewer: Stop ends a runaway SQL query', stopped === 'Stopped', stopped);
+    const after = await sqlValue('n_after', 'SELECT count(*) AS n_after FROM entities');
+    check('viewer: SQL data unchanged after refused writes and Stop', after === before && Number(before.replace(/\D/g, '')) > 0, `${before} / ${after}`);
+    await v.page.reload();
+    await v.page.waitForSelector('button.btn-primary:has-text("Run"):not([disabled])', { timeout: 30000 });
+    const kept = await v.page.locator('.sql-main p.muted.small').first().innerText().catch(() => '');
+    check('viewer: SQL tables kept in the browser for the next visit', /kept in this browser from your last visit/.test(kept), kept.slice(0, 90));
     check('viewer has no Build button with a catalog either', (await v.page.locator('.open-buttons a:has-text("Build")').count()) === 0);
     check('viewer pages without script errors', v.errors.length === 0, v.errors.join('; '));
     await v.close();
