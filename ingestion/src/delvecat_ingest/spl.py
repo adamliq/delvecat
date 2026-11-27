@@ -152,24 +152,34 @@ MacroResolver = Callable[[str], "tuple[str, list[str]] | None"]
 _MACRO_CALL = re.compile(r"^\s*([\w.:-]+)\s*(?:\((.*)\))?\s*$", re.S)
 
 
+_MACRO_CHARS = re.compile(r'[\\"`]')
+
+
 def _macro_spans(s: str) -> list[tuple[int, int]]:
-    """Positions of `...` macro calls outside double quotes."""
-    spans, quote, start = [], False, None
-    i = 0
-    while i < len(s):
-        c = s[i]
-        if c == "\\" and quote:
-            i += 2
+    """Positions of `...` macro calls outside double quotes (jumping from one backslash,
+    quote or backtick to the next rather than walking every character)."""
+    if "`" not in s:
+        return []
+    spans: list[tuple[int, int]] = []
+    quote, start, skip = False, None, -1
+    for m in _MACRO_CHARS.finditer(s):
+        i = m.start()
+        if i < skip:
             continue
-        if c == '"' and start is None:
-            quote = not quote
-        elif c == "`" and not quote:
+        c = s[i]
+        if c == "\\":
+            if quote:
+                skip = i + 2  # an escaped character inside quotes
+            continue
+        if c == '"':
+            if start is None:
+                quote = not quote
+        elif not quote:
             if start is None:
                 start = i
             else:
                 spans.append((start, i))
                 start = None
-        i += 1
     return spans
 
 
