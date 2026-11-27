@@ -59,7 +59,7 @@ const ids = {
     ["health", () => nav("/health", "h1")],
     ["governance", () => nav("/governance", "h1")],
     ["insights", () => nav("/insights", ".kpi")],
-    ["sql console", () => nav("/sql", ".sql-schema details")],
+    ["sql console (Run usable)", () => nav("/sql", 'button.btn-primary:has-text("Run"):not([disabled])')],
   ];
   for (const [name, run] of steps) {
     const t = Date.now();

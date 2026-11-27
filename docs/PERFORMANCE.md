@@ -13,10 +13,57 @@ make perf SCALE=0.25    # a smaller run
 cd ingestion && uv run delvecat-ingest synth --scale 2 --out /tmp/big --shard --validate
 ```
 
+## Up to 1,000,000 objects: the supported maximum
+
+The Help page ("Tested size and limits") states **1,000,000 objects and 7 million
+relationships** (6.8 million tested) as the supported maximum, from runs at three sizes (0.44.0):
+
+```sh
+cd ingestion && uv run delvecat-ingest synth --scale 6.8 --host-indexes 16 --out ../web/.x600 --shard
+cd ingestion && uv run delvecat-ingest synth --scale 11.4 --host-indexes 16 --out ../web/.x1m --shard
+```
+
+| Step | 301,405 / 2.0 M | 603,037 / 4.0 M | 1,008,734 / 6.8 M |
+|---|---:|---:|---:|
+| Build in Splunk's Python 3.13 (generate, assemble, governance, quality) | 62 s, 1.6 GB | 109 s, 3.2 GB | 190 s, 5.4 GB |
+| of which governance | | 51 s | 88 s |
+| Schema validation | 29 s | 52 s, 3.3 GB | 95 s, 5.6 GB |
+| Size; compressed in Splunk | 211 MB; 26 MB | 425 MB; 55 MB (18 parts) | 714 MB; 93 MB (30 parts) |
+| Publish | 26 s | 37 s | 60 s |
+| Splunk Web, first opening; again | 5 s; 4.5 s | 12 s; 10.6 s | 24 s; 20 s |
+| Tab heap after opening; after every page | 580 MB; 800 MB | 1.1 GB; 1.6 GB | 1.9 GB; 2.5 GB |
+| Search right after opening (first results) | 0.4 s | 3.4 s | 7.3 s |
+| Browse with facets | 0.5 s | 0.7 s | 1.2 s |
+| Object pages | 0.1–0.5 s | 0.1–1.6 s | 0.6–1.8 s |
+| Health, Coverage, Domains, Glossary | 0.08–0.17 s | 0.07–0.35 s | 0.1–0.25 s |
+| Governance; Schemas; Insights | 0.4; 1.0; 2.2 s | 0.7; 1.7; 4.5 s | 1.5; 3.3; 9.1 s |
+| SQL: ready; first on entities; first on edges; first join | 1.1; 2.6; 5.6; 5.0 s | 1.2; 6.0; 13.6; 10.7 s | 1.1; 10.9; 33.6; 28.7 s |
+
+Every step grows roughly in proportion to the catalog. What broke on the way, and was
+fixed:
+
+- **Splunk Web could not open a million objects.** The catalog is 714 MB of JSON,
+  more than the roughly 512 million characters a browser string can hold, so reading
+  it as text failed and the page said "File is not valid JSON" (the sharded files
+  served directly were not affected). Catalogs are now read from their bytes
+  (`web/src/lib/bigJson.ts`): under 256 MB in one go, above that member by member and
+  lists 8 MB at a time. The copy kept in the browser holds the JSON bytes instead of
+  text.
+- **Governance page: 1.9 s at 300k, 8 s at 600k, 21 s at a million.** The store
+  matrix sort counted each store's roles inside the comparator; counted once, it is
+  1.5 s at a million.
+- `scripts/perf.cjs` waited for an element the SQL console no longer has, so it
+  reported the console as failing; it now waits for Run to be usable.
+
+What sets the maximum: the browser tab holds the whole catalog (2 to 2.5 GB at a
+million objects; browsers stop a tab at about 4 GB), and a build needs about 5.3 KB
+per object. Tried and not kept: maintaining the relationship indexes while the SQL
+console fills edges in the background avoids the one pause on the first join (29 s
+at a million), but made the fill take 170 s instead of 34 s.
+
 ## 300,000 objects and 2 million relationships
 
-The largest size tested, and the figures shown on the Help page ("Tested size and
-limits"):
+The size first tested in detail:
 
 ```sh
 cd ingestion && uv run delvecat-ingest synth --scale 3.4 --host-indexes 16 --out ../web/.large --shard

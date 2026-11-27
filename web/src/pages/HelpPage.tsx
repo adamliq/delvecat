@@ -246,38 +246,46 @@ const SECTIONS: Section[] = [
   {
     id: "limits",
     title: "Tested size and limits",
-    keywords: "size limit maximum supported scale performance large objects relationships memory slow capacity",
+    keywords: "size limit maximum supported scale performance large objects relationships memory slow capacity million",
     body: (
       <>
         <p>
-          Licoryx Delvecat is tested with a synthetic catalog of <strong>301,405 objects and 2,025,265 relationships</strong>
-          {" "}(68,000 hosts sending to many indexes, 40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users,
-          {" "}123,000 fields),
-          built through the real pipeline. This is the largest size it is tested at; larger catalogs may work but are not tested.
+          <strong>Supported up to 1,000,000 objects and about 7 million relationships.</strong> Licoryx Delvecat is tested at three
+          sizes with synthetic catalogs built through the real pipeline: hosts each sending to about 16 indexes, saved searches,
+          detections, dashboards, users and fields in the proportions of a large estate (at 300,000 objects: 68,000 hosts,
+          40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users and 123,000 fields).
+          Up to about 300,000 objects every page answers within about 2 seconds; at a million, everything works but opening
+          takes about 25 seconds and the heaviest pages up to 9.
         </p>
-        <table className="mini-table">
-          <thead><tr><th>At 300,000 objects and 2 million relationships</th><th>Measured</th></tr></thead>
-          <tbody>
-            <tr><td>Building the catalog (lineage, health, governance, quality)</td><td>69 s, 1.8 GB memory (62 s and 1.6 GB in Splunk's own Python)</td></tr>
-            <tr><td>Checking it against the catalog schema (part of every build)</td><td>29 s</td></tr>
-            <tr><td>Size</td><td>211 MB (relationships 44 MB), 26 MB compressed as stored in Splunk</td></tr>
-            <tr><td>Publishing into Splunk</td><td>26 s, 1.7 GB memory (9 parts)</td></tr>
-            <tr><td>Opening it in Splunk Web</td><td>5 s the first time, 4.5 s again; the browser tab uses about 550 MB of memory</td></tr>
-            <tr><td>Searching right after opening</td><td>at once on names, apps and descriptions; full-text results follow within about 8 s</td></tr>
-            <tr><td>Browse and its filters</td><td>0.1–0.5 s</td></tr>
-            <tr><td>Object pages (overview, lineage, relationships, fields)</td><td>under 0.6 s</td></tr>
-            <tr><td>Health, Findings, Coverage, Changes, Domains, Glossary</td><td>under 0.3 s</td></tr>
-            <tr><td>Governance, Insights, Schemas</td><td>1–2 s</td></tr>
-            <tr><td>SQL console</td><td>ready in about 1 s; objects and relationships load in the background within about 15 s (a query needing them meanwhile waits for them); other tables load the first time a query uses them; later queries under 1 s</td></tr>
-            <tr><td>Combining two such catalogs (<code>delvecat-ingest merge</code>)</td><td>2.5 min, 3.8 GB memory</td></tr>
-            <tr><td>Redacting it for public use; exporting it from the browser</td><td>56 s and 2 GB; 7 s</td></tr>
-          </tbody>
-        </table>
+        <div className="table-wrap">
+          <table className="mini-table">
+            <thead>
+              <tr><th>Objects / relationships</th><th>301,405 / 2.0 million</th><th>603,037 / 4.0 million</th><th>1,008,734 / 6.8 million</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Building the catalog in Splunk's own Python (lineage, health, governance, quality)</td><td>62 s, 1.6 GB</td><td>109 s, 3.2 GB</td><td>190 s, 5.4 GB</td></tr>
+              <tr><td>Checking it against the catalog schema (part of every build outside Splunk)</td><td>29 s</td><td>52 s</td><td>95 s</td></tr>
+              <tr><td>Size; as stored in Splunk (compressed)</td><td>211 MB; 26 MB</td><td>425 MB; 55 MB</td><td>714 MB; 93 MB</td></tr>
+              <tr><td>Publishing into Splunk</td><td>26 s</td><td>37 s</td><td>60 s</td></tr>
+              <tr><td>Opening it in Splunk Web: first time; again (copy saved in the browser)</td><td>5 s; 4.5 s</td><td>12 s; 11 s</td><td>24 s; 20 s</td></tr>
+              <tr><td>Memory used by the browser tab</td><td>about 550–800 MB</td><td>about 1.1–1.6 GB</td><td>about 1.9–2.5 GB</td></tr>
+              <tr><td>Searching right after opening: first results (names, apps and descriptions; full text follows)</td><td>0.4 s</td><td>3.4 s</td><td>7 s</td></tr>
+              <tr><td>Browse and its filters</td><td>0.1–0.5 s</td><td>0.7 s</td><td>1.2 s</td></tr>
+              <tr><td>Object pages (overview, lineage, relationships, fields)</td><td>under 0.6 s</td><td>0.1–1.6 s</td><td>0.6–1.8 s</td></tr>
+              <tr><td>Health, Findings, Coverage, Changes, Domains, Glossary</td><td>under 0.3 s</td><td>under 0.4 s</td><td>under 0.3 s</td></tr>
+              <tr><td>Governance; Schemas; Insights</td><td>0.4 s; 1 s; 2.2 s</td><td>0.7 s; 1.7 s; 4.5 s</td><td>1.5 s; 3.3 s; 9 s</td></tr>
+              <tr><td>SQL console: ready; first query on objects; first on relationships; first join on them</td><td>1 s; 2.6 s; 5.6 s; 5 s</td><td>1.2 s; 6 s; 14 s; 11 s</td><td>1 s; 11 s; 34 s; 29 s</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Also at 300,000 objects: combining two such catalogs (<code>delvecat-ingest merge</code>) 2.5 min and 3.8 GB; redacting it for public use 56 s and 2 GB; exporting it from the browser 7 s.</p>
         <ul>
+          <li><strong>Why a million is the maximum</strong>: the browser tab holds the whole catalog, about 2 to 2.5 GB at a million objects, and browsers stop a tab at about 4 GB; building needs about 5.3 KB of memory per object (5.4 GB at a million). Larger catalogs are not supported: split them by stack, or leave out what you do not need (for example hosts, which are most of the objects in these tests).</li>
           <li><strong>Opening</strong>: the loading screen says what it is doing. The catalog is kept in your browser, so opening it again does not download it again until a new build is published (Splunk is still asked which build is current, and whether you may read it).</li>
-          <li><strong>Browser</strong>: allow about 600 MB to 1 GB of memory per tab at the tested size; a desktop browser with 8 GB or more is comfortable.</li>
-          <li><strong>Building in Splunk</strong>: the <em>Build</em> button reads a real Splunk, so its time depends on that Splunk (searches, permissions, the search time limit) more than on the catalog's size. The search head needs about 5 KB of free memory per object (1.6 GB at the tested size); a build stops with a message saying so, before the memory-heavy part, when it has less. Build outside Splunk with <code>delvecat-ingest</code> and publish the result instead.</li>
-          <li>Measured on 4 CPU cores and 15 GB of memory, headless Chromium, Splunk 10.4 on the same machine (a slower network adds download time to the first opening). Re-run it with <code>delvecat-ingest synth --scale 3.4 --host-indexes 16</code>.</li>
+          <li><strong>Browser</strong>: a desktop browser with 8 GB of memory is comfortable up to 300,000 objects; allow 16 GB for a million.</li>
+          <li><strong>SQL console</strong>: tables load the first time a query uses them, and objects and relationships load in the background once the console is open. The first query that joins relationships (by <code>from_id</code> or <code>to_id</code>) indexes them first; the page does not respond while it does (5 s at 300,000 objects, 11 s at 600,000, 29 s at a million), and later queries are quick.</li>
+          <li><strong>Building in Splunk</strong>: the <em>Build</em> button reads a real Splunk, so its time depends on that Splunk (searches, permissions, the search time limit) more than on the catalog's size. A build stops with a message saying so, before the memory-heavy part, when the search head has less free memory than it needs. Build outside Splunk with <code>delvecat-ingest</code> and publish the result instead.</li>
+          <li>Measured on 4 CPU cores and 15 GB of memory, headless Chromium, Splunk 10.4 on the same machine (a slower network adds download time to the first opening). Re-run it with <code>delvecat-ingest synth --scale 3.4 --host-indexes 16</code> (6.8 for 600,000 objects, 11.4 for a million).</li>
         </ul>
       </>
     ),
