@@ -69,3 +69,39 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  # A synthetic catalog of about 89,000 objects and 600,000 relationships: the build and
+  # every page must stay within budget, so work that grows faster than the catalog (as
+  # once on the Governance page) fails here rather than on a large estate.
+  scale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build a synthetic catalog (budget 120 s)
+        working-directory: ingestion
+        run: |
+          uv sync --locked
+          start=$(date +%s)
+          uv run delvecat-ingest synth --scale 1.0 --host-indexes 16 --out ../web/.ci --shard
+          took=$(( $(date +%s) - start ))
+          echo "build took ${took} s"
+          test "$took" -le 120 || { echo "over the 120 s budget"; exit 1; }
+      - name: Build the web app
+        working-directory: web
+        run: npm ci && npm run build && cp -r .ci dist/ci
+      - name: Install Playwright and Chromium
+        working-directory: web
+        run: npm install --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+      - name: Every page within budget (scripts/perf-budget.json)
+        working-directory: web
+        run: |
+          npx vite preview --port 4173 --strictPort > /tmp/preview.log 2>&1 &
+          for i in $(seq 30); do curl -sf http://localhost:4173/ > /dev/null && break; sleep 1; done
+          node scripts/perf.cjs --budget scripts/perf-budget.json http://localhost:4173 .ci ci/catalog.json
+

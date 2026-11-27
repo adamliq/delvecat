@@ -12,7 +12,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
 
-const [BASE = "http://localhost:4173", DIR = ".large", SERVED = "large/catalog.json"] = process.argv.slice(2);
+const args = process.argv.slice(2);
+// --budget <file>: fail (exit 1) when a step takes longer than its budget, fails, or the
+// page logs an error (CI runs this on a synthetic catalog).
+const budgetAt = args.indexOf("--budget");
+const budget = budgetAt >= 0 ? JSON.parse(fs.readFileSync(args.splice(budgetAt, 2)[1], "utf8")) : null;
+const [BASE = "http://localhost:4173", DIR = ".large", SERVED = "large/catalog.json"] = args;
+let failed = 0;
 const shard = (type) => {
   const f = path.join(DIR, "entities", `${type}.json`);
   return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")).entities : [];
@@ -65,11 +71,21 @@ const ids = {
     const t = Date.now();
     try {
       await run();
-      console.log(name.padEnd(22), `${String(Date.now() - t).padStart(7)} ms`, `${String(await heap()).padStart(5)} MB heap`);
+      const ms = Date.now() - t;
+      const limit = budget?.[name];
+      const over = limit !== undefined && ms > limit;
+      if (over) failed++;
+      console.log(name.padEnd(22), `${String(ms).padStart(7)} ms`, `${String(await heap()).padStart(5)} MB heap`, limit !== undefined ? (over ? `OVER BUDGET (${limit} ms)` : `budget ${limit} ms`) : "");
     } catch (e) {
+      failed++;
       console.log(name.padEnd(22), "FAIL", e.message.split("\n")[0].slice(0, 100));
     }
   }
   console.log(errors.length ? `console errors: ${errors.slice(0, 5).join(" | ")}` : "no console errors");
+  if (errors.length) failed++;
   await browser.close();
+  if (budget && failed) {
+    console.log(`${failed} problem(s)`);
+    process.exit(1);
+  }
 })();

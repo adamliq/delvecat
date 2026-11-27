@@ -3,3 +3,7 @@ dist/
 public/catalog/
 *.tsbuildinfo
 .demo-parts/
+.ci/
+.ci100/
+.x600/
+.x1m/

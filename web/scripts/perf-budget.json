@@ -1,0 +1,21 @@
+{
+  "_comment": "CI check (scale 1.0, about 89,000 objects and 600,000 relationships): the most each step may take, in ms. About five times what it takes on a 4-core machine (at least 1,500 ms), so only real slowdowns fail, e.g. work that grows faster than the catalog.",
+  "load + home": 9000,
+  "search": 5000,
+  "browse with facets": 1500,
+  "index page": 1500,
+  "index lineage": 1500,
+  "index relationships": 1500,
+  "sourcetype schema": 1500,
+  "sourcetype lineage": 1500,
+  "search fields used": 1500,
+  "field page": 1500,
+  "domains": 1500,
+  "schemas": 1500,
+  "glossary": 1500,
+  "coverage": 1500,
+  "health": 1500,
+  "governance": 1500,
+  "insights": 3000,
+  "sql console (Run usable)": 5000
+}
