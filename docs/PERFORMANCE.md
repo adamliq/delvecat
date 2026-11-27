@@ -13,6 +13,42 @@ make perf SCALE=0.25    # a smaller run
 cd ingestion && uv run delvecat-ingest synth --scale 2 --out /tmp/big --shard --validate
 ```
 
+## 300,000 objects and 2 million relationships
+
+The largest size tested, and the figures shown on the Help page ("Tested size and
+limits"):
+
+```sh
+cd ingestion && uv run delvecat-ingest synth --scale 3.4 --host-indexes 16 --out ../web/.large --shard
+```
+
+301,405 objects and 2,025,265 relationships: 68,000 hosts each sending to about 16
+indexes, 40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users,
+122,861 fields. Measured on 4 cores and 15 GB, headless Chromium, Splunk 10.4.
+
+| Step | Measured |
+|---|---:|
+| Build (generate 4.7 s, assemble 35 s, governance 26 s, quality 1.2 s, write 6.6 s) | 75 s, 2.2 GB peak |
+| Schema validation (`delvecat-ingest validate`, part of every `build`) | 167 s, 2.4 GB peak |
+| Size on disk (edges 216 MB) | 383 MB |
+| Published into Splunk (`delvecat-ingest publish`) | 32 s, 27.1 MB compressed in 9 parts |
+| First load, served directly | 12.8 s, 990 MB heap |
+| First load in Splunk Web (and after a reload) | 16.7 s, about 1 GB heap |
+| Search; Browse with facets | 2.0 s; 0.9–1.5 s |
+| Object pages (overview, lineage, relationships, schema, field) | 0.01–0.6 s |
+| Health, Findings, Coverage, Changes, Domains, Glossary, Compare | 0.03–0.14 s |
+| Schemas, Governance, Insights | 0.8–1.9 s |
+| SQL console | not finished after 15 min |
+
+Limits found:
+
+- **SQL console** copies the whole catalog into SQLite in the browser; at 2.3 million
+  rows it does not finish. It needs to load on demand or in a Web Worker, or be
+  limited at this size.
+- **Schema validation** takes longer than the build itself (jsonschema, pure Python).
+- **First load** is mostly downloading, parsing and indexing 383 MB of JSON; memory
+  per tab is about 1 GB.
+
 ## Web app (headless Chromium, 1280×900)
 
 Time from navigation until the page has rendered. Before = the code before

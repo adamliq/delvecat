@@ -244,6 +244,42 @@ const SECTIONS: Section[] = [
     ),
   },
   {
+    id: "limits",
+    title: "Tested size and limits",
+    keywords: "size limit maximum supported scale performance large objects relationships memory slow capacity",
+    body: (
+      <>
+        <p>
+          Licoryx Delvecat is tested with a synthetic catalog of <strong>301,405 objects and 2,025,265 relationships</strong>
+          {" "}(68,000 hosts sending to many indexes, 40,800 saved searches, 6,800 detections, 10,200 dashboards, 17,000 users,
+          {" "}123,000 fields),
+          built through the real pipeline. This is the largest size it is tested at; larger catalogs may work but are not tested.
+        </p>
+        <table className="mini-table">
+          <thead><tr><th>At 300,000 objects and 2 million relationships</th><th>Measured</th></tr></thead>
+          <tbody>
+            <tr><td>Building the catalog (lineage, health, governance, quality)</td><td>75 s, 2.2 GB memory</td></tr>
+            <tr><td>Checking it against the catalog schema (part of every build)</td><td>2 min 47 s</td></tr>
+            <tr><td>Size</td><td>383 MB, 27 MB compressed as stored in Splunk</td></tr>
+            <tr><td>Publishing into Splunk</td><td>32 s (9 parts)</td></tr>
+            <tr><td>Opening it in Splunk Web (first time, or after a reload)</td><td>17 s; the browser tab uses about 1 GB of memory</td></tr>
+            <tr><td>Browse and search</td><td>1–2 s</td></tr>
+            <tr><td>Object pages (overview, lineage, relationships, fields)</td><td>under 1 s</td></tr>
+            <tr><td>Health, Findings, Coverage, Changes, Domains, Glossary</td><td>under 0.2 s</td></tr>
+            <tr><td>Governance, Insights, Schemas</td><td>1–2 s</td></tr>
+            <tr><td>SQL console</td><td>does not open at this size (not finished after 15 min)</td></tr>
+          </tbody>
+        </table>
+        <ul>
+          <li><strong>SQL console</strong>: it copies the whole catalog into a database in the browser. It opens in about 8 s at 90,000 objects and 290,000 relationships; well beyond that, use Browse, the object pages and Download CSV instead.</li>
+          <li><strong>Browser</strong>: allow about 1 GB of memory per tab at the tested size; a desktop browser with 8 GB or more is comfortable.</li>
+          <li><strong>Building in Splunk</strong>: the <em>Build</em> button reads a real Splunk, so its time depends on that Splunk (searches, permissions, the search time limit) more than on the catalog's size. The figures above are for building outside Splunk with <code>delvecat-ingest</code>.</li>
+          <li>Measured on 4 CPU cores and 15 GB of memory, headless Chromium, Splunk 10.4. Re-run it with <code>delvecat-ingest synth --scale 3.4 --host-indexes 16</code>.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
     id: "troubleshooting",
     title: "Troubleshooting",
     keywords: "error problem missing empty not found access denied stale",
