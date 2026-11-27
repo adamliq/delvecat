@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from .sql import tables as _sql_tables
@@ -230,51 +231,60 @@ def expand_macros(
 # --- search terms ---------------------------------------------------------------------------
 
 
-def _tokens(s: str) -> list[str]:
+# An unescaped double quote (the tokenizer's quote toggle), whitespace that ``=`` or
+# ``!=`` sticks to, other whitespace runs, and tokens.
+_QUOTE = re.compile(r'(?<!\\)"')
+_EQ_SPACE = re.compile(r"(?<==)\s+|\s+(?=!=|=)")
+_SPACE = re.compile(r"\s+")
+_PIECE = re.compile(r"[()]|[^\s()]+")
+
+
+@lru_cache(maxsize=8192)
+def _tokens(s: str) -> tuple[str, ...]:
     """Split a search clause into terms, parentheses and quoted strings.
 
     Whitespace around ``=`` and ``!=`` is removed first, so ``index = web`` works.
+    Text between unescaped double quotes stays whole and joins the term it touches.
+    (Cached: the same clause is tokenized for terms and for fields.)
     """
-    compact, quote = [], False
-    i = 0
-    while i < len(s):
-        c = s[i]
-        if c == '"' and (i == 0 or s[i - 1] != "\\"):
-            quote = not quote
-        if not quote and c.isspace():
-            j = i
-            while j < len(s) and s[j].isspace():
-                j += 1
-            prev = compact[-1] if compact else ""
-            nxt = s[j] if j < len(s) else ""
-            if prev in ("=",) or nxt == "=" or (nxt == "!" and s[j : j + 2] == "!="):
-                i = j
-                continue
-            compact.append(" ")
-            i = j
-            continue
-        compact.append(c)
-        i += 1
-    text = "".join(compact)
-    tokens, cur, quote = [], [], False
-    for i, c in enumerate(text):
-        if c == '"' and (i == 0 or text[i - 1] != "\\"):
-            quote = not quote
-            cur.append(c)
-        elif not quote and c in "()":
-            if cur:
-                tokens.append("".join(cur))
-                cur = []
-            tokens.append(c)
-        elif not quote and c.isspace():
-            if cur:
-                tokens.append("".join(cur))
-                cur = []
+    if '"' not in s:
+        text = _SPACE.sub(" ", _EQ_SPACE.sub("", s))
+        return tuple(_PIECE.findall(text))
+    # Unquoted and quoted stretches, alternately; a quote opens or closes a stretch.
+    marks = [m.start() for m in _QUOTE.finditer(s)]
+    parts, quoted, last = [], False, 0
+    for at in [*marks, len(s)]:
+        chunk = s[last:at]
+        if quoted:
+            parts.append((True, chunk))
         else:
-            cur.append(c)
+            parts.append((False, _SPACE.sub(" ", _EQ_SPACE.sub("", chunk))))
+        if at < len(s):
+            parts.append((True, '"'))
+        quoted = not quoted
+        last = at + 1
+    tokens: list[str] = []
+    cur = ""
+    for is_quoted, chunk in parts:
+        if is_quoted:
+            cur += chunk
+            continue
+        for m in re.finditer(r"[()]|\s+|[^\s()]+", chunk):
+            piece = m.group()
+            if piece in ("(", ")"):
+                if cur:
+                    tokens.append(cur)
+                    cur = ""
+                tokens.append(piece)
+            elif piece[0].isspace():
+                if cur:
+                    tokens.append(cur)
+                    cur = ""
+            else:
+                cur += piece
     if cur:
-        tokens.append("".join(cur))
-    return tokens
+        tokens.append(cur)
+    return tuple(tokens)
 
 
 _TERM = re.compile(r"^([A-Za-z_][\w.]*)(::|!=|=)(.*)$", re.S)

@@ -146,6 +146,16 @@ def propagate(
     readers: dict[str, set[str]] = defaultdict(set)
     stopped: dict[str, set[str]] = defaultdict(set)
 
+    # What each object does with columns is the same for every class: worked out once.
+    specs: dict[str, tuple] = {}
+    type_of = {eid: e["type"] for eid, e in by_id.items()}
+
+    def spec(nxt: str) -> tuple:
+        sp = specs.get(nxt)
+        if sp is None:
+            sp = specs[nxt] = _spec(by_id[nxt], defines.get(nxt, []))
+        return sp
+
     classes = {c for per in seeds.values() for c in per if c in carried}
     for cls in sorted(classes):
         cols: dict[str, frozenset[str] | None] = {}
@@ -190,7 +200,7 @@ def propagate(
                 inputs = [(p, c) for p, c in inputs if c is ALL or c]
                 if not inputs:
                     continue
-                new, reads = _evaluate(e, inputs, by_id, defines.get(nxt, []))
+                new, reads = _evaluate(spec(nxt), inputs, type_of)
                 if reads:
                     readers[nxt].add(cls)
                 if cls in seeds.get(nxt, {}):
@@ -215,35 +225,48 @@ def propagate(
     return derived, readers, stopped
 
 
+def _spec(e: dict[str, Any], defined_names: list[str]) -> tuple:
+    """How an object turns the columns it reads into the columns it carries:
+    ("fixed", columns) or ("pass",) or ("fields", matchable types, used, outputs)."""
+    if e["type"] in DEFINER_TYPES:
+        return ("fixed", frozenset(defined_names) if defined_names else ALL)
+    if e["type"] == "dataModel":  # its fields are named Dataset.field, unlike the events
+        return ("fixed", ALL)
+    fl = (e.get("lineage") or {}).get("fields")
+    if fl is None:  # no column evidence: pass on what comes in
+        return ("pass",)
+    outputs = fl.get("outputs")
+    return (
+        "fields",
+        _MATCHABLE.get(fl.get("source", ""), set()),
+        frozenset(u["name"] for u in fl.get("used", [])),
+        None
+        if outputs is None
+        else [
+            (o["name"], frozenset(o["from"])) for o in outputs if not o.get("masked") and o["from"]
+        ],
+    )
+
+
 def _evaluate(
-    e: dict[str, Any],
+    sp: tuple,
     inputs: list[tuple[str, frozenset[str] | None]],
-    by_id: dict[str, dict[str, Any]],
-    defined_names: list[str],
+    type_of: dict[str, str],
 ) -> tuple[frozenset[str] | None, bool]:
     """(columns the node carries, whether it reads the classification)."""
-    fl = (e.get("lineage") or {}).get("fields")
-    if e["type"] in DEFINER_TYPES:
-        return (frozenset(defined_names) if defined_names else ALL), True
-    if e["type"] == "dataModel":  # its fields are named Dataset.field, unlike the events
-        return ALL, True
-    if fl is None:  # no column evidence: pass on what comes in
+    if sp[0] == "fixed":
+        return sp[1], True
+    if sp[0] == "pass":
         src: frozenset[str] | None = frozenset()
         for _, c in inputs:
             src = _union(src, c)
         return src, True
-    matchable = _MATCHABLE.get(fl.get("source", ""), set())
+    _, matchable, used, outputs = sp
     src = frozenset()
     for p, c in inputs:
-        src = _union(src, c if by_id[p]["type"] in matchable else ALL)
-    used = {u["name"] for u in fl.get("used", [])}
+        src = _union(src, c if type_of[p] in matchable else ALL)
     reads = src is ALL or bool(used & src)
-    outputs = fl.get("outputs")
     if outputs is None:
         return src, reads
-    carried = frozenset(
-        o["name"]
-        for o in outputs
-        if not o.get("masked") and o["from"] and (src is ALL or set(o["from"]) & src)
-    )
+    carried = frozenset(name for name, frm in outputs if src is ALL or frm & src)
     return carried, reads
