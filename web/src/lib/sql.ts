@@ -290,7 +290,7 @@ const INDEXED_BY_ENTITY = new Set(["labels", "classifications", "properties", "s
  * filled (in the background, or when a join needs them first): 7 million relationships
  * take about 11 seconds, and counting or grouping them does not need it. */
 export const EDGE_INDEXES = ["CREATE INDEX edges_from ON edges(from_id)", "CREATE INDEX edges_to ON edges(to_id)"];
-export const needsEdgeIndexes = (sql: string) => /\b(from_id|to_id)\b/i.test(sql);
+export const needsEdgeIndexes = (sql: string) => /\b(from_id|to_id|depends)\b/i.test(sql);
 
 /** Indexes made when a table is filled (the edges' are made separately, see EDGE_INDEXES). */
 export function tableIndexes(t: Table): string[] {
@@ -299,9 +299,36 @@ export function tableIndexes(t: Table): string[] {
   return INDEXED_BY_ENTITY.has(t.name) ? [`CREATE INDEX ${t.name}_entity ON ${t.name}(entity_id)`] : [];
 }
 
-/** CREATE TABLE statements for every table. */
+/** A view over tables (filled when a query names the view). */
+export interface View {
+  name: string;
+  doc: string;
+  columns: Column[];
+  over: string[];
+  sql: string;
+}
+
+/** Relationships put the same way round: object_id depends on on_id (the directions the
+ * risk rules use), so lineage is one recursive query. */
+export const VIEWS: View[] = [
+  {
+    name: "depends",
+    doc: "Dependencies, one direction: object_id depends on on_id (a search on the index it reads, an index on the sourcetype that feeds it). Walk it with WITH RECURSIVE for everything upstream or downstream of an object.",
+    columns: [col("object_id", "TEXT", "The object that depends"), col("on_id", "TEXT", "What it depends on"), col("type", "TEXT", "The relationship (reads, uses, feeds, writes, ...)")],
+    over: ["edges"],
+    sql: `CREATE VIEW depends AS
+      SELECT from_id AS object_id, to_id AS on_id, type FROM edges WHERE type IN ('reads', 'uses', 'mapsTo', 'triggers', 'readsField')
+      UNION ALL
+      SELECT to_id AS object_id, from_id AS on_id, type FROM edges WHERE type IN ('definesField', 'feeds', 'writes', 'accelerates', 'deploys')`,
+  },
+];
+
+/** CREATE TABLE statements for every table, then the views. */
 export function schemaStatements(tables: Table[]): string[] {
-  return tables.map((t) => `CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`);
+  return [
+    ...tables.map((t) => `CREATE TABLE ${t.name} (${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`),
+    ...VIEWS.map((v) => v.sql),
+  ];
 }
 
 /** Every table, empty: queries see the whole schema before any table is filled. */
@@ -313,6 +340,7 @@ export function createSchema(db: Database, tables: Table[]) {
 export function tablesIn(sql: string, tables: Table[]): Table[] {
   const text = sql.replace(/'(?:[^']|'')*'/g, "''").replace(/--[^\n]*/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ").toLowerCase();
   const words = new Set(text.match(/[a-z_][a-z0-9_]*/g) ?? []);
+  for (const v of VIEWS) if (words.has(v.name)) for (const t of v.over) words.add(t); // a view needs its tables
   return tables.filter((t) => words.has(t.name));
 }
 
@@ -363,6 +391,59 @@ SELECT id, name, app, cron
 FROM m
 WHERE minute = '*' OR (minute LIKE '*/%' AND CAST(substr(minute, 3) AS INTEGER) <= 15)
 ORDER BY app, name;`,
+  },
+  {
+    title: "Everything an object depends on (upstream)",
+    sql: `-- Change the object: any id from Browse (Copy id), e.g. SELECT 'my:dashboard:id'.
+-- Each object is visited once (UNION), so loops end and large estates stay quick.
+WITH RECURSIVE start(id) AS (
+  SELECT e.id FROM entities e WHERE e.type = 'dashboard' AND EXISTS (SELECT 1 FROM depends d WHERE d.object_id = e.id)
+  ORDER BY e.name LIMIT 1
+), up(id) AS (
+  SELECT id FROM start
+  UNION
+  SELECT d.on_id FROM up JOIN depends d ON d.object_id = up.id
+)
+SELECT e.type, count(*) AS objects, min(e.name) AS for_example
+FROM up JOIN entities e ON e.id = up.id
+WHERE up.id NOT IN (SELECT id FROM start)
+GROUP BY e.type
+ORDER BY objects DESC;`,
+  },
+  {
+    title: "Everything that depends on an object (downstream impact)",
+    sql: `-- What could break if this object changes. Change the object: e.g. SELECT 'my:index:id'.
+WITH RECURSIVE start(id) AS (
+  SELECT e.id FROM entities e WHERE e.type = 'index' AND EXISTS (SELECT 1 FROM depends d WHERE d.on_id = e.id)
+  ORDER BY e.name LIMIT 1
+), down(id) AS (
+  SELECT id FROM start
+  UNION
+  SELECT d.object_id FROM down JOIN depends d ON d.on_id = down.id
+)
+SELECT e.type, count(*) AS objects, min(e.name) AS for_example
+FROM down JOIN entities e ON e.id = down.id
+WHERE down.id NOT IN (SELECT id FROM start)
+GROUP BY e.type
+ORDER BY objects DESC;`,
+  },
+  {
+    title: "Indexes behind the most dashboards",
+    sql: `-- Dashboards reading an index themselves or through a saved search they use.
+WITH dashboards AS (SELECT id FROM entities WHERE type = 'dashboard'),
+indexes AS (SELECT id FROM entities WHERE type = 'index'),
+dash_index(dashboard, idx) AS (
+  SELECT x.from_id, x.to_id FROM edges x
+  WHERE x.type = 'reads' AND x.from_id IN dashboards AND x.to_id IN indexes
+  UNION
+  SELECT u.from_id, r.to_id FROM edges u JOIN edges r ON r.from_id = u.to_id AND r.type = 'reads'
+  WHERE u.type = 'uses' AND u.from_id IN dashboards AND r.to_id IN indexes
+)
+SELECT i.name AS index_name, i.instance, count(*) AS dashboards
+FROM dash_index di JOIN entities i ON i.id = di.idx
+GROUP BY i.id
+ORDER BY dashboards DESC
+LIMIT 50;`,
   },
   {
     title: "Most depended-on objects",

@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { SqlEditor, type SqlEditorHandle } from "../components/SqlEditor";
 import { SqlResults } from "../components/SqlResults";
 import { useCatalog } from "../lib/CatalogContext";
-import { EXAMPLES, type QueryResult } from "../lib/sql";
+import { EXAMPLES, VIEWS, type QueryResult, type Table } from "../lib/sql";
 import { catalogDb, Stopped, type CatalogDb, type LoadProgress } from "../lib/sqlDb";
 import { explainError, formatSql, jsonPaths, type ErrorHelp } from "../lib/sqlEditor";
 import { EXAMPLE_GROUPS, exampleInfo } from "../lib/sqlExamples";
@@ -48,7 +48,11 @@ export default function SqlPage() {
     };
   }, [catalog]);
 
-  const tables = db.status === "ready" ? db.tables : [];
+  // Tables and views, for completion and highlighting in the editor.
+  const tables = useMemo<Table[]>(
+    () => (db.status === "ready" ? [...db.tables, ...VIEWS.map((v) => ({ name: v.name, doc: v.doc, columns: v.columns, rows: [], built: true }))] : []),
+    [db],
+  );
 
   const run = useCallback(async (text: string) => {
     if (db.status !== "ready") return;
@@ -237,6 +241,22 @@ export default function SqlPage() {
                 ))}
               </ul>
               <button className="btn btn-small" onClick={() => load(`SELECT * FROM ${t.name} LIMIT 100;`)}>Preview</button>
+            </details>
+          ))}
+
+          {side === "tables" && db.status === "ready" && VIEWS.map((v) => (
+            <details key={v.name}>
+              <summary><code>{v.name}</code> <span className="muted small">view</span></summary>
+              <p className="small">{v.doc}</p>
+              <ul className="plain-list small">
+                {v.columns.map((c) => (
+                  <li key={c.name}>
+                    <button type="button" className="link-btn" onClick={() => editor.current?.insert(c.name)} title="Insert at the cursor"><code>{c.name}</code></button>{" "}
+                    <span className="muted">{c.type.toLowerCase()}{c.doc ? ` · ${c.doc}` : ""}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className="btn btn-small" onClick={() => load(`SELECT * FROM ${v.name} LIMIT 100;`)}>Preview</button>
             </details>
           ))}
 

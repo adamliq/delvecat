@@ -35,6 +35,9 @@ export const EXAMPLE_INFO: Record<string, { group: ExampleGroup; description: st
   "Missing required properties by owner": { group: "Hygiene and quality", description: "Annotation gaps per owner." },
   "Fields missing from most events": { group: "Hygiene and quality", description: "Sparse fields per sourcetype." },
   "Sourcetype fields nobody uses": { group: "Hygiene and quality", description: "Extracted fields no search reads." },
+  "Everything an object depends on (upstream)": { group: "Lineage and dependencies", description: "Walks the depends view from one object, counted by type." },
+  "Everything that depends on an object (downstream impact)": { group: "Lineage and dependencies", description: "What could break if one object changes, by type." },
+  "Indexes behind the most dashboards": { group: "Lineage and dependencies", description: "Dashboards per index, directly or through a saved search." },
   "Most depended-on objects": { group: "Lineage and dependencies", description: "Objects the most others read or use." },
   "Problems that put the most objects at risk": { group: "Lineage and dependencies", description: "Root causes ranked by what depends on them." },
 };

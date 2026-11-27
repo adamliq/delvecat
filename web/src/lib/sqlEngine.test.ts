@@ -4,7 +4,7 @@ import initSqlJs from "sql.js";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { CatalogBundle } from "../generated/catalog";
 import { demoBundle } from "./demoCatalog.testutil";
-import { catalogTables, EDGE_INDEXES, EXAMPLES, fillDatabase, runQuery, schemaStatements, tableIndexes } from "./sql";
+import { catalogTables, EDGE_INDEXES, EXAMPLES, fillDatabase, needsEdgeIndexes, runQuery, schemaStatements, tableIndexes, tablesIn } from "./sql";
 import { fileFor, splitStatements, SqlEngine } from "./sqlEngine";
 
 const require = createRequire(import.meta.url);
@@ -184,3 +184,20 @@ function fakePool() {
   } as unknown as Parameters<typeof SqlEngine.open>[3];
   return { pool, files };
 }
+
+describe("depends view", () => {
+  it("puts dependencies one way round and walks upstream", () => {
+    const { e, tables } = filled();
+    expect(tablesIn("SELECT * FROM depends", tables).map((t) => t.name)).toEqual(["edges"]);
+    expect(needsEdgeIndexes("SELECT * FROM depends")).toBe(true);
+    const reads = e.query("SELECT count(*) FROM edges WHERE type = 'reads'").rows[0][0];
+    const feeds = e.query("SELECT count(*) FROM edges WHERE type = 'feeds'").rows[0][0];
+    expect(e.query("SELECT count(*) FROM depends WHERE type = 'reads'").rows[0][0]).toBe(reads);
+    // feeds: the index depends on the sourcetype that feeds it (reversed)
+    expect(e.query("SELECT count(*) FROM depends d JOIN edges x ON x.type = 'feeds' AND d.object_id = x.to_id AND d.on_id = x.from_id").rows[0][0]).toBe(feeds);
+    for (const title of ["Everything an object depends on", "Everything that depends on an object", "Indexes behind the most dashboards"]) {
+      expect(e.query(EXAMPLES.find((x) => x.title.startsWith(title))!.sql).rows.length, title).toBeGreaterThan(0);
+    }
+  });
+});
+
