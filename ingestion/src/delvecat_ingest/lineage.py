@@ -13,6 +13,7 @@ and ``warnings``, plus field-level lineage in ``fields`` (see
 
 from __future__ import annotations
 
+import os
 from collections import defaultdict
 from typing import Any
 
@@ -123,97 +124,160 @@ def _spl_sources(e: dict[str, Any]) -> list[tuple[str, bool, str]]:
     return []
 
 
+def _derive_one(
+    e: dict[str, Any], macros: MacroLibrary, commands: frozenset[str]
+) -> tuple[dict[str, Any], list[Ref]] | None:
+    """Lineage of one object and the references its SPL makes (None: it has no SPL)."""
+    refs: list[Ref] = []
+    sources = _spl_sources(e)
+    saved_refs = [
+        s["ref"]
+        for s in (e.get("properties") or {}).get("searches") or []
+        if e["type"] == "dashboard" and s.get("kind") == "savedSearch" and s.get("ref")
+    ]
+    if not sources and not saved_refs:
+        return None
+    app, owner = e.get("app"), e.get("owner") if e.get("sharing") == "user" else None
+    combined = SplAnalysis()
+    # Keep warnings recorded during extraction (e.g. unparseable dashboard XML).
+    combined.warnings.extend((e.get("lineage") or {}).get("warnings", []))
+    # Splunk's own parse of searches the analyser could not follow (parser_assist).
+    parsed = e.get("_parsedSpl") or {}
+    for spl, fragment, label in sources:
+        spl = parsed.get(spl, spl)
+        a = analyze(spl, macros.resolver(app, owner), fragment=fragment)
+        add_command_refs(a, commands)
+        combined.merge(a)
+        if a.implicit_index:
+            combined.warnings.append(
+                f"{label}: no index specified, so Splunk searches the user's default indexes"
+            )
+    for name in saved_refs:
+        combined.refs.add(("reads", "savedSearch", name, False))
+
+    for edge_type, target_type, name, pattern in sorted(federated_refs(combined.refs)):
+        if e["type"] == "macro" and target_type == "macro" and name == e["name"]:
+            continue
+        if e["type"] == "adhocSearch" and pattern and name.strip("_") in ("*", ""):
+            continue  # "index=*" typed at the search bar says nothing about which index
+        refs.append(
+            Ref(
+                e["id"],
+                Target(
+                    target_type,
+                    name,
+                    app,
+                    pattern,
+                    visible_only=target_type in KNOWLEDGE_TYPES,
+                    owner=owner,
+                ),
+                edge_type,
+                origin="spl",
+            )
+        )
+    unresolved = [f"macro:{m}" for m in combined.unresolved_macros if not m.startswith("(")]
+    for m in combined.unresolved_macros:
+        if m.startswith("("):
+            combined.warnings.append(m.strip("()"))
+        elif apps := macros.hidden_elsewhere(m):
+            combined.warnings.append(
+                f"macro {m} exists in {', '.join(apps)} but is not shared with {app}"
+            )
+    lineage: dict[str, Any] = {}
+    if combined.implicit_index and e["type"] in (
+        "savedSearch",
+        "adhocSearch",
+        "correlationSearch",
+        "dashboard",
+        "workflowAction",
+    ):
+        lineage["implicitIndex"] = True
+    if combined.dynamic and e["type"] in ("dashboard", "panel", "workflowAction"):
+        lineage["dynamic"] = True
+    if unresolved:
+        lineage["unresolved"] = unresolved
+    warnings = [
+        w
+        for w in combined.warnings
+        if e["type"] in SEARCH_TYPES
+        or "not shared" in w
+        or "too deep" in w
+        or "could not parse" in w
+    ]
+    if warnings:
+        lineage["warnings"] = warnings
+    if parsed:
+        lineage["parsedBySplunk"] = True
+    if combined.datasets:
+        lineage["dataModelDatasets"] = sorted(combined.datasets)
+    if combined.commands and not all(fragment for _, fragment, _ in sources):
+        lineage["commands"] = sorted(combined.commands)
+    if combined.fields is not None and (combined.fields.used or combined.fields.outputs):
+        lineage["fields"] = combined.fields.to_json()
+    return lineage, refs
+
+
+# Objects per job, and the number of objects with SPL from which jobs run in parallel
+# processes (forked, so they share the catalog without copying it).
+_JOB = 2000
+_PARALLEL_FROM = 20000
+_WORK: tuple[list[dict[str, Any]], MacroLibrary, frozenset[str]] | None = None
+
+
+def _derive_range(span: tuple[int, int]) -> list[tuple[dict[str, Any], list[Ref]] | None]:
+    assert _WORK is not None
+    entities, macros, commands = _WORK
+    return [_derive_one(e, macros, commands) for e in entities[span[0] : span[1]]]
+
+
+def _workers() -> int:
+    env = os.environ.get("DELVECAT_PROCESSES")
+    if env:
+        try:
+            return max(1, int(env))
+        except ValueError:
+            return 1
+    return os.cpu_count() or 1
+
+
+def _derive_all(
+    entities: list[dict[str, Any]], macros: MacroLibrary, commands: frozenset[str]
+) -> list[tuple[dict[str, Any], list[Ref]] | None]:
+    """Analyse every object's SPL; in parallel processes on large catalogs where the
+    platform can fork (Linux, macOS), otherwise one after the other. Same results either
+    way, in the same order. DELVECAT_PROCESSES=1 turns it off."""
+    global _WORK
+    workers = _workers()
+    with_spl = sum(1 for e in entities if e.get("type") in SEARCH_TYPES)
+    if workers > 1 and with_spl >= _PARALLEL_FROM:
+        try:
+            import multiprocessing as mp
+            from concurrent.futures import ProcessPoolExecutor
+
+            ctx = mp.get_context("fork")
+            spans = [(i, min(len(entities), i + _JOB)) for i in range(0, len(entities), _JOB)]
+            _WORK = (entities, macros, commands)
+            try:
+                with ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as pool:
+                    return [r for part in pool.map(_derive_range, spans) for r in part]
+            finally:
+                _WORK = None
+        except (ValueError, OSError, RuntimeError, ImportError):
+            pass  # no fork here, or no processes allowed: one after the other
+    return [_derive_one(e, macros, commands) for e in entities]
+
+
 def derive(entities: list[dict[str, Any]]) -> list[Ref]:
     """Analyze SPL on every entity; return references and set ``entity["lineage"]``."""
     macros = MacroLibrary(entities)
     commands = command_names(entities)
     refs: list[Ref] = []
-    for e in entities:
-        sources = _spl_sources(e)
-        saved_refs = [
-            s["ref"]
-            for s in (e.get("properties") or {}).get("searches") or []
-            if e["type"] == "dashboard" and s.get("kind") == "savedSearch" and s.get("ref")
-        ]
-        if not sources and not saved_refs:
+    for e, result in zip(entities, _derive_all(entities, macros, commands)):
+        if result is None:
             continue
-        app, owner = e.get("app"), e.get("owner") if e.get("sharing") == "user" else None
-        combined = SplAnalysis()
-        # Keep warnings recorded during extraction (e.g. unparseable dashboard XML).
-        combined.warnings.extend((e.get("lineage") or {}).get("warnings", []))
-        # Splunk's own parse of searches the analyser could not follow (parser_assist).
-        parsed = e.pop("_parsedSpl", None) or {}
-        for spl, fragment, label in sources:
-            spl = parsed.get(spl, spl)
-            a = analyze(spl, macros.resolver(app, owner), fragment=fragment)
-            add_command_refs(a, commands)
-            combined.merge(a)
-            if a.implicit_index:
-                combined.warnings.append(
-                    f"{label}: no index specified, so Splunk searches the user's default indexes"
-                )
-        for name in saved_refs:
-            combined.refs.add(("reads", "savedSearch", name, False))
-
-        for edge_type, target_type, name, pattern in sorted(federated_refs(combined.refs)):
-            if e["type"] == "macro" and target_type == "macro" and name == e["name"]:
-                continue
-            if e["type"] == "adhocSearch" and pattern and name.strip("_") in ("*", ""):
-                continue  # "index=*" typed at the search bar says nothing about which index
-            refs.append(
-                Ref(
-                    e["id"],
-                    Target(
-                        target_type,
-                        name,
-                        app,
-                        pattern,
-                        visible_only=target_type in KNOWLEDGE_TYPES,
-                        owner=owner,
-                    ),
-                    edge_type,
-                    origin="spl",
-                )
-            )
-        unresolved = [f"macro:{m}" for m in combined.unresolved_macros if not m.startswith("(")]
-        for m in combined.unresolved_macros:
-            if m.startswith("("):
-                combined.warnings.append(m.strip("()"))
-            elif apps := macros.hidden_elsewhere(m):
-                combined.warnings.append(
-                    f"macro {m} exists in {', '.join(apps)} but is not shared with {app}"
-                )
-        lineage: dict[str, Any] = {}
-        if combined.implicit_index and e["type"] in (
-            "savedSearch",
-            "adhocSearch",
-            "correlationSearch",
-            "dashboard",
-            "workflowAction",
-        ):
-            lineage["implicitIndex"] = True
-        if combined.dynamic and e["type"] in ("dashboard", "panel", "workflowAction"):
-            lineage["dynamic"] = True
-        if unresolved:
-            lineage["unresolved"] = unresolved
-        warnings = [
-            w
-            for w in combined.warnings
-            if e["type"] in SEARCH_TYPES
-            or "not shared" in w
-            or "too deep" in w
-            or "could not parse" in w
-        ]
-        if warnings:
-            lineage["warnings"] = warnings
-        if parsed:
-            lineage["parsedBySplunk"] = True
-        if combined.datasets:
-            lineage["dataModelDatasets"] = sorted(combined.datasets)
-        if combined.commands and not all(fragment for _, fragment, _ in sources):
-            lineage["commands"] = sorted(combined.commands)
-        if combined.fields is not None and (combined.fields.used or combined.fields.outputs):
-            lineage["fields"] = combined.fields.to_json()
+        lineage, own = result
+        e.pop("_parsedSpl", None)
+        refs.extend(own)
         if lineage:
             e["lineage"] = lineage
         else:
