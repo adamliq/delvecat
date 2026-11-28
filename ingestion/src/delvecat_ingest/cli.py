@@ -19,6 +19,7 @@ from .connectors import (
     soar,
     splunk,
     splunk_cloud_acs,
+    splunkbase,
     stream,
     ueba,
 )
@@ -72,7 +73,7 @@ def _verify(args: argparse.Namespace) -> bool | str:
     return args.ca_bundle or True
 
 
-PRODUCTS = {"deploymentServer", "dbConnect", "stream", "enterpriseSecurity"}
+PRODUCTS = {"deploymentServer", "dbConnect", "stream", "enterpriseSecurity", "splunkbase"}
 
 
 def _build(args: argparse.Namespace) -> int:
@@ -148,6 +149,8 @@ def _build(args: argparse.Namespace) -> int:
         result.extend(stream.extract(transport, args.instance))
     if "enterpriseSecurity" in products:
         result.extend(enterprise_security.extract(transport, args.instance))
+    if "splunkbase" in products:
+        result.extend(splunkbase.extract(transport, args.instance))
 
     # SOAR and UBA are separate servers: each becomes its own instance in the bundle.
     extra_instances: list[dict[str, Any]] = []
@@ -550,8 +553,9 @@ def main(argv: list[str] | None = None) -> int:
     prod = b.add_argument_group("Splunk products")
     prod.add_argument(
         "--products",
-        help="comma-separated: deploymentServer,dbConnect,stream,enterpriseSecurity; 'all' "
-        "(the default without --only) or 'none'. Each is skipped when not installed.",
+        help="comma-separated: deploymentServer,dbConnect,stream,enterpriseSecurity,splunkbase "
+        "(Splunkbase versions from the Splunkbase Version Catalog app); 'all' (the default "
+        "without --only) or 'none'. Each is skipped when not installed.",
     )
     for kind, label, env in (
         ("soar", "Splunk SOAR", "DELVECAT_SOAR_TOKEN"),

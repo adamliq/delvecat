@@ -71,7 +71,7 @@ const SECTIONS: Section[] = [
     keywords: "entity lineage relationships tabs spl fields annotations raw",
     body: (
       <ul>
-        <li><strong>Overview</strong>: product, instance, app, owner and status; <em>Used by</em> (what depends on it, by type) with <em>Show impact</em> for the full list; health and usage; storage (for indexes); the SPL with the objects it names linked; every property in plain words. "On this page" jumps to a section.</li>
+        <li><strong>Overview</strong>: product, instance, app, owner and status; <em>Used by</em> (what depends on it, by type) with <em>Show impact</em> for the full list; for an app, its latest <em>Splunkbase</em> release, the Splunk versions it lists and whether it is archived (with the Splunkbase Version Catalog app installed); health and usage; storage (for indexes); the SPL with the objects it names linked; every property in plain words. "On this page" jumps to a section.</li>
         <li><strong>Lineage</strong>: what feeds the object and what it feeds, as a graph; broken references are marked.</li>
         <li><strong>Fields</strong>: for sourcetypes, the field schema; for searches, the fields they use.</li>
         <li><strong>Relationships</strong>: every connection, as a graph or a list.</li>
@@ -84,13 +84,13 @@ const SECTIONS: Section[] = [
   {
     id: "health",
     title: "Health, findings and acknowledging",
-    keywords: "stale skipped failed noisy alert token retention acknowledge accept snooze trend fixed",
+    keywords: "stale skipped failed noisy alert token retention acknowledge accept snooze trend fixed splunkbase app update archived",
     body: (
       <>
         <p>
           Each build checks data freshness and volume, ingestion delay, parsing, skipped and failed scheduled searches, objects whose owner no longer exists,
-          noisy alerts, forwarders and deployment servers (including second-tier ones), DB Connect inputs and outputs, Stream groups, streams and sensors, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions and
-          authentication tokens. The thresholds used are listed at the top of the <L to="/health">Health</L> page.
+          noisy alerts, forwarders and deployment servers (including second-tier ones), DB Connect inputs and outputs, Stream groups, streams and sensors, HTTP Event Collector, retention by size, routing, acceleration, ES suppressions,
+          authentication tokens and, with the Splunkbase Version Catalog app installed, apps with a newer version on Splunkbase or archived there. The thresholds used are listed at the top of the <L to="/health">Health</L> page.
         </p>
         <ul>
           <li><strong>How to fix</strong> under a finding says why it matters, what to do, and gives a search to investigate (<em>Open in Splunk search</em> or <em>Copy search</em>).</li>

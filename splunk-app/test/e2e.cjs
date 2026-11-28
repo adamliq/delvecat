@@ -127,7 +127,7 @@ const sections = {
     await a.page.click('text=Build the catalog of this Splunk');
     await a.page.waitForSelector('fieldset.parts', { timeout: 20000 });
     const all = await a.page.locator('.parts-all').innerText();
-    check('Build page opens from the empty state, default 65 of 66 parts', /65 of 66/.test(all), all.trim());
+    check('Build page opens from the empty state, default 66 of 67 parts', /66 of 67/.test(all), all.trim());
     await a.close();
   },
 
@@ -135,7 +135,7 @@ const sections = {
     const a = await session('admin');
     // The page starts from the previous build's parts (by design); with none, the default.
     const prevParts = (await buildDoc())?.options?.parts;
-    const expected = prevParts ? prevParts.length : 65;
+    const expected = prevParts ? prevParts.length : 66;
     const t0 = Date.now();
     const doc = await uiBuild(a.page);
     check('default build from the page finishes and publishes', doc?.state === 'done' && !doc.dryRun,
@@ -276,7 +276,7 @@ const sections = {
         await p.click('input[aria-label="Select all parts"]'); // none
         await p.click('input[aria-label="Select all of Platform"]');
         const n = await p.locator('.parts-all').innerText();
-        check('picker: Select all clears, a group selects its 7 parts', /7 of 66/.test(n), n.trim());
+        check('picker: Select all clears, a group selects its 7 parts', /7 of 67/.test(n), n.trim());
         check('picker warns about a partial catalog', (await mainText(p)).includes('Only the selected parts are read'));
       },
     });
@@ -294,7 +294,7 @@ const sections = {
         if (!(await p.isChecked('input[aria-label="Select all parts"]'))) await p.click('input[aria-label="Select all parts"]');
       },
     });
-    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 66, `${doc?.entities} objects`);
+    check('Select all builds the complete catalog again', doc?.state === 'done' && doc.options.parts.length === 67, `${doc?.entities} objects`);
     await a.close();
   },
 
@@ -728,6 +728,72 @@ const sections = {
     check('the next object opens its own lineage afresh (upstream shown)', up !== '' && up !== '0', `Upstream ${up}`);
     check('Used by and Show impact without script errors', v.errors.length === 0, v.errors.join('; '));
     await v.close();
+  },
+
+  async splunkbase() {
+    // The Splunkbase Version Catalog app's catalogue (its KV store collection) read by a
+    // build and matched to the installed apps by folder name. Test records are seeded in
+    // this disposable Splunk and removed afterwards; skipped when that app is not installed.
+    const SB = '/servicesNS/nobody/splunkbase_version_catalog/storage/collections/data/splunkbase_catalog';
+    if ((await rest('GET', SB)).status === 404) {
+      skipped.push('splunkbase: the Splunkbase Version Catalog app is not installed');
+      return;
+    }
+    const installed = Object.fromEntries((((await rest('GET', '/services/apps/local?count=0')).json || {}).entry || [])
+      .map((e) => [e.name, e.content.version]));
+    const now = Math.floor(Date.now() / 1000);
+    const rec = (uid, appid, latest, extra = {}) => ({
+      _key: String(uid), app_uid: uid, appid, title: appid, latest_version: latest,
+      release_date: '2026-10-01T09:00:00Z', splunk_versions: '9.4,10.0,10.4', is_archived: false,
+      archive_status: 'live', cloud_compatible: true, app_url: `https://splunkbase.splunk.com/app/${uid}/`,
+      last_checked: now, ...extra,
+    });
+    const seeded = [
+      rec(990001, 'python_upgrade_readiness_app', '99.0.0'), // newer than installed
+      rec(990002, 'splunk-dashboard-studio', installed['splunk-dashboard-studio'] || '1.0.0'), // the same
+      rec(990003, 'splunk_rapid_diag', '1.9.8', { is_archived: true, archive_status: 'archived' }),
+      rec(990004, 'e2e_not_installed_here', '1.0.0'),
+    ];
+    const admin = { Authorization: 'Basic ' + Buffer.from(`admin:${USERS.admin}`).toString('base64') };
+    const saved = await fetch(`${MGMT}${SB}/batch_save?output_mode=json`, {
+      method: 'POST', headers: { ...admin, 'Content-Type': 'application/json' }, body: JSON.stringify(seeded),
+    });
+    check('setup: test records in the Splunkbase catalogue', saved.status < 300, `HTTP ${saved.status}`);
+    const row = ((await oneshot('| delvecatbuild replacesmaller=true')).results || [])[0] || {};
+    check('a build with the catalogue finishes', row.status === 'done', `${row.status} ${row.entities} objects`);
+    const object = async (name) => {
+      const list = (await rest('GET', `/services/delvecat/catalog?type=app&name=${encodeURIComponent(name)}&limit=50`, 'viewer')).json?.results || [];
+      const hit = list.find((x) => x.name === name && x.instance !== 'es-e2e');
+      return hit ? (await rest('GET', `/services/delvecat/catalog?id=${encodeURIComponent(hit.id)}&relationships=0`, 'viewer')).json?.object : null;
+    };
+    const checksOf = (o) => (o?.health?.checks || []).map((c) => c.check);
+    const pura = await object('python_upgrade_readiness_app');
+    const sb = pura?.properties?.splunkbase || {};
+    check('installed app matched: Splunkbase has a newer version (a finding)',
+      sb.latestVersion === '99.0.0' && sb.updateAvailable === true && checksOf(pura).includes('appUpdate'), JSON.stringify(sb).slice(0, 120));
+    const studio = (await object('splunk-dashboard-studio'))?.properties?.splunkbase || {};
+    check('an app at the latest version is not flagged', studio.updateAvailable === false, JSON.stringify(studio).slice(0, 100));
+    check('an app archived on Splunkbase is a finding', checksOf(await object('splunk_rapid_diag')).includes('appArchived'));
+    const summary = (await object('splunkbase_version_catalog'))?.properties?.splunkbaseCatalog || {};
+    check('the catalogue app says what its catalogue holds',
+      summary.apps === 4 && summary.installedHere === 3 && summary.updatesAvailable === 1 && summary.archived === 1, JSON.stringify(summary));
+    if (pura) {
+      const v = await session('viewer');
+      await v.page.goto(app(`#/entity/${encodeURIComponent(pura.id)}`));
+      await v.page.waitForSelector('main h1', { timeout: 60000 }).catch(() => {});
+      await sleep(1500);
+      const panel = (await v.page.locator('section:has(h2:text-is("Splunkbase"))').innerText().catch(() => '')).replace(/\s+/g, ' ');
+      check('app page shows its Splunkbase release', /Newer version on Splunkbase: 99\.0\.0/.test(panel)
+        && panel.includes(`Installed version ${installed.python_upgrade_readiness_app}`), panel.slice(0, 160));
+      await v.page.goto(app('#/findings?check=appUpdate'));
+      await v.page.waitForSelector('.tiles', { timeout: 60000 }).catch(() => {});
+      await sleep(1500);
+      const t = await mainText(v.page);
+      check('Findings lists it as "Newer version on Splunkbase"', t.includes('Newer version on Splunkbase') && t.includes('99.0.0'));
+      check('Splunkbase pages without script errors', v.errors.length === 0, v.errors.join('; '));
+      await v.close();
+    }
+    for (const r of seeded) await rest('DELETE', `${SB}/${r._key}`);
   },
 
   async layout() {

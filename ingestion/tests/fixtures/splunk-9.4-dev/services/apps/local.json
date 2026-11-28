@@ -1977,6 +1977,59 @@
    },
    "name": "TA-acme-firewall",
    "updated": "1970-01-01T00:00:00+00:00"
+  },
+  {
+   "acl": {
+    "app": "system",
+    "can_change_perms": true,
+    "can_list": true,
+    "can_share_app": true,
+    "can_share_global": true,
+    "can_share_user": false,
+    "can_write": true,
+    "modifiable": true,
+    "owner": "nobody",
+    "perms": {
+     "read": [
+      "admin",
+      "sc_admin"
+     ],
+     "write": [
+      "admin",
+      "sc_admin"
+     ]
+    },
+    "removable": true,
+    "sharing": "app"
+   },
+   "author": "nobody",
+   "content": {
+    "build": 4,
+    "check_for_updates": true,
+    "configured": false,
+    "core": false,
+    "description": "Builds and maintains a local catalogue of Splunkbase app versions in a KV Store, with dashboards to browse the catalogue and to compare installed apps against the latest Splunkbase releases.",
+    "disabled": false,
+    "eai:acl": null,
+    "label": "Splunkbase Version Catalog",
+    "managed_by_deployment_client": false,
+    "show_in_nav": true,
+    "state_change_requires_restart": false,
+    "version": "2.7.0",
+    "visible": true
+   },
+   "id": "https://localhost:8089/servicesNS/nobody/system/apps/local/splunkbase_version_catalog",
+   "links": {
+    "_reload": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog/_reload",
+    "alternate": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog",
+    "disable": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog/disable",
+    "edit": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog",
+    "list": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog",
+    "package": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog/package",
+    "remove": "/servicesNS/nobody/system/apps/local/splunkbase_version_catalog"
+   },
+   "name": "splunkbase_version_catalog",
+   "updated": "2026-11-02T09:12:44+00:00"
   }
  ],
  "generator": {
@@ -1986,7 +2039,7 @@
  "messages": [],
  "paging": {
   "offset": 0,
-  "total": 39
+  "total": 40
  },
  "updated": "2026-11-06T07:34:34+00:00"
 }

@@ -30,6 +30,7 @@ export const SECTIONS: Section[] = [
   { id: "ownership", title: "Owners no longer here", checks: ["orphaned"], empty: "Every object's owner still exists." },
   { id: "commands", title: "Risky commands", checks: ["riskyCommand"], empty: "No search runs a command that deletes data, runs programs or sends data out." },
   { id: "es", title: "Enterprise Security", checks: ["suppressionExpired", "suppressesWholeDetection"], empty: "No suppression problems." },
+  { id: "apps", title: "Apps and Splunkbase", checks: ["appUpdate", "appArchived", "splunkbaseStale"], empty: "Every app found on Splunkbase is current and maintained." },
   { id: "other", title: "Other", checks: [], empty: "Nothing else." },
 ];
 
@@ -227,6 +228,18 @@ export const REMEDIES: Record<string, Remedy> = {
   suppressesWholeDetection: {
     why: "It hides every finding from a detection, not just the noisy ones: that detection is effectively off.",
     fix: "Narrow it to the fields that make the noise (host, user, signature), or tune the detection itself.",
+  },
+  appUpdate: {
+    why: "Splunkbase has a later release of this app: fixes, security updates and support for newer Splunk versions are in it, and an old version may stop working after a Splunk upgrade.",
+    fix: "Read the release notes on the app's Splunkbase page (linked on its page here), try the new version on a test instance, then upgrade it the way it was installed (Apps > Manage Apps, your deployment server, or your Splunk Cloud app process).",
+  },
+  appArchived: {
+    why: "The app is archived on Splunkbase: nobody maintains it, so it gets no fixes or security updates and may not work with future Splunk versions.",
+    fix: "Find its successor (its Splunkbase page often names one) or a supported alternative, and plan the move: what uses it is on its Lineage and Relationships tabs.",
+  },
+  splunkbaseStale: {
+    why: "The Splunkbase Version Catalog app refreshes its catalogue once a day; it has not for days, so releases published since are missing and the version findings may be out of date.",
+    fix: "In that app's Setup & Troubleshoot page, check its input is enabled, its run time, and that this Splunk can reach splunkbase.splunk.com (or the proxy it is set to use).",
   },
   tokenExpired: {
     why: "The token no longer works; whatever used it is failing.",

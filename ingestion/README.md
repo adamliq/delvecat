@@ -30,7 +30,7 @@ Useful options:
 | `--fields` | sample events per sourcetype to discover fields (`--max-field-sourcetypes`) |
 | `--inventory-window` | time range for observed sourcetypes/hosts/sources (default `-7d`) |
 | `--only a,b` | run selected platform extractors (product connectors are skipped unless `--products` is given) |
-| `--products` | `deploymentServer,dbConnect,stream`, `all` (default) or `none`; each is skipped when not installed |
+| `--products` | `deploymentServer,dbConnect,stream,enterpriseSecurity,splunkbase`, `all` (default) or `none`; each is skipped when not installed. `splunkbase` reads the Splunkbase Version Catalog app's `splunkbase_catalog` collection and matches it to installed apps by folder name |
 | `--deployment-apps-dir` | the Deployment Server's deployment-apps folder, to catalogue the inputs each app pushes |
 | `--record DIR` | save every response as replayable fixtures (secrets and emails removed) |
 | `--no-usage` | skip the usage and health searches over `_audit` and `_internal` |

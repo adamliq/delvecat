@@ -45,6 +45,7 @@ describe("build report", () => {
     { connector: "splunk.spl2", status: "skipped", message: "not available: orchestrator" },
     { connector: "enterpriseSecurity.queues", status: "failed", message: "boom" },
     { connector: "health", status: "ok" },
+    { connector: "splunkbase.versions", status: "skipped", message: "not available: the Splunkbase Version Catalog app's catalogue is empty (enable its input)" },
   ]);
   it("names parts as the Build page does", () => {
     expect(rows.map((r) => [r.area, r.part, r.status])).toEqual([
@@ -52,9 +53,10 @@ describe("build report", () => {
       ["Splunk", "SPL2 modules, datasets and connections (Splunk 10+)", "skipped"],
       ["Enterprise Security", "Queues", "failed"],
       ["Processing", "Health and usage", "ok"],
+      ["Splunkbase Version Catalog", "Versions", "skipped"],
     ]);
     expect(rows[0].objects).toBe(6);
     expect(rows[0].seconds).toBe(0.4);
-    expect(coverageSummary(rows)).toBe("2 read, 1 skipped, 1 failed");
+    expect(coverageSummary(rows)).toBe("2 read, 2 skipped, 1 failed");
   });
 });

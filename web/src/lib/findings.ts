@@ -57,6 +57,9 @@ export const CHECK_TITLES: Record<string, string> = {
   orphaned: "Owner no longer exists",
   suppressionExpired: "Suppression ended",
   suppressesWholeDetection: "Suppression hides a whole detection",
+  appUpdate: "Newer version on Splunkbase",
+  appArchived: "Archived on Splunkbase",
+  splunkbaseStale: "Splunkbase catalogue not refreshed",
 };
 
 export const checkTitle = (check: string): string => CHECK_TITLES[check] ?? check;

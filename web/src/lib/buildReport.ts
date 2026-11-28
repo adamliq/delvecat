@@ -21,6 +21,8 @@ export interface PartRow {
 }
 
 const PART_LABEL = new Map(PART_GROUPS.flatMap((g) => g.parts.map((p) => [p.id, p.label] as const)));
+// Parts that read another app rather than a product of their own.
+const AREAS: Record<string, string> = { splunkbase: "Splunkbase Version Catalog" };
 const PROCESSING: Record<string, string> = {
   lineage: "SPL lineage",
   resolver: "Resolving references",
@@ -50,7 +52,7 @@ export function partRows(reports: Report[]): PartRow[] {
       area = "Processing";
       part = PROCESSING[prefix] ?? propLabel(prefix);
     } else {
-      area = PRODUCT_LABELS[prefix as keyof typeof PRODUCT_LABELS] ?? propLabel(prefix);
+      area = AREAS[prefix] ?? PRODUCT_LABELS[prefix as keyof typeof PRODUCT_LABELS] ?? propLabel(prefix);
       part = propLabel(sub);
     }
     const counts = r.counts ?? {};

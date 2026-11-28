@@ -78,7 +78,8 @@ one. The same from a search:
 
 - **What it reads**: this Splunk (the search head the app is on) and the
   products installed on it (Enterprise Security, DB Connect, Stream, Deployment
-  Server), over its REST API and with read-only searches of `_internal` and
+  Server, and the Splunkbase Version Catalog app's catalogue of Splunkbase
+  releases), over its REST API and with read-only searches of `_internal` and
   `_audit`, exactly as `delvecat-ingest build --url` does. It runs as the
   person who starts it, with their session: **the catalog shows what they can
   see**, so build as an admin for a complete one.
@@ -405,8 +406,10 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 empty state, builds from the page, every page of the catalog as a viewer, field
 discovery in chosen indexes, partial builds and the size safeguard, cancel,
 two builds at once, a publisher who sees less, dry runs, acknowledging findings (Health
-and Findings), what uses an object and its impact, and keyboard use of the menus and
-the Go to dialog. The header of the
+and Findings), what uses an object and its impact, keyboard use of the menus and
+the Go to dialog, and, when the Splunkbase Version Catalog app is installed (its input
+can stay disabled), Splunkbase versions of the installed apps from test records it
+adds to that app's catalogue and removes again. The header of the
 script lists the users it expects. Last run: Splunk 10.4 and 9.4, all passing.
 
 ## Layout

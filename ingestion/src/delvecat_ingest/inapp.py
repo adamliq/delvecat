@@ -12,7 +12,14 @@ from collections.abc import Callable
 from typing import Any
 
 from .bundle import assemble
-from .connectors import db_connect, deployment_server, enterprise_security, splunk, stream
+from .connectors import (
+    db_connect,
+    deployment_server,
+    enterprise_security,
+    splunk,
+    splunkbase,
+    stream,
+)
 from .connectors.splunk import Options, data
 from .governance import apply_governance
 from .model import ExtractResult, merge_facts
@@ -24,6 +31,7 @@ PRODUCTS: dict[str, Callable[[Any, str], Any]] = {
     "dbConnect": db_connect.extract,
     "stream": stream.extract,
     "enterpriseSecurity": enterprise_security.extract,
+    "splunkbase": splunkbase.extract,
 }
 INSTANCE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
 # Every part a build can run: the Splunk platform extractors, then the products.

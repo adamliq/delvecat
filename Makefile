@@ -17,7 +17,7 @@ INGEST = cd ingestion && uv run delvecat-ingest
 demo:  ## build the demo catalog (search head + Deployment Server + SOAR + UBA, merged)
 	rm -rf web/.demo-parts && mkdir -p web/.demo-parts
 	$(INGEST) build --fixtures $(FIXTURE) --instance acme --instance-name "Acme search head" \
-		--fields --max-field-sourcetypes 10 --products dbConnect,stream,enterpriseSecurity \
+		--fields --max-field-sourcetypes 10 --products dbConnect,stream,enterpriseSecurity,splunkbase \
 		--strict --out $(PARTS)/search-head.json
 	$(INGEST) build --fixtures $(FIXTURE) --instance acme-ds --instance-name "Acme deployment server" \
 		--only serverInfo,apps --no-usage --products deploymentServer \

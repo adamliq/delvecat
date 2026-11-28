@@ -84,6 +84,11 @@ cd ingestion && uv run delvecat-ingest build --url https://splunk.example.com:80
 Splunk Cloud: add `--acs-stack <stack>` (ACS token in `DELVECAT_ACS_TOKEN`).
 Several instances (search heads, indexers, Deployment Server, SOAR, ...): build
 each with its own `--instance` and combine them with `delvecat-ingest merge`.
+With the [Splunkbase Version Catalog](https://github.com/adamliq/App_Splunkbase-catalog)
+app installed, a build also reads its catalogue (a KV store collection) and shows, on
+each installed app it lists, the latest Splunkbase release, the Splunk versions it
+supports and whether it is archived; apps with a newer version or archived on
+Splunkbase are findings.
 See [ingestion/README.md](ingestion/README.md) for all options.
 
 On Windows, `scripts/Build-Catalog.ps1` does the same from PowerShell (5.1 or

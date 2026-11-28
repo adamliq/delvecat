@@ -115,6 +115,7 @@ export const PART_GROUPS: PartGroup[] = [
       { id: "dbConnect", label: "DB Connect (incl. run status of inputs and outputs)", searches: true },
       { id: "stream", label: "Stream" },
       { id: "deploymentServer", label: "Deployment Server" },
+      { id: "splunkbase", label: "Splunkbase versions of installed apps (Splunkbase Version Catalog app)" },
     ],
   },
 ];

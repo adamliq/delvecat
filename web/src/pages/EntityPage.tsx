@@ -29,6 +29,7 @@ import { LazyDetails } from "../components/LazyDetails";
 import { objectHistory } from "../lib/changes";
 import { lookupColumns } from "../lib/lookups";
 import { LineageTab, UsedBy } from "../components/LineageTab";
+import { SplunkbasePanel } from "../components/SplunkbasePanel";
 import { hasLineage } from "../lib/lineage";
 import { PropContext, PropValue } from "../components/PropValue";
 import { SectionNav } from "../components/SectionNav";
@@ -110,7 +111,7 @@ export function EntityPage() {
   const code = Object.entries(props).filter(([k, v]) => k in CODE && typeof v === "string" && v);
   const DETECTION_KEYS = new Set(["mitreAttack", "killChainPhases", "analyticStories", "securityDomain", "severity", "dataModels"]);
   // Shown in their own section (EmailRecipients).
-  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy", "capabilities", "importedCapabilities", "deploymentServerInstance", "receivedFrom", "movedTo"]);
+  const OWN_SECTION = new Set(["alertRecipients", "defaultRecipients", "sender", "pivot", "storage", "indexTime", "appliesTo", "createdBy", "capabilities", "importedCapabilities", "deploymentServerInstance", "receivedFrom", "movedTo", "splunkbase", "splunkbaseCatalog"]);
   const shownInStorage = entity.type === "index" && !!props.storage;
   const rest = Object.entries(props).filter(
     ([k]) => !(k in CODE) && !OWN_SECTION.has(k) && !(isDetection(entity) && DETECTION_KEYS.has(k)) && !(shownInStorage && STORAGE_KEYS.has(k)),
@@ -228,6 +229,8 @@ export function EntityPage() {
             next.set("focus", "impact");
             setParams(next);
           }} />
+
+          <SplunkbasePanel entity={entity} />
 
           {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
 

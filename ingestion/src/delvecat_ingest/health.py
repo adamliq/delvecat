@@ -50,6 +50,7 @@ TOKEN_STALE_DAYS = 90  # not used for this long: probably not needed
 SUMMARY_UNUSED_DAYS = 30  # an acceleration summary no search used for this long
 RETENTION_SIZE_RATIO = 0.9  # an index this full freezes data by size, not by age
 ALERT_NOISY_PER_DAY = 24  # an alert firing more than hourly on average is hard to act on
+SPLUNKBASE_STALE_DAYS = 3  # the Splunkbase catalogue refreshes daily: older means it stopped
 SUMMARY_SOURCETYPES = ("stash", "stash_new", "stash_hec")  # summary data: delay by design
 
 HISTORY_POINTS = 60  # builds kept in the health trend
@@ -73,6 +74,7 @@ def thresholds() -> dict[str, float]:
         "summaryUnusedDays": SUMMARY_UNUSED_DAYS,
         "retentionSizeRatio": RETENTION_SIZE_RATIO,
         "alertNoisyPerDay": ALERT_NOISY_PER_DAY,
+        "splunkbaseStaleDays": SPLUNKBASE_STALE_DAYS,
     }
 
 
@@ -646,6 +648,40 @@ def _stream_checks(e: dict[str, Any], checks: list[dict[str, str]]) -> None:
         )
 
 
+def _splunkbase_checks(e: dict[str, Any], as_of: datetime, checks: list[dict[str, str]]) -> None:
+    """Splunkbase (from the Splunkbase Version Catalog app): a newer version, an app archived
+    upstream, and a catalogue that stopped refreshing."""
+    p = e.get("properties") or {}
+    sb = p.get("splunkbase") or {}
+    released = f" (released {str(sb['releaseDate'])[:10]})" if sb.get("releaseDate") else ""
+    if sb.get("archived"):
+        _check(
+            checks,
+            "appArchived",
+            "warning",
+            "Archived on Splunkbase: no longer maintained, so no fixes or security updates"
+            + (f"; its last release is {sb['latestVersion']}" if sb.get("latestVersion") else ""),
+        )
+    if sb.get("updateAvailable"):
+        _check(
+            checks,
+            "appUpdate",
+            "warning",
+            f"Splunkbase has version {sb.get('latestVersion')}{released}; "
+            f"this is {p.get('version') or 'an unknown version'}",
+        )
+    cat = p.get("splunkbaseCatalog") or {}
+    age = _age_hours(as_of, cat.get("lastChecked"))
+    if age is not None and age > SPLUNKBASE_STALE_DAYS * 24:
+        _check(
+            checks,
+            "splunkbaseStale",
+            "warning",
+            f"Its Splunkbase catalogue was last refreshed {_fmt_age(age)} ago (it refreshes "
+            "daily): newer versions published since are not known",
+        )
+
+
 def _db_checks(
     e: dict[str, Any], names: dict[tuple, dict[str, Any]], checks: list[dict[str, str]]
 ) -> None:
@@ -817,6 +853,8 @@ def evaluate_health(
             _stream_checks(e, checks)
         if e["type"] in ("dbConnection", "dbInput", "dbOutput", "dbLookup"):
             _db_checks(e, db_names, checks)
+        if e["type"] == "app":
+            _splunkbase_checks(e, as_of, checks)
         _command_checks(e, risky_custom, checks)
         _orphan_checks(e, user_names if e.get("instance") in with_users else None, checks)
         if e["type"] == "role" and e["name"] not in SPLUNK_ROLES:
