@@ -890,3 +890,5 @@ main.content:focus { outline: none; }
 .ack-compact > .ack-form { margin-top: 4px; }
 .reach-controls label { white-space: nowrap; min-width: 0; }
 .reach-controls select { max-width: 14em; }
+/* Build now in the Current catalog card. */
+.card > .actions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0 20px; }

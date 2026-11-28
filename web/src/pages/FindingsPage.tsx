@@ -117,7 +117,7 @@ export function FindingsPage() {
         <button type="button" className={`tile${f.status === "warning" ? " active" : ""}`} onClick={() => set("status", f.status === "warning" ? "" : "warning")}>
           <span className="tile-num">{all.length - critical}</span><span className="tile-label">warning{all.length - critical === 1 ? "" : "s"}</span>
         </button>
-        <div className="tile static" title="Findings shown on this page, and the objects they are on"><span className="tile-num">{new Set(all.map((x) => x.entity.id)).size}</span><span className="tile-label">objects ({all.length.toLocaleString()} finding{all.length === 1 ? "" : "s"})</span></div>
+        <div className="tile static" title="Findings shown on this page, and the objects they are on"><span className="tile-num">{all.length.toLocaleString()}</span><span className="tile-label">finding{all.length === 1 ? "" : "s"} on {new Set(all.map((x) => x.entity.id)).size.toLocaleString()} object{new Set(all.map((x) => x.entity.id)).size === 1 ? "" : "s"}</span></div>
         {hasPrevious(catalog.bundle) && (
           <button type="button" className={`tile${params.get("new") === "1" ? " active" : ""}`} onClick={() => set("new", params.get("new") === "1" ? "" : "1")}>
             <span className="tile-num">{all.filter((x) => x.isNew).length}</span><span className="tile-label">new since the last build</span>
