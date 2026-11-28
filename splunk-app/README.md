@@ -64,8 +64,8 @@ Cloud. Tested on Splunk 9.4 (legacy) and 10.4.
 
 ## Build in Splunk
 
-Open *Licoryx Delvecat > Build* (shown to admins and `delvecat_publisher`), choose the
-parts to read and the options, and press *Build now*. The page follows the build and shows the new
+Open *Licoryx Delvecat > Build* (shown to admins and `delvecat_publisher`) and press
+*Build now* at the top, or first change the parts to read and the options below it. The page follows the build and shows the new
 catalog when it is done: about 10 seconds on a small Splunk, minutes on a large
 one. The same from a search:
 

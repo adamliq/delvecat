@@ -54,7 +54,7 @@ const SECTIONS: Section[] = [
         <dt><L to="/glossary">Glossary</L></dt><dd>Business terms, the objects and fields they describe, and unused terms.</dd>
         <dt><L to="/coverage">Coverage</L></dt><dd>MITRE ATT&amp;CK and CIM coverage of your detections, and what would let detections that cannot fire work.</dd>
         <dt><L to="/findings">Findings</L></dt><dd>Every warning and critical check in one list, with how to fix each.</dd>
-        <dt><L to="/health">Health</L></dt><dd>Findings by area, the trend over builds, who needs to act, what was fixed, and the cleanup report of unused objects. Accept or snooze findings here.</dd>
+        <dt><L to="/health">Health</L></dt><dd>Findings by area, the trend over builds, who needs to act, what was fixed, and the cleanup report of unused objects. Accept or snooze findings here or on Findings.</dd>
         <dt><L to="/governance">Governance</L></dt><dd>Where sensitive data lives, how it spreads through lineage, and which roles, users and groups can reach it; and the high-risk capabilities with the roles and users holding them. Role and user pages list their capabilities; each capability page says who holds it.</dd>
         <dt><L to="/changes">Changes</L></dt><dd>What changed in Splunk since the previous build: added, removed and modified objects, with each changed setting before and after.</dd>
         <dt><L to="/insights">Insights</L></dt><dd>Documentation and ownership targets with worklists, distributions, what is used most, and every command searches run (risky ones marked; each command has a page listing the searches that run it).</dd>
@@ -71,7 +71,7 @@ const SECTIONS: Section[] = [
     keywords: "entity lineage relationships tabs spl fields annotations raw",
     body: (
       <ul>
-        <li><strong>Overview</strong>: product, instance, app, owner and status; health and usage; storage (for indexes); the SPL with the objects it names linked; every property in plain words. "On this page" jumps to a section.</li>
+        <li><strong>Overview</strong>: product, instance, app, owner and status; <em>Used by</em> (what depends on it, by type) with <em>Show impact</em> for the full list; health and usage; storage (for indexes); the SPL with the objects it names linked; every property in plain words. "On this page" jumps to a section.</li>
         <li><strong>Lineage</strong>: what feeds the object and what it feeds, as a graph; broken references are marked.</li>
         <li><strong>Fields</strong>: for sourcetypes, the field schema; for searches, the fields they use.</li>
         <li><strong>Relationships</strong>: every connection, as a graph or a list.</li>
@@ -94,7 +94,7 @@ const SECTIONS: Section[] = [
         </p>
         <ul>
           <li><strong>How to fix</strong> under a finding says why it matters, what to do, and gives a search to investigate (<em>Open in Splunk search</em> or <em>Copy search</em>).</li>
-          <li><strong>Acknowledge</strong>: accept a finding (known, not fixing) or snooze it for 7, 30 or 90 days with a note. It is hidden until the snooze ends or it gets worse. In Splunk, catalog publishers and admins can acknowledge, and everyone sees who did and why; elsewhere it is kept in your browser.</li>
+          <li><strong>Acknowledge</strong>: <em>Accept finding</em> (known, not fixing) or <em>Snooze 7 days</em> / <em>30 days</em>, with an optional note (<em>Add note…</em>), on the Health page or under <em>Acknowledge</em> on a Findings row. It is hidden until the snooze ends or it gets worse. In Splunk, catalog publishers and admins can acknowledge, and everyone sees who did and why; elsewhere it is kept in your browser.</li>
           <li><strong>New and fixed</strong>: each build is compared with the previous one, so findings show when they were first seen, and those that went away are listed as fixed.</li>
           <li>Ages ("6 hours ago") count from when the catalog was measured, not from today.</li>
         </ul>

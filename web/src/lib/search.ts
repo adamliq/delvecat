@@ -139,6 +139,21 @@ function toDoc(e: Entity): Doc {
   };
 }
 
+/** Objects whose name (or display name) is the query come first, then those whose name
+ * starts with it, then the rest in their order: someone typing "main" wants the index
+ * called main before the inputs that mention it. Stable within each group. */
+export function byName(query: string, list: Entity[]): Entity[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return list;
+  const rank = (e: Entity) => {
+    const names = [e.name, e.displayName].filter((n): n is string => !!n).map((n) => n.toLowerCase());
+    return names.some((n) => n === q) ? 0 : names.some((n) => n.startsWith(q)) ? 1 : 2;
+  };
+  const groups: Entity[][] = [[], [], []];
+  for (const e of list) groups[rank(e)].push(e);
+  return groups.flat();
+}
+
 /** Why an object matched: the words found and the fields they were found in. */
 export interface Match {
   terms: string[];
@@ -253,7 +268,7 @@ export class EntitySearch {
       matches.set(e.id, { terms: words, fields: words.some((w) => name.includes(w)) ? ["name"] : ["description"] });
       return true;
     });
-    return { list, matches };
+    return { list: byName(q, list), matches };
   }
 
   private matching(query: string): { list: Entity[]; matches: Map<string, Match>; partial?: boolean } {
@@ -272,10 +287,11 @@ export class EntitySearch {
       const fields = [...new Set(Object.values(r.match).flat())];
       matches.set(r.id as string, { terms: Object.keys(r.match), fields });
     }
-    const words = hits.map((r) => this.byId.get(r.id as string)!).filter(Boolean);
+    const words = byName(q, hits.map((r) => this.byId.get(r.id as string)!).filter(Boolean));
     if (!exact.length) return { list: words, matches };
     const seen = new Set(exact.map((e) => e.id));
-    return { list: [...exact, ...words.filter((e) => !seen.has(e.id))], matches };
+    // Names still come first: "main" is the index main before the inputs that send to it.
+    return { list: byName(q, [...exact, ...words.filter((e) => !seen.has(e.id))]), matches };
   }
 
   /** ``hide`` leaves objects out entirely (counts included), e.g. built-in settings. */

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { CommandPalette, Menu, SearchBox } from "./NavParts";
+import { CommandPalette, Menu, SearchBox, useNarrow } from "./NavParts";
 import { ADMIN, ago, changesSeen, HELP, markChangesSeen, menuOf, MENUS } from "../lib/nav";
 import { useCatalogState } from "../lib/CatalogContext";
 import { findings } from "../lib/findings";
@@ -42,6 +42,16 @@ export function Layout({ children }: { children: ReactNode }) {
   const newBuild = !!bundle && !!changes && seen !== bundle.generatedAt && changeCount > 0;
   const [menuOpen, setMenuOpen] = useState(false); // small screens
   useEffect(() => setMenuOpen(false), [location.pathname]);
+  const narrow = useNarrow();
+  const toggle = useRef<HTMLButtonElement>(null);
+  // Escape closes the small-screen Menu sheet, back on its button.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMenuOpen(false); toggle.current?.focus(); } };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+  const main = useRef<HTMLElement>(null);
 
   const fileInput = useRef<HTMLInputElement>(null);
   const folderInput = useRef<HTMLInputElement>(null);
@@ -63,17 +73,24 @@ export function Layout({ children }: { children: ReactNode }) {
   }, []);
 
   const section = menuOf(location.pathname);
+  // The number shows; screen readers hear what it counts ("17 findings need attention").
   const badge = (n: number, label: string, cls = "") =>
-    n > 0 ? <span className={`nav-badge${cls}`} aria-label={`${n} ${label}`}>{n > 999 ? "999+" : n}</span> : null;
+    n > 0 ? (
+      <span className={`nav-badge${cls}`} title={`${n.toLocaleString()} ${label}`}>
+        <span aria-hidden>{n > 999 ? "999+" : n}</span>
+        <span className="visually-hidden"> ({n.toLocaleString()} {label})</span>
+      </span>
+    ) : null;
   const allInstances = full.status === "ready" ? full.catalog.bundle.instances : [];
 
   return (
     <div className="shell">
+      <a href="#" className="skip-link" onClick={(e) => { e.preventDefault(); main.current?.focus(); }}>Skip to content</a>
       <header className={`topbar${menuOpen ? " menu-open" : ""}`} ref={header}>
         <Link to="/" className="brand">
           <span className="logo" aria-hidden>LD</span> Licoryx Delvecat
         </Link>
-        <button type="button" className="menu-toggle btn" aria-expanded={menuOpen} aria-controls="main-nav" onClick={() => setMenuOpen(!menuOpen)}>
+        <button ref={toggle} type="button" className="menu-toggle btn" aria-expanded={menuOpen} aria-controls="main-nav" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? "Close" : "Menu"}
         </button>
         <nav className="nav" id="main-nav" aria-label="Main">
@@ -81,8 +98,9 @@ export function Layout({ children }: { children: ReactNode }) {
             <Menu
               key={m.id}
               label={m.label}
+              flat={narrow}
               active={section === m.id}
-              badge={m.id === "quality" ? badge(findingCount, "findings") : undefined}
+              badge={m.id === "quality" ? badge(findingCount, "findings need attention") : undefined}
               items={m.items.map((i) => ({
                 ...i,
                 badge: i.to === "/findings" ? badge(findingCount, "findings")
@@ -95,7 +113,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <NavLink to={HELP.to} className="nav-link">{HELP.label}</NavLink>
         </nav>
         <SearchBox search={ready?.search} />
-        <button type="button" className="btn btn-small palette-button" title="Go to a page or object (Ctrl+K)" onClick={() => window.dispatchEvent(new Event("delvecat:palette"))}>
+        <button type="button" className="btn btn-small palette-button" title="Go to a page or object by name (Ctrl+K)" aria-label="Go to a page or object (Ctrl+K)" onClick={() => window.dispatchEvent(new Event("delvecat:palette"))}>
           Go to… <kbd>Ctrl K</kbd>
         </button>
         {allInstances.length > 1 && (
@@ -120,7 +138,8 @@ export function Layout({ children }: { children: ReactNode }) {
                 Build
               </NavLink>
             )}
-            {builder && <Menu label="Admin" items={ADMIN} active={section === "admin"} align="right" />}
+            {/* Build has its own button; the Admin menu holds the rest. */}
+            {builder && <Menu label="Admin" items={ADMIN.filter((i) => i.to !== "/build")} active={section === "admin"} align="right" flat={narrow} />}
             <a className="btn" href={splunkHomeUrl()} title="Back to Splunk's home page">
               Splunk
             </a>
@@ -134,7 +153,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <input ref={folderInput} type="file" hidden onChange={onPick} />
       </header>
       <CommandPalette search={ready?.search} byId={ready?.catalog.byId} />
-      <main className="content">{children}</main>
+      <main className="content" id="main" ref={main} tabIndex={-1}>{children}</main>
       <footer className="footer">
         <label className="theme-pick">
           Theme{" "}

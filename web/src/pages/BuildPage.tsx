@@ -180,12 +180,30 @@ export function BuildPage() {
         ) : (
           <p className="muted">No catalog has been published yet.</p>
         )}
+        {allowed && (
+          <div className="actions">
+            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0 || badIndexes.length > 0}>
+              {running ? "Building…" : busy ? "Starting…" : "Build now"}
+            </button>
+            {running && status && (
+              <button type="button" className="btn" onClick={() => void cancelBuild(status.sid).then(refresh)}>
+                Cancel
+              </button>
+            )}
+            <span className="muted small">
+              {partial ? "Only the selected parts: " : "Every default part, "}see <a href="#build-options" onClick={(e) => { e.preventDefault(); document.getElementById("build-options")?.scrollIntoView({ block: "start" }); }}>Options</a> below.
+            </span>
+          </div>
+        )}
         {bundle?.ingestionReport?.length ? (
           <>
             <h3>What the last build did</h3>
-            <CoverageReport bundle={bundle} />
+            <CoverageReport bundle={bundle} open={false} />
           </>
         ) : null}
+        {IN_SPLUNK && (
+          <p className="small"><Link to="/testing">Test a connection to another stack</Link> before importing from it.</p>
+        )}
       </section>
 
       <TransferPanel bundle={bundle} canImport={!!allowed} inSplunk={IN_SPLUNK} onImported={() => { void refresh(); reload(); }} />
@@ -198,7 +216,7 @@ export function BuildPage() {
       )}
 
       {allowed && (
-        <section className="card build-form">
+        <section className="card build-form" id="build-options">
           <h2>Options</h2>
           <label>
             Instance id{" "}
@@ -305,14 +323,9 @@ export function BuildPage() {
             </p>
           )}
           <div className="actions">
-            <button type="button" className="btn btn-primary" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0 || badIndexes.length > 0}>
-              {running ? "Building…" : busy ? "Starting…" : "Build now"}
+            <button type="button" className="btn" onClick={() => void start(false)} disabled={busy || running || opts.parts.length === 0 || badIndexes.length > 0}>
+              {running ? "Building…" : busy ? "Starting…" : "Build with these options"}
             </button>
-            {running && status && (
-              <button type="button" className="btn" onClick={() => void cancelBuild(status.sid).then(refresh)}>
-                Cancel
-              </button>
-            )}
           </div>
         </section>
       )}

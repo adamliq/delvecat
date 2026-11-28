@@ -7,17 +7,38 @@ import { ALL_PAGES, type NavItem } from "../lib/nav";
 import { recentIds } from "../lib/recent";
 import { entityPath, searchPath } from "../lib/routes";
 
-/** A menu in the bar: a button that opens its pages. Closes on Escape, outside click or
- * navigation. */
-export function Menu({ label, items, active, badge, align = "left" }: {
+/** Whether the screen is narrow (the bar folds behind a Menu button). */
+export function useNarrow(query = "(max-width: 900px)"): boolean {
+  const get = () => typeof window !== "undefined" && !!window.matchMedia?.(query).matches;
+  const [narrow, setNarrow] = useState(get);
+  useEffect(() => {
+    const m = window.matchMedia?.(query);
+    if (!m) return;
+    const on = () => setNarrow(m.matches);
+    m.addEventListener?.("change", on);
+    return () => m.removeEventListener?.("change", on);
+  }, [query]);
+  return narrow;
+}
+
+/** A menu in the bar: a button that opens its pages. Keyboard: Enter, Space or Arrow Down
+ * opens it on the first page, Arrow Up on the last; arrows, Home and End move; Escape
+ * closes it and returns to the button; Tab moves on and closes it. Closes on an outside
+ * click or navigation. On narrow screens (inside the Menu sheet) its pages are listed
+ * under its name instead, one tap away. */
+export function Menu({ label, items, active, badge, align = "left", flat = false }: {
   label: string;
   items: (NavItem & { badge?: ReactNode })[];
   active?: boolean;
   badge?: ReactNode;
   align?: "left" | "right";
+  /** List the pages under the label (no button): the small-screen Menu sheet. */
+  flat?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [focusAt, setFocusAt] = useState<"first" | "last" | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
   const location = useLocation();
   useEffect(() => setOpen(false), [location.pathname]);
   useEffect(() => {
@@ -26,13 +47,53 @@ export function Menu({ label, items, active, badge, align = "left" }: {
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
+  const itemsEls = () => [...(ref.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])];
+  useEffect(() => {
+    if (!open || !focusAt) return;
+    const els = itemsEls();
+    (focusAt === "first" ? els[0] : els[els.length - 1])?.focus();
+    setFocusAt(null);
+  }, [open, focusAt]);
+  if (flat) {
+    const id = `menu-${label.replace(/\W+/g, "-").toLowerCase()}`;
+    return (
+      <div className={`menu menu-flat${active ? " active" : ""}`} role="group" aria-labelledby={id}>
+        <div className="menu-flat-label" id={id}>{label}{badge}</div>
+        {items.map((i) => (
+          <NavLink key={i.to} to={i.to} className="menu-item">
+            <span className="menu-item-label">{i.label}{i.badge}</span>
+            <span className="menu-item-hint">{i.hint}</span>
+          </NavLink>
+        ))}
+      </div>
+    );
+  }
+  const onButtonKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setOpen(true);
+      setFocusAt(e.key === "ArrowDown" ? "first" : "last");
+    }
+  };
+  const onPanelKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const els = itemsEls();
+    const at = els.indexOf(document.activeElement as HTMLElement);
+    const move = (i: number) => { e.preventDefault(); els[(i + els.length) % els.length]?.focus(); };
+    if (e.key === "ArrowDown") move(at + 1);
+    else if (e.key === "ArrowUp") move(at - 1);
+    else if (e.key === "Home") move(0);
+    else if (e.key === "End") move(els.length - 1);
+    else if (e.key === "Tab") setOpen(false);
+  };
   return (
-    <div className={`menu${active ? " active" : ""}`} ref={ref} onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}>
-      <button type="button" className="menu-button" aria-haspopup="true" aria-expanded={open} onClick={() => setOpen(!open)}>
+    <div className={`menu${active ? " active" : ""}`} ref={ref}
+      onKeyDown={(e) => { if (e.key === "Escape" && open) { e.stopPropagation(); setOpen(false); button.current?.focus(); } }}>
+      <button ref={button} type="button" className="menu-button" aria-haspopup="menu" aria-expanded={open}
+        onClick={() => { setOpen(!open); if (!open) setFocusAt("first"); }} onKeyDown={onButtonKey}>
         {label}{badge}<span className="menu-caret" aria-hidden>▾</span>
       </button>
       {open && (
-        <div className={`menu-panel menu-${align}`} role="menu">
+        <div className={`menu-panel menu-${align}`} role="menu" aria-label={label} onKeyDown={onPanelKey}>
           {items.map((i) => (
             <NavLink key={i.to} to={i.to} role="menuitem" className="menu-item">
               <span className="menu-item-label">{i.label}{i.badge}</span>
@@ -68,10 +129,17 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-  const suggestions = useMemo(
-    () => (search && q.trim().length >= 2 ? search.query(q.trim()).results.slice(0, 8) : []),
-    [search, q, indexReady],
-  );
+  // Pages whose name matches come first (typing "health" offers the Health page), then
+  // objects, an exact name first (search ranks those first).
+  const suggestions = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (t.length < 2) return [];
+    const pages = ALL_PAGES.filter((p) => p.label.toLowerCase().startsWith(t)).slice(0, 3)
+      .map((p) => ({ key: `page:${p.to}`, to: p.to, kind: "Page", label: p.label, spl: false }));
+    const objects = search ? search.query(q.trim()).results.slice(0, 8 - pages.length)
+      .map((e) => ({ key: e.id, to: entityPath(e.id), kind: typeLabel(e.type), label: name(e), spl: e.type === "adhocSearch" })) : [];
+    return [...pages, ...objects];
+  }, [search, q, indexReady]);
   const go = (to: string) => { setFocus(false); setQ(""); setSel(-1); input.current?.blur(); navigate(to); };
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") { e.preventDefault(); setSel((s) => Math.min(s + 1, suggestions.length - 1)); }
@@ -81,7 +149,7 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
   return (
     <form className="search-box" role="search" onSubmit={(e) => {
       e.preventDefault();
-      go(sel >= 0 && suggestions[sel] ? entityPath(suggestions[sel].id) : searchPath({ q }));
+      go(sel >= 0 && suggestions[sel] ? suggestions[sel].to : searchPath({ q }));
     }}>
       <input
         ref={input}
@@ -99,9 +167,9 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
       {focus && suggestions.length > 0 && (
         <ul className="suggest" role="listbox">
           {suggestions.map((e, i) => (
-            <li key={e.id} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
-              onMouseDown={(ev) => { ev.preventDefault(); go(entityPath(e.id)); }}>
-              <span className="type-tag">{typeLabel(e.type)}</span> <span className={e.type === "adhocSearch" ? "spl-title" : undefined}>{name(e)}</span>
+            <li key={e.key} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
+              onMouseDown={(ev) => { ev.preventDefault(); go(e.to); }}>
+              <span className="type-tag">{e.kind}</span> <span className={e.spl ? "spl-title" : undefined}>{e.label}</span>
             </li>
           ))}
           <li className="suggest-all" onMouseDown={(ev) => { ev.preventDefault(); go(searchPath({ q })); }}>All results for “{q}” →</li>

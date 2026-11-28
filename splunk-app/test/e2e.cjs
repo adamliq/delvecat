@@ -315,9 +315,9 @@ const sections = {
     const link = await pub.page.locator('.remedy a:has-text("Open in Splunk search")').first().getAttribute('href').catch(() => null);
     check('How to fix links to a Splunk search', !!link && /\/app\/search\/search\?q=/.test(link), link || 'no link');
     const before = await pub.page.locator('.finding').count();
-    await pub.page.locator('.ack-form summary').first().click();
+    await pub.page.locator('.ack-form button:has-text("Add note")').first().click();
     await pub.page.locator('.ack-form input[aria-label=Note]').first().fill('e2e: known');
-    await pub.page.locator('.ack-form button:has-text("Save")').first().click();
+    await pub.page.locator('.ack-form button:has-text("Accept finding")').first().click();
     await sleep(1500);
     const stored = (await rest('GET', ACKS)).json || [];
     check('publisher accepts a finding: saved in the app\'s KV collection', stored.length === 1 && stored[0].by === 'publisher' && stored[0].note === 'e2e: known',

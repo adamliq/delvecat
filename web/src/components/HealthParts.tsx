@@ -150,16 +150,16 @@ function RemedyBody({ item, webUrl, inSplunk, prefix }: { item: Item; webUrl?: s
   );
 }
 
-const SNOOZE_DAYS = [7, 30, 90];
-
-/** Accept or snooze a finding, or undo it. */
-export function AckControl({ item, canWrite, onSave, onRemove }: {
+/** Accept or snooze a finding in one click (with an optional note), or undo it. */
+export function AckControl({ item, canWrite, onSave, onRemove, compact }: {
   item: Item;
   canWrite: boolean;
+  /** Behind an "Acknowledge" disclosure (long lists such as Findings). */
+  compact?: boolean;
   onSave: (state: AckState, days: number | undefined, note: string) => Promise<void>;
   onRemove: (ack: Ack) => Promise<void>;
 }) {
-  const [choice, setChoice] = useState("accept");
+  const [noting, setNoting] = useState(false);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -184,23 +184,25 @@ export function AckControl({ item, canWrite, onSave, onRemove }: {
     );
   }
   if (!canWrite) return null;
-  return (
-    <LazyDetails className="ack-form" summary="Acknowledge">{() => (
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const days = choice === "accept" ? undefined : Number(choice);
-        void act(() => onSave(days ? "snoozed" : "accepted", days, note.trim()));
-      }}>
-        <select value={choice} onChange={(e) => setChoice(e.target.value)} aria-label="Acknowledge how">
-          <option value="accept">Accept (known, not fixing)</option>
-          {SNOOZE_DAYS.map((d) => <option key={d} value={String(d)}>Snooze for {d} days</option>)}
-        </select>
-        <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (optional)" aria-label="Note" maxLength={300} />
-        <button type="submit" className="btn btn-small" disabled={busy}>Save</button>
-        {error && <div className="error small">{error}</div>}
-      </form>
-    )}</LazyDetails>
+  const save = (days?: number) => void act(() => onSave(days ? "snoozed" : "accepted", days, note.trim()));
+  const buttons = (
+    <div className="ack-form" role="group" aria-label="Acknowledge this finding">
+      <button type="button" className="btn btn-small" disabled={busy} onClick={() => save()}
+        title="Known and not being fixed: hidden until it gets worse">Accept finding</button>
+      <button type="button" className="btn btn-small" disabled={busy} onClick={() => save(7)}
+        title="Hidden for 7 days, or until it gets worse">Snooze 7 days</button>
+      <button type="button" className="btn btn-small" disabled={busy} onClick={() => save(30)}
+        title="Hidden for 30 days, or until it gets worse">Snooze 30 days</button>
+      {noting ? (
+        <input type="text" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note, saved with your choice"
+          aria-label="Note" maxLength={300} autoFocus />
+      ) : (
+        <button type="button" className="link-btn small" onClick={() => setNoting(true)}>Add note…</button>
+      )}
+      {error && <div className="error small">{error}</div>}
+    </div>
   );
+  return compact ? <details className="ack-compact"><summary>Acknowledge</summary>{buttons}</details> : buttons;
 }
 
 export function NewBadge() {

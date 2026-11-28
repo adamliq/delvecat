@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { DataTable, type Column } from "../components/DataTable";
 import { useCatalog } from "../lib/CatalogContext";
-import { NewBadge, RemedyBox, webUrlOf } from "../components/HealthParts";
-import { ackLabel, ackStore, type Ack } from "../lib/acks";
+import { AckControl, NewBadge, RemedyBox, webUrlOf } from "../components/HealthParts";
+import { ackStore, type Ack, type AckState } from "../lib/acks";
 import { checkTitle, filterFindings, findings } from "../lib/findings";
 import { hasPrevious, items as healthItems, type Item } from "../lib/healthView";
 import { IN_SPLUNK, splunkHomeUrl } from "../lib/splunkSource";
@@ -18,11 +18,22 @@ export function FindingsPage() {
   const [params, setParams] = useSearchParams();
   const store = useMemo(() => ackStore(), []);
   const [acks, setAcks] = useState<Ack[]>([]);
+  const [canWrite, setCanWrite] = useState(false);
   useEffect(() => {
     let live = true;
     store.list().then((a) => live && setAcks(a)).catch(() => undefined);
+    store.canWrite().then((w) => live && setCanWrite(w)).catch(() => undefined);
     return () => { live = false; };
   }, [store]);
+  const save = async (x: Item, state: AckState, days: number | undefined, note: string) => {
+    const until = days ? new Date(Date.now() + days * 86400000).toISOString() : undefined;
+    const ack = await store.save({ entity: x.entity.id, check: x.check, state, until, status: x.status, note: note || undefined });
+    setAcks((a) => [...a.filter((y) => y._key !== ack._key), ack]);
+  };
+  const remove = async (ack: Ack) => {
+    await store.remove(ack._key);
+    setAcks((a) => a.filter((y) => y._key !== ack._key));
+  };
   const ackMap = useMemo(() => new Map(acks.map((a) => [`${a.entity}\u0000${a.check}`, a])), [acks]);
   const showHandled = params.get("acked") === "1";
   // Same order as findings(): most severe first, then by finding and object.
@@ -63,7 +74,7 @@ export function FindingsPage() {
     { label: "Severity", value: (x) => (x.status === "critical" ? 0 : 1), render: (x) => <StatusLabel status={x.status} /> },
     { label: "Finding", value: (x) => checkTitle(x.check), render: (x) => (
       <>{checkTitle(x.check)}{x.isNew && <> <NewBadge /></>}
-        <div><Link className="small" to={`/health?check=${encodeURIComponent(x.check)}`}>on the Health page</Link></div></>
+        <div><Link className="small" to={`/health?check=${encodeURIComponent(x.check)}&q=${encodeURIComponent(x.entity.displayName ?? x.entity.name)}`}>on the Health page</Link></div></>
     ) },
     {
       label: "Object",
@@ -77,8 +88,8 @@ export function FindingsPage() {
     },
     { label: "Detail", value: (x) => x.message, render: (x) => (
       <>{x.message}
-        {x.ack && <div className="muted small">{ackLabel(x.ack)}{x.ack.note ? `: ${x.ack.note}` : ""}</div>}
-        <RemedyBox item={x} webUrl={webUrlOf(catalog.bundle, x.entity)} inSplunk={IN_SPLUNK} prefix={prefix} /></>
+        <RemedyBox item={x} webUrl={webUrlOf(catalog.bundle, x.entity)} inSplunk={IN_SPLUNK} prefix={prefix} />
+        <AckControl compact item={x} canWrite={canWrite} onSave={(st, d, n) => save(x, st, d, n)} onRemove={remove} /></>
     ) },
     { label: "App", value: (x) => x.entity.app ?? "" },
     { label: "Owner", value: owner },
@@ -94,25 +105,26 @@ export function FindingsPage() {
         </div>
         <p className="lede">
           Everything the catalog flagged, most severe first: data and scheduler problems, tokens, alerts, suppressions,
-          routing, retention and acceleration. Each finding links to its object and says how to fix it; accept or snooze
-          findings on the <Link to="/health">Health page</Link>.
+          routing, retention and acceleration. Each finding links to its object and says how to fix it.
+          {canWrite ? " Accept or snooze a finding here or on the " : " The "}<Link to="/health">Health page</Link>
+          {canWrite ? "." : " groups them by area, owner and app."}
         </p>
       </div>
       <div className="tiles">
         <button type="button" className={`tile${f.status === "critical" ? " active" : ""}`} onClick={() => set("status", f.status === "critical" ? "" : "critical")}>
-          <span className="tile-num">{critical}</span><span className="tile-label">critical</span>
+          <span className="tile-num">{critical}</span><span className="tile-label">critical finding{critical === 1 ? "" : "s"}</span>
         </button>
         <button type="button" className={`tile${f.status === "warning" ? " active" : ""}`} onClick={() => set("status", f.status === "warning" ? "" : "warning")}>
-          <span className="tile-num">{all.length - critical}</span><span className="tile-label">warnings</span>
+          <span className="tile-num">{all.length - critical}</span><span className="tile-label">warning{all.length - critical === 1 ? "" : "s"}</span>
         </button>
-        <div className="tile static"><span className="tile-num">{new Set(all.map((x) => x.entity.id)).size}</span><span className="tile-label">objects affected</span></div>
+        <div className="tile static" title="Findings shown on this page, and the objects they are on"><span className="tile-num">{new Set(all.map((x) => x.entity.id)).size}</span><span className="tile-label">objects ({all.length.toLocaleString()} finding{all.length === 1 ? "" : "s"})</span></div>
         {hasPrevious(catalog.bundle) && (
           <button type="button" className={`tile${params.get("new") === "1" ? " active" : ""}`} onClick={() => set("new", params.get("new") === "1" ? "" : "1")}>
             <span className="tile-num">{all.filter((x) => x.isNew).length}</span><span className="tile-label">new since the last build</span>
           </button>
         )}
         {handled > 0 && (
-          <button type="button" className={`tile${showHandled ? " active" : ""}`} onClick={() => set("acked", showHandled ? "" : "1")} title="Accepted or snoozed on the Health page">
+          <button type="button" className={`tile${showHandled ? " active" : ""}`} onClick={() => set("acked", showHandled ? "" : "1")} title="Accepted or snoozed">
             <span className="tile-num">{handled}</span><span className="tile-label">acknowledged {showHandled ? "(shown)" : "(hidden)"}</span>
           </button>
         )}

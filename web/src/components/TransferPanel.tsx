@@ -150,7 +150,7 @@ export function TransferPanel({ bundle, canImport, inSplunk, onImported }: {
             <label className="sort"><input type="radio" name="mode" checked={mode === "replace"} onChange={() => setMode("replace")} /> Replace this stack&apos;s catalog</label>
           </fieldset>
           <div>
-            <button type="submit" className="btn btn-primary" disabled={busy !== null || (from === "file" ? !file : !url.trim() || !token.trim())}>
+            <button type="submit" className="btn" disabled={busy !== null || (from === "file" ? !file : !url.trim() || !token.trim())}>
               {busy === "import" ? "Importing…" : "Import"}
             </button>
           </div>

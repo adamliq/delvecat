@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Entity, EntityType } from "../generated/catalog";
-import { EntitySearch, FACETS, propertyValues } from "./search";
+import { byName, EntitySearch, FACETS, propertyValues } from "./search";
 
 const ent = (type: EntityType, name: string, properties: Record<string, unknown> = {}): Entity =>
   ({ id: `i:${type}:${name}`, type, name, product: "splunk", instance: "i", properties });
@@ -117,5 +117,17 @@ describe("facet counts", () => {
       expect(got.results.length).toBe(want.n);
       for (const facet of s.facetNames) expect(Object.fromEntries(got.facets[facet])).toEqual(want.out[facet]);
     }
+  });
+});
+
+describe("byName", () => {
+  const e = (id: string, name: string, displayName?: string) => ({ id, name, displayName, type: "index" }) as unknown as Entity;
+  it("puts exact names first, then names that start with the query, keeping order within each", () => {
+    const list = [e("a", "summary_main"), e("b", "main_backup"), e("c", "main"), e("d", "x", "Main")];
+    expect(byName("main", list).map((x) => x.id)).toEqual(["c", "d", "b", "a"]);
+  });
+  it("leaves the list alone for an empty query", () => {
+    const list = [e("a", "b"), e("c", "a")];
+    expect(byName("  ", list)).toBe(list);
   });
 });

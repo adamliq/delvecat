@@ -554,7 +554,7 @@ input::placeholder { color: var(--muted); opacity: 1; }
 .facet-group-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin: 4px 0 2px; }
 
 .nav-badge { display: inline-block; min-width: 1.4em; margin-left: 4px; padding: 0 5px; border-radius: 999px; background: var(--warn); color: #fff; font-size: 0.7rem; font-weight: 600; line-height: 1.5; text-align: center; vertical-align: middle; }
-.th-sort { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; font-weight: 600; color: inherit; }
+.th-sort { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; font-weight: 600; color: inherit; min-height: 24px; }
 .th-sort:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; border-radius: 3px; }
 .th-arrow { font-size: 0.7em; opacity: 0.45; }
 th[aria-sort] .th-arrow { opacity: 1; }
@@ -665,7 +665,7 @@ button.tile { font: inherit; color: inherit; text-align: left; cursor: pointer; 
 .remedy p { margin: 6px 0; }
 .remedy-spl { display: grid; gap: 6px; margin: 6px 0; }
 .remedy-spl code { display: block; white-space: pre-wrap; word-break: break-word; background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; font-size: 0.82rem; }
-.ack-form form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.ack-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .ack-state { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-top: 4px; }
 .ack-lapsed .muted { color: var(--status-critical); }
 .badge-new { background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 0 5px; font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.3px; }
@@ -831,7 +831,7 @@ a.spl-link:hover { text-decoration-style: solid; }
 
 /* Printed reports (Health, Findings...): content only, every row and panel. */
 @media print {
-  .topbar, .footer, .section-nav, .health-filters, .findings-filters, .lineage-controls, .ack-form,
+  .topbar, .footer, .section-nav, .health-filters, .findings-filters, .lineage-controls, .ack-form, .ack-compact, .skip-link,
   .data-table-bar button, .table-more button, .btn, .seg, .print-hide, .help-toc { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .content { max-width: none; padding: 0; }
@@ -864,3 +864,29 @@ h1.spl-title { font-size: 1.35rem; overflow-wrap: anywhere; }
 .topbar .search-box { flex: 1 1 200px; min-width: 150px; }
 @media (max-width: 1250px) and (min-width: 901px) { .topbar .brand { font-size: 0; gap: 0; } .topbar .brand .logo { font-size: 12px; } .stack-pick select { max-width: 130px; } }
 @media (max-width: 1450px) { .palette-button kbd { display: none; } .stack-pick select { max-width: 140px; } }
+
+/* Skip link: hidden until focused (first Tab on a page). */
+.skip-link { position: absolute; left: 8px; top: -60px; z-index: 100; padding: 8px 12px; border-radius: 6px; background: var(--surface); color: var(--accent); border: 2px solid var(--accent); }
+.skip-link:focus { top: 8px; }
+main.content:focus { outline: none; }
+/* Small-screen Menu sheet: each menu's pages listed under its name. */
+.menu-flat { display: grid; gap: 2px; padding: 4px 0 8px; }
+.menu-flat-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); padding: 4px 10px; }
+.menu-flat .menu-item { min-height: 44px; align-content: center; }
+.menu-flat .menu-item.active { background: var(--accent-soft); }
+/* Touch targets: at least 24px everywhere, 44px on touch screens. */
+.link-btn, .section-nav a, .btn-small { min-height: 24px; }
+.link-btn { display: inline-flex; align-items: center; }
+@media (pointer: coarse) {
+  .link-btn, .section-nav a, .btn, .btn-small, summary, .menu-item, .nav-link, .menu-button, .th-sort { min-height: 44px; }
+  .section-nav a, .link-btn { display: inline-flex; align-items: center; }
+}
+
+
+/* Show impact: the list lands below the sticky header. */
+.scroll-target { scroll-margin-top: calc(var(--header-h, 60px) + 12px); }
+.ack-compact { margin-top: 4px; font-size: 0.88rem; }
+.ack-compact > summary { cursor: pointer; color: var(--accent); }
+.ack-compact > .ack-form { margin-top: 4px; }
+.reach-controls label { white-space: nowrap; min-width: 0; }
+.reach-controls select { max-width: 14em; }

@@ -230,6 +230,14 @@ export function HealthPage() {
     return () => { live = false; };
   }, [store]);
 
+  // Arriving with a finding chosen (from Findings or an object's page): start at the list.
+  const arrivedFiltered = useRef(!!(params.get("check") || params.get("q")));
+  useEffect(() => {
+    if (!arrivedFiltered.current) return;
+    arrivedFiltered.current = false;
+    requestAnimationFrame(() => listTop.current?.scrollIntoView({ block: "start" }));
+  }, []);
+
   const ackMap = useMemo(() => new Map(acks.map((a) => [`${a.entity}\u0000${a.check}`, a])), [acks]);
   // With a stack chosen, everything on the page (tiles included) is about that stack.
   const stack = params.get("instance") ?? "";
@@ -360,7 +368,7 @@ export function HealthPage() {
             <button key={v} type="button" role="tab" aria-selected={view === v} className={view === v ? "active" : undefined} onClick={() => setView(v)}>{label}</button>
           ))}
         </div>
-        <span className="muted small" role="status">{list.length.toLocaleString()} finding{list.length === 1 ? "" : "s"}{active ? " match" : ""}</span>
+        <span className="muted small" role="status">{list.length.toLocaleString()} finding{list.length === 1 ? "" : "s"}{active ? " match" : ""} on {new Set(list.map((x) => x.entity.id)).size.toLocaleString()} object{new Set(list.map((x) => x.entity.id)).size === 1 ? "" : "s"}</span>
         <button type="button" className="btn btn-small" disabled={!list.length}
           onClick={() => downloadText("delvecat-health-findings.csv", toCsv([HEALTH_CSV, ...csvRows(list)]))}>Download CSV</button>
       </div>

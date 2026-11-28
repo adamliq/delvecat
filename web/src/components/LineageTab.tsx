@@ -1,7 +1,7 @@
 import { SourcetypeFieldLineage } from "./SourcetypeFieldLineage";
 import { ColumnLineage } from "./ColumnLineage";
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import type { Entity, EntityType } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
@@ -96,9 +96,40 @@ function Depth({ label, value, onChange }: { label: string; value: number; onCha
   );
 }
 
+/** What depends on an object, for its Overview: direct users by type and how many more
+ * depend on it through them, with the way to the full list. */
+export function UsedBy({ catalog, entity, onShow }: { catalog: Catalog; entity: Entity; onShow: () => void }) {
+  const all = useMemo(() => reach(catalog, entity.id, "down"), [catalog, entity.id]);
+  const direct = all.filter((r) => r.depth === 1);
+  const counts = new Map<EntityType, number>();
+  direct.forEach((r) => counts.set(r.entity.type, (counts.get(r.entity.type) ?? 0) + 1));
+  const more = all.length - direct.length;
+  return (
+    <section>
+      <h2>Used by</h2>
+      {all.length === 0 ? (
+        <p className="muted small">Nothing in the catalog depends on this object.</p>
+      ) : (
+        <p>
+          {[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([t, n]) => `${n.toLocaleString()} ${n === 1 ? typeLabel(t) : pluralTypeLabel(t)}`).join(", ")}
+          {more > 0 && <span className="muted"> · {more.toLocaleString()} more through them</span>}{" "}
+          <button type="button" className="btn btn-small" onClick={onShow}>Show impact</button>
+        </p>
+      )}
+    </section>
+  );
+}
+
 export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Entity }) {
-  const [up, setUp] = useState(2);
+  // ?focus=impact (Show impact on the Overview): what depends on this object, first.
+  const [params] = useSearchParams();
+  const impact = params.get("focus") === "impact";
+  const [up, setUp] = useState(impact ? 0 : 2);
   const [down, setDown] = useState(2);
+  const impactRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (impact) impactRef.current?.scrollIntoView({ block: "start" });
+  }, [impact, entity.id]);
   const l = entity.lineage;
 
   return (
@@ -153,10 +184,23 @@ export function LineageTab({ catalog, entity }: { catalog: Catalog; entity: Enti
       {entity.type === "sourcetype" && <SourcetypeFieldLineage catalog={catalog} entity={entity} />}
 
       <section className="rel-grid">
-        <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}
-          empty="Nothing upstream." />
-        <ReachList title="Impact (downstream)" entity={entity} direction="down" catalog={catalog}
-          empty="Nothing in the catalog depends on this object." />
+        {impact ? (
+          <>
+            <div ref={impactRef} id="impact" className="scroll-target">
+              <ReachList title="Impact (downstream)" entity={entity} direction="down" catalog={catalog}
+                empty="Nothing in the catalog depends on this object." />
+            </div>
+            <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}
+              empty="Nothing upstream." />
+          </>
+        ) : (
+          <>
+            <ReachList title="Depends on (upstream)" entity={entity} direction="up" catalog={catalog}
+              empty="Nothing upstream." />
+            <ReachList title="Impact (downstream)" entity={entity} direction="down" catalog={catalog}
+              empty="Nothing in the catalog depends on this object." />
+          </>
+        )}
       </section>
     </div>
   );

@@ -28,7 +28,7 @@ import { DiffTable } from "./ChangesPage";
 import { LazyDetails } from "../components/LazyDetails";
 import { objectHistory } from "../lib/changes";
 import { lookupColumns } from "../lib/lookups";
-import { LineageTab } from "../components/LineageTab";
+import { LineageTab, UsedBy } from "../components/LineageTab";
 import { hasLineage } from "../lib/lineage";
 import { PropContext, PropValue } from "../components/PropValue";
 import { SectionNav } from "../components/SectionNav";
@@ -143,6 +143,7 @@ export function EntityPage() {
   const tab: Tab = tabs.some(([t]) => t === requested) ? requested! : "overview";
   const selectTab = (t: Tab) => {
     const next = new URLSearchParams(params);
+    next.delete("focus");
     if (t === "overview") next.delete("tab");
     else next.set("tab", t);
     setParams(next, { replace: true });
@@ -220,6 +221,13 @@ export function EntityPage() {
               </>
             )}
           </dl>
+
+          <UsedBy catalog={catalog} entity={entity} onShow={() => {
+            const next = new URLSearchParams(params);
+            next.set("tab", "lineage");
+            next.set("focus", "impact");
+            setParams(next);
+          }} />
 
           {isDetection(entity) && <DetectionPanel catalog={catalog} entity={entity} />}
 
