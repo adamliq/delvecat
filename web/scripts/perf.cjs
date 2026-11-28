@@ -62,9 +62,19 @@ const ids = {
     ["schemas", () => nav("/schemas", ".network-svg, .muted")],
     ["glossary", () => nav("/glossary", "h1")],
     ["coverage", () => nav("/coverage", "h1")],
+    ["findings", () => nav("/findings", ".tiles")],
     ["health", () => nav("/health", "h1")],
     ["governance", () => nav("/governance", "h1")],
     ["insights", () => nav("/insights", ".kpi")],
+    // Typing in the header search until suggestions show (includes 5 keys x 60 ms of typing),
+    // once the word index is built (here, well after loading).
+    ["header search typing", async () => {
+      const box = page.locator(".search-box input");
+      await box.fill("");
+      await box.pressSequentially("index", { delay: 60 });
+      await page.waitForSelector(".search-box [role=option]", { timeout: 60000 });
+      await page.keyboard.press("Escape");
+    }],
     ["sql console (Run usable)", () => nav("/sql", 'button.btn-primary:has-text("Run"):not([disabled])')],
   ];
   for (const [name, run] of steps) {

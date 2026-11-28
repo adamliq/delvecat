@@ -139,8 +139,59 @@ export interface Reached {
   via?: Entity; // the object it was reached through (undefined at depth 1)
 }
 
-/** Everything reachable downstream ("impact") or upstream, with hop count and path. */
+// The last few reach() results (an object's Overview, Lineage tab and back again ask for
+// the same lists; on large catalogs each takes a few hundred ms).
+const reached = new WeakMap<Catalog, Map<string, Reached[]>>();
+const REACH_KEEP = 8;
+
+/** Everything reachable downstream ("impact") or upstream, with hop count and path.
+ * The list is shared with later callers: do not change it. */
 export function reach(catalog: Catalog, id: string, direction: "down" | "up", maxDepth = 20): Reached[] {
+  let kept = reached.get(catalog);
+  if (!kept) reached.set(catalog, (kept = new Map()));
+  const key = `${direction}|${maxDepth}|${id}`;
+  const hit = kept.get(key);
+  if (hit) {
+    kept.delete(key); // most recently used last
+    kept.set(key, hit);
+    return hit;
+  }
+  const result = reachUncached(catalog, id, direction, maxDepth);
+  kept.set(key, result);
+  if (kept.size > REACH_KEEP) kept.delete(kept.keys().next().value!);
+  return result;
+}
+
+/** What depends on an object, for a summary: the objects one step downstream, and how many
+ * there are in all (as reach() counts them), counted no further than ``cap`` beyond the
+ * first step. No list is built or sorted, so it stays quick for objects half the catalog
+ * depends on. */
+export function dependents(catalog: Catalog, id: string, cap = 10000, maxDepth = 20): { direct: Entity[]; total: number; capped: boolean } {
+  const down = flow(catalog).down;
+  const seen = new Set<string>([id]);
+  const direct: Entity[] = [];
+  let total = 0;
+  let frontier = [id];
+  for (let d = 1; d <= maxDepth && frontier.length; d++) {
+    const next: string[] = [];
+    for (const n of frontier) {
+      for (const e of down.get(n) ?? []) {
+        if (seen.has(e.to)) continue;
+        seen.add(e.to);
+        next.push(e.to); // walked through even without an object, as reach() does
+        const entity = catalog.byId.get(e.to);
+        if (!entity) continue;
+        total++;
+        if (d === 1) direct.push(entity);
+        else if (total - direct.length >= cap) return { direct, total, capped: true };
+      }
+    }
+    frontier = next;
+  }
+  return { direct, total, capped: false };
+}
+
+function reachUncached(catalog: Catalog, id: string, direction: "down" | "up", maxDepth: number): Reached[] {
   const f = flow(catalog);
   const map = direction === "down" ? f.down : f.up;
   const next = (e: FlowEdge) => (direction === "down" ? e.to : e.from);

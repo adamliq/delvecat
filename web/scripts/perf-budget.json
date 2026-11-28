@@ -14,8 +14,10 @@
   "schemas": 1500,
   "glossary": 1500,
   "coverage": 1500,
+  "findings": 1500,
   "health": 1500,
   "governance": 1500,
   "insights": 3000,
+  "header search typing": 3500,
   "sql console (Run usable)": 5000
 }

@@ -166,13 +166,9 @@ export function SearchPage() {
   // Built-in time ranges, chart types and settings stay out unless asked for: a type or
   // origin filter, or "show built-in settings".
   const showSettings = params.has("settings") || Boolean(filters.origin?.length) || (filters.type ?? []).some((t) => SETTING_TYPES.has(t));
-  // How many of the objects matching this search and these filters are hidden.
   const indexReady = useSearchReady(search); // search again once full-text search is ready
-  const hiddenSettings = useMemo(
-    () => (showSettings ? 0 : search.query(q, filters, sort).results.filter(isBuiltinSetting).length),
-    [search, q, filters, sort, showSettings, indexReady],
-  );
-  const { results, facets, matches, partial } = useMemo(
+  // One pass: the results, their counts, and how many built-in settings were left out.
+  const { results, facets, matches, partial, hidden: hiddenSettings } = useMemo(
     () => search.query(q, filters, sort, showSettings ? undefined : isBuiltinSetting),
     [search, q, filters, sort, showSettings, indexReady],
   );

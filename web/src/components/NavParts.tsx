@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import type { Entity } from "../generated/catalog";
 import { useSearchReady, type EntitySearch } from "../lib/search";
@@ -108,8 +108,25 @@ export function Menu({ label, items, active, badge, align = "left", flat = false
 
 const name = (e: Entity) => e.displayName ?? e.name;
 
+/** ``value`` once it has stopped changing for ``ms`` (at once when ``ms`` is 0), and a way to
+ * take the latest value now (a key that acts on the suggestions). */
+export function useSettled<T>(value: T, ms: number): [T, () => void] {
+  const [settled, setSettled] = useState(value);
+  useEffect(() => {
+    if (!ms) return;
+    const t = setTimeout(() => setSettled(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return [ms ? settled : value, () => setSettled(value)];
+}
+
+/** How long typing must pause before suggesting: on large catalogs one search takes a few
+ * hundred ms, too long to run for every key (and the keys would lag). */
+export const suggestDelay = (search?: EntitySearch) => (search && search.size > 20000 ? 150 : 0);
+
 /** The search box: suggestions while typing (Enter opens Browse with the query), and "/"
- * anywhere to jump to it. */
+ * anywhere to jump to it. A combobox: the arrow keys move through the suggestions, and
+ * screen readers hear the one chosen. */
 export function SearchBox({ search }: { search?: EntitySearch }) {
   const indexReady = useSearchReady(search);
   const [q, setQ] = useState("");
@@ -117,6 +134,12 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
   const [sel, setSel] = useState(-1);
   const input = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const listId = useId();
+  const [typed, flush] = useSettled(q.trim(), suggestDelay(search));
+  // Leaving the box hides the suggestions a moment later (a click on one lands first);
+  // coming back before then keeps them.
+  const blurTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(blurTimer.current), []);
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
@@ -132,24 +155,30 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
   // Pages whose name matches come first (typing "health" offers the Health page), then
   // objects, an exact name first (search ranks those first).
   const suggestions = useMemo(() => {
-    const t = q.trim().toLowerCase();
+    const t = typed.toLowerCase();
     if (t.length < 2) return [];
     const pages = ALL_PAGES.filter((p) => p.label.toLowerCase().startsWith(t)).slice(0, 3)
       .map((p) => ({ key: `page:${p.to}`, to: p.to, kind: "Page", label: p.label, spl: false }));
-    const objects = search ? search.query(q.trim()).results.slice(0, 8 - pages.length)
+    const objects = search ? search.suggest(typed, 8 - pages.length)
       .map((e) => ({ key: e.id, to: entityPath(e.id), kind: typeLabel(e.type), label: name(e), spl: e.type === "adhocSearch" })) : [];
     return [...pages, ...objects];
-  }, [search, q, indexReady]);
+  }, [search, typed, indexReady]);
+  const open = focus && suggestions.length > 0;
+  const all = suggestions.length; // the last option: "All results for …"
+  const optionId = (i: number) => `${listId}-${i}`;
   const go = (to: string) => { setFocus(false); setQ(""); setSel(-1); input.current?.blur(); navigate(to); };
   const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "ArrowDown") { e.preventDefault(); setSel((s) => Math.min(s + 1, suggestions.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setSel((s) => Math.max(s - 1, -1)); }
-    else if (e.key === "Escape") { setFocus(false); input.current?.blur(); }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      // Still waiting for typing to pause: suggest for what is typed now, from the top.
+      if (typed !== q.trim()) { flush(); setSel(e.key === "ArrowDown" ? 0 : -1); return; }
+      setSel((s) => (e.key === "ArrowDown" ? Math.min(s + 1, all) : Math.max(s - 1, -1)));
+    } else if (e.key === "Escape") { setFocus(false); input.current?.blur(); }
   };
   return (
     <form className="search-box" role="search" onSubmit={(e) => {
       e.preventDefault();
-      go(sel >= 0 && suggestions[sel] ? suggestions[sel].to : searchPath({ q }));
+      go(sel >= 0 && sel < all ? suggestions[sel].to : searchPath({ q }));
     }}>
       <input
         ref={input}
@@ -157,85 +186,122 @@ export function SearchBox({ search }: { search?: EntitySearch }) {
         placeholder="Search the catalog  ( / )"
         value={q}
         onChange={(e) => { setQ(e.target.value); setSel(-1); }}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setTimeout(() => setFocus(false), 150)}
+        onFocus={() => { clearTimeout(blurTimer.current); setFocus(true); }}
+        onBlur={() => { blurTimer.current = setTimeout(() => setFocus(false), 150); }}
         onKeyDown={onKey}
+        role="combobox"
         aria-label="Search the catalog"
         aria-autocomplete="list"
-        aria-expanded={focus && suggestions.length > 0}
+        aria-expanded={open}
+        aria-controls={open ? listId : undefined}
+        aria-activedescendant={open && sel >= 0 ? optionId(sel) : undefined}
       />
-      {focus && suggestions.length > 0 && (
-        <ul className="suggest" role="listbox">
+      {open && (
+        <ul className="suggest" role="listbox" id={listId} aria-label="Suggestions">
           {suggestions.map((e, i) => (
-            <li key={e.key} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
+            <li key={e.key} id={optionId(i)} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
               onMouseDown={(ev) => { ev.preventDefault(); go(e.to); }}>
               <span className="type-tag">{e.kind}</span> <span className={e.spl ? "spl-title" : undefined}>{e.label}</span>
             </li>
           ))}
-          <li className="suggest-all" onMouseDown={(ev) => { ev.preventDefault(); go(searchPath({ q })); }}>All results for “{q}” →</li>
+          <li id={optionId(all)} role="option" aria-selected={sel === all} className={`suggest-all${sel === all ? " selected" : ""}`}
+            onMouseDown={(ev) => { ev.preventDefault(); go(searchPath({ q })); }}>All results for “{q}” →</li>
         </ul>
       )}
     </form>
   );
 }
 
-/** Ctrl+K (or ⌘K): jump to any page or object by name; recently viewed objects first. */
-export function CommandPalette({ search, byId }: { search?: EntitySearch; byId?: Map<string, Entity> }) {
-  const [open, setOpen] = useState(false);
+/** Ctrl+K (or ⌘K): jump to any page or object by name; recently viewed objects first. A
+ * dialog: Layout puts the page behind it out of reach while it is open, Escape closes it
+ * wherever focus is, and focus goes back to where it was. */
+export function CommandPalette({ open, setOpen, search, byId }: {
+  open: boolean; setOpen: (open: boolean) => void; search?: EntitySearch; byId?: Map<string, Entity>;
+}) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const navigate = useNavigate();
+  const listId = useId();
+  const indexReady = useSearchReady(search);
+  const opener = useRef<Element | null>(null);
+  const isOpen = useRef(open);
+  isOpen.current = open;
   useEffect(() => {
+    const show = () => { opener.current = document.activeElement; setQ(""); setSel(0); setOpen(true); };
     const onKey = (e: globalThis.KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen((o) => !o);
-        setQ("");
-        setSel(0);
+        if (isOpen.current) setOpen(false);
+        else show();
+      } else if (e.key === "Escape" && isOpen.current) {
+        e.preventDefault();
+        setOpen(false);
       }
     };
-    const openIt = () => { setOpen(true); setQ(""); setSel(0); };
     window.addEventListener("keydown", onKey);
-    window.addEventListener("delvecat:palette", openIt);
-    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("delvecat:palette", openIt); };
-  }, []);
-  const rows = useMemo(() => {
-    const t = q.trim().toLowerCase();
+    window.addEventListener("delvecat:palette", show);
+    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("delvecat:palette", show); };
+  }, [setOpen]);
+  // Closed: back to where it was opened from (the page is reachable again by now).
+  useEffect(() => {
+    if (open) return;
+    const el = opener.current;
+    opener.current = null;
+    if (el instanceof HTMLElement && el.isConnected) el.focus();
+  }, [open]);
+  const [typed, flush] = useSettled(q.trim().toLowerCase(), suggestDelay(search));
+  const rowsFor = (t: string) => {
     const pages = ALL_PAGES.filter((p) => !t || p.label.toLowerCase().includes(t) || p.hint.toLowerCase().includes(t))
       .map((p) => ({ key: `page:${p.to}`, to: p.to, label: p.label, kind: "Page" }));
     const objects: Entity[] = t.length >= 2 && search
-      ? search.query(t).results.slice(0, 12)
+      ? search.suggest(t, 12)
       : recentIds().map((id) => byId?.get(id)).filter((e): e is Entity => !!e).slice(0, 8);
     return [...pages.slice(0, t ? 6 : 4), ...objects.map((e) => ({ key: e.id, to: entityPath(e.id), label: name(e), kind: typeLabel(e.type) }))];
-  }, [q, search, byId]);
+  };
+  const rows = useMemo(() => rowsFor(typed), [typed, search, byId, indexReady]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!open) return null;
+  const pending = typed !== q.trim().toLowerCase();
   const go = (to: string) => { setOpen(false); navigate(to); };
+  const optionId = (i: number) => `${listId}-${i}`;
   return (
     <div className="palette-backdrop" onMouseDown={() => setOpen(false)}>
-      <div className="palette" role="dialog" aria-label="Go to" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="palette" role="dialog" aria-modal="true" aria-label="Go to" onMouseDown={(e) => e.stopPropagation()}>
         <input
           autoFocus
           type="text"
           placeholder="Go to a page or object…"
           value={q}
+          role="combobox"
           aria-label="Go to a page or object"
+          aria-autocomplete="list"
+          aria-expanded={rows.length > 0}
+          aria-controls={rows.length ? listId : undefined}
+          aria-activedescendant={rows[sel] ? optionId(sel) : undefined}
           onChange={(e) => { setQ(e.target.value); setSel(0); }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") setOpen(false);
-            else if (e.key === "ArrowDown") { e.preventDefault(); setSel((s) => Math.min(s + 1, rows.length - 1)); }
-            else if (e.key === "ArrowUp") { e.preventDefault(); setSel((s) => Math.max(s - 1, 0)); }
-            else if (e.key === "Enter" && rows[sel]) go(rows[sel].to);
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              if (pending) { flush(); setSel(0); return; }
+              setSel((s) => (e.key === "ArrowDown" ? Math.min(s + 1, rows.length - 1) : Math.max(s - 1, 0)));
+            } else if (e.key === "Enter") {
+              // Typed faster than the pause: go where the text typed now leads.
+              const now = pending ? rowsFor(q.trim().toLowerCase()) : rows;
+              if (now[pending ? 0 : sel]) go(now[pending ? 0 : sel].to);
+            }
           }}
         />
-        <ul className="palette-list" role="listbox">
-          {rows.length === 0 && <li className="muted">Nothing matches.</li>}
-          {rows.map((r, i) => (
-            <li key={r.key} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
-              onMouseEnter={() => setSel(i)} onMouseDown={(e) => { e.preventDefault(); go(r.to); }}>
-              <span className="type-tag">{r.kind}</span> {r.label}
-            </li>
-          ))}
-        </ul>
+        {rows.length ? (
+          <ul className="palette-list" role="listbox" id={listId} aria-label="Pages and objects">
+            {rows.map((r, i) => (
+              <li key={r.key} id={optionId(i)} role="option" aria-selected={i === sel} className={i === sel ? "selected" : undefined}
+                onMouseEnter={() => setSel(i)} onMouseDown={(e) => { e.preventDefault(); go(r.to); }}>
+                <span className="type-tag">{r.kind}</span> {r.label}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted palette-empty">Nothing matches.</p>
+        )}
         <p className="muted small palette-foot">{q.trim() ? "Pages, then matching objects." : "Pages, then the objects you viewed last."} <Link to={searchPath({ q })} onClick={() => setOpen(false)}>Search everything</Link> · Esc to close</p>
       </div>
     </div>

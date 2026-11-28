@@ -44,13 +44,18 @@ export function Layout({ children }: { children: ReactNode }) {
   useEffect(() => setMenuOpen(false), [location.pathname]);
   const narrow = useNarrow();
   const toggle = useRef<HTMLButtonElement>(null);
-  // Escape closes the small-screen Menu sheet, back on its button.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  // The small-screen Menu sheet covers the page: while it is open the page behind is out of
+  // reach (inert: no Tab stops, no clicks), Escape or a tap outside it closes it.
+  const sheet = menuOpen && narrow;
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!sheet || paletteOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMenuOpen(false); toggle.current?.focus(); } };
+    const onDown = (e: PointerEvent) => { if (!header.current?.contains(e.target as Node)) setMenuOpen(false); };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+    document.addEventListener("pointerdown", onDown);
+    return () => { window.removeEventListener("keydown", onKey); document.removeEventListener("pointerdown", onDown); };
+  }, [sheet, paletteOpen]);
   const main = useRef<HTMLElement>(null);
 
   const fileInput = useRef<HTMLInputElement>(null);
@@ -85,8 +90,8 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="shell">
-      <a href="#" className="skip-link" onClick={(e) => { e.preventDefault(); main.current?.focus(); }}>Skip to content</a>
-      <header className={`topbar${menuOpen ? " menu-open" : ""}`} ref={header}>
+      <a href="#" className="skip-link" inert={sheet || paletteOpen} onClick={(e) => { e.preventDefault(); main.current?.focus(); }}>Skip to content</a>
+      <header className={`topbar${menuOpen ? " menu-open" : ""}`} ref={header} inert={paletteOpen}>
         <Link to="/" className="brand">
           <span className="logo" aria-hidden>LD</span> Licoryx Delvecat
         </Link>
@@ -152,9 +157,9 @@ export function Layout({ children }: { children: ReactNode }) {
         <input ref={fileInput} type="file" accept="application/json,.json" multiple hidden onChange={onPick} />
         <input ref={folderInput} type="file" hidden onChange={onPick} />
       </header>
-      <CommandPalette search={ready?.search} byId={ready?.catalog.byId} />
-      <main className="content" id="main" ref={main} tabIndex={-1}>{children}</main>
-      <footer className="footer">
+      <CommandPalette open={paletteOpen} setOpen={setPaletteOpen} search={ready?.search} byId={ready?.catalog.byId} />
+      <main className="content" id="main" ref={main} tabIndex={-1} inert={sheet || paletteOpen}>{children}</main>
+      <footer className="footer" inert={sheet || paletteOpen}>
         <label className="theme-pick">
           Theme{" "}
           <select value={theme} aria-label="Theme" onChange={(e) => { const t = e.target.value as ThemeChoice; setTheme(t); chooseTheme(t); }}>

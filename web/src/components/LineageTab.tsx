@@ -6,7 +6,7 @@ import type { Entity, EntityType } from "../generated/catalog";
 import type { Catalog } from "../lib/catalog";
 import { pluralTypeLabel, typeLabel } from "../lib/labels";
 import { downloadText, toCsv } from "../lib/health";
-import { reach } from "../lib/lineage";
+import { dependents, reach } from "../lib/lineage";
 import { entityPath } from "../lib/routes";
 import { LineageGraph } from "./LineageGraph";
 
@@ -97,22 +97,22 @@ function Depth({ label, value, onChange }: { label: string; value: number; onCha
 }
 
 /** What depends on an object, for its Overview: direct users by type and how many more
- * depend on it through them, with the way to the full list. */
+ * depend on it through them, with the way to the full list. Counted, not listed: quick
+ * even for an index thousands of objects depend on. */
 export function UsedBy({ catalog, entity, onShow }: { catalog: Catalog; entity: Entity; onShow: () => void }) {
-  const all = useMemo(() => reach(catalog, entity.id, "down"), [catalog, entity.id]);
-  const direct = all.filter((r) => r.depth === 1);
+  const { direct, total, capped } = useMemo(() => dependents(catalog, entity.id), [catalog, entity.id]);
   const counts = new Map<EntityType, number>();
-  direct.forEach((r) => counts.set(r.entity.type, (counts.get(r.entity.type) ?? 0) + 1));
-  const more = all.length - direct.length;
+  direct.forEach((e) => counts.set(e.type, (counts.get(e.type) ?? 0) + 1));
+  const more = total - direct.length;
   return (
     <section>
       <h2>Used by</h2>
-      {all.length === 0 ? (
+      {total === 0 ? (
         <p className="muted small">Nothing in the catalog depends on this object.</p>
       ) : (
         <p>
           {[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([t, n]) => `${n.toLocaleString()} ${n === 1 ? typeLabel(t) : pluralTypeLabel(t)}`).join(", ")}
-          {more > 0 && <span className="muted"> · {more.toLocaleString()} more through them</span>}{" "}
+          {more > 0 && <span className="muted"> · {more.toLocaleString()}{capped ? "+" : ""} more through them</span>}{" "}
           <button type="button" className="btn btn-small" onClick={onShow}>Show impact</button>
         </p>
       )}

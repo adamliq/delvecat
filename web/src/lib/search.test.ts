@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Entity, EntityType } from "../generated/catalog";
-import { byName, EntitySearch, FACETS, propertyValues } from "./search";
+import { byName, EntitySearch, FACETS, isBuiltinSetting, propertyValues } from "./search";
+import { demoBundle } from "./demoCatalog.testutil";
 
 const ent = (type: EntityType, name: string, properties: Record<string, unknown> = {}): Entity =>
   ({ id: `i:${type}:${name}`, type, name, product: "splunk", instance: "i", properties });
@@ -129,5 +130,39 @@ describe("byName", () => {
   it("leaves the list alone for an empty query", () => {
     const list = [e("a", "b"), e("c", "a")];
     expect(byName("  ", list)).toBe(list);
+  });
+});
+
+describe("suggestions and one-pass queries (large catalogs)", () => {
+  const entities = demoBundle().entities;
+  const search = new EntitySearch(entities);
+
+  it("suggests the first results of the query, in the same order", () => {
+    for (const q of ["main", "web", "acme", "access", "x"]) {
+      expect(search.suggest(q, 8).map((e) => e.id)).toEqual(search.query(q).results.slice(0, 8).map((e) => e.id));
+    }
+    expect(search.suggest("  ", 8)).toEqual([]);
+  });
+
+  it("counts what it hides in the same pass (as filtering the full results did)", () => {
+    for (const q of ["", "time", "web"]) {
+      for (const filters of [{}, { type: ["timeRange", "index"] }]) {
+        const all = search.query(q, filters).results;
+        const shown = search.query(q, filters, "relevance", isBuiltinSetting);
+        expect(shown.hidden).toBe(all.filter(isBuiltinSetting).length);
+        expect(shown.results.map((e) => e.id)).toEqual(all.filter((e) => !isBuiltinSetting(e)).map((e) => e.id));
+      }
+    }
+  });
+
+  it("reuses a match across filters, and matches again once the word index is complete", async () => {
+    const s = new EntitySearch(entities);
+    void s.indexInBackground(); // no step has run yet: names, apps and descriptions only
+    expect(s.query("web").partial).toBe(true);
+    expect(s.query("web", { type: ["index"] }).partial).toBe(true);
+    await s.whenReady();
+    const full = s.query("web");
+    expect(full.partial).toBeUndefined();
+    expect(full.results.map((e) => e.id)).toEqual(new EntitySearch(entities).query("web").results.map((e) => e.id));
   });
 });

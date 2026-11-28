@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogBundle, Edge, Entity, EntityType } from "../generated/catalog";
 import { Catalog } from "./catalog";
-import { hasLineage, impact, lineageGraph, upstreamOf } from "./lineage";
+import { dependents, hasLineage, impact, lineageGraph, reach, upstreamOf } from "./lineage";
+import { demoBundle } from "./demoCatalog.testutil";
 
 const ent = (type: EntityType, name: string): Entity => ({ id: `i:${type}:${name}`, type, name, product: "splunk", instance: "i" });
 const E = (from: Entity, type: Edge["type"], to: Entity): Edge => ({ from: from.id, to: to.id, type });
@@ -74,5 +75,36 @@ describe("layout", () => {
     });
     const levels = Object.fromEntries(lineageGraph(cat, board.id, 3, 0).nodes.map((n) => [n.entity.name, n.level]));
     expect(levels).toEqual({ b: 0, s: -1, idx: -2, st: -3 });
+  });
+});
+
+describe("dependents (Used by)", () => {
+  it("counts what reach() lists, without listing it", () => {
+    const demo = new Catalog(demoBundle());
+    for (const e of demo.bundle.entities.slice(0, 400)) {
+      const all = reach(demo, e.id, "down");
+      const d = dependents(demo, e.id);
+      expect(d.capped).toBe(false);
+      expect(d.total).toBe(all.length);
+      expect(d.direct.map((x) => x.id).sort()).toEqual(all.filter((r) => r.depth === 1).map((r) => r.entity.id).sort());
+    }
+  });
+  it("stops counting past the cap, but always lists every direct user", () => {
+    const d = dependents(c, input.id, 2);
+    expect(d.direct.map((e) => e.name)).toEqual(["web"]);
+    expect(d).toMatchObject({ total: 3, capped: true }); // web, then rollup and ... stops at 2 more
+    expect(dependents(c, input.id).total).toBe(reach(c, input.id, "down").length);
+  });
+});
+
+describe("reach cache", () => {
+  it("gives the same list again, and keeps only the last few", () => {
+    const fresh = new Catalog(bundle);
+    const first = reach(fresh, index.id, "down");
+    expect(reach(fresh, index.id, "down")).toBe(first);
+    expect(reach(fresh, index.id, "up")).not.toBe(first);
+    for (const e of bundle.entities) reach(fresh, e.id, "up");
+    expect(reach(fresh, index.id, "down")).not.toBe(first); // pushed out by nine others
+    expect(reach(fresh, index.id, "down")).toEqual(first);
   });
 });

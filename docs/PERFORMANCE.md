@@ -61,6 +61,33 @@ per object. Tried and not kept: maintaining the relationship indexes while the S
 console fills edges in the background avoids the one pause on the first join (29 s
 at a million), but made the fill take 170 s instead of 34 s.
 
+## 0.48.2: object pages and search as you type
+
+Measured in headless Chromium at 301,405 objects and 2 million relationships, 0.48.1 and
+0.48.2 run one after the other on the same machine (three runs each where shown).
+
+| | 0.48.1 | 0.48.2 |
+|---|---:|---:|
+| Overview of an index 68,000 objects depend on (*Used by*) | 0.51–0.76 s | 0.30–0.44 s |
+| Its Lineage tab, opened again | 0.62–0.78 s | 0.10–0.21 s |
+| Its Lineage tab, opened directly | 0.59–0.73 s | 0.59–0.68 s |
+| Typing "index" in the header search: page blocked | 1.25 s (4 tasks, longest 0.41 s) | 0.19 s (one task) |
+| Typing "index": until suggestions show | 1.57 s | 0.61 s |
+| Typing "src_ip": page blocked | 0.62 s | none |
+| Browse "index", then a filter | 0.59 s | 0.23 s |
+
+- *Used by* counts what depends on an object instead of listing and sorting it, and
+  stops counting at 10,000 beyond the direct users ("10,000+ more through them").
+- The last eight upstream and downstream lists are kept, so going back to a Lineage tab
+  does not work them out again.
+- Suggestions (header search and Go to) wait for typing to pause (150 ms, only on
+  catalogs over 20,000 objects) and skip the filter counts only Browse shows.
+- Browse matches a query once for all filters and sorts, and counts the hidden built-in
+  settings in the same pass (it ran the whole search twice).
+
+CI's large-catalog check now also times typing in the header search and the Findings
+page.
+
 ## 0.47.0: risk in the build, faster writing, measured dead ends
 
 - **Risk is worked out when a catalog is written** (`riskTable`, compact integers):

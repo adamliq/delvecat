@@ -169,12 +169,17 @@ export interface SearchResult {
   /** True while the word index is still being built: only names, apps and descriptions
    * were matched (the page shows that, and searches again when the index is ready). */
   partial?: boolean;
+  /** With ``hide``: how many objects match the search and filters but were left out. */
+  hidden: number;
 }
 
 /** Objects added to the word index per step when it is built in the background: small
  * batches while the browser is idle, or steps with pauses where idle callbacks are missing. */
 const INDEX_BATCH = 250;
 const INDEX_STEP = 1000;
+
+/** The objects a text query matches, in order, and why each matched. */
+type Matched = { list: Entity[]; matches: Map<string, Match>; partial?: boolean };
 
 export class EntitySearch {
   private readonly index: MiniSearch<Doc>;
@@ -184,6 +189,9 @@ export class EntitySearch {
   private readonly byId: Map<string, Entity>;
   /** Whole values (and their host:port / URL parts), lower-cased, to the objects holding them. */
   private readonly exact = new Map<string, string[]>();
+  /** The last text match: changing filters or the sort keeps the query, and matching it again
+   * is most of the work on large catalogs. */
+  private lastMatch: { q: string; indexed: number; result: Matched } | null = null;
 
   readonly facets: Record<Facet, FacetFn>;
   readonly facetNames: Facet[];
@@ -271,7 +279,21 @@ export class EntitySearch {
     return { list: byName(q, list), matches };
   }
 
-  private matching(query: string): { list: Entity[]; matches: Map<string, Match>; partial?: boolean } {
+  /** How many objects there are to search. */
+  get size(): number {
+    return this.entities.length;
+  }
+
+  private matching(query: string): Matched {
+    const q = query.trim();
+    const last = this.lastMatch;
+    if (last && last.q === q && last.indexed === this.indexed) return last.result;
+    const result = this.matchingUncached(q);
+    this.lastMatch = { q, indexed: this.indexed, result };
+    return result;
+  }
+
+  private matchingUncached(query: string): Matched {
     const q = query.trim();
     const matches = new Map<string, Match>();
     if (!q) return { list: this.entities, matches };
@@ -294,10 +316,16 @@ export class EntitySearch {
     return { list: byName(q, [...exact, ...words.filter((e) => !seen.has(e.id))]), matches };
   }
 
-  /** ``hide`` leaves objects out entirely (counts included), e.g. built-in settings. */
+  /** The first ``limit`` objects for a text query, in the order query() lists them, without
+   * the filter counts (suggestions as you type). */
+  suggest(query: string, limit: number): Entity[] {
+    return query.trim() ? this.matching(query).list.slice(0, limit) : [];
+  }
+
+  /** ``hide`` leaves objects out entirely (counts included), e.g. built-in settings; how
+   * many matched but were left out is ``hidden``. */
   query(query: string, filters: Filters = {}, sort: Sort = "relevance", hide?: (e: Entity) => boolean): SearchResult {
     const matched = this.matching(query);
-    const base = hide ? matched.list.filter((e) => !hide(e)) : matched.list;
     const { matches } = matched;
     const active = this.facetNames.filter((f) => filters[f]?.length);
     const wanted = new Map(active.map((f) => [f, new Set(filters[f])]));
@@ -317,7 +345,9 @@ export class EntitySearch {
       else if (vs.length > 1) for (const v of new Set(vs)) c.set(v, (c.get(v) ?? 0) + 1);
     };
     const results: Entity[] = [];
-    for (const e of base) {
+    let hidden = 0;
+    for (const e of matched.list) {
+      const isHidden = hide !== undefined && hide(e);
       let failed: Facet | null = null;
       let fails = 0;
       for (const f of active) {
@@ -326,7 +356,9 @@ export class EntitySearch {
           if (++fails > 1) break;
         }
       }
-      if (fails === 0) {
+      if (isHidden) {
+        if (fails === 0) hidden++;
+      } else if (fails === 0) {
         results.push(e);
         for (const f of this.facetNames) add(f, e);
       } else if (fails === 1) {
@@ -342,7 +374,7 @@ export class EntitySearch {
     if (effective === "name") results.sort((a, b) => (a.displayName ?? a.name).localeCompare(b.displayName ?? b.name));
     if (effective === "type") results.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
     if (effective === "updated") results.sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
-    return { results, facets, matches, ...(matched.partial ? { partial: true } : {}) };
+    return { results, facets, matches, hidden, ...(matched.partial ? { partial: true } : {}) };
   }
 
   /** Backwards-compatible single-value filtering used by simple callers. */

@@ -404,7 +404,9 @@ it publishes in about 6 seconds and opens in Splunk in about 4.
 `etc/apps`) through Splunk Web and the REST API. It checks access by role, the
 empty state, builds from the page, every page of the catalog as a viewer, field
 discovery in chosen indexes, partial builds and the size safeguard, cancel,
-two builds at once, a publisher who sees less, and dry runs. The header of the
+two builds at once, a publisher who sees less, dry runs, acknowledging findings (Health
+and Findings), what uses an object and its impact, and keyboard use of the menus and
+the Go to dialog. The header of the
 script lists the users it expects. Last run: Splunk 10.4 and 9.4, all passing.
 
 ## Layout

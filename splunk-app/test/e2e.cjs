@@ -357,6 +357,40 @@ const sections = {
     await pub2.close();
   },
 
+  async findings() {
+    // Acknowledge from a row of Findings (0.48): saved for the team in the app's own
+    // collection; viewers see who decided, but cannot.
+    const ACKS = '/servicesNS/nobody/delvecat/storage/collections/data/delvecat_acks';
+    await rest('DELETE', ACKS);
+    const pub = await session('publisher');
+    await pub.page.goto(app('#/findings'));
+    await pub.page.waitForSelector('.tiles', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    if (!(await pub.page.locator('.ack-compact').count())) {
+      skipped.push('findings: nothing to acknowledge');
+      await pub.close();
+      return;
+    }
+    await pub.page.locator('.ack-compact summary').first().click();
+    await pub.page.locator('.ack-compact button:has-text("Snooze 7 days")').first().click();
+    await sleep(1500);
+    const stored = (await rest('GET', ACKS)).json || [];
+    check('Findings: publisher snoozes a finding from its row (app KV collection)',
+      stored.length === 1 && stored[0].state === 'snoozed' && stored[0].by === 'publisher' && !!stored[0].until,
+      JSON.stringify(stored[0] || {}).slice(0, 120));
+    const tile = (await pub.page.locator('.tile:has-text("acknowledged")').innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+    check('Findings: the snoozed finding is counted and hidden', /^1 acknowledged \(hidden\)/.test(tile), tile);
+    check('Findings page without script errors (publisher)', pub.errors.length === 0, pub.errors.join('; '));
+    await pub.close();
+    const v = await session('viewer');
+    await v.page.goto(app('#/findings'));
+    await v.page.waitForSelector('.tiles', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    check('Findings: a viewer has no Acknowledge controls', (await v.page.locator('.ack-compact, .ack-form').count()) === 0);
+    await v.close();
+    await rest('DELETE', ACKS);
+  },
+
   async pages() {
     const v = await session('viewer');
     const go = async (hash, wait) => {
@@ -660,6 +694,42 @@ const sections = {
     check('REST catalog: a user without the app role is refused', plain.status === 403, `HTTP ${plain.status}`);
   },
 
+  async usedBy() {
+    // An index other objects depend on: its Overview says what uses it, and Show impact
+    // opens Lineage at that list.
+    const list = (await rest('GET', '/services/delvecat/catalog?type=index&limit=1000', 'viewer')).json?.results || [];
+    const first = ['_internal', 'main', '_audit'];
+    list.sort((a, b) => (first.includes(b.name) ? 1 : 0) - (first.includes(a.name) ? 1 : 0));
+    let target = null;
+    for (const x of list.slice(0, 40)) {
+      const down = await rest('GET', `/services/delvecat/catalog?downstream=${encodeURIComponent(x.id)}&depth=1&limit=1`, 'viewer');
+      if ((down.json?.total || 0) > 0) { target = x; break; }
+    }
+    if (!target) { skipped.push('usedBy: no index anything depends on'); return; }
+    const v = await session('viewer');
+    await v.page.goto(app(`#/entity/${encodeURIComponent(target.id)}`));
+    await v.page.waitForSelector('main h1', { timeout: 60000 }).catch(() => {});
+    await sleep(1500);
+    const used = (await v.page.locator('section:has(h2:text-is("Used by"))').innerText().catch(() => '')).replace(/\s+/g, ' ');
+    check(`object page says what uses it (index ${target.name})`, /Used by \d/.test(used) && /Show impact/.test(used), used.slice(0, 120));
+    await v.page.click('button:has-text("Show impact")');
+    await sleep(1500);
+    const below = await v.page.evaluate(() => {
+      const list = document.querySelector('#impact');
+      const head = document.querySelector('header.topbar');
+      return list && head ? Math.round(list.getBoundingClientRect().top - head.getBoundingClientRect().bottom) : null;
+    });
+    const url = v.page.url().split('#')[1] || '';
+    check('Show impact opens Lineage at the impact list, just below the header',
+      /tab=lineage/.test(url) && /focus=impact/.test(url) && below !== null && below >= 0 && below < 200, `${url}: ${below}px below the header`);
+    await v.page.locator('#impact a').first().click();
+    await sleep(1500);
+    const up = await v.page.locator('.lineage-controls select').first().inputValue().catch(() => '');
+    check('the next object opens its own lineage afresh (upstream shown)', up !== '' && up !== '0', `Upstream ${up}`);
+    check('Used by and Show impact without script errors', v.errors.length === 0, v.errors.join('; '));
+    await v.close();
+  },
+
   async layout() {
     // Every page fits the window from phone to wide screen: no sideways scrolling of the
     // page (graphs and tables may scroll inside their own boxes).
@@ -705,6 +775,17 @@ const sections = {
     await a.page.keyboard.press('Enter');
     await a.page.waitForTimeout(800);
     check('Ctrl+K opens a page by name', /#\/governance/.test(a.page.url()), a.page.url());
+    // The Go to dialog keeps focus inside, Escape closes it, and focus goes back.
+    await a.page.focus('header .palette-button');
+    await a.page.keyboard.press('Enter');
+    await a.page.waitForSelector('.palette', { timeout: 5000 });
+    for (let i = 0; i < 4; i++) await a.page.keyboard.press('Tab');
+    const inside = await a.page.evaluate(() => !!document.activeElement.closest('.palette') || document.activeElement === document.body);
+    await a.page.keyboard.press('Escape');
+    await a.page.waitForTimeout(300);
+    const back = await a.page.evaluate(() => document.activeElement.classList.contains('palette-button'));
+    check('Go to keeps focus inside; Escape closes it, back on the button', inside && back && (await a.page.locator('.palette').count()) === 0,
+      `inside ${inside}, back ${back}`);
     check('the header says when the catalog was built', /Built .*ago|Built just now/.test(await a.page.locator('.freshness').innerText().catch(() => '')));
     check('menu bar page errors', a.errors.length === 0, a.errors.join('; '));
     await a.close();

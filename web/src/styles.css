@@ -794,6 +794,9 @@ a.spl-link:hover { text-decoration-style: solid; }
   .topbar .search-box { order: 5; flex-basis: 100%; max-width: none; }
   .palette-button, .stack-pick { display: none; }
   .topbar.menu-open .stack-pick { display: block; order: 11; }
+  /* Open, the sheet scrolls on its own (it sticks to the top and is often taller than the
+     screen: its end was out of reach until the very end of the page). */
+  .topbar.menu-open { max-height: 100vh; max-height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
 }
 
 /* Help */
@@ -892,3 +895,4 @@ main.content:focus { outline: none; }
 .reach-controls select { max-width: 14em; }
 /* Build now in the Current catalog card. */
 .card > .actions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0 20px; }
+.palette-empty { margin: 8px 4px; }

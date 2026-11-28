@@ -353,7 +353,8 @@ export function EntityPage() {
 
       {tab === "quality" && <QualityTab entity={entity} />}
 
-      {tab === "lineage" && <LineageTab catalog={catalog} entity={entity} />}
+      {/* Its own state for each object (and for Show impact): depths and filters start afresh. */}
+      {tab === "lineage" && <LineageTab key={`${entity.id}|${params.get("focus") ?? ""}`} catalog={catalog} entity={entity} />}
 
       {tab === "relationships" && (
         groups.length === 0 ? (
